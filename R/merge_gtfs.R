@@ -158,10 +158,13 @@ merge_gtfs <- function(..., files = NULL, prefix = FALSE) {
       # changed.
       # field_value, from translations, doesn't end with _id but refers to an
       # id, thus should be changed.
+      # parent_station, from stops, also doesn't end with _id but refers to an
+      # id (stops$stop_id), thus should also be changed.
 
       id_cols <- names(dt)[(grepl("_id$", names(dt)))]
       id_cols <- setdiff(id_cols, "direction_id")
       if (!is.null(dt[["field_value"]])) id_cols <- c(id_cols, "field_value")
+      if (!is.null(dt[["parent_station"]])) id_cols <- c(id_cols, "parent_station")
 
       # then add the prefix to the id value
 
