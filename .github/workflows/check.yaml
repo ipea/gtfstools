@@ -43,6 +43,12 @@ jobs:
         java-version: '11'
         distribution: 'temurin'
 
+    - name: Configure Java PATH
+      run: |
+        echo "JAVA_HOME=${{ env.JAVA_HOME }}" >> $GITHUB_ENV
+        echo "${{ env.JAVA_HOME }}/bin" >> $GITHUB_PATH
+      shell: bash
+
     - uses: r-lib/actions/setup-r-dependencies@v2
       with:
         extra-packages: any::rcmdcheck
