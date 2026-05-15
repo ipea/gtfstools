@@ -31,19 +31,6 @@ download_validator <- function(path,
                                version = "latest",
                                force = FALSE,
                                quiet = TRUE) {
-  available_versions <- c(
-    "latest",
-    "6.0.0",
-    "5.0.1",
-    "5.0.0",
-    "4.2.0",
-    "4.1.0",
-    "4.0.0",
-    "3.1.1",
-    "3.1.0",
-    "3.0.1",
-    "3.0.0"
-  )
 
   checkmate::assert(
     checkmate::check_string(path),
@@ -51,20 +38,25 @@ download_validator <- function(path,
     combine = "and"
   )
   checkmate::assert(
-    checkmate::check_string(version),
-    checkmate::check_names(version, subset.of = available_versions),
-    combine = "and"
+    checkmate::check_string(version, pattern = "\\d.\\d.\\d"),
+    version == "latest",
+    combine = "or"
   )
   checkmate::assert_logical(force, any.missing = FALSE, len = 1)
   checkmate::assert_logical(quiet, any.missing = FALSE, len = 1)
 
-  if (version == "latest") {
-    version <- setdiff(available_versions, "latest")[1]
+  validator_url <- get_validator_url(version)
+  try_url <- httr2::request(validator_url) |>
+    httr2::req_perform() |>
+    try()
+  if(inherits(try_url, "try-error")) {
+    stop(
+      "Assertion on 'validator_url' failed: ivalid URL. ",
+      "Please make sure that the `version` is in the format 'X.Y.Z'",
+      "\nTip: run `gtfstools::list_validator_versions()`")
   }
 
-  validator_url <- get_validator_url(version, available_versions)
-
-  validator_basename <- paste0("gtfs-validator-v", version, ".jar")
+  validator_basename <- paste0("gtfs-validator-v", names(validator_url), ".jar")
   output_file <- file.path(path, validator_basename)
 
   if (file.exists(output_file) && (!force)) {
@@ -83,8 +75,14 @@ download_validator <- function(path,
   return(invisible(normalizePath(output_file)))
 }
 
-get_validator_url <- function(version, available_versions) {
+get_validator_url <- function(version) {
   base_url <- "https://github.com/MobilityData/gtfs-validator/releases/"
+
+  if(version == "latest") {
+    req <- httr2::request("https://github.com/MobilityData/gtfs-validator/releases/latest") |>
+      httr2::req_perform()
+    version <- regmatches(req$url, regexpr("([^/v])+$", req$url))
+  }
 
   release_url <- paste0(base_url, "download/v", version, "/")
   cli_basename <- paste0("gtfs-validator-", version, "-cli.jar")
@@ -95,6 +93,48 @@ get_validator_url <- function(version, available_versions) {
   }
 
   validator_url <- paste0(release_url, cli_basename)
+  names(validator_url) <- version
 
   return(validator_url)
+}
+
+
+
+# list_validator_versions ---------------------------------------------------------------------
+
+#' List MobilityData's GTFS validator versions
+#'
+#' Lists available versions of MobilityData's command line tool to validate GTFS feeds.
+#'
+#' @return A data.table with each CLI version, published date, and download URL.
+#'
+#' @family validation
+#'
+#' @export
+
+list_validator_versions <- function() {
+  req <- httr2::request("https://api.github.com/repos/MobilityData/gtfs-validator/releases") |>
+    httr2::req_headers(`User-Agent` = "httr2") |>
+    httr2::req_perform()
+
+  data <- httr2::resp_body_json(req)
+
+  versions <- lapply(
+    data, function(x) {
+      asset_nr <- x$assets |>
+        lapply(\(x) grepl("jar$", x$name) & grepl("cli", x$name)) |>
+        unlist() |>
+        which()
+      versions <- data.frame(
+        version = x$tag_name,
+        published_at = x$published_at,
+        cli_download_url = ifelse(length(asset_nr) == 0, NA_character_,
+                              x$assets[[asset_nr]]$browser_download_url)
+      )
+      return(versions)
+    }
+  ) |>
+    data.table::rbindlist()
+
+  versions <- versions[!is.na(versions$cli_download_url), ]
 }
