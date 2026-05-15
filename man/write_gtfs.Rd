@@ -68,7 +68,7 @@ names(gtfs_stop_times)
 
 }
 \seealso{
-Other io functions: 
-\code{\link{read_gtfs}()}
+Other io functions:
+\code{\link[=read_gtfs]{read_gtfs()}}
 }
 \concept{io functions}

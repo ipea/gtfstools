@@ -57,7 +57,7 @@ Please note that this function requires a working installation of Java 11 or
 higher to work.
 }
 \examples{
-\dontshow{if (identical(tolower(Sys.getenv("NOT_CRAN")), "true")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (identical(tolower(Sys.getenv("NOT_CRAN")), "true")) withAutoprint(\{ # examplesIf}
 data_path <- system.file("extdata/spo_gtfs.zip", package = "gtfstools")
 output_path <- tempfile("validation_result")
 validator_path <- download_validator(tempdir())
@@ -79,7 +79,8 @@ list.files(newer_output_path)
 \dontshow{\}) # examplesIf}
 }
 \seealso{
-Other validation: 
-\code{\link{download_validator}()}
+Other validation:
+\code{\link[=download_validator]{download_validator()}},
+\code{\link[=list_validator_versions]{list_validator_versions()}}
 }
 \concept{validation}
