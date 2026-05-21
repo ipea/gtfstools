@@ -38,6 +38,7 @@ Useful links:
 
 Authors:
 \itemize{
+  \item Daniel Herszenhut \email{dhersz@gmail.com} (\href{https://orcid.org/0000-0001-8066-1105}{ORCID})
   \item Rafael H. M. Pereira (\href{https://orcid.org/0000-0003-2125-7465}{ORCID})
   \item Pedro R. Andrade (\href{https://orcid.org/0000-0001-8675-4046}{ORCID})
   \item Joao Bazzo (\href{https://orcid.org/0000-0003-4536-5006}{ORCID})

@@ -79,16 +79,16 @@ object.size(smaller_gtfs)
 invisible(filter_by_stop_id(gtfs, stop_ids, full_trips = TRUE))
 }
 \seealso{
-Other filtering functions: 
-\code{\link{filter_by_agency_id}()},
-\code{\link{filter_by_route_id}()},
-\code{\link{filter_by_route_type}()},
-\code{\link{filter_by_service_id}()},
-\code{\link{filter_by_sf}()},
-\code{\link{filter_by_shape_id}()},
-\code{\link{filter_by_spatial_extent}()},
-\code{\link{filter_by_time_of_day}()},
-\code{\link{filter_by_trip_id}()},
-\code{\link{filter_by_weekday}()}
+Other filtering functions:
+\code{\link[=filter_by_agency_id]{filter_by_agency_id()}},
+\code{\link[=filter_by_route_id]{filter_by_route_id()}},
+\code{\link[=filter_by_route_type]{filter_by_route_type()}},
+\code{\link[=filter_by_service_id]{filter_by_service_id()}},
+\code{\link[=filter_by_sf]{filter_by_sf()}},
+\code{\link[=filter_by_shape_id]{filter_by_shape_id()}},
+\code{\link[=filter_by_spatial_extent]{filter_by_spatial_extent()}},
+\code{\link[=filter_by_time_of_day]{filter_by_time_of_day()}},
+\code{\link[=filter_by_trip_id]{filter_by_trip_id()}},
+\code{\link[=filter_by_weekday]{filter_by_weekday()}}
 }
 \concept{filtering functions}

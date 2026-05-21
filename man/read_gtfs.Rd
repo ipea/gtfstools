@@ -79,7 +79,7 @@ names(gtfs$agency)
 
 }
 \seealso{
-Other io functions: 
-\code{\link{write_gtfs}()}
+Other io functions:
+\code{\link[=write_gtfs]{write_gtfs()}}
 }
 \concept{io functions}

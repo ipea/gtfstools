@@ -20,7 +20,7 @@ data.}
 \item{spatial_operation}{A spatial operation function from the set of
 options listed in \link[sf:geos_binary_pred]{geos_binary_pred} (check the
 \href{https://en.wikipedia.org/wiki/DE-9IM}{DE-I9M} Wikipedia entry for the
-definition of each function). Defaults to \code{\link[sf:geos_binary_pred]{sf::st_intersects}}, which
+definition of each function). Defaults to \code{\link[sf:st_intersects]{sf::st_intersects}}, which
 tests if the shapes and trips have ANY intersection with the object
 specified in \code{geom}. Please note that \code{geom} is passed as the \code{x} argument
 of these functions.}
@@ -69,16 +69,16 @@ object.size(smaller_gtfs)
 
 }
 \seealso{
-Other filtering functions: 
-\code{\link{filter_by_agency_id}()},
-\code{\link{filter_by_route_id}()},
-\code{\link{filter_by_route_type}()},
-\code{\link{filter_by_service_id}()},
-\code{\link{filter_by_sf}()},
-\code{\link{filter_by_shape_id}()},
-\code{\link{filter_by_stop_id}()},
-\code{\link{filter_by_time_of_day}()},
-\code{\link{filter_by_trip_id}()},
-\code{\link{filter_by_weekday}()}
+Other filtering functions:
+\code{\link[=filter_by_agency_id]{filter_by_agency_id()}},
+\code{\link[=filter_by_route_id]{filter_by_route_id()}},
+\code{\link[=filter_by_route_type]{filter_by_route_type()}},
+\code{\link[=filter_by_service_id]{filter_by_service_id()}},
+\code{\link[=filter_by_sf]{filter_by_sf()}},
+\code{\link[=filter_by_shape_id]{filter_by_shape_id()}},
+\code{\link[=filter_by_stop_id]{filter_by_stop_id()}},
+\code{\link[=filter_by_time_of_day]{filter_by_time_of_day()}},
+\code{\link[=filter_by_trip_id]{filter_by_trip_id()}},
+\code{\link[=filter_by_weekday]{filter_by_weekday()}}
 }
 \concept{filtering functions}

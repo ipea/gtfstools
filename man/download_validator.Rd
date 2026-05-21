@@ -28,7 +28,7 @@ Invisibly returns the normalized path to the downloaded validator.
 Downloads MobilityData's command line tool to validate GTFS feeds.
 }
 \examples{
-\dontshow{if (identical(tolower(Sys.getenv("NOT_CRAN")), "true")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (identical(tolower(Sys.getenv("NOT_CRAN")), "true")) withAutoprint(\{ # examplesIf}
 path <- tempdir()
 
 download_validator(path)
@@ -38,7 +38,8 @@ download_validator(path, version = "6.0.0")
 \dontshow{\}) # examplesIf}
 }
 \seealso{
-Other validation: 
-\code{\link{validate_gtfs}()}
+Other validation:
+\code{\link[=list_validator_versions]{list_validator_versions()}},
+\code{\link[=validate_gtfs]{validate_gtfs()}}
 }
 \concept{validation}
