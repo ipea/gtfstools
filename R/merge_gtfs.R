@@ -130,8 +130,7 @@ merge_gtfs <- function(..., files = NULL, prefix = FALSE) {
   for (dt in seq_along(merged_gtfs)) {
     # determine the character columns in each data.table
 
-    col_classes <- vapply(merged_gtfs[[dt]], class, character(1))
-    charac_cols <- which(col_classes == "character")
+    charac_cols <- which(vapply(merged_gtfs[[dt]], is.character, logical(1)))
 
     # then substitute NA by ""
 
