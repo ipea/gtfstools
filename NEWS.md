@@ -6,7 +6,14 @@
 
 ## New features
 
+- New function `list_validator_versions()` which returns a df with the available CLI versions and their URLs. PR contribution by @baarthur
+
 ## Notes
+- Function `download_validator()` now automatically detects the latest version available. PR contribution by @baarthur
+
+
+
+
 
 # gtfstools 1.4.0
 
