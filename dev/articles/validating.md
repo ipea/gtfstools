@@ -41,7 +41,7 @@ library(gtfstools)
 
 latest_validator <- download_validator(tempdir())
 latest_validator
-#> [1] "/tmp/RtmpcM32CH/gtfs-validator-v6.0.0.jar"
+#> [1] "/tmp/Rtmp72WZbM/gtfs-validator-v6.0.0.jar"
 ```
 
 The second (and final) step is actually running
