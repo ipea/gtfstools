@@ -7,8 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Validating GTFS feeds • gtfstools</title>
 <script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Validating GTFS feeds">
 <meta name="robots" content="noindex">
@@ -106,7 +106,7 @@ the command-line tool version, which controls some of its behavior.</p>
 <span></span>
 <span><span class="va">latest_validator</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/download_validator.html">download_validator</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">latest_validator</span></span>
-<span><span class="co">#&gt; [1] "/tmp/RtmpCeaeVF/gtfs-validator-v6.0.0.jar"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "/tmp/RtmpcM32CH/gtfs-validator-v6.0.0.jar"</span></span></code></pre></div>
 <p>The second (and final) step is actually running
 <code><a href="../reference/validate_gtfs.html">validate_gtfs()</a></code>. To do that we need some GTFS data, which
 the function accepts in varying formats: it can be a GTFS object, as
@@ -150,7 +150,7 @@ stream, the content would have been saved in
 &lt;code&gt;validation_stderr.txt&lt;/code&gt; may slightly vary depending on the
 version of the validator.&lt;/p&gt;"><sup>1</sup></a>.</li>
 </ul>
-<p><img src="../reference/figures/html_validation_report.png" width="100%"></p>
+<p><img src="../reference/figures/html_validation_report.png" class="r-plt" alt="" width="100%"></p>
 <p>Had we run the validator using the same GTFS data in different
 formats (an URL or a GTFS object, for example) the results would be
 exactly the same:</p>
@@ -193,7 +193,7 @@ A huge shoutout to them!</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>
