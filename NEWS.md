@@ -2,7 +2,8 @@
 
 ## Bug fixes
 
-- Fixed bug in merge_gtfs that errored when columns were are of type character (unknown). PR contribution by @gmatosferreira.
+- Fixed bug in `merge_gtfs()` that errored when columns were are of type character (unknown). PR contribution by @gmatosferreira.
+- Fixed bug that was leading to drop parent station ids in `merge_gtfs()`. PR contribution by @gmatosferreira .
 
 ## New features
 
