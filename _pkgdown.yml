@@ -28,10 +28,15 @@ reference:
   - title: "Validation"
   - contents:
     - download_validator
+    - list_validator_versions
     - validate_gtfs
   - title: "Filters"
   - contents:
     - starts_with("filter_by_")
+    - -filter_by_sf
   - title: "Interoperability between GTFS packages"
   - contents:
     - "as_dt_gtfs"
+  - title: "Deprecated"
+  - contents:
+    - filter_by_sf

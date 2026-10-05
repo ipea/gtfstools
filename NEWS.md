@@ -30,6 +30,7 @@
 - `get_children_stops()` is now much faster on large feeds (about 250x faster with 20,000 stops).
 - Converting date fields when reading and writing feeds (`read_gtfs()`, `write_gtfs()`, `as_dt_gtfs()`) is now much faster (about 200x faster for the date conversion itself), noticeably speeding up `read_gtfs()` on feeds with large `calendar_dates` tables.
 - The package documentation website moved to <https://ipea.github.io/gtfstools/> and the GitHub repository to <https://github.com/ipea/gtfstools>. All links were updated.
+- The filtering vignette and the documentation now use `filter_by_spatial_extent()` instead of the deprecated `filter_by_sf()`, which was moved to a "Deprecated" section of the reference index.
 
 
 

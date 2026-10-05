@@ -96,7 +96,6 @@ Other filtering functions:
 \code{\link[=filter_by_route_id]{filter_by_route_id()}},
 \code{\link[=filter_by_route_type]{filter_by_route_type()}},
 \code{\link[=filter_by_service_id]{filter_by_service_id()}},
-\code{\link[=filter_by_sf]{filter_by_sf()}},
 \code{\link[=filter_by_shape_id]{filter_by_shape_id()}},
 \code{\link[=filter_by_spatial_extent]{filter_by_spatial_extent()}},
 \code{\link[=filter_by_stop_id]{filter_by_stop_id()}},

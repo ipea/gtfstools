@@ -25,7 +25,7 @@
 #' @return The GTFS object passed to the `gtfs` parameter, after the filtering
 #' process.
 #'
-#' @family filtering functions
+#' @seealso [filter_by_spatial_extent()], which replaces this function.
 #'
 #' @examples
 #' \dontshow{
