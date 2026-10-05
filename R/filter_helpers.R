@@ -22,7 +22,7 @@ filter_attributions_from_agency_id <- function(gtfs,
   if (gtfsio::check_field_exists(gtfs, "attributions", "agency_id")) {
     gtfsio::assert_field_class(gtfs, "attributions", "agency_id", "character")
     gtfs$attributions <- gtfs$attributions[
-      agency_id %ffilter% relevant_agencies
+      agency_id %chin% "" | agency_id %ffilter% relevant_agencies
     ]
   }
 
@@ -72,7 +72,9 @@ filter_fare_rules_from_route_id <- function(gtfs,
                                             `%ffilter%`) {
   if (gtfsio::check_field_exists(gtfs, "fare_rules", "route_id")) {
     gtfsio::assert_field_class(gtfs, "fare_rules", "route_id", "character")
-    gtfs$fare_rules <- gtfs$fare_rules[route_id %ffilter% relevant_routes]
+    gtfs$fare_rules <- gtfs$fare_rules[
+      route_id %chin% "" | route_id %ffilter% relevant_routes
+    ]
   }
 
   return(gtfs)
@@ -246,8 +248,12 @@ filter_transfers_from_stop_id <- function(gtfs, relevant_stops, `%ffilter%`) {
       from_to_stop_id,
       rep("character", 2)
     )
-    gtfs$transfers <- gtfs$transfers[from_stop_id %ffilter% relevant_stops]
-    gtfs$transfers <- gtfs$transfers[to_stop_id %ffilter% relevant_stops]
+    gtfs$transfers <- gtfs$transfers[
+      from_stop_id %chin% "" | from_stop_id %ffilter% relevant_stops
+    ]
+    gtfs$transfers <- gtfs$transfers[
+      to_stop_id %chin% "" | to_stop_id %ffilter% relevant_stops
+    ]
   }
 
   return(gtfs)
