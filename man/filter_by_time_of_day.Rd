@@ -33,7 +33,7 @@ this parameter changes the function behaviour.}
 
 \item{update_frequencies}{A logical. Whether the \code{frequencies} table should
 have its \code{start_time} and \code{end_time} fields updated to fit inside/outside the
-specified time of day (defaults to \code{FALSE}, which doesn't update the fields).}
+specified time of day (defaults to \code{TRUE}, which updates the fields).}
 }
 \value{
 The GTFS object passed to the \code{gtfs} parameter, after the filtering
@@ -104,6 +104,10 @@ Finally, please note that many GTFS feeds may contain \code{stop_times} entries
 with empty departure and arrival times. In such cases, filtering by time of
 day with \code{full_trips} as \code{FALSE} will drop the entries with empty times.
 Please set \code{full_trips} to \code{TRUE} to preserve these entries.
+
+Existing \verb{_secs} columns in \code{stop_times} and \code{frequencies} (e.g. created
+with \code{\link[=convert_time_to_seconds]{convert_time_to_seconds()}}) are used as-is, not recalculated from the
+time strings.
 }
 
 \examples{

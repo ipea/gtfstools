@@ -24,6 +24,10 @@
 #' between its arrival time and its departure time, as specified in the
 #' `stop_times` file.
 #'
+#' Existing `_secs` columns in `stop_times` (e.g. created with
+#' [convert_time_to_seconds()]) are used as-is, not recalculated from the time
+#' strings.
+#'
 #' @examples
 #' \dontshow{
 #'   old_dt_threads <- data.table::setDTthreads(1)
@@ -103,17 +107,15 @@ get_trip_segment_duration <- function(gtfs,
     durations <- data.table::setorderv(durations, c("trip_id", "stop_sequence"))
   }
 
-  durations[
+  # compute per trip, so rows of interleaved trips are never mixed up
+  durations <- durations[
     ,
-    last_stop_departure := data.table::shift(
-      departure_time_secs,
-      1L,
-      type = "lag"
-    )
+    .(
+      segment = seq_len(max(.N - 1L, 0L)),
+      duration = arrival_time_secs[-1L] - departure_time_secs[-.N]
+    ),
+    by = trip_id
   ]
-  durations <- durations[!durations[, .I[1], by = trip_id]$V1]
-  durations[, duration := arrival_time_secs - last_stop_departure]
-  durations[, segment := seq.int(1, .N, length.out = .N), by = trip_id]
 
   # select desired columns and convert duration to desired unit
 
@@ -149,10 +151,6 @@ get_trip_segment_duration <- function(gtfs,
     exists("created_arrival_secs")
   ) {
     gtfs$stop_times[, arrival_time_secs := NULL]
-  }
-
-  if (gtfsio::check_field_exists(gtfs, "stop_times", "last_stop_departure")) {
-    gtfs$stop_times[, last_stop_departure := NULL]
   }
 
   return(durations[])

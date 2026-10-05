@@ -50,9 +50,9 @@ method convert all date fields, represented as \code{integer}s in \code{{gtfsio}
 representation, to \code{Date} objects.
 \item \code{list}: this method tries to convert the elements of a list into
 \code{data.table}s. Please note that all list elements must inherit from
-\code{data.frame} and must be named. This method does not try not convert fields
-to the representation used in \code{{gtfstools}}, as it does not have any
-information on how they are formatted in the first place.
+\code{data.frame} and must be named. Like the \code{gtfs} method, it converts date
+fields represented as \code{integer}s (\code{YYYYMMDD}) to \code{Date} objects; other fields
+are kept as they are.
 }
 }
 \examples{

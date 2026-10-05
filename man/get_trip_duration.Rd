@@ -28,6 +28,10 @@ Returns the duration of each specified \code{trip_id}.
 The duration of a trip is defined as the time difference between its last
 arrival time and its first departure time, as specified in the \code{stop_times}
 table.
+
+Existing \verb{_secs} columns in \code{stop_times} (e.g. created with
+\code{\link[=convert_time_to_seconds]{convert_time_to_seconds()}}) are used as-is, not recalculated from the time
+strings.
 }
 
 \examples{

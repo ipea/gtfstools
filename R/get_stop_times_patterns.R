@@ -36,6 +36,10 @@
 #' stop B with `stop_sequence`s 1 and 3, they are assigned to the same
 #' `pattern_id`).
 #'
+#' Existing `_secs` columns in `stop_times` (e.g. created with
+#' [convert_time_to_seconds()]) are used as-is, not recalculated from the time
+#' strings.
+#'
 #' @examples
 #' \dontshow{
 #'   old_dt_threads <- data.table::setDTthreads(1)

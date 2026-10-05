@@ -20,7 +20,7 @@
 #' this parameter changes the function behaviour.
 #' @param update_frequencies A logical. Whether the `frequencies` table should
 #' have its `start_time` and `end_time` fields updated to fit inside/outside the
-#' specified time of day (defaults to `FALSE`, which doesn't update the fields).
+#' specified time of day (defaults to `TRUE`, which updates the fields).
 #'
 #' @return The GTFS object passed to the `gtfs` parameter, after the filtering
 #' process.
@@ -82,6 +82,10 @@
 #' with empty departure and arrival times. In such cases, filtering by time of
 #' day with `full_trips` as `FALSE` will drop the entries with empty times.
 #' Please set `full_trips` to `TRUE` to preserve these entries.
+#'
+#' Existing `_secs` columns in `stop_times` and `frequencies` (e.g. created
+#' with [convert_time_to_seconds()]) are used as-is, not recalculated from the
+#' time strings.
 #'
 #' @family filtering functions
 #'
@@ -166,6 +170,7 @@ filter_by_time_of_day <- function(gtfs,
   # specified period and conditionally update the entries that were kept
 
   frequency_trips <- character()
+  lost_frequency_trips <- character()
   if (gtfsio::check_file_exists(gtfs, "frequencies")) {
     gtfsio::assert_field_class(
       gtfs,
@@ -173,6 +178,8 @@ filter_by_time_of_day <- function(gtfs,
       c("trip_id", "start_time", "end_time"),
       rep("character", 3)
     )
+
+    original_frequency_trips <- unique(gtfs$frequencies$trip_id)
 
     gtfs$frequencies <- filter_frequencies(
       gtfs,
@@ -183,6 +190,7 @@ filter_by_time_of_day <- function(gtfs,
     )
 
     frequency_trips <- unique(gtfs$frequencies$trip_id)
+    lost_frequency_trips <- setdiff(original_frequency_trips, frequency_trips)
   }
 
   # filter the stop_times table and then filter the rest of the gtfs based on
@@ -197,6 +205,11 @@ filter_by_time_of_day <- function(gtfs,
     full_trips,
     frequency_trips
   )
+
+  # frequency-based trips whose frequencies entries were all filtered out must
+  # not be judged by their template times, so they are dropped altogether
+
+  gtfs$stop_times <- gtfs$stop_times[!trip_id %chin% lost_frequency_trips]
 
   relevant_trips <- unique(gtfs$stop_times$trip_id)
   invalid_trip_id <- relevant_trips[
@@ -377,11 +390,11 @@ update_frequencies_times <- function(filtered_frequencies,
       ]
 
       filtered_frequencies[
-        from_within == TRUE & exact_times == 0,
+        from_within == TRUE & !exact_times %in% 1L,
         start_time_secs := from_secs
       ]
       filtered_frequencies[
-        from_within == TRUE & exact_times == 1,
+        from_within == TRUE & exact_times %in% 1L,
         start_time_secs := start_time_secs +
           ceiling((from_secs - start_time_secs) / headway_secs) * headway_secs
       ]
@@ -424,11 +437,11 @@ update_frequencies_times <- function(filtered_frequencies,
       ]
 
       filtered_frequencies[
-        to_within == TRUE & exact_times == 0,
+        to_within == TRUE & !exact_times %in% 1L,
         start_time_secs := to_secs
       ]
       filtered_frequencies[
-        to_within == TRUE & exact_times == 1,
+        to_within == TRUE & exact_times %in% 1L,
         start_time_secs := start_time_secs +
           ceiling((to_secs - start_time_secs) / headway_secs) * headway_secs
       ]

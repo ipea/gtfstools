@@ -163,6 +163,10 @@ test_that("date fields are converted to Date objects", {
   ggl_gtfs$calendar_dates[, date := date_to_integer(date)]
 
   unconverted_gtfs <- gtfsio::import_gtfs(ggl_path)
+  unconverted_gtfs$routes[
+    ,
+    route_desc := gsub("\"\"", "\"", route_desc, fixed = TRUE)
+  ]
   expect_identical(unclass(ggl_gtfs), unclass(unconverted_gtfs))
 })
 

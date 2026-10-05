@@ -17,6 +17,10 @@
 #' arrival time and its first departure time, as specified in the `stop_times`
 #' table.
 #'
+#' Existing `_secs` columns in `stop_times` (e.g. created with
+#' [convert_time_to_seconds()]) are used as-is, not recalculated from the time
+#' strings.
+#'
 #' @examples
 #' \dontshow{
 #'   old_dt_threads <- data.table::setDTthreads(1)

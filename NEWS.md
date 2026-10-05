@@ -6,6 +6,7 @@
 - Malformed time strings (e.g. `"5:30"`, `"abc"`, `"12:60:00"`, hours too large to be stored) are now converted to `NA` with a warning by all functions that convert times to seconds, instead of silently becoming wrong values. Blank times still become `NA` silently. `filter_by_time_of_day()` now also rejects `from`/`to` values with minutes or seconds of 60 or more.
 - `get_stop_times_patterns(type = "spatiotemporal")` may return different pattern ids for feeds with blank intermediate stop times, which are now correctly accounted for (see Bug fixes).
 - The `filter_by_*()` functions may now return more rows, as they no longer drop rows with blank optional keys, station entrances, generic nodes and boarding areas of kept stations and platforms, and the `agency` of single-agency feeds (see Bug fixes).
+- Invalid dates (e.g. `20240230`) are still converted to `NA` when reading or converting feeds, but now raise a warning (class `gtfstools_invalid_date`) listing the invalid values.
 
 ## Bug fixes
 
@@ -18,6 +19,16 @@
 - Fixed bug in `filter_by_trip_id()`, `filter_by_route_id()`, `filter_by_service_id()`, `filter_by_shape_id()` and `filter_by_agency_id()` (and the filters built on them) that dropped station entrances, generic nodes and boarding areas of kept stations and platforms, together with their pathways and levels.
 - Fixed bug in `set_trip_speed()` that identified the first stop of each trip by its row position instead of its `stop_sequence`, producing wrong times for feeds whose `stop_times` are not ordered.
 - Fixed bug in `get_children_stops()` that returned rows with `NA` values for stops whose `parent_station` is `NA`.
+- Fixed bug in `read_gtfs()` that kept doubled quotes (`""`) inside quoted text fields, which `write_gtfs()` then doubled again on every read/write round trip.
+- Fixed bug in `set_trip_speed()` that left existing `*_secs` columns (e.g. created by `convert_time_to_seconds()`) out of sync with the updated times, so functions such as `get_trip_speed()` reported the old speeds.
+- Fixed bug in `merge_gtfs()` that prefixed the `field_value` and `record_sub_id` columns of `translations`, so those translations no longer matched their records.
+- Fixed bug in `get_trip_segment_duration()` that mixed up trips whose `stop_times` rows are interleaved when `sort_sequence = FALSE`. It also no longer deletes a user column named `last_stop_departure`.
+- Fixed bug in `filter_by_time_of_day()` that did not update the `start_time` of `frequencies` entries with a blank `exact_times`, which should be treated as `0`.
+- Fixed bug in `filter_by_time_of_day()` that returned frequency-based trips whose `frequencies` entries were all filtered out, as if they were scheduled trips.
+- Fixed bug in `convert_time_to_seconds()` that checked for the wrong column before converting `end_time` and `arrival_time`, silently skipping them or raising an error when only one column of a pair was present.
+- Fixed bug in `write_gtfs()` that wrote text read with `read_gtfs(encoding = "Latin-1")` back as Latin-1 instead of UTF-8, as required by the GTFS specification.
+- Fixed bug in `as_dt_gtfs()` that did not convert the date fields of lists to `Date`, producing objects that `write_gtfs()` would reject.
+- Fixed the documentation of `filter_by_time_of_day()`, which stated that `update_frequencies` defaults to `FALSE` (it defaults to `TRUE`).
 - Fixed bug in `merge_gtfs()` that errored when columns were are of type character (unknown). PR contribution by @gmatosferreira.
 - Fixed bug that was leading to drop parent station ids in `merge_gtfs()`. PR contribution by @gmatosferreira and @haneroglu.
 

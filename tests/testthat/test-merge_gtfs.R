@@ -208,6 +208,10 @@ test_that("works with non dt_gtfs objects", {
   # gtfsio objects
 
   gtfsio_ggl <- gtfsio::import_gtfs(ggl_path)
+  gtfsio_ggl$routes[
+    ,
+    route_desc := gsub("\"\"", "\"", route_desc, fixed = TRUE)
+  ]
   expect_identical(merged_gtfs, merge_gtfs(spo_gtfs, gtfsio_ggl))
 
   # tidytransit objects

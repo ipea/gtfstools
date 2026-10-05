@@ -16,6 +16,11 @@
 #' GTFS object invisibly (please note that in such case the original GTFS object
 #' is altered).
 #'
+#' @details
+#' Other gtfstools functions use existing `_secs` columns as-is. Only the
+#' functions that edit times ([set_trip_speed()] and [filter_by_time_of_day()])
+#' keep them in sync, so re-run `convert_time_to_seconds()` after other edits.
+#'
 #' @examples
 #' \dontshow{
 #'   old_dt_threads <- data.table::setDTthreads(1)
@@ -99,7 +104,7 @@ convert_time_to_seconds <- function(gtfs, file = NULL, by_reference = FALSE) {
     if (gtfsio::check_field_exists(gtfs, "frequencies", "start_time")) {
       gtfs$frequencies[, start_time_secs := string_to_seconds(start_time)]
     }
-    if (gtfsio::check_field_exists(gtfs, "frequencies", "start_time")) {
+    if (gtfsio::check_field_exists(gtfs, "frequencies", "end_time")) {
       gtfs$frequencies[, end_time_secs := string_to_seconds(end_time)]
     }
   }
@@ -113,7 +118,7 @@ convert_time_to_seconds <- function(gtfs, file = NULL, by_reference = FALSE) {
         departure_time_secs := string_to_seconds(departure_time)
       ]
     }
-    if (gtfsio::check_field_exists(gtfs, "stop_times", "departure_time")) {
+    if (gtfsio::check_field_exists(gtfs, "stop_times", "arrival_time")) {
       gtfs$stop_times[, arrival_time_secs := string_to_seconds(arrival_time)]
     }
   }
