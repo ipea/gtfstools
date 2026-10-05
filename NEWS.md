@@ -26,6 +26,7 @@
 
 ## Notes
 - Function `download_validator()` now automatically detects the latest version available. PR contribution by @baarthur
+- Converting date fields when reading and writing feeds (`read_gtfs()`, `write_gtfs()`, `as_dt_gtfs()`) is now much faster (about 200x faster for the date conversion itself), noticeably speeding up `read_gtfs()` on feeds with large `calendar_dates` tables.
 
 
 
