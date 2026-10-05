@@ -9,6 +9,7 @@
 
 - Fixed bug in `filter_by_route_id()` (and therefore `filter_by_route_type()`) that filtered `fare_rules` by `level_id`s instead of `route_id`s, dropping the kept routes' fares with `keep = TRUE` and keeping the dropped routes' fares with `keep = FALSE`.
 - Fixed bug in `get_stop_times_patterns()` that ignored stop timing when identifying spatiotemporal patterns of trips with any blank stop time.
+- Fixed bug in `filter_by_time_of_day()` that, with `keep = FALSE` and `full_trips = TRUE`, dropped every trip with an untimed stop, even trips entirely outside the time window.
 - Fixed bug in `merge_gtfs()` that errored when columns were are of type character (unknown). PR contribution by @gmatosferreira.
 - Fixed bug that was leading to drop parent station ids in `merge_gtfs()`. PR contribution by @gmatosferreira and @haneroglu.
 
