@@ -170,6 +170,7 @@ filter_by_time_of_day <- function(gtfs,
   # specified period and conditionally update the entries that were kept
 
   frequency_trips <- character()
+  lost_frequency_trips <- character()
   if (gtfsio::check_file_exists(gtfs, "frequencies")) {
     gtfsio::assert_field_class(
       gtfs,
@@ -177,6 +178,8 @@ filter_by_time_of_day <- function(gtfs,
       c("trip_id", "start_time", "end_time"),
       rep("character", 3)
     )
+
+    original_frequency_trips <- unique(gtfs$frequencies$trip_id)
 
     gtfs$frequencies <- filter_frequencies(
       gtfs,
@@ -187,6 +190,7 @@ filter_by_time_of_day <- function(gtfs,
     )
 
     frequency_trips <- unique(gtfs$frequencies$trip_id)
+    lost_frequency_trips <- setdiff(original_frequency_trips, frequency_trips)
   }
 
   # filter the stop_times table and then filter the rest of the gtfs based on
@@ -201,6 +205,11 @@ filter_by_time_of_day <- function(gtfs,
     full_trips,
     frequency_trips
   )
+
+  # frequency-based trips whose frequencies entries were all filtered out must
+  # not be judged by their template times, so they are dropped altogether
+
+  gtfs$stop_times <- gtfs$stop_times[!trip_id %chin% lost_frequency_trips]
 
   relevant_trips <- unique(gtfs$stop_times$trip_id)
   invalid_trip_id <- relevant_trips[

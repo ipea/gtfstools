@@ -23,6 +23,7 @@
 - Fixed bug in `merge_gtfs()` that prefixed the `field_value` and `record_sub_id` columns of `translations`, so those translations no longer matched their records.
 - Fixed bug in `get_trip_segment_duration()` that mixed up trips whose `stop_times` rows are interleaved when `sort_sequence = FALSE`. It also no longer deletes a user column named `last_stop_departure`.
 - Fixed bug in `filter_by_time_of_day()` that did not update the `start_time` of `frequencies` entries with a blank `exact_times`, which should be treated as `0`.
+- Fixed bug in `filter_by_time_of_day()` that returned frequency-based trips whose `frequencies` entries were all filtered out, as if they were scheduled trips.
 - Fixed bug in `merge_gtfs()` that errored when columns were are of type character (unknown). PR contribution by @gmatosferreira.
 - Fixed bug that was leading to drop parent station ids in `merge_gtfs()`. PR contribution by @gmatosferreira and @haneroglu.
 
