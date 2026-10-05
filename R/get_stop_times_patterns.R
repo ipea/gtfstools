@@ -11,11 +11,11 @@
 #' @param type A string specifying the type of patterns to be analyzed. Either
 #'   `"spatial"` (the default) or "spatiotemporal".
 #' @param sort_sequence A logical specifying whether to sort timetables by
-#'   `stop_sequence`. Defaults to `FALSE`, otherwise spec-compliant feeds, in
-#'   which timetables points are already ordered by `stop_sequence`, would be
-#'   penalized through longer processing times. Pattern identification based on
-#'   unordered timetables may result in multiple ids identifying what would be
-#'   the same pattern, had the table been ordered.
+#'   `stop_sequence`. Defaults to `TRUE`. Sorting an already ordered table is
+#'   cheap, and pattern identification based on unordered timetables may result
+#'   in multiple ids identifying what would be the same pattern, had the table
+#'   been ordered. Set to `FALSE` only if the timetables are known to be
+#'   ordered.
 #'
 #' @return A `data.table` associating each `trip_id` to a `pattern_id`.
 #'
@@ -67,7 +67,7 @@
 get_stop_times_patterns <- function(gtfs,
                                     trip_id = NULL,
                                     type = "spatial",
-                                    sort_sequence = FALSE) {
+                                    sort_sequence = TRUE) {
   gtfs <- assert_and_assign_gtfs_object(gtfs)
   checkmate::assert_character(trip_id, null.ok = TRUE, any.missing = FALSE)
   checkmate::assert(
@@ -139,32 +139,24 @@ get_stop_times_patterns <- function(gtfs,
       created_arrival_secs <- TRUE
     }
 
-    patterns[
-      ,
-      `:=`(
-        template_departure = departure_time_secs - min(departure_time_secs),
-        template_arrival = arrival_time_secs - min(departure_time_secs)
-      ),
-      by = trip_id
-    ]
-
     patterns <- patterns[
       ,
-      .(
-        data = paste(
-          stop_id,
-          template_departure,
-          template_arrival,
-          sep = "|",
-          collapse = ";"
+      {
+        first_departure <- if (all(is.na(departure_time_secs))) NA_integer_ else
+          min(departure_time_secs, na.rm = TRUE)
+
+        .(
+          data = paste(
+            stop_id,
+            departure_time_secs - first_departure,
+            arrival_time_secs - first_departure,
+            sep = "|",
+            collapse = ";"
+          )
         )
-      ),
+      },
       keyby = trip_id
     ]
-
-    if (gtfsio::check_field_exists(gtfs, "stop_times", "template_arrival")) {
-      gtfs$stop_times[, c("template_departure", "template_arrival") := NULL]
-    }
 
     if (
       gtfsio::check_field_exists(gtfs, "stop_times", "departure_time_secs") &&

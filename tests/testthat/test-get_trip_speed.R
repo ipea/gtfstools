@@ -318,4 +318,13 @@ test_that("sort_sequence works correctly", {
     sort_sequence = TRUE
   )
   expect_identical(ordered_speeds, speeds)
+
+  # sort_sequence defaults to TRUE (#94)
+  default_speeds <- get_trip_speed(
+    unordered_gtfs,
+    trip_id,
+    file = c("shapes", "stop_times"),
+    unit = "km/h"
+  )
+  expect_identical(default_speeds, speeds)
 })

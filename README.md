@@ -6,7 +6,7 @@ status](https://www.r-pkg.org/badges/version/gtfstools)](https://CRAN.R-project.
 [![gtfstools status
 badge](https://dhersz.r-universe.dev/badges/gtfstools)](https://dhersz.r-universe.dev)
 [![B
-status](https://github.com/ipeaGIT/gtfstools/workflows/check/badge.svg)](https://github.com/ipeaGIT/gtfstools/actions?query=workflow%3Acheck)
+status](https://github.com/ipea/gtfstools/workflows/check/badge.svg)](https://github.com/ipea/gtfstools/actions?query=workflow%3Acheck)
 [![Codecov test
 coverage](https://codecov.io/gh/ipeaGIT/gtfstools/branch/main/graph/badge.svg)](https://app.codecov.io/gh/ipeaGIT/gtfstools?branch=main)
 [![Lifecycle:
@@ -19,7 +19,7 @@ transit feeds in GTFS format. Feeds are read as a `list` of
 `data.table`s, allowing for easy and fast data manipulation. Many of
 this package’s features are based on functions from other packages,
 especially [`{tidytransit}`](https://github.com/r-transit/tidytransit)
-and [`{gtfs2gps}`](https://github.com/ipeaGIT/gtfs2gps).
+and [`{gtfs2gps}`](https://github.com/ipea/gtfs2gps).
 
 ## Installation
 
@@ -37,7 +37,7 @@ install.packages("gtfstools", repos = "https://dhersz.r-universe.dev")
 
 # or
 # install.packages("remotes")
-remotes::install_github("ipeaGIT/gtfstools")
+remotes::install_github("ipea/gtfstools")
 ```
 
 This package requires a working installation of
@@ -51,20 +51,20 @@ Please read **gtfstools** vignettes for more on the package usage:
 
 - Basic usage: reading, analysing, manipulating and writing feeds. Run
   `vignette("gtfstools")` or check it on the website ([Introduction to
-  gtfstools](https://ipeagit.github.io/gtfstools/articles/gtfstools.html)).
+  gtfstools](https://ipea.github.io/gtfstools/articles/gtfstools.html)).
 - Filtering GTFS feeds. Run
   `vignette("filtering", package = "gtfstools")` or check it on the
   website ([Filtering GTFS
-  feeds](https://ipeagit.github.io/gtfstools/articles/filtering.html)).
+  feeds](https://ipea.github.io/gtfstools/articles/filtering.html)).
 - Validating GTFS feeds. Run
   `vignette("validating", package = "gtfstools")` or check it on the
   website ([Validating GTFS
-  feeds](https://ipeagit.github.io/gtfstools/articles/validating.html)).
+  feeds](https://ipea.github.io/gtfstools/articles/validating.html)).
 
 ## Related packages
 
 - [`{tidytransit}`](https://github.com/r-transit/tidytransit)
-- [`{gtfs2gps}`](https://github.com/ipeaGIT/gtfs2gps)
+- [`{gtfs2gps}`](https://github.com/ipea/gtfs2gps)
 - [`{gtfsrouter}`](https://github.com/UrbanAnalyst/gtfsrouter)
 
 ## Acknowledgement <a href="https://www.ipea.gov.br"><img align="right" src="man/figures/ipea_logo.png" alt="IPEA" width="300" /></a>

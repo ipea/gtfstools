@@ -57,7 +57,10 @@ convert_from_standard <- function(gtfs) {
 #'
 #' @keywords internal
 integer_to_date <- function(field) {
-  as.Date(as.character(field), format = "%Y%m%d")
+  if (inherits(field, "Date")) return(field)
+  # convert each distinct value only once, then expand back to full length
+  u <- unique(field)
+  as.Date(as.character(u), format = "%Y%m%d")[match(field, u)]
 }
 
 
@@ -152,5 +155,7 @@ convert_to_standard <- function(gtfs) {
 #'
 #' @keywords internal
 date_to_integer <- function(field) {
-  as.integer(strftime(field, format = "%Y%m%d"))
+  # convert each distinct value only once, then expand back to full length
+  u <- unique(field)
+  as.integer(strftime(u, format = "%Y%m%d"))[match(unclass(field), unclass(u))]
 }

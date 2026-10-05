@@ -61,8 +61,13 @@ get_children_stops <- function(gtfs, stop_id = NULL) {
 
   # recursively find children
 
+  # look children up in a parent -> children list built once. factor()
+  # excludes NA parent_stations, so they don't generate NA children. unique()
+  # levels avoid a costly string sort. a cycle in parent_station terminates
+  # because only children not yet in result are checked
+
   parents <- gtfs$stops$parent_station
-  names(parents) <- gtfs$stops$stop_id
+  kids <- split(gtfs$stops$stop_id, factor(parents, levels = unique(parents)))
 
   result <- data.table::data.table(
     stop_id = stop_id,
@@ -75,10 +80,7 @@ get_children_stops <- function(gtfs, stop_id = NULL) {
     result[
       checked == FALSE,
       `:=`(
-        children_list = lapply(
-          stop_id,
-          function(stop) names(parents[parents == stop])
-        ),
+        children_list = unname(kids[stop_id]),
         checked = TRUE
       )
     ]
@@ -102,29 +104,17 @@ get_children_stops <- function(gtfs, stop_id = NULL) {
     }
   }
 
-  result[
-    ,
-    children_list := lapply(
-      children_list,
-      function(children) {
-        if (identical(children, character(0))) {
-          ""
-        } else {
-          children
-        }
-      }
-    )
-  ]
+  # stops without children get "". rows are ordered as by = stop_id would:
+  # in order of each stop_id's first appearance
 
+  children_list <- result$children_list
+  children_list[lengths(children_list) == 0L] <- list("")
+  ord <- order(match(result$stop_id, result$stop_id))
 
-  # if stop_id == character(0) (be it because it was specified like so or
-  # because none of the specified stop_ids were valid), the unlist() call below
-  # would fail because data.table wouldn't be able to infer the column type
-
-  if (identical(result$children_list, list())) {
-    result[, children_list := character()]
-  }
-  result <- result[, .(child_id = unlist(children_list)), by = stop_id]
+  result <- data.table::data.table(
+    stop_id = rep(result$stop_id[ord], lengths(children_list)[ord]),
+    child_id = as.character(unlist(children_list[ord]))
+  )
 
   return(result[])
 }

@@ -15,11 +15,10 @@
 #'   `crs` object. Defaults to 4326 (WGS 84).
 #' @param sort_sequence A logical specifying whether to sort shapes and
 #'   timetables by `shape_pt_sequence` and `stop_sequence`, respectively.
-#'   Defaults to `FALSE`, otherwise spec-compliant feeds, in which
-#'   shape/timetables points are already ordered by
-#'   `shape_pt_sequence`/`stop_sequence`, would be penalized through longer
-#'   processing times. Geometries generated from unordered sequences do not
-#'   correctly depict the trip trajectories.
+#'   Defaults to `TRUE`. Sorting an already ordered table is cheap. Set to
+#'   `FALSE` only if shapes and timetables are known to be ordered. Geometries
+#'   generated from unordered sequences do not correctly depict the trip
+#'   trajectories.
 #'
 #' @return A `LINESTRING sf`.
 #'
@@ -57,7 +56,7 @@ get_trip_geometry <- function(gtfs,
                               trip_id = NULL,
                               file = NULL,
                               crs = 4326,
-                              sort_sequence = FALSE) {
+                              sort_sequence = TRUE) {
   gtfs <- assert_and_assign_gtfs_object(gtfs)
   checkmate::assert_character(trip_id, null.ok = TRUE, any.missing = FALSE)
   checkmate::assert(

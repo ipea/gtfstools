@@ -1,7 +1,23 @@
 # gtfstools (development version)
 
+## Potentially breaking changes
+
+- The `sort_sequence` argument of `convert_shapes_to_sf()`, `get_trip_geometry()`, `get_trip_length()`, `get_trip_speed()`, `get_trip_segment_duration()` and `get_stop_times_patterns()` now defaults to `TRUE`. Results only change for feeds whose `shapes` or `stop_times` are not ordered by `shape_pt_sequence`/`stop_sequence`, in which case the previous output was incorrect. As a consequence, these columns are now required by default. Use `sort_sequence = FALSE` to restore the previous behaviour (#94).
+- Malformed time strings (e.g. `"5:30"`, `"abc"`, `"12:60:00"`, hours too large to be stored) are now converted to `NA` with a warning by all functions that convert times to seconds, instead of silently becoming wrong values. Blank times still become `NA` silently. `filter_by_time_of_day()` now also rejects `from`/`to` values with minutes or seconds of 60 or more.
+- `get_stop_times_patterns(type = "spatiotemporal")` may return different pattern ids for feeds with blank intermediate stop times, which are now correctly accounted for (see Bug fixes).
+- The `filter_by_*()` functions may now return more rows, as they no longer drop rows with blank optional keys, station entrances, generic nodes and boarding areas of kept stations and platforms, and the `agency` of single-agency feeds (see Bug fixes).
+
 ## Bug fixes
 
+- Fixed bug in `filter_by_route_id()` (and therefore `filter_by_route_type()`) that filtered `fare_rules` by `level_id`s instead of `route_id`s, dropping the kept routes' fares with `keep = TRUE` and keeping the dropped routes' fares with `keep = FALSE`.
+- Fixed bug in `get_stop_times_patterns()` that ignored stop timing when identifying spatiotemporal patterns of trips with any blank stop time.
+- Fixed bug in `filter_by_time_of_day()` that, with `keep = FALSE` and `full_trips = TRUE`, dropped every trip with an untimed stop, even trips entirely outside the time window.
+- Fixed bug in `as_dt_gtfs()` that turned date fields that were already `Date` into `NA`.
+- Fixed bug in the `filter_by_*()` functions that dropped zone `fare_rules` without `route_id`, `transfers` without `from_stop_id`/`to_stop_id` and `attributions` without `agency_id`, whose blank keys mean "applies to all".
+- Fixed bug in `filter_by_trip_id()` and the other filters built on trips and routes that emptied `agency` in single-agency feeds whose `routes.agency_id` is blank or absent.
+- Fixed bug in `filter_by_trip_id()`, `filter_by_route_id()`, `filter_by_service_id()`, `filter_by_shape_id()` and `filter_by_agency_id()` (and the filters built on them) that dropped station entrances, generic nodes and boarding areas of kept stations and platforms, together with their pathways and levels.
+- Fixed bug in `set_trip_speed()` that identified the first stop of each trip by its row position instead of its `stop_sequence`, producing wrong times for feeds whose `stop_times` are not ordered.
+- Fixed bug in `get_children_stops()` that returned rows with `NA` values for stops whose `parent_station` is `NA`.
 - Fixed bug in `merge_gtfs()` that errored when columns were are of type character (unknown). PR contribution by @gmatosferreira.
 - Fixed bug that was leading to drop parent station ids in `merge_gtfs()`. PR contribution by @gmatosferreira and @haneroglu.
 
@@ -11,6 +27,10 @@
 
 ## Notes
 - Function `download_validator()` now automatically detects the latest version available. PR contribution by @baarthur
+- `get_children_stops()` is now much faster on large feeds (about 250x faster with 20,000 stops).
+- Converting date fields when reading and writing feeds (`read_gtfs()`, `write_gtfs()`, `as_dt_gtfs()`) is now much faster (about 200x faster for the date conversion itself), noticeably speeding up `read_gtfs()` on feeds with large `calendar_dates` tables.
+- The package documentation website moved to <https://ipea.github.io/gtfstools/> and the GitHub repository to <https://github.com/ipea/gtfstools>. All links were updated.
+- The filtering vignette and the documentation now use `filter_by_spatial_extent()` instead of the deprecated `filter_by_sf()`, which was moved to a "Deprecated" section of the reference index.
 
 
 
@@ -160,14 +180,14 @@
 
 - `get_trip_speed()` and `set_trip_speed()` examples and tests now only run if `{lwgeom}` is installed. `{lwgeom}` is an `{sf}` "soft" dependency required by these functions, and is listed in `Suggests`. However, package checks would fail not so gracefully if it wasn't installed, which is now fixed.
 - Fixed a bug in which the `crs` passed to `get_trip_geometry()` would be assigned to the result without actually reprojecting it.
-- Changed the behaviour of `get_trip_geometry()` to not raise an error when the 'file' parameter is left untouched and the GTFS object doesn't contain either the shapes or the stop_times table. Closes [#29](https://github.com/ipeaGIT/gtfstools/issues/29).
+- Changed the behaviour of `get_trip_geometry()` to not raise an error when the 'file' parameter is left untouched and the GTFS object doesn't contain either the shapes or the stop_times table. Closes [#29](https://github.com/ipea/gtfstools/issues/29).
 - Fixed a bug that would cause `merge_gtfs()` to create objects that inherited only from `dt_gtfs` (ignoring `gtfs` and `list`).
 - Fixed a bug in which `get_trip_speed()` returned `NA` speeds if the specified `trip_id` was listed in trips, but not in stop_times.
 - Adjusted `set_trip_speed()` to stop raising a `max()`-related warning when none of the specified `trip_id`s exists.
 
 ## Notes
 
-- Some utility functions previously provided by [`{gtfs2gps}`](https://github.com/ipeaGIT/gtfs2gps) will now be exported by `{gtfstools}`. Huge thanks to the whole `{gtfs2gps}` crew (Rafael Pereira @rafapereirabr, Pedro Andrade @pedro-andrade-inpe and João Bazzo @Joaobazzo)!
+- Some utility functions previously provided by [`{gtfs2gps}`](https://github.com/ipea/gtfs2gps) will now be exported by `{gtfstools}`. Huge thanks to the whole `{gtfs2gps}` crew (Rafael Pereira @rafapereirabr, Pedro Andrade @pedro-andrade-inpe and João Bazzo @Joaobazzo)!
 - The package now imports `{gtfsio}`, and many functions now heavily rely on it, such as `read_gtfs()` and `write_gtfs()`.
 - Internal function `string_to_seconds()` now runs much faster thanks to Mark Padgham (@mpadge).
 - `get_trip_geometry()` now runs much faster due to `data.table`-related optimizations.

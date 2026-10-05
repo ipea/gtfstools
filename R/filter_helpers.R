@@ -16,13 +16,22 @@ filter_agency_from_agency_id <- function(gtfs, relevant_agencies, `%ffilter%`) {
   return(gtfs)
 }
 
+filter_agency_from_derived_agency_id <- function(gtfs, relevant_agencies) {
+  # agency_id may be blank or absent in single-agency feeds, so we keep
+  # 'agency' intact in such cases
+
+  if (NROW(gtfs$agency) <= 1L) return(gtfs)
+
+  return(filter_agency_from_agency_id(gtfs, relevant_agencies, `%chin%`))
+}
+
 filter_attributions_from_agency_id <- function(gtfs,
                                                relevant_agencies,
                                                `%ffilter%`) {
   if (gtfsio::check_field_exists(gtfs, "attributions", "agency_id")) {
     gtfsio::assert_field_class(gtfs, "attributions", "agency_id", "character")
     gtfs$attributions <- gtfs$attributions[
-      agency_id %ffilter% relevant_agencies
+      agency_id %chin% "" | agency_id %ffilter% relevant_agencies
     ]
   }
 
@@ -72,7 +81,9 @@ filter_fare_rules_from_route_id <- function(gtfs,
                                             `%ffilter%`) {
   if (gtfsio::check_field_exists(gtfs, "fare_rules", "route_id")) {
     gtfsio::assert_field_class(gtfs, "fare_rules", "route_id", "character")
-    gtfs$fare_rules <- gtfs$fare_rules[route_id %ffilter% relevant_routes]
+    gtfs$fare_rules <- gtfs$fare_rules[
+      route_id %chin% "" | route_id %ffilter% relevant_routes
+    ]
   }
 
   return(gtfs)
@@ -246,8 +257,12 @@ filter_transfers_from_stop_id <- function(gtfs, relevant_stops, `%ffilter%`) {
       from_to_stop_id,
       rep("character", 2)
     )
-    gtfs$transfers <- gtfs$transfers[from_stop_id %ffilter% relevant_stops]
-    gtfs$transfers <- gtfs$transfers[to_stop_id %ffilter% relevant_stops]
+    gtfs$transfers <- gtfs$transfers[
+      from_stop_id %chin% "" | from_stop_id %ffilter% relevant_stops
+    ]
+    gtfs$transfers <- gtfs$transfers[
+      to_stop_id %chin% "" | to_stop_id %ffilter% relevant_stops
+    ]
   }
 
   return(gtfs)
@@ -356,6 +371,16 @@ get_stops_and_parents <- function(gtfs) {
       stops_with_parents <- get_parent_station(gtfs, relevant_stops)
     )
     relevant_stops <- stops_with_parents$stop_id
+
+    # also keep the entrances, generic nodes and boarding areas (location_type
+    # 2, 3 and 4) whose parents are kept
+    if (gtfsio::check_field_exists(gtfs, "stops", "location_type")) {
+      children <- gtfs$stops$stop_id[
+        gtfs$stops$location_type %in% 2:4 &
+          gtfs$stops$parent_station %chin% relevant_stops
+      ]
+      relevant_stops <- unique(c(relevant_stops, children))
+    }
   }
 
   return(relevant_stops)

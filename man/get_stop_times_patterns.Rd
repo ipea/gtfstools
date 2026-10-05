@@ -8,7 +8,7 @@ get_stop_times_patterns(
   gtfs,
   trip_id = NULL,
   type = "spatial",
-  sort_sequence = FALSE
+  sort_sequence = TRUE
 )
 }
 \arguments{
@@ -22,11 +22,11 @@ analyses the pattern of every \code{trip_id} in the GTFS.}
 \code{"spatial"} (the default) or "spatiotemporal".}
 
 \item{sort_sequence}{A logical specifying whether to sort timetables by
-\code{stop_sequence}. Defaults to \code{FALSE}, otherwise spec-compliant feeds, in
-which timetables points are already ordered by \code{stop_sequence}, would be
-penalized through longer processing times. Pattern identification based on
-unordered timetables may result in multiple ids identifying what would be
-the same pattern, had the table been ordered.}
+\code{stop_sequence}. Defaults to \code{TRUE}. Sorting an already ordered table is
+cheap, and pattern identification based on unordered timetables may result
+in multiple ids identifying what would be the same pattern, had the table
+been ordered. Set to \code{FALSE} only if the timetables are known to be
+ordered.}
 }
 \value{
 A \code{data.table} associating each \code{trip_id} to a \code{pattern_id}.

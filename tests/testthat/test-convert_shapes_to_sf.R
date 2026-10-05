@@ -99,11 +99,14 @@ test_that("sort_sequence works correctly", {
   unordered_gtfs$shapes <- gtfs$shapes[shape_id == "17846"]
   unordered_gtfs$shapes <- unordered_gtfs$shapes[c(200:547, 1:199)]
 
-  unordered_sf <- convert_shapes_to_sf(unordered_gtfs)
+  unordered_sf <- convert_shapes_to_sf(unordered_gtfs, sort_sequence = FALSE)
   expect_false(identical(unordered_sf, shapes_sf))
 
   ordered_sf <- convert_shapes_to_sf(unordered_gtfs, sort_sequence = TRUE)
   expect_identical(ordered_sf, shapes_sf)
+
+  # sort_sequence defaults to TRUE (#94)
+  expect_identical(convert_shapes_to_sf(unordered_gtfs), shapes_sf)
 })
 
 test_that("doesn't change passed gtfs object (only the index of gtfs$shapes)", {

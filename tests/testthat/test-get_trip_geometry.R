@@ -273,4 +273,8 @@ test_that("sort_sequence works correctly", {
 
   ordered_geoms <- tester(unordered_gtfs, trip_id, sort_sequence = TRUE)
   expect_identical(ordered_geoms, geoms)
+
+  # sort_sequence defaults to TRUE (#94)
+  default_geoms <- get_trip_geometry(unordered_gtfs, trip_id)
+  expect_identical(default_geoms, geoms)
 })

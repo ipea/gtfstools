@@ -148,8 +148,8 @@ filter_by_time_of_day <- function(gtfs,
                                   full_trips = FALSE,
                                   update_frequencies = TRUE) {
   gtfs <- assert_and_assign_gtfs_object(gtfs)
-  checkmate::assert_string(from, pattern = "^\\d{2}:\\d{2}:\\d{2}$")
-  checkmate::assert_string(to, pattern = "^\\d{2}:\\d{2}:\\d{2}$")
+  checkmate::assert_string(from, pattern = "^\\d{2}:[0-5]\\d:[0-5]\\d$")
+  checkmate::assert_string(to, pattern = "^\\d{2}:[0-5]\\d:[0-5]\\d$")
   checkmate::assert_logical(keep, len = 1, any.missing = FALSE)
   checkmate::assert_logical(full_trips, len = 1, any.missing = FALSE)
   checkmate::assert_logical(update_frequencies, len = 1, any.missing = FALSE)
@@ -498,33 +498,21 @@ filter_stop_times <- function(gtfs,
     ]
 
     if (full_trips) {
-      # to drop trips that had any of their stops filtered, we compare the
-      # filtered stop_times to the original stop_times and remove trips that
-      # had stops removed
+      # we drop exactly the trips that keep = TRUE would keep, using the same
+      # predicate. which() treats NA as FALSE, so untimed entries don't cause
+      # their trips to be dropped
 
-      trips_kept <- unique(filtered_stop_times$trip_id)
-      original_stop_times <- gtfs$stop_times[trip_id %chin% trips_kept]
-      original_stop_count <- original_stop_times[
-        ,
-        .(n_stops = .N),
-        by = trip_id
-      ]
-      filtered_stop_count <- filtered_stop_times[
-        ,
-        .(n_stops = .N),
-        by = trip_id
-      ]
-
-      original_stop_count[
-        filtered_stop_count,
-        on = "trip_id",
-        filtered_n_stops := i.n_stops
-      ]
-      trips_to_drops <- original_stop_count[n_stops != filtered_n_stops]$trip_id
-
-      filtered_stop_times <- filtered_stop_times[
-        ! trip_id %chin% trips_to_drops
-      ]
+      trips_to_drop <- unique(
+        gtfs$stop_times[
+          which(
+            !(trip_id %chin% frequency_trips) &
+              (departure_time_secs >= from_secs |
+                 arrival_time_secs >= from_secs) &
+              (departure_time_secs <= to_secs | arrival_time_secs <= to_secs)
+          )
+        ]$trip_id
+      )
+      filtered_stop_times <- gtfs$stop_times[!trip_id %chin% trips_to_drop]
     }
   }
 

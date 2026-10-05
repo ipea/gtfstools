@@ -9,7 +9,7 @@ get_trip_speed(
   trip_id = NULL,
   file = "shapes",
   unit = "km/h",
-  sort_sequence = FALSE
+  sort_sequence = TRUE
 )
 }
 \arguments{
@@ -30,10 +30,8 @@ Either \code{"km/h"} (the default) or \code{"m/s"}.}
 specifying whether to sort shapes and timetables by \code{shape_pt_sequence} and
 \code{stop_sequence}, respectively. Speeds calculated from trip trajectories
 generated with unordered sequences do not correctly depict the actual trip
-speeds. Defaults to \code{FALSE}, otherwise spec-compliant feeds, in which
-shape/timetables points are already ordered by
-\code{shape_pt_sequence}/\code{stop_sequence}, would be penalized through longer
-processing times.}
+speeds. Defaults to \code{TRUE}. Sorting an already ordered table is cheap. Set
+to \code{FALSE} only if shapes and timetables are known to be ordered.}
 }
 \value{
 A \code{data.table} containing the duration of each specified trip and the

@@ -31,7 +31,7 @@ GTFS feeds are often used to describe very large and complex public transport ne
 - `filter_by_route_type()`
 - `filter_by_weekday()`
 - `filter_by_time_of_day()`
-- `filter_by_sf()`
+- `filter_by_spatial_extent()`
 
 This vignette will introduce you to these functions and will cover their usage in detail.
 
@@ -177,7 +177,7 @@ head(smaller_gtfs$stop_times[, c("trip_id", "departure_time", "arrival_time")])
 
 # Filtering using a spatial extent
 
-It's not uncommon that one wants to analyze only the transit services of a smaller region contained inside a feed. The `filter_by_sf()` function allows you to filter GTFS data using a given spatial extent. This functions takes a spatial `sf`/`sfc` object (or its bounding box) and keeps/drops the entries related to shapes and trips selected via a specified spatial operation. It may sound a bit complicated, but it's fairly easy to understand when shown. Let's create an auxiliary function to save us some typing:
+It's not uncommon that one wants to analyze only the transit services of a smaller region contained inside a feed. The `filter_by_spatial_extent()` function allows you to filter GTFS data using a given spatial extent. This functions takes a spatial `sf`/`sfc` object (or its bounding box) and keeps/drops the entries related to shapes and trips selected via a specified spatial operation. It may sound a bit complicated, but it's fairly easy to understand when shown. Let's create an auxiliary function to save us some typing:
 
 ```{r}
 plotter <- function(gtfs,
@@ -186,7 +186,7 @@ plotter <- function(gtfs,
                     keep = TRUE,
                     do_filter = TRUE) {
   if (do_filter) {
-    gtfs <- filter_by_sf(gtfs, geom, spatial_operation, keep)
+    gtfs <- filter_by_spatial_extent(gtfs, geom, spatial_operation, keep)
   }
 
   shapes <- convert_shapes_to_sf(gtfs)
@@ -205,9 +205,9 @@ This function:
 - Conditionally filters a GTFS object given a spatial object (called `geom`);
 - Generates shapes' and trips' geometries as described in their respective tables;
 - Generates a polygon from the bounding box;
-- Plots all the `sf` objects cited above to show the effect of each `filter_by_sf()` argument in the final result.
+- Plots all the `sf` objects cited above to show the effect of each `filter_by_spatial_extent()` argument in the final result.
 
-Also, please note that our `plotter()` function takes the same arguments of `filter_by_sf()` (with the exception of `do_filter`, which is used to show the unfiltered data), as well as the same defaults.
+Also, please note that our `plotter()` function takes the same arguments of `filter_by_spatial_extent()` (with the exception of `do_filter`, which is used to show the unfiltered data), as well as the same defaults.
 
 Let's say that we want to filter GTFS data using the bounding box of the shape `68962`. Here's how the unfiltered data looks like, with the bounding box placed on top of it.
 
@@ -217,7 +217,7 @@ bbox <- sf::st_bbox(convert_shapes_to_sf(gtfs, shape_id = "68962"))
 plotter(gtfs, bbox, do_filter = FALSE)
 ```
 
-By default `filter_by_sf()` (and `plotter()`, consequently) keeps all the data related to the trips and shapes that intersect the given geometry. Here's how it looks like:
+By default `filter_by_spatial_extent()` (and `plotter()`, consequently) keeps all the data related to the trips and shapes that intersect the given geometry. Here's how it looks like:
 
 ```{r, eval = requireNamespace("ggplot2", quietly = TRUE)}
 plotter(gtfs, bbox)

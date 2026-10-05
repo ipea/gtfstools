@@ -113,7 +113,7 @@ filter_by_route_id <- function(gtfs, route_id, keep = TRUE) {
 
   # fare_rules (route_id)
 
-  gtfs <- filter_fare_rules_from_route_id(gtfs, relevant_levels, `%ffilter%`)
+  gtfs <- filter_fare_rules_from_route_id(gtfs, route_id, `%ffilter%`)
 
   # 'fare_rules' allows us to filter by 'fare_id'
 
@@ -132,7 +132,7 @@ filter_by_route_id <- function(gtfs, route_id, keep = TRUE) {
   )
   relevant_agencies <- unique(relevant_agencies)
 
-  gtfs <- filter_agency_from_agency_id(gtfs, relevant_agencies, `%chin%`)
+  gtfs <- filter_agency_from_derived_agency_id(gtfs, relevant_agencies)
 
   return(gtfs)
 }

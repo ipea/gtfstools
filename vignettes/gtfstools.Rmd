@@ -43,7 +43,7 @@ install.packages("gtfstools", repos = "https://dhersz.r-universe.dev")
 
 # or
 # install.packages("remotes")
-remotes::install_github("ipeaGIT/gtfstools")
+remotes::install_github("ipea/gtfstools")
 ```
 
 Then attach it to the current R session:

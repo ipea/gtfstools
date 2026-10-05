@@ -252,4 +252,8 @@ test_that("sort_sequence works correctly", {
 
   ordered_lengths <- tester(unordered_gtfs, trip_id, sort_sequence = TRUE)
   expect_identical(ordered_lengths, lengths)
+
+  # sort_sequence defaults to TRUE (#94)
+  default_lengths <- get_trip_length(unordered_gtfs, trip_id, unit = "km")
+  expect_identical(default_lengths, lengths)
 })

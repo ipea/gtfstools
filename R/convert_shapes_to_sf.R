@@ -8,10 +8,10 @@
 #' @param crs The CRS of the resulting object, either as an EPSG code or as an
 #'   `crs` object. Defaults to 4326 (WGS 84).
 #' @param sort_sequence A logical. Whether to sort shapes by
-#'   `shape_pt_sequence`. Defaults to `FALSE`, otherwise spec-compliant feeds,
-#'   in which shape points are already ordered by `shape_pt_sequence`, would be
-#'   penalized through longer processing times. Shapes generated from unordered
-#'   sequences do not correctly depict the real life trip shapes.
+#'   `shape_pt_sequence`. Defaults to `TRUE`. Sorting an already ordered table is
+#'   cheap, and shapes generated from unordered sequences do not correctly
+#'   depict the real life trip shapes. Set to `FALSE` only if the shapes are
+#'   known to be ordered.
 #'
 #' @return A `LINESTRING sf` object.
 #'
@@ -34,7 +34,7 @@
 convert_shapes_to_sf <- function(gtfs,
                                  shape_id = NULL,
                                  crs = 4326,
-                                 sort_sequence = FALSE) {
+                                 sort_sequence = TRUE) {
   gtfs <- assert_and_assign_gtfs_object(gtfs)
   checkmate::assert_character(shape_id, null.ok = TRUE, any.missing = FALSE)
   checkmate::assert(

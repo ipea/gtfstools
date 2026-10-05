@@ -95,7 +95,7 @@ filter_by_shape_id <- function(gtfs, shape_id, keep = TRUE) {
   )
   relevant_agencies <- unique(relevant_agencies)
 
-  gtfs <- filter_agency_from_agency_id(gtfs, relevant_agencies, `%chin%`)
+  gtfs <- filter_agency_from_derived_agency_id(gtfs, relevant_agencies)
 
   # 'stop_times', 'frequencies' and 'transfers' (trip_id)
 

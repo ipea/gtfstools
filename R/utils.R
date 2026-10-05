@@ -12,6 +12,15 @@ string_to_seconds <- function(string) {
 
   seconds_from_midgnight <- cpp_time_to_seconds(string)
 
+  na_idx <- which(is.na(seconds_from_midgnight) & !is.na(string))
+  n_bad <- sum(!trimws(string[na_idx]) %in% c("", "NA"))
+  if (n_bad > 0) {
+    cli::cli_warn(
+      "{n_bad} malformed time string{?s} (not H:MM:SS) converted to NA.",
+      class = "gtfstools_malformed_time"
+    )
+  }
+
   return(seconds_from_midgnight)
 }
 

@@ -17,3 +17,8 @@
 ^CRAN-SUBMISSION$
 ^\.positai$
 ^\.claude$
+^CLAUDE\.md$
+^MEMORY\.md$
+^CHANGELOG\.md$
+^templates$
+^quality_reports$

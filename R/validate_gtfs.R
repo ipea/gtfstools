@@ -50,7 +50,7 @@
 #'
 #' # and with feeds pointed by an url
 #' newer_output_path <- tempfile("newer_validation_result")
-#' gtfs_url <- "https://github.com/ipeaGIT/gtfstools/raw/main/inst/extdata/spo_gtfs.zip"
+#' gtfs_url <- "https://github.com/ipea/gtfstools/raw/main/inst/extdata/spo_gtfs.zip"
 #' validate_gtfs(gtfs_url, newer_output_path, validator_path)
 #' list.files(newer_output_path)
 #'

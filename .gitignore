@@ -14,3 +14,11 @@ README.html
 /doc/
 /Meta/
 .positai
+
+# Claude Code workflow (only CLAUDE.md + .claude/rules/ are tracked)
+/.claude/*
+!/.claude/rules/
+/MEMORY.md
+/CHANGELOG.md
+/templates/
+/quality_reports/
