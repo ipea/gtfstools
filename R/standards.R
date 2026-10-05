@@ -156,6 +156,19 @@ convert_to_standard <- function(gtfs) {
     }
   }
 
+  # write strings as UTF-8, as required by GTFS. gtfsio::export_gtfs() calls
+  # fwrite() without encoding = "UTF-8", so latin1 strings (e.g. from
+  # read_gtfs(encoding = "Latin-1")) would be written byte-as-is. time
+  # columns are always ASCII, so they are skipped to save time on large feeds
+  for (file in names(new_gtfs)) {
+    if (!is.data.frame(new_gtfs[[file]])) next
+    for (col in names(new_gtfs[[file]])) {
+      if (is.character(new_gtfs[[file]][[col]]) && !endsWith(col, "_time")) {
+        new_gtfs[[file]][[col]] <- enc2utf8(new_gtfs[[file]][[col]])
+      }
+    }
+  }
+
   class(new_gtfs) <- setdiff(class(new_gtfs), "dt_gtfs")
 
   return(new_gtfs[])
