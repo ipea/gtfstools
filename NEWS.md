@@ -18,6 +18,7 @@
 - Fixed bug in `filter_by_trip_id()`, `filter_by_route_id()`, `filter_by_service_id()`, `filter_by_shape_id()` and `filter_by_agency_id()` (and the filters built on them) that dropped station entrances, generic nodes and boarding areas of kept stations and platforms, together with their pathways and levels.
 - Fixed bug in `set_trip_speed()` that identified the first stop of each trip by its row position instead of its `stop_sequence`, producing wrong times for feeds whose `stop_times` are not ordered.
 - Fixed bug in `get_children_stops()` that returned rows with `NA` values for stops whose `parent_station` is `NA`.
+- Fixed bug in `read_gtfs()` that kept doubled quotes (`""`) inside quoted text fields, which `write_gtfs()` then doubled again on every read/write round trip.
 - Fixed bug in `merge_gtfs()` that errored when columns were are of type character (unknown). PR contribution by @gmatosferreira.
 - Fixed bug that was leading to drop parent station ids in `merge_gtfs()`. PR contribution by @gmatosferreira and @haneroglu.
 

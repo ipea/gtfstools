@@ -91,6 +91,23 @@ read_gtfs <- function(path,
     quiet = quiet,
     encoding = encoding
   )
+
+  # stopgap for an upstream issue: data.table::fread() keeps the doubled quotes
+  # ("") that escape a quote inside quoted fields, so we unescape them here.
+  # id and time columns are skipped for performance
+
+  for (file in names(gtfs)) {
+    if (!data.table::is.data.table(gtfs[[file]])) next
+    for (col in names(gtfs[[file]])) {
+      x <- gtfs[[file]][[col]]
+      if (!is.character(x) || grepl("_(id|time)$", col)) next
+      if (any(grepl("\"\"", x, fixed = TRUE, useBytes = TRUE))) {
+        x <- gsub("\"\"", "\"", x, fixed = TRUE)
+        data.table::set(gtfs[[file]], j = col, value = x)
+      }
+    }
+  }
+
   gtfs <- convert_from_standard(gtfs)
 
   return(gtfs)
