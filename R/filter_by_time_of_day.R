@@ -20,7 +20,7 @@
 #' this parameter changes the function behaviour.
 #' @param update_frequencies A logical. Whether the `frequencies` table should
 #' have its `start_time` and `end_time` fields updated to fit inside/outside the
-#' specified time of day (defaults to `FALSE`, which doesn't update the fields).
+#' specified time of day (defaults to `TRUE`, which updates the fields).
 #'
 #' @return The GTFS object passed to the `gtfs` parameter, after the filtering
 #' process.
