@@ -1,17 +1,35 @@
 #include "convert-time.h"
 
-#include <iostream>
+#include <climits>
 
 int convert_time_to_seconds(std::string hms) {
-    const std::string delim = ":";
-    unsigned int ipos = static_cast<unsigned int>(hms.find(delim.c_str()));
-    int h = atoi(hms.substr(0, ipos).c_str());
-    hms = hms.substr(ipos + 1, hms.length() - ipos - 1);
-    ipos = static_cast<unsigned int>(hms.find(delim.c_str()));
-    int m = atoi(hms.substr(0, ipos).c_str());
-    int s = atoi(hms.substr(ipos + 1, hms.length()).c_str());
+    // trim surrounding whitespace; malformed strings return NA_INTEGER
+    const char* ws = " \t\r\n";
+    const size_t b = hms.find_first_not_of(ws);
+    if (b == std::string::npos) return NA_INTEGER;
+    hms = hms.substr(b, hms.find_last_not_of(ws) - b + 1);
 
-    return 3600 * h + 60 * m + s;
+    long long part[3] = {0, 0, 0};
+    int ndig[3] = {0, 0, 0};
+    int field = 0;
+    for (const char c : hms) {
+        if (c == ':') {
+            if (++field > 2) return NA_INTEGER;
+        } else if (c >= '0' && c <= '9' && ndig[field] < 9) {
+            part[field] = part[field] * 10 + (c - '0');
+            ndig[field]++;
+        } else {
+            return NA_INTEGER;
+        }
+    }
+    if (field != 2 || ndig[0] == 0 || ndig[1] != 2 || ndig[2] != 2 ||
+        part[1] >= 60 || part[2] >= 60) {
+        return NA_INTEGER;
+    }
+
+    const long long secs = 3600 * part[0] + 60 * part[1] + part[2];
+    if (secs > INT_MAX) return NA_INTEGER;
+    return static_cast<int>(secs);
 }
 
 //' cpp_time_to_seconds

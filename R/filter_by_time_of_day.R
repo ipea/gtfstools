@@ -148,8 +148,8 @@ filter_by_time_of_day <- function(gtfs,
                                   full_trips = FALSE,
                                   update_frequencies = TRUE) {
   gtfs <- assert_and_assign_gtfs_object(gtfs)
-  checkmate::assert_string(from, pattern = "^\\d{2}:\\d{2}:\\d{2}$")
-  checkmate::assert_string(to, pattern = "^\\d{2}:\\d{2}:\\d{2}$")
+  checkmate::assert_string(from, pattern = "^\\d{2}:[0-5]\\d:[0-5]\\d$")
+  checkmate::assert_string(to, pattern = "^\\d{2}:[0-5]\\d:[0-5]\\d$")
   checkmate::assert_logical(keep, len = 1, any.missing = FALSE)
   checkmate::assert_logical(full_trips, len = 1, any.missing = FALSE)
   checkmate::assert_logical(update_frequencies, len = 1, any.missing = FALSE)

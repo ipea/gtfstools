@@ -3,6 +3,7 @@
 ## Potentially breaking changes
 
 - The `sort_sequence` argument of `convert_shapes_to_sf()`, `get_trip_geometry()`, `get_trip_length()`, `get_trip_speed()`, `get_trip_segment_duration()` and `get_stop_times_patterns()` now defaults to `TRUE`. Results only change for feeds whose `shapes` or `stop_times` are not ordered by `shape_pt_sequence`/`stop_sequence`, in which case the previous output was incorrect. As a consequence, these columns are now required by default. Use `sort_sequence = FALSE` to restore the previous behaviour (#94).
+- Malformed time strings (e.g. `"5:30"`, `"abc"`, `"12:60:00"`, hours too large to be stored) are now converted to `NA` with a warning by all functions that convert times to seconds, instead of silently becoming wrong values. Blank times still become `NA` silently. `filter_by_time_of_day()` now also rejects `from`/`to` values with minutes or seconds of 60 or more.
 - `get_stop_times_patterns(type = "spatiotemporal")` may return different pattern ids for feeds with blank intermediate stop times, which are now correctly accounted for (see Bug fixes).
 - The `filter_by_*()` functions may now return more rows, as they no longer drop rows with blank optional keys, station entrances, generic nodes and boarding areas of kept stations and platforms, and the `agency` of single-agency feeds (see Bug fixes).
 
