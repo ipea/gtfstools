@@ -17,6 +17,7 @@
 - Fixed bug in `filter_by_trip_id()` and the other filters built on trips and routes that emptied `agency` in single-agency feeds whose `routes.agency_id` is blank or absent.
 - Fixed bug in `filter_by_trip_id()`, `filter_by_route_id()`, `filter_by_service_id()`, `filter_by_shape_id()` and `filter_by_agency_id()` (and the filters built on them) that dropped station entrances, generic nodes and boarding areas of kept stations and platforms, together with their pathways and levels.
 - Fixed bug in `set_trip_speed()` that identified the first stop of each trip by its row position instead of its `stop_sequence`, producing wrong times for feeds whose `stop_times` are not ordered.
+- Fixed bug in `get_children_stops()` that returned rows with `NA` values for stops whose `parent_station` is `NA`.
 - Fixed bug in `merge_gtfs()` that errored when columns were are of type character (unknown). PR contribution by @gmatosferreira.
 - Fixed bug that was leading to drop parent station ids in `merge_gtfs()`. PR contribution by @gmatosferreira and @haneroglu.
 
@@ -26,6 +27,7 @@
 
 ## Notes
 - Function `download_validator()` now automatically detects the latest version available. PR contribution by @baarthur
+- `get_children_stops()` is now much faster on large feeds (about 250x faster with 20,000 stops).
 - Converting date fields when reading and writing feeds (`read_gtfs()`, `write_gtfs()`, `as_dt_gtfs()`) is now much faster (about 200x faster for the date conversion itself), noticeably speeding up `read_gtfs()` on feeds with large `calendar_dates` tables.
 
 
