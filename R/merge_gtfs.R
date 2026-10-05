@@ -154,13 +154,11 @@ merge_gtfs <- function(..., files = NULL, prefix = FALSE) {
     for (dt in merged_gtfs) {
       # determine the id columns (or columns that refer to ids) in each table.
       # direction_id, from trips, ends with _id but is an enum and should not be
-      # changed.
-      # field_value, from translations, doesn't end with _id but refers to an
-      # id, thus should be changed.
+      # changed. in translations, record_sub_id (a stop_sequence) and
+      # field_value (a field's value) are not ids and should not be changed.
 
       id_cols <- names(dt)[grepl("_id$|parent_station", names(dt))]
-      id_cols <- setdiff(id_cols, "direction_id")
-      if (!is.null(dt[["field_value"]])) id_cols <- c(id_cols, "field_value")
+      id_cols <- setdiff(id_cols, c("direction_id", "record_sub_id"))
 
       # then add the prefix to the id value
 
