@@ -371,6 +371,16 @@ get_stops_and_parents <- function(gtfs) {
       stops_with_parents <- get_parent_station(gtfs, relevant_stops)
     )
     relevant_stops <- stops_with_parents$stop_id
+
+    # also keep the entrances, generic nodes and boarding areas (location_type
+    # 2, 3 and 4) whose parents are kept
+    if (gtfsio::check_field_exists(gtfs, "stops", "location_type")) {
+      children <- gtfs$stops$stop_id[
+        gtfs$stops$location_type %in% 2:4 &
+          gtfs$stops$parent_station %chin% relevant_stops
+      ]
+      relevant_stops <- unique(c(relevant_stops, children))
+    }
   }
 
   return(relevant_stops)
