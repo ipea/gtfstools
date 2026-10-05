@@ -125,7 +125,7 @@ set_trip_speed <- function(gtfs,
 
   min_stops_index_df <- stop_times[
     trip_id %chin% trip_length_ids,
-    .I[1],
+    .I[which.min(stop_sequence)],
     by = trip_id
   ]
   min_stops_index <- min_stops_index_df$V1

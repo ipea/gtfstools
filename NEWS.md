@@ -16,6 +16,7 @@
 - Fixed bug in the `filter_by_*()` functions that dropped zone `fare_rules` without `route_id`, `transfers` without `from_stop_id`/`to_stop_id` and `attributions` without `agency_id`, whose blank keys mean "applies to all".
 - Fixed bug in `filter_by_trip_id()` and the other filters built on trips and routes that emptied `agency` in single-agency feeds whose `routes.agency_id` is blank or absent.
 - Fixed bug in `filter_by_trip_id()`, `filter_by_route_id()`, `filter_by_service_id()`, `filter_by_shape_id()` and `filter_by_agency_id()` (and the filters built on them) that dropped station entrances, generic nodes and boarding areas of kept stations and platforms, together with their pathways and levels.
+- Fixed bug in `set_trip_speed()` that identified the first stop of each trip by its row position instead of its `stop_sequence`, producing wrong times for feeds whose `stop_times` are not ordered.
 - Fixed bug in `merge_gtfs()` that errored when columns were are of type character (unknown). PR contribution by @gmatosferreira.
 - Fixed bug that was leading to drop parent station ids in `merge_gtfs()`. PR contribution by @gmatosferreira and @haneroglu.
 
