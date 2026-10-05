@@ -96,7 +96,7 @@ Had we run the validator using the same GTFS data in different formats (an URL
 or a GTFS object, for example) the results would be exactly the same:
 
 ```{r}
-gtfs_url <- "https://github.com/ipeaGIT/gtfstools/raw/main/inst/extdata/spo_gtfs.zip"
+gtfs_url <- "https://github.com/ipea/gtfstools/raw/main/inst/extdata/spo_gtfs.zip"
 gtfs <- read_gtfs(data_path)
 
 url_output_dir <- tempfile("validation_from_url")

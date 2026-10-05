@@ -21,9 +21,9 @@ Description: Utility functions to read, manipulate, analyse and write
     transit feeds in the General Transit Feed Specification (GTFS) data
     format.
 License: MIT + file LICENSE
-URL: https://ipeagit.github.io/gtfstools/,
-    https://github.com/ipeaGIT/gtfstools
-BugReports: https://github.com/ipeaGIT/gtfstools/issues
+URL: https://ipea.github.io/gtfstools/,
+    https://github.com/ipea/gtfstools
+BugReports: https://github.com/ipea/gtfstools/issues
 Depends: 
     R (>= 2.10)
 Imports:

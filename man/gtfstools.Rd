@@ -15,21 +15,21 @@ General Transit Feed Specification (GTFS) data format.
 Please check the vignettes for more on the package usage:
 \itemize{
 \item Basic usage: reading, analysing, manipulating and writing feeds. Run
-\code{vignette("gtfstools")} or check it on the \href{https://ipeagit.github.io/gtfstools/articles/gtfstools.html}{website}.
+\code{vignette("gtfstools")} or check it on the \href{https://ipea.github.io/gtfstools/articles/gtfstools.html}{website}.
 \item Filtering GTFS feeds. Run \code{vignette("filtering", package = "gtfstools")} or
-check it on the \href{https://ipeagit.github.io/gtfstools/articles/filtering.html}{website}.
+check it on the \href{https://ipea.github.io/gtfstools/articles/filtering.html}{website}.
 \item Validating GTFS feeds. Run \code{vignette("validating", package = "gtfstools")}
 or check it on the
-\href{https://ipeagit.github.io/gtfstools/articles/validating.html}{website}.
+\href{https://ipea.github.io/gtfstools/articles/validating.html}{website}.
 }
 }
 
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://ipeagit.github.io/gtfstools/}
-  \item \url{https://github.com/ipeaGIT/gtfstools}
-  \item Report bugs at \url{https://github.com/ipeaGIT/gtfstools/issues}
+  \item \url{https://ipea.github.io/gtfstools/}
+  \item \url{https://github.com/ipea/gtfstools}
+  \item Report bugs at \url{https://github.com/ipea/gtfstools/issues}
 }
 
 }

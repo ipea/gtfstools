@@ -4,9 +4,9 @@
   "identifier": "gtfstools",
   "description": "Utility functions to read, manipulate, analyse and write transit feeds in the General Transit Feed Specification (GTFS) data format.",
   "name": "gtfstools: General Transit Feed Specification (GTFS) Editing and Analysing\n    Tools",
-  "relatedLink": ["https://ipeagit.github.io/gtfstools/", "https://CRAN.R-project.org/package=gtfstools"],
-  "codeRepository": "https://github.com/ipeaGIT/gtfstools",
-  "issueTracker": "https://github.com/ipeaGIT/gtfstools/issues",
+  "relatedLink": ["https://ipea.github.io/gtfstools/", "https://CRAN.R-project.org/package=gtfstools"],
+  "codeRepository": "https://github.com/ipea/gtfstools",
+  "issueTracker": "https://github.com/ipea/gtfstools/issues",
   "license": "https://spdx.org/licenses/MIT",
   "version": "1.4.0.9000",
   "programmingLanguage": {
@@ -305,9 +305,9 @@
     "SystemRequirements": null
   },
   "fileSize": "4597.473KB",
-  "releaseNotes": "https://github.com/ipeaGIT/gtfstools/blob/master/NEWS.md",
-  "readme": "https://github.com/ipeaGIT/gtfstools/blob/main/README.md",
-  "contIntegration": ["https://github.com/ipeaGIT/gtfstools/actions?query=workflow%3Acheck", "https://app.codecov.io/gh/ipeaGIT/gtfstools?branch=master"],
+  "releaseNotes": "https://github.com/ipea/gtfstools/blob/master/NEWS.md",
+  "readme": "https://github.com/ipea/gtfstools/blob/main/README.md",
+  "contIntegration": ["https://github.com/ipea/gtfstools/actions?query=workflow%3Acheck", "https://app.codecov.io/gh/ipeaGIT/gtfstools?branch=master"],
   "developmentStatus": "https://lifecycle.r-lib.org/articles/stages.html",
   "keywords": ["r", "gtfs", "public-transport", "publictransport"]
 }
