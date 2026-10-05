@@ -21,9 +21,9 @@
 #'
 #' - `list`: this method tries to convert the elements of a list into
 #' `data.table`s. Please note that all list elements must inherit from
-#' `data.frame` and must be named. This method does not try not convert fields
-#' to the representation used in `{gtfstools}`, as it does not have any
-#' information on how they are formatted in the first place.
+#' `data.frame` and must be named. Like the `gtfs` method, it converts date
+#' fields represented as `integer`s (`YYYYMMDD`) to `Date` objects; other fields
+#' are kept as they are.
 #'
 #' @param gtfs The object that should be coerced to a `dt_gtfs`.
 #' @param ... Ignored.
@@ -148,7 +148,7 @@ as_dt_gtfs.list <- function(gtfs, ...) {
   gtfs[no_dot_names] <- lapply(gtfs[no_dot_names], data.table::as.data.table)
   if (!is.null(gtfs$.)) gtfs$. <- lapply(gtfs$., data.table::as.data.table)
 
-  gtfs <- gtfsio::new_gtfs(gtfs, "dt_gtfs")
+  gtfs <- convert_from_standard(gtfsio::new_gtfs(gtfs))
 
   return(gtfs)
 }

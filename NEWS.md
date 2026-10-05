@@ -27,6 +27,7 @@
 - Fixed bug in `filter_by_time_of_day()` that returned frequency-based trips whose `frequencies` entries were all filtered out, as if they were scheduled trips.
 - Fixed bug in `convert_time_to_seconds()` that checked for the wrong column before converting `end_time` and `arrival_time`, silently skipping them or raising an error when only one column of a pair was present.
 - Fixed bug in `write_gtfs()` that wrote text read with `read_gtfs(encoding = "Latin-1")` back as Latin-1 instead of UTF-8, as required by the GTFS specification.
+- Fixed bug in `as_dt_gtfs()` that did not convert the date fields of lists to `Date`, producing objects that `write_gtfs()` would reject.
 - Fixed the documentation of `filter_by_time_of_day()`, which stated that `update_frequencies` defaults to `FALSE` (it defaults to `TRUE`).
 - Fixed bug in `merge_gtfs()` that errored when columns were are of type character (unknown). PR contribution by @gmatosferreira.
 - Fixed bug that was leading to drop parent station ids in `merge_gtfs()`. PR contribution by @gmatosferreira and @haneroglu.
