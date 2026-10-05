@@ -4,7 +4,7 @@
 
 - The `sort_sequence` argument of `convert_shapes_to_sf()`, `get_trip_geometry()`, `get_trip_length()`, `get_trip_speed()`, `get_trip_segment_duration()` and `get_stop_times_patterns()` now defaults to `TRUE`. Results only change for feeds whose `shapes` or `stop_times` are not ordered by `shape_pt_sequence`/`stop_sequence`, in which case the previous output was incorrect. As a consequence, these columns are now required by default. Use `sort_sequence = FALSE` to restore the previous behaviour (#94).
 - `get_stop_times_patterns(type = "spatiotemporal")` may return different pattern ids for feeds with blank intermediate stop times, which are now correctly accounted for (see Bug fixes).
-- The `filter_by_*()` functions may now return more rows, as they no longer drop rows with blank optional keys (see Bug fixes).
+- The `filter_by_*()` functions may now return more rows, as they no longer drop rows with blank optional keys and the `agency` of single-agency feeds (see Bug fixes).
 
 ## Bug fixes
 
@@ -13,6 +13,7 @@
 - Fixed bug in `filter_by_time_of_day()` that, with `keep = FALSE` and `full_trips = TRUE`, dropped every trip with an untimed stop, even trips entirely outside the time window.
 - Fixed bug in `as_dt_gtfs()` that turned date fields that were already `Date` into `NA`.
 - Fixed bug in the `filter_by_*()` functions that dropped zone `fare_rules` without `route_id`, `transfers` without `from_stop_id`/`to_stop_id` and `attributions` without `agency_id`, whose blank keys mean "applies to all".
+- Fixed bug in `filter_by_trip_id()` and the other filters built on trips and routes that emptied `agency` in single-agency feeds whose `routes.agency_id` is blank or absent.
 - Fixed bug in `merge_gtfs()` that errored when columns were are of type character (unknown). PR contribution by @gmatosferreira.
 - Fixed bug that was leading to drop parent station ids in `merge_gtfs()`. PR contribution by @gmatosferreira and @haneroglu.
 

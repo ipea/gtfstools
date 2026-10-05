@@ -16,6 +16,15 @@ filter_agency_from_agency_id <- function(gtfs, relevant_agencies, `%ffilter%`) {
   return(gtfs)
 }
 
+filter_agency_from_derived_agency_id <- function(gtfs, relevant_agencies) {
+  # agency_id may be blank or absent in single-agency feeds, so we keep
+  # 'agency' intact in such cases
+
+  if (NROW(gtfs$agency) <= 1L) return(gtfs)
+
+  return(filter_agency_from_agency_id(gtfs, relevant_agencies, `%chin%`))
+}
+
 filter_attributions_from_agency_id <- function(gtfs,
                                                relevant_agencies,
                                                `%ffilter%`) {
