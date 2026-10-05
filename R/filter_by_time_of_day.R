@@ -381,11 +381,11 @@ update_frequencies_times <- function(filtered_frequencies,
       ]
 
       filtered_frequencies[
-        from_within == TRUE & exact_times == 0,
+        from_within == TRUE & !exact_times %in% 1L,
         start_time_secs := from_secs
       ]
       filtered_frequencies[
-        from_within == TRUE & exact_times == 1,
+        from_within == TRUE & exact_times %in% 1L,
         start_time_secs := start_time_secs +
           ceiling((from_secs - start_time_secs) / headway_secs) * headway_secs
       ]
@@ -428,11 +428,11 @@ update_frequencies_times <- function(filtered_frequencies,
       ]
 
       filtered_frequencies[
-        to_within == TRUE & exact_times == 0,
+        to_within == TRUE & !exact_times %in% 1L,
         start_time_secs := to_secs
       ]
       filtered_frequencies[
-        to_within == TRUE & exact_times == 1,
+        to_within == TRUE & exact_times %in% 1L,
         start_time_secs := start_time_secs +
           ceiling((to_secs - start_time_secs) / headway_secs) * headway_secs
       ]
