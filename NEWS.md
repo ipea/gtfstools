@@ -3,10 +3,12 @@
 ## Potentially breaking changes
 
 - The `sort_sequence` argument of `convert_shapes_to_sf()`, `get_trip_geometry()`, `get_trip_length()`, `get_trip_speed()`, `get_trip_segment_duration()` and `get_stop_times_patterns()` now defaults to `TRUE`. Results only change for feeds whose `shapes` or `stop_times` are not ordered by `shape_pt_sequence`/`stop_sequence`, in which case the previous output was incorrect. As a consequence, these columns are now required by default. Use `sort_sequence = FALSE` to restore the previous behaviour (#94).
+- `get_stop_times_patterns(type = "spatiotemporal")` may return different pattern ids for feeds with blank intermediate stop times, which are now correctly accounted for (see Bug fixes).
 
 ## Bug fixes
 
 - Fixed bug in `filter_by_route_id()` (and therefore `filter_by_route_type()`) that filtered `fare_rules` by `level_id`s instead of `route_id`s, dropping the kept routes' fares with `keep = TRUE` and keeping the dropped routes' fares with `keep = FALSE`.
+- Fixed bug in `get_stop_times_patterns()` that ignored stop timing when identifying spatiotemporal patterns of trips with any blank stop time.
 - Fixed bug in `merge_gtfs()` that errored when columns were are of type character (unknown). PR contribution by @gmatosferreira.
 - Fixed bug that was leading to drop parent station ids in `merge_gtfs()`. PR contribution by @gmatosferreira and @haneroglu.
 

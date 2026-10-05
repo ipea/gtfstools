@@ -139,32 +139,24 @@ get_stop_times_patterns <- function(gtfs,
       created_arrival_secs <- TRUE
     }
 
-    patterns[
-      ,
-      `:=`(
-        template_departure = departure_time_secs - min(departure_time_secs),
-        template_arrival = arrival_time_secs - min(departure_time_secs)
-      ),
-      by = trip_id
-    ]
-
     patterns <- patterns[
       ,
-      .(
-        data = paste(
-          stop_id,
-          template_departure,
-          template_arrival,
-          sep = "|",
-          collapse = ";"
+      {
+        first_departure <- if (all(is.na(departure_time_secs))) NA_integer_ else
+          min(departure_time_secs, na.rm = TRUE)
+
+        .(
+          data = paste(
+            stop_id,
+            departure_time_secs - first_departure,
+            arrival_time_secs - first_departure,
+            sep = "|",
+            collapse = ";"
+          )
         )
-      ),
+      },
       keyby = trip_id
     ]
-
-    if (gtfsio::check_field_exists(gtfs, "stop_times", "template_arrival")) {
-      gtfs$stop_times[, c("template_departure", "template_arrival") := NULL]
-    }
 
     if (
       gtfsio::check_field_exists(gtfs, "stop_times", "departure_time_secs") &&
