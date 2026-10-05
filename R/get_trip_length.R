@@ -15,11 +15,10 @@
 #'   Either `"km"` (the default) or `"m"`.
 #' @param sort_sequence A logical specifying whether to sort shapes and
 #'   timetables by `shape_pt_sequence` and `stop_sequence`, respectively.
-#'   Defaults to `FALSE`, otherwise spec-compliant feeds, in which
-#'   shape/timetables points are already ordered by
-#'   `shape_pt_sequence`/`stop_sequence`, would be penalized through longer
-#'   processing times. Lengths calculated from trip trajectories generated with
-#'   unordered sequences do not correctly depict the actual trip lengths.
+#'   Defaults to `TRUE`. Sorting an already ordered table is cheap. Set to
+#'   `FALSE` only if shapes and timetables are known to be ordered. Lengths
+#'   calculated from trip trajectories generated with unordered sequences do
+#'   not correctly depict the actual trip lengths.
 #'
 #' @return A `data.table` containing the length of each specified trip.
 #'
@@ -53,7 +52,7 @@ get_trip_length <- function(gtfs,
                             trip_id = NULL,
                             file = NULL,
                             unit = "km",
-                            sort_sequence = FALSE) {
+                            sort_sequence = TRUE) {
   gtfs <- assert_and_assign_gtfs_object(gtfs)
   checkmate::assert_character(trip_id, null.ok = TRUE, any.missing = FALSE)
   checkmate::assert(

@@ -11,11 +11,11 @@
 #' @param type A string specifying the type of patterns to be analyzed. Either
 #'   `"spatial"` (the default) or "spatiotemporal".
 #' @param sort_sequence A logical specifying whether to sort timetables by
-#'   `stop_sequence`. Defaults to `FALSE`, otherwise spec-compliant feeds, in
-#'   which timetables points are already ordered by `stop_sequence`, would be
-#'   penalized through longer processing times. Pattern identification based on
-#'   unordered timetables may result in multiple ids identifying what would be
-#'   the same pattern, had the table been ordered.
+#'   `stop_sequence`. Defaults to `TRUE`. Sorting an already ordered table is
+#'   cheap, and pattern identification based on unordered timetables may result
+#'   in multiple ids identifying what would be the same pattern, had the table
+#'   been ordered. Set to `FALSE` only if the timetables are known to be
+#'   ordered.
 #'
 #' @return A `data.table` associating each `trip_id` to a `pattern_id`.
 #'
@@ -67,7 +67,7 @@
 get_stop_times_patterns <- function(gtfs,
                                     trip_id = NULL,
                                     type = "spatial",
-                                    sort_sequence = FALSE) {
+                                    sort_sequence = TRUE) {
   gtfs <- assert_and_assign_gtfs_object(gtfs)
   checkmate::assert_character(trip_id, null.ok = TRUE, any.missing = FALSE)
   checkmate::assert(

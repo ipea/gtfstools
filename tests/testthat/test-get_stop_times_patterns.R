@@ -220,4 +220,8 @@ test_that("sort_sequence works correctly", {
 
   ordered_patterns <- tester(unordered_gtfs, ids, sort_sequence = TRUE)
   expect_identical(ordered_patterns, patterns)
+
+  # sort_sequence defaults to TRUE (#94)
+  default_patterns <- get_stop_times_patterns(unordered_gtfs, ids)
+  expect_identical(default_patterns, patterns)
 })

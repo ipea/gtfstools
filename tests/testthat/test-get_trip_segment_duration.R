@@ -184,4 +184,12 @@ test_that("sort_sequence works correctly", {
 
   ordered_durations <- tester(unordered_gtfs, trip_id, sort_sequence = TRUE)
   expect_identical(ordered_durations, durations)
+
+  # sort_sequence defaults to TRUE (#94)
+  default_durations <- get_trip_segment_duration(
+    unordered_gtfs,
+    trip_id,
+    unit = "min"
+  )
+  expect_identical(default_durations, durations)
 })

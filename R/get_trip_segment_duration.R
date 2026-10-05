@@ -10,11 +10,10 @@
 #'   desired. One of `"s"` (seconds), `"min"` (minutes, the default),
 #'   `"h"` (hours) or `"d"` (days).
 #' @param sort_sequence A logical specifying whether to sort timetables by
-#'   `stop_sequence`. Defaults to `FALSE`, otherwise spec-compliant feeds, in
-#'   which timetables points are already ordered by `stop_sequence`, would be
-#'   penalized through longer processing times. Durations calculated from
-#'   unordered timetables do not correctly depict the real life segment
-#'   durations.
+#'   `stop_sequence`. Defaults to `TRUE`. Sorting an already ordered table is
+#'   cheap, and durations calculated from unordered timetables do not correctly
+#'   depict the real life segment durations. Set to `FALSE` only if the
+#'   timetables are known to be ordered.
 #'
 #' @return A `data.table` containing the segments' duration of each specified
 #'   trip.
@@ -49,7 +48,7 @@
 get_trip_segment_duration <- function(gtfs,
                                       trip_id = NULL,
                                       unit = "min",
-                                      sort_sequence = FALSE) {
+                                      sort_sequence = TRUE) {
   gtfs <- assert_and_assign_gtfs_object(gtfs)
   checkmate::assert_character(trip_id, null.ok = TRUE, any.missing = FALSE)
   checkmate::assert(

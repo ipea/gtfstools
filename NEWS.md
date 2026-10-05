@@ -1,5 +1,9 @@
 # gtfstools (development version)
 
+## Potentially breaking changes
+
+- The `sort_sequence` argument of `convert_shapes_to_sf()`, `get_trip_geometry()`, `get_trip_length()`, `get_trip_speed()`, `get_trip_segment_duration()` and `get_stop_times_patterns()` now defaults to `TRUE`. Results only change for feeds whose `shapes` or `stop_times` are not ordered by `shape_pt_sequence`/`stop_sequence`, in which case the previous output was incorrect. As a consequence, these columns are now required by default. Use `sort_sequence = FALSE` to restore the previous behaviour (#94).
+
 ## Bug fixes
 
 - Fixed bug in `merge_gtfs()` that errored when columns were are of type character (unknown). PR contribution by @gmatosferreira.
