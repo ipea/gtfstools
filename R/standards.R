@@ -60,7 +60,18 @@ integer_to_date <- function(field) {
   if (inherits(field, "Date")) return(field)
   # convert each distinct value only once, then expand back to full length
   u <- unique(field)
-  as.Date(as.character(u), format = "%Y%m%d")[match(field, u)]
+  idx <- match(field, u)
+  dates <- as.Date(as.character(u), format = "%Y%m%d")
+  bad <- is.na(dates) & !is.na(u)
+  if (any(bad)) bad[bad] <- nzchar(trimws(u[bad])) # blank/NA stay silent
+  if (any(bad)) cli::cli_warn(
+    paste0(
+      "{sum(bad[idx])} invalid date{?s} (not a valid YYYYMMDD) ",
+      "converted to NA: {.val {u[bad]}}"
+    ),
+    class = "gtfstools_invalid_date"
+  )
+  dates[idx]
 }
 
 
