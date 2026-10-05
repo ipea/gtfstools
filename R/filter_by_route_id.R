@@ -113,7 +113,7 @@ filter_by_route_id <- function(gtfs, route_id, keep = TRUE) {
 
   # fare_rules (route_id)
 
-  gtfs <- filter_fare_rules_from_route_id(gtfs, relevant_levels, `%ffilter%`)
+  gtfs <- filter_fare_rules_from_route_id(gtfs, route_id, `%ffilter%`)
 
   # 'fare_rules' allows us to filter by 'fare_id'
 
