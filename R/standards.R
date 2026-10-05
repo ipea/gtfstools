@@ -57,6 +57,7 @@ convert_from_standard <- function(gtfs) {
 #'
 #' @keywords internal
 integer_to_date <- function(field) {
+  if (inherits(field, "Date")) return(field)
   as.Date(as.character(field), format = "%Y%m%d")
 }
 
