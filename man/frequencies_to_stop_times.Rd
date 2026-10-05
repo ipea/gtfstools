@@ -40,6 +40,10 @@ suffix to the newly created trips to differentiate each one of them (e.g. in
 this case, the new trips, described in the \code{trips} and \code{stop_times} tables,
 would be called \code{"example_trip_1"}, \code{"example_trip_2"} and
 \code{"example_trip_3"}).
+
+Existing \verb{_secs} columns in \code{stop_times} and \code{frequencies} (e.g. created
+with \code{\link[=convert_time_to_seconds]{convert_time_to_seconds()}}) are used as-is, not recalculated from the
+time strings.
 }
 
 \examples{

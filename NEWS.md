@@ -19,6 +19,7 @@
 - Fixed bug in `set_trip_speed()` that identified the first stop of each trip by its row position instead of its `stop_sequence`, producing wrong times for feeds whose `stop_times` are not ordered.
 - Fixed bug in `get_children_stops()` that returned rows with `NA` values for stops whose `parent_station` is `NA`.
 - Fixed bug in `read_gtfs()` that kept doubled quotes (`""`) inside quoted text fields, which `write_gtfs()` then doubled again on every read/write round trip.
+- Fixed bug in `set_trip_speed()` that left existing `*_secs` columns (e.g. created by `convert_time_to_seconds()`) out of sync with the updated times, so functions such as `get_trip_speed()` reported the old speeds.
 - Fixed bug in `merge_gtfs()` that errored when columns were are of type character (unknown). PR contribution by @gmatosferreira.
 - Fixed bug that was leading to drop parent station ids in `merge_gtfs()`. PR contribution by @gmatosferreira and @haneroglu.
 

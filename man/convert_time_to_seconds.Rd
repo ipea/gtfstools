@@ -27,6 +27,11 @@ Converts \code{stop_times}' and \code{frequencies}' fields in the "HH:MM:SS" for
 seconds after midnight. Instead of overwritting the existing fields, creates
 new fields with the \verb{_secs} suffix.
 }
+\details{
+Other gtfstools functions use existing \verb{_secs} columns as-is. Only the
+functions that edit times (\code{\link[=set_trip_speed]{set_trip_speed()}} and \code{\link[=filter_by_time_of_day]{filter_by_time_of_day()}})
+keep them in sync, so re-run \code{convert_time_to_seconds()} after other edits.
+}
 \examples{
 \dontshow{
   old_dt_threads <- data.table::setDTthreads(1)

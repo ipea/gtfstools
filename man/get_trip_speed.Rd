@@ -45,6 +45,10 @@ from either the \code{shapes} or the \code{stop_times} file (or both).
 
 Please check \code{\link[=get_trip_geometry]{get_trip_geometry()}} documentation to understand how geometry
 generation differs depending on the chosen file.
+
+Existing \verb{_secs} columns in \code{stop_times} (e.g. created with
+\code{\link[=convert_time_to_seconds]{convert_time_to_seconds()}}) are used as-is, not recalculated from the time
+strings.
 }
 
 \examples{

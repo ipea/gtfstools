@@ -183,6 +183,18 @@ set_trip_speed <- function(gtfs,
     )
   ]
 
+  # refresh pre-existing *_secs columns, which other functions use as-is
+
+  for (time_col in c("departure_time", "arrival_time")) {
+    secs_col <- paste0(time_col, "_secs")
+    if (secs_col %chin% names(stop_times)) {
+      stop_times[
+        desired_trips_index,
+        (secs_col) := string_to_seconds(get(time_col))
+      ]
+    }
+  }
+
   if (by_reference) return(invisible(gtfs))
 
   gtfs$stop_times <- stop_times

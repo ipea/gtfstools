@@ -53,6 +53,10 @@ other on the \code{stop_times} table (e.g. if trip X lists stops A followed by
 stop B with \code{stop_sequence}s 1 and 2, and trip Y lists stops A followed by
 stop B with \code{stop_sequence}s 1 and 3, they are assigned to the same
 \code{pattern_id}).
+
+Existing \verb{_secs} columns in \code{stop_times} (e.g. created with
+\code{\link[=convert_time_to_seconds]{convert_time_to_seconds()}}) are used as-is, not recalculated from the time
+strings.
 }
 
 \examples{

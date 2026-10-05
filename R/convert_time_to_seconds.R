@@ -16,6 +16,11 @@
 #' GTFS object invisibly (please note that in such case the original GTFS object
 #' is altered).
 #'
+#' @details
+#' Other gtfstools functions use existing `_secs` columns as-is. Only the
+#' functions that edit times ([set_trip_speed()] and [filter_by_time_of_day()])
+#' keep them in sync, so re-run `convert_time_to_seconds()` after other edits.
+#'
 #' @examples
 #' \dontshow{
 #'   old_dt_threads <- data.table::setDTthreads(1)

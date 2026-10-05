@@ -83,6 +83,10 @@
 #' day with `full_trips` as `FALSE` will drop the entries with empty times.
 #' Please set `full_trips` to `TRUE` to preserve these entries.
 #'
+#' Existing `_secs` columns in `stop_times` and `frequencies` (e.g. created
+#' with [convert_time_to_seconds()]) are used as-is, not recalculated from the
+#' time strings.
+#'
 #' @family filtering functions
 #'
 #' @examples

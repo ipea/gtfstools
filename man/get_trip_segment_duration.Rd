@@ -41,6 +41,10 @@ A trip segment is defined as the path between two subsequent stops in the
 same trip. The  duration of a segment is defined as the time difference
 between its arrival time and its departure time, as specified in the
 \code{stop_times} file.
+
+Existing \verb{_secs} columns in \code{stop_times} (e.g. created with
+\code{\link[=convert_time_to_seconds]{convert_time_to_seconds()}}) are used as-is, not recalculated from the time
+strings.
 }
 
 \examples{
