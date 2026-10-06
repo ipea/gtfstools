@@ -35,11 +35,15 @@
 ## New features
 
 - New function `list_validator_versions()` which returns a df with the available CLI versions and their URLs. PR contribution by @baarthur
+- `write_gtfs()` gains a `compression_level` argument. It defaults to 6 (previously the feed was always compressed at level 9), which makes writing a feed about 2 to 3 times faster for files of very similar size. The content of the written files is unchanged.
 
 ## Notes
 - Function `download_validator()` now automatically detects the latest version available. PR contribution by @baarthur
 - `get_children_stops()` is now much faster on large feeds (about 250x faster with 20,000 stops).
 - Converting date fields when reading and writing feeds (`read_gtfs()`, `write_gtfs()`, `as_dt_gtfs()`) is now much faster (about 200x faster for the date conversion itself), noticeably speeding up `read_gtfs()` on feeds with large `calendar_dates` tables.
+- Converting times between `"HH:MM:SS"` strings and seconds is now faster, as each distinct time is converted only once. This speeds up `convert_time_to_seconds()` (about 20 times faster on a feed with 900,000 `stop_times` rows), `filter_by_time_of_day()` (about 7 times faster on the same feed) and, to a lesser extent, the other functions that convert times.
+- `get_trip_segment_duration()` and `get_trip_duration()` are much faster when `unit` is not `"s"` (about 60 and 10 times faster, respectively, on a feed with 900,000 `stop_times` rows).
+- `get_trip_geometry()` is much faster when `crs` is not WGS 84, as each shape is now transformed only once, instead of once per trip that uses it (about 45 times faster for `file = "shapes"` on a feed with 15,000 trips and 160 shapes).
 - The package documentation website moved to <https://ipea.github.io/gtfstools/> and the GitHub repository to <https://github.com/ipea/gtfstools>. All links were updated.
 - The filtering vignette and the documentation now use `filter_by_spatial_extent()` instead of the deprecated `filter_by_sf()`, which was moved to a "Deprecated" section of the reference index.
 

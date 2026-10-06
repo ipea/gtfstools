@@ -123,17 +123,14 @@ get_trip_segment_duration <- function(gtfs,
   durations <- durations[, setdiff(names(durations), desired_cols) := NULL]
   data.table::setcolorder(durations, desired_cols)
 
+  # {units} converts element by element, which is slow on long vectors, so we
+  # get the conversion factor from a single value and multiply by it
+
   if (unit != "s") {
-    durations[
-      ,
-      duration := as.numeric(
-        units::set_units(
-          units::as_units(duration, "s"),
-          unit,
-          mode = "standard"
-        )
-      )
-    ]
+    unit_factor <- as.numeric(
+      units::set_units(units::as_units(1, "s"), unit, mode = "standard")
+    )
+    durations[, duration := duration * unit_factor]
   }
 
   # the function may have created some colums to gtfs$stop_times if a copy

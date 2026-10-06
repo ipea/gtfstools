@@ -11,7 +11,8 @@ write_gtfs(
   standard_only = FALSE,
   as_dir = FALSE,
   overwrite = TRUE,
-  quiet = TRUE
+  quiet = TRUE,
+  compression_level = 6
 )
 }
 \arguments{
@@ -36,6 +37,11 @@ file).}
 
 \item{quiet}{Whether to hide log messages and progress bars (defaults to
 \code{TRUE}).}
+
+\item{compression_level}{A number between 1 and 9 indicating how much the
+\code{.zip} file should be compressed. Lower levels write faster but create
+larger files. Defaults to 6, which is usually several times faster than 9
+and creates files of very similar size. Ignored when \code{as_dir = TRUE}.}
 }
 \value{
 Invisibly returns the same GTFS object passed to the \code{gtfs}

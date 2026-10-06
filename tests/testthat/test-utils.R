@@ -22,6 +22,18 @@ test_that("calculates seconds adequately", {
   expect_identical(string_to_seconds("01:01:01"), 3661L)
 })
 
+test_that("handles repeated values and counts malformed strings per row", {
+  string <- c("abc", "08:00:00", "", "abc", NA, "08:00:00", " ", "NA")
+  expect_warning(
+    result <- string_to_seconds(string),
+    regexp = "^2 malformed time strings",
+    class = "gtfstools_malformed_time"
+  )
+  expect_identical(result, c(NA, 28800L, NA, NA, NA, 28800L, NA, NA))
+
+  expect_identical(string_to_seconds(character(0)), integer(0))
+})
+
 
 # seconds_to_string -------------------------------------------------------
 
@@ -40,6 +52,14 @@ test_that("generates strings correctly", {
   expect_identical(seconds_to_string(0L), "00:00:00")
   expect_identical(seconds_to_string(90000L), "25:00:00")
   expect_identical(seconds_to_string(3661L), "01:01:01")
+})
+
+test_that("handles repeated values", {
+  expect_identical(
+    seconds_to_string(c(3661L, NA, 3661L, 0L, NA)),
+    c("01:01:01", "", "01:01:01", "00:00:00", "")
+  )
+  expect_identical(seconds_to_string(integer(0)), character(0))
 })
 
 
