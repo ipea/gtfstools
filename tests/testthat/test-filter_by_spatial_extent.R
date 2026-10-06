@@ -107,6 +107,47 @@ test_that("'keep' and 'spatial_operation' arguments work correctly", {
   )
 })
 
+test_that("selects the union of trips selected by shapes and by stop_times", {
+  # a trip is selected if its shape or the path through its stops intersects
+  # with the polygon. 'keep = FALSE' must drop all of these trips. the western
+  # half of the feed's extent selects some trips only through their stops
+
+  shapes <- convert_shapes_to_sf(spo_gtfs)
+  half_bbox <- sf::st_bbox(shapes)
+  half_bbox["xmax"] <- (half_bbox["xmin"] + half_bbox["xmax"]) / 2
+  half_polygon <- sf::st_as_sfc(half_bbox)
+
+  shapes_hit <- sf::st_intersects(half_polygon, shapes, sparse = FALSE)
+  shapes_hit <- shapes[shapes_hit, ]$shape_id
+  trips_hit_by_shape <- spo_gtfs$trips[shape_id %chin% shapes_hit]$trip_id
+
+  trips <- get_trip_geometry(spo_gtfs, file = "stop_times")
+  trips_hit_by_stops <- sf::st_intersects(half_polygon, trips, sparse = FALSE)
+  trips_hit_by_stops <- trips[trips_hit_by_stops, ]$trip_id
+
+  # make sure the test is not vacuous: some trips are selected by only one of
+  # the criteria
+
+  expect_false(setequal(trips_hit_by_shape, trips_hit_by_stops))
+
+  selected_trips <- union(trips_hit_by_shape, trips_hit_by_stops)
+  not_selected_trips <- setdiff(spo_gtfs$trips$trip_id, selected_trips)
+
+  smaller_keeping <- tester(spo_gtfs, half_polygon)
+  expect_setequal(smaller_keeping$trips$trip_id, selected_trips)
+
+  smaller_not_keeping <- tester(spo_gtfs, half_polygon, keep = FALSE)
+  expect_setequal(smaller_not_keeping$trips$trip_id, not_selected_trips)
+})
+
+test_that("doesn't add attributes to the given stop_times table", {
+  gtfs <- read_gtfs(spo_path)
+  original_attributes <- attributes(gtfs$stop_times)
+
+  smaller_gtfs <- tester(gtfs, bbox)
+  expect_identical(attributes(gtfs$stop_times), original_attributes)
+})
+
 test_that("works with sf describing two features", {
   another_shape <- "17846"
   another_bbox <- sf::st_bbox(convert_shapes_to_sf(spo_gtfs, another_shape))

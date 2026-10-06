@@ -174,6 +174,42 @@ test_that("outputs an 'sf' object with correct crs", {
   expect_identical(sf::st_crs(sf_geom), sf::st_crs(point))
 })
 
+test_that("projected geometries equal the transformed WGS 84 geometries", {
+  poa_path <- system.file("extdata/poa_gtfs.zip", package = "gtfstools")
+  poa_gtfs <- read_gtfs(poa_path)
+
+  for (f in list("shapes", "stop_times", NULL)) {
+    expected <- sf::st_transform(tester(poa_gtfs, file = f), 31982)
+    expect_identical(tester(poa_gtfs, file = f, crs = 31982), expected)
+    expect_identical(
+      tester(poa_gtfs, file = f, crs = sf::st_crs(31982)),
+      expected
+    )
+  }
+
+  # subset of trips and trips whose shape is missing from 'shapes'
+
+  trips <- c("CPTM L07-0", "CPTM L07-1", "CPTM L08-0")
+  expect_identical(
+    tester(trip_id = trips, crs = 31983),
+    sf::st_transform(tester(trip_id = trips), 31983)
+  )
+
+  # the trip whose shape is missing gets an empty geometry, as with crs = 4326
+
+  missing_shape_gtfs <- read_gtfs(data_path)
+  missing_shape_gtfs$shapes <- missing_shape_gtfs$shapes[shape_id != "17846"]
+  wgs_geom <- tester(missing_shape_gtfs, file = "shapes")
+  projected_geom <- tester(missing_shape_gtfs, file = "shapes", crs = 31983)
+
+  missing_trip <- projected_geom$trip_id == "CPTM L07-0"
+  expect_true(sf::st_is_empty(projected_geom$geometry[missing_trip]))
+  expect_identical(
+    sf::st_coordinates(projected_geom[!missing_trip, ]),
+    sf::st_coordinates(sf::st_transform(wgs_geom[!missing_trip, ], 31983))
+  )
+})
+
 test_that("outputs an 'sf' object with correct column types", {
   sf_geom <- tester(trip_id = "CPTM L07-0")
   expect_s3_class(sf_geom, "sf")

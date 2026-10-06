@@ -135,15 +135,14 @@ get_trip_duration <- function(gtfs, trip_id = NULL, unit = "min") {
 
   # convert duration to desired unit
 
+  # {units} converts element by element, which is slow on long vectors, so we
+  # get the conversion factor from a single value and multiply by it
+
   if (unit != "s") {
-    durations[
-      ,
-      duration := as.numeric(
-        units::set_units(
-          units::as_units(duration, "s"), unit, mode = "standard"
-        )
-      )
-    ]
+    unit_factor <- as.numeric(
+      units::set_units(units::as_units(1, "s"), unit, mode = "standard")
+    )
+    durations[, duration := duration * unit_factor]
   }
 
   return(durations[])

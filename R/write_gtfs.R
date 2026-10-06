@@ -17,6 +17,10 @@
 #'   `TRUE`).
 #' @param quiet Whether to hide log messages and progress bars (defaults to
 #'   `TRUE`).
+#' @param compression_level A number between 1 and 9 indicating how much the
+#'   `.zip` file should be compressed. Lower levels write faster but create
+#'   larger files. Defaults to 6, which is usually several times faster than 9
+#'   and creates files of very similar size. Ignored when `as_dir = TRUE`.
 #'
 #' @return Invisibly returns the same GTFS object passed to the `gtfs`
 #' parameter.
@@ -52,7 +56,8 @@ write_gtfs <- function(gtfs,
                        standard_only = FALSE,
                        as_dir = FALSE,
                        overwrite = TRUE,
-                       quiet = TRUE) {
+                       quiet = TRUE,
+                       compression_level = 6) {
 
   # inputs are more thoroughly checked on gtfsio::export_gtfs()
 
@@ -71,6 +76,7 @@ write_gtfs <- function(gtfs,
   checkmate::assert_logical(standard_only, any.missing = FALSE, len = 1)
   checkmate::assert_logical(overwrite, any.missing = FALSE, len = 1)
   checkmate::assert_logical(quiet, any.missing = FALSE, len = 1)
+  checkmate::assert_int(compression_level, lower = 1, upper = 9)
 
   # convert relevant fields to standard types and write result using {gtfsio}
 
@@ -82,7 +88,8 @@ write_gtfs <- function(gtfs,
     standard_only = standard_only,
     as_dir = as_dir,
     overwrite = overwrite,
-    quiet = quiet
+    quiet = quiet,
+    compression_level = as.numeric(compression_level)
   )
 
   # return object passed to 'gtfs' invisibly

@@ -49,6 +49,22 @@ test_that("raises errors due to incorrect input types", {
   expect_error(write_gtfs(gtfs, temp_file, quiet = "TRUE"))
   expect_error(write_gtfs(gtfs, temp_file, quiet = NA))
   expect_error(write_gtfs(gtfs, temp_file, quiet = c(TRUE, TRUE)))
+  expect_error(write_gtfs(gtfs, temp_file, compression_level = "6"))
+  expect_error(write_gtfs(gtfs, temp_file, compression_level = NA))
+  expect_error(write_gtfs(gtfs, temp_file, compression_level = 0))
+  expect_error(write_gtfs(gtfs, temp_file, compression_level = 10))
+  expect_error(write_gtfs(gtfs, temp_file, compression_level = 1.5))
+  expect_error(write_gtfs(gtfs, temp_file, compression_level = c(1, 9)))
+})
+
+test_that("writes the same content regardless of compression_level", {
+  write_gtfs(gtfs, temp_file)
+  written_default <- read_gtfs(temp_file)
+
+  for (level in list(1, 6L, 9)) {
+    write_gtfs(gtfs, temp_file, compression_level = level)
+    expect_identical(read_gtfs(temp_file), written_default)
+  }
 })
 
 test_that("raises an errors if file exists and should not be overwritten", {

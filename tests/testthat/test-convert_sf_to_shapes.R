@@ -113,3 +113,109 @@ test_that("calculated coords and distances are correct", {
   # distances in original gtfs don't start at 0 and are not really trustworthy,
   # so not checking that for now
 })
+
+test_that("shape_dist_traveled matches the distances calculated by sf/s2", {
+  old_s2 <- sf::sf_use_s2(TRUE)
+  on.exit(sf::sf_use_s2(old_s2), add = TRUE)
+
+  result <- tester(calculate_distance = TRUE)
+  expect_identical(
+    names(result),
+    c(
+      "shape_id", "shape_dist_traveled", "shape_pt_lon", "shape_pt_lat",
+      "shape_pt_sequence"
+    )
+  )
+
+  # cumulative distance between consecutive points, calculated with sf
+
+  expected <- result[
+    ,
+    {
+      points <- sf::st_as_sf(
+        data.frame(x = shape_pt_lon, y = shape_pt_lat),
+        coords = c("x", "y"),
+        crs = 4326
+      )
+      dists <- sf::st_distance(
+        points[-.N, ],
+        points[-1, ],
+        by_element = TRUE
+      )
+      .(dist = cumsum(c(0, as.numeric(dists))))
+    },
+    by = shape_id
+  ]
+  expect_equal(
+    result$shape_dist_traveled,
+    expected$dist,
+    tolerance = 1e-6 / max(expected$dist)
+  )
+  expect_true(all(result[, shape_dist_traveled[1], by = shape_id]$V1 == 0))
+
+  # the last value of each shape equals the length of the shape
+
+  lengths <- as.numeric(sf::st_length(shapes_sf))
+  last_dist <- result[, shape_dist_traveled[.N], by = shape_id]$V1
+  expect_equal(last_dist, lengths, tolerance = 1e-6 / max(lengths))
+
+  # results don't depend on whether s2 is enabled
+
+  sf::sf_use_s2(FALSE)
+  expect_identical(tester(calculate_distance = TRUE), result)
+})
+
+test_that("keeps extra columns before shape_dist_traveled", {
+  larger_sf <- shapes_sf
+  larger_sf$extra_col <- c(1L, 2L, 3L)
+
+  result <- tester(larger_sf, calculate_distance = TRUE)
+  expect_identical(
+    names(result),
+    c(
+      "shape_id", "extra_col", "shape_dist_traveled", "shape_pt_lon",
+      "shape_pt_lat", "shape_pt_sequence"
+    )
+  )
+})
+
+test_that("doesn't change given sf", {
+  original_sf <- convert_shapes_to_sf(
+    gtfs,
+    shape_id = c("17846", "17847", "17848")
+  )
+  given_sf <- convert_shapes_to_sf(
+    gtfs,
+    shape_id = c("17846", "17847", "17848")
+  )
+  expect_identical(original_sf, given_sf)
+
+  result <- tester(given_sf, calculate_distance = TRUE)
+  expect_identical(original_sf, given_sf)
+})
+
+test_that("rcpp_distance_haversine() calculates distances correctly", {
+  # one degree along the equator and along a meridian
+
+  one_degree <- 6371010 * pi / 180
+  expect_equal(
+    rcpp_distance_haversine(c(0, 0), c(0, 0), c(0, 1), c(1, 0)),
+    c(one_degree, one_degree)
+  )
+
+  # antipodal points
+
+  expect_equal(rcpp_distance_haversine(0, 0, 0, 180), 6371010 * pi)
+
+  # NA coordinates result in NA
+
+  expect_identical(
+    rcpp_distance_haversine(c(NA, 0), c(0, 0), c(0, 0), c(0, NA)),
+    c(NA_real_, NA_real_)
+  )
+  expect_identical(
+    rcpp_distance_haversine(numeric(0), numeric(0), numeric(0), numeric(0)),
+    numeric(0)
+  )
+  expect_error(rcpp_distance_haversine(0, 0, 0, c(0, 1)))
+})

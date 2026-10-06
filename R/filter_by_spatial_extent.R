@@ -81,46 +81,48 @@ filter_by_spatial_extent <- function(gtfs,
     geom <- sf::st_union(geom)
   }
 
-  gtfs_list <- vector("list", 2L)
+  has_shapes <- gtfsio::check_file_exists(gtfs, "shapes")
+  has_stop_times <- gtfsio::check_file_exists(gtfs, "stop_times")
 
-  if (gtfsio::check_file_exists(gtfs, "shapes")) {
-    shapes_sf <- convert_shapes_to_sf(gtfs)
-    did_succeed_operation <- spatial_operation(geom, shapes_sf, sparse = FALSE)
-
-    shapes_sf <- shapes_sf[did_succeed_operation, ]
-    relevant_shapes <- shapes_sf$shape_id
-
-    shapes_gtfs <- filter_by_shape_id(gtfs, relevant_shapes, keep)
-    gtfs_list[[1]] <- shapes_gtfs
-  }
-
-  if (gtfsio::check_file_exists(gtfs, "stop_times")) {
-    trips_sf <- get_trip_geometry(gtfs, file = "stop_times")
-    did_succeed_operation <- spatial_operation(geom, trips_sf, sparse = FALSE)
-
-    trips_sf <- trips_sf[did_succeed_operation, ]
-    relevant_trips <- trips_sf$trip_id
-
-    trips_gtfs <- filter_by_trip_id(gtfs, relevant_trips, keep)
-    gtfs_list[[2]] <- trips_gtfs
-  }
-
-  # remove NULL elements from 'gtfs_list' and raise error if it's empty (happens
-  # when neither 'shapes' nor 'stop_times' tables are present in gtfs)
-
-  gtfs_list <- Filter(Negate(is.null), gtfs_list)
-
-  if (length(gtfs_list) == 0) {
+  if (!has_shapes && !has_stop_times) {
     stop(
       "Could not conduct spatial operations with the provided GTFS object. ",
       "It must contain either a 'shapes' or a 'stop_times' table."
     )
   }
 
-  # merge the gtfs objects
+  # a trip is selected if either its shape or the path through its stops
+  # satisfies the spatial operation. we gather the union of these trips and
+  # filter the gtfs only once, so 'keep = FALSE' drops trips selected by either
+  # of them
 
-  result_gtfs <- merge_gtfs(gtfs_list)
-  result_gtfs <- remove_duplicates(result_gtfs)
+  relevant_trips <- character(0)
+
+  if (has_shapes) {
+    shapes_sf <- convert_shapes_to_sf(gtfs)
+    did_succeed_operation <- spatial_operation(geom, shapes_sf, sparse = FALSE)
+
+    relevant_shapes <- shapes_sf$shape_id[did_succeed_operation]
+    is_relevant <- gtfs$trips$shape_id %chin% relevant_shapes
+    relevant_trips <- c(relevant_trips, gtfs$trips$trip_id[is_relevant])
+  }
+
+  if (has_stop_times) {
+    # trips already selected by their shapes don't need to be tested again. the
+    # logical index is created outside of `[` so that {data.table} doesn't add
+    # an index to the original stop_times table
+
+    to_test <- !(gtfs$stop_times$trip_id %chin% relevant_trips)
+    untested_gtfs <- gtfs
+    untested_gtfs$stop_times <- gtfs$stop_times[to_test]
+
+    trips_sf <- get_trip_geometry(untested_gtfs, file = "stop_times")
+    did_succeed_operation <- spatial_operation(geom, trips_sf, sparse = FALSE)
+
+    relevant_trips <- c(relevant_trips, trips_sf$trip_id[did_succeed_operation])
+  }
+
+  result_gtfs <- filter_by_trip_id(gtfs, unique(relevant_trips), keep)
 
   return(result_gtfs)
 }

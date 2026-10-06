@@ -249,3 +249,74 @@ test_that("works ok if trip is not in frequencies but is in stop_times", {
   expect_warning(converted_gtfs <- tester(trip_id = trip))
   expect_identical(converted_gtfs, tester(trip_id = character(0)))
 })
+
+test_that("raises informative errors if frequencies has invalid entries", {
+  # end_time before start_time
+
+  bad_gtfs <- read_gtfs(data_path)
+  bad_gtfs$frequencies[1, end_time := "00:00:00"]
+  bad_trip <- bad_gtfs$frequencies$trip_id[1]
+  expect_error(
+    tester(bad_gtfs),
+    class = "gtfstools_invalid_frequencies",
+    regexp = bad_trip,
+    fixed = TRUE
+  )
+
+  # no headway between different start_time and end_time
+
+  bad_gtfs <- read_gtfs(data_path)
+  bad_gtfs$frequencies[1, headway_secs := 0L]
+  expect_error(tester(bad_gtfs), class = "gtfstools_invalid_frequencies")
+
+  # blank start_time
+
+  bad_gtfs <- read_gtfs(data_path)
+  bad_gtfs$frequencies[1, start_time := ""]
+  expect_error(tester(bad_gtfs), class = "gtfstools_invalid_frequencies")
+
+  # the given gtfs is not changed when the error is raised
+
+  original_gtfs <- read_gtfs(data_path)
+  original_gtfs$frequencies[1, start_time := ""]
+  expect_identical(bad_gtfs, original_gtfs)
+})
+
+test_that("an entry with equal start_time and end_time creates one trip", {
+  one_trip_gtfs <- read_gtfs(data_path)
+  one_trip_gtfs$frequencies <- one_trip_gtfs$frequencies[1]
+  one_trip_gtfs$frequencies[, `:=`(end_time = start_time, headway_secs = 0L)]
+  converted_trip <- one_trip_gtfs$frequencies$trip_id
+
+  converted_gtfs <- tester(one_trip_gtfs)
+  new_trips <- converted_gtfs$trips$trip_id
+  expect_identical(
+    new_trips[startsWith(new_trips, paste0(converted_trip, "_"))],
+    paste0(converted_trip, "_1")
+  )
+})
+
+test_that("raises informative error if a trip has no departure times", {
+  bad_gtfs <- read_gtfs(data_path)
+  bad_gtfs$stop_times[trip_id == "CPTM L07-0", departure_time := ""]
+  expect_error(
+    tester(bad_gtfs),
+    class = "gtfstools_empty_template",
+    regexp = "CPTM L07-0",
+    fixed = TRUE
+  )
+
+  # the given gtfs is not changed when the error is raised
+
+  original_gtfs <- read_gtfs(data_path)
+  original_gtfs$stop_times[trip_id == "CPTM L07-0", departure_time := ""]
+  expect_identical(bad_gtfs, original_gtfs)
+})
+
+test_that("duplicated trip_ids are converted only once", {
+  full_gtfs <- read_gtfs(data_path)
+  expect_identical(
+    tester(full_gtfs, trip_id = c(trip_id, trip_id)),
+    tester(full_gtfs, trip_id = trip_id)
+  )
+})

@@ -15,8 +15,10 @@ converted. If \code{NULL} (the default), all shapes are converted.}
 
 \item{calculate_distance}{A logical. Whether to calculate and populate the
 \code{shape_dist_traveled} column. This column is used to describe the distance
-along the shape from each one of its points to its first point. Defaults to
-\code{TRUE}.}
+along the shape from each one of its points to its first point, in meters.
+Distances are great-circle distances on a sphere with the same radius used
+by \code{{s2}} (6,371,010 meters), regardless of whether \code{sf::sf_use_s2()} is
+enabled. Defaults to \code{TRUE}.}
 }
 \value{
 A \code{data.table} representing a GTFS \code{shapes} table.

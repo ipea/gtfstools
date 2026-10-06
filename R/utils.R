@@ -10,16 +10,24 @@
 string_to_seconds <- function(string) {
   checkmate::assert_character(string)
 
-  seconds_from_midgnight <- cpp_time_to_seconds(string)
+  # time columns have few distinct values, so each one is converted only once
+  # and the result is expanded back to the full length
 
-  na_idx <- which(is.na(seconds_from_midgnight) & !is.na(string))
-  n_bad <- sum(!trimws(string[na_idx]) %in% c("", "NA"))
+  unique_strings <- unique(string)
+  idx <- match(string, unique_strings)
+  unique_seconds <- cpp_time_to_seconds(unique_strings)
+
+  bad <- is.na(unique_seconds) & !is.na(unique_strings)
+  if (any(bad)) bad[bad] <- !trimws(unique_strings[bad]) %in% c("", "NA")
+  n_bad <- sum(bad[idx])
   if (n_bad > 0) {
     cli::cli_warn(
       "{n_bad} malformed time string{?s} (not H:MM:SS) converted to NA.",
       class = "gtfstools_malformed_time"
     )
   }
+
+  seconds_from_midgnight <- unique_seconds[idx]
 
   return(seconds_from_midgnight)
 }
@@ -39,7 +47,11 @@ string_to_seconds <- function(string) {
 seconds_to_string <- function(seconds) {
   checkmate::assert_integer(seconds, lower = 0)
 
-  time_string <- cpp_seconds_to_string(seconds)
+  # format each distinct value only once, then expand back to the full length
+
+  unique_seconds <- unique(seconds)
+  time_string <- cpp_seconds_to_string(unique_seconds)
+  time_string <- time_string[match(seconds, unique_seconds)]
 
   return(time_string)
 }

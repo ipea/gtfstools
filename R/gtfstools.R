@@ -102,6 +102,9 @@ utils::globalVariables(
     "to_route_id",
     "from_trip_id",
     "to_trip_id",
-    ".flagged"
+    ".flagged",
+    "new_trip_id",
+    "first_departure",
+    "first_row"
   )
 )

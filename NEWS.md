@@ -7,6 +7,8 @@
 - `get_stop_times_patterns(type = "spatiotemporal")` may return different pattern ids for feeds with blank intermediate stop times, which are now correctly accounted for (see Bug fixes).
 - The `filter_by_*()` functions may now return more rows, as they no longer drop rows with blank optional keys, station entrances, generic nodes and boarding areas of kept stations and platforms, and the `agency` of single-agency feeds (see Bug fixes).
 - Invalid dates (e.g. `20240230`) are still converted to `NA` when reading or converting feeds, but now raise a warning (class `gtfstools_invalid_date`) listing the invalid values.
+- `frequencies_to_stop_times()` now raises an informative error (class `gtfstools_invalid_frequencies`) when `frequencies` has invalid entries (missing or malformed `start_time`/`end_time`, `end_time` before `start_time`, or a missing or non-positive `headway_secs` while `start_time` and `end_time` differ), and another one (class `gtfstools_empty_template`) when a trip to be converted has no `departure_time` in `stop_times`. Previously, these cases failed with obscure errors. Duplicated values in its `trip_id` argument are now converted only once.
+- `filter_by_spatial_extent()` (and `filter_by_sf()`) now filters the feed by the selected trips only once, instead of filtering it by shapes and by trips separately and merging the results. As a consequence, shapes not used by any trip are no longer kept, duplicated rows of the given feed are no longer removed, and rows keep the order of the given feed (see Bug fixes).
 
 ## Bug fixes
 
@@ -31,15 +33,37 @@
 - Fixed the documentation of `filter_by_time_of_day()`, which stated that `update_frequencies` defaults to `FALSE` (it defaults to `TRUE`).
 - Fixed bug in `merge_gtfs()` that errored when columns were are of type character (unknown). PR contribution by @gmatosferreira.
 - Fixed bug that was leading to drop parent station ids in `merge_gtfs()`. PR contribution by @gmatosferreira and @haneroglu.
+- Fixed bug in `filter_by_spatial_extent()` (and `filter_by_sf()`) that, with `keep = FALSE`, kept trips selected only by their shapes or only by their stops, instead of dropping every selected trip.
 
 ## New features
 
 - New function `list_validator_versions()` which returns a df with the available CLI versions and their URLs. PR contribution by @baarthur
+- `write_gtfs()` gains a `compression_level` argument. It defaults to 6 (previously the feed was always compressed at level 9), which makes writing a feed about 2 to 3 times faster for files of very similar size. The content of the written files is unchanged.
 
 ## Notes
 - Function `download_validator()` now automatically detects the latest version available. PR contribution by @baarthur
 - `get_children_stops()` is now much faster on large feeds (about 250x faster with 20,000 stops).
 - Converting date fields when reading and writing feeds (`read_gtfs()`, `write_gtfs()`, `as_dt_gtfs()`) is now much faster (about 200x faster for the date conversion itself), noticeably speeding up `read_gtfs()` on feeds with large `calendar_dates` tables.
+- Converting times between `"HH:MM:SS"` strings and seconds is now faster, as each distinct time is converted only once. This speeds up `convert_time_to_seconds()` (about 20 times faster on a feed with 900,000 `stop_times` rows), `filter_by_time_of_day()` (about 7 times faster on the same feed) and, to a lesser extent, the other functions that convert times.
+- `get_trip_segment_duration()` and `get_trip_duration()` are much faster when `unit` is not `"s"` (about 60 and 10 times faster, respectively, on a feed with 900,000 `stop_times` rows).
+- `frequencies_to_stop_times()` is much faster (about 13 times faster when converting a feed into 300,000 `stop_times` rows), as it creates all new trips at once instead of one at a time. It also no longer adds and then removes auxiliary columns from the tables of the given feed.
+- `filter_by_spatial_extent()` (and `filter_by_sf()`) is much faster and uses much less memory (about 25 times faster on a feed with 900,000 `stop_times` rows), as it filters the feed only once and doesn't create geometries for trips already selected by their shapes.
+- `convert_sf_to_shapes()` is much faster (about 30 times faster with `calculate_distance = FALSE` and 70 times faster with `calculate_distance = TRUE` on a feed with 50,000 shape points), as it no longer casts the linestrings to points and calculates `shape_dist_traveled` with a vectorised haversine formula. Distances are calculated on the same sphere used by `{s2}`, so they match the previous results (with `sf::sf_use_s2(TRUE)`, the default) to within a micrometre. With `sf::sf_use_s2(FALSE)`, the previous version calculated ellipsoidal distances, which differ from the spherical ones by up to about 0.4%; distances are now always spherical.
+- `get_trip_geometry()` is much faster when `crs` is not WGS 84, as each shape is now transformed only once, instead of once per trip that uses it (about 45 times faster for `file = "shapes"` on a feed with 15,000 trips and 160 shapes).
+- The table below shows how many times faster each function optimised above is, compared with the development version before these optimisations, on the example feeds shipped with the package (each stacked twice with `merge_gtfs()`). `get_trip_duration()` and `get_trip_segment_duration()` used `unit = "min"`, `get_trip_geometry()` used `crs = 31983`, and `filter_by_spatial_extent()` used the western half of each feed's extent. The poa feed has no `frequencies` table. Differences under about 1.2 times are within measurement noise.
+
+  | function | n times faster on poa | n times faster on spo |
+  |---|---|---|
+  | `convert_sf_to_shapes()` | 11.3 | 33.7 |
+  | `convert_time_to_seconds()` | 5.8 | 1.3 |
+  | `filter_by_spatial_extent()` | 2.9 | 1.9 |
+  | `filter_by_time_of_day()` | 2.9 | 1.2 |
+  | `frequencies_to_stop_times()` | – | 12.7 |
+  | `get_trip_duration()` | 4.0 | 1.5 |
+  | `get_trip_geometry()` | 2.5 | 1.0 |
+  | `get_trip_segment_duration()` | 50.1 | 2.8 |
+  | `get_trip_speed()` | 2.6 | 1.0 |
+  | `write_gtfs()` | 1.5 | 0.9 |
 - The package documentation website moved to <https://ipea.github.io/gtfstools/> and the GitHub repository to <https://github.com/ipea/gtfstools>. All links were updated.
 - The filtering vignette and the documentation now use `filter_by_spatial_extent()` instead of the deprecated `filter_by_sf()`, which was moved to a "Deprecated" section of the reference index.
 
