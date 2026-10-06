@@ -34,6 +34,8 @@
 - Fixed bug in `merge_gtfs()` that errored when columns were are of type character (unknown). PR contribution by @gmatosferreira.
 - Fixed bug that was leading to drop parent station ids in `merge_gtfs()`. PR contribution by @gmatosferreira and @haneroglu.
 - Fixed bug in `filter_by_spatial_extent()` (and `filter_by_sf()`) that, with `keep = FALSE`, kept trips selected only by their shapes or only by their stops, instead of dropping every selected trip.
+- Fixed bug in `filter_by_stop_id(full_trips = FALSE)` that added a `.flagged` column to the `fare_rules` table of the given GTFS object when this table had a `contains_id` column but no `origin_id` and `destination_id` columns.
+- Fixed bug in `get_stop_times_patterns()` that assigned the same pattern to trips with different sequences of stops when their `stop_id`s contained the `;` character (or `|`, with `type = "spatiotemporal"`).
 
 ## New features
 

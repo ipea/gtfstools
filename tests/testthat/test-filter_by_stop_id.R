@@ -350,3 +350,18 @@ test_that("include_parents and include_children arguments work correctly", {
   expect_true("F12" %in% only_stop_dropping$stops$stop_id)
   expect_true(!any(c("F12S", "B1", "B3") %in% only_stop_dropping$stops$stop_id))
 })
+
+test_that("doesn't add columns to the fare_rules of the given gtfs", {
+  # when 'fare_rules' has 'contains_id' but neither 'origin_id' nor
+  # 'destination_id', its zones are filtered before it is subset by any other
+  # step, so the original table must not be modified
+
+  ggl_path <- system.file("extdata/ggl_gtfs.zip", package = "gtfstools")
+  ggl_gtfs <- read_gtfs(ggl_path)
+  ggl_gtfs$fare_rules <- data.table::copy(ggl_gtfs$fare_rules)
+  ggl_gtfs$fare_rules[, c("origin_id", "destination_id") := NULL]
+  original_fare_rules <- data.table::copy(ggl_gtfs$fare_rules)
+
+  smaller_ggl <- tester2(ggl_gtfs, c("S1", "N1", "N2", "S6", "S7"))
+  expect_identical(ggl_gtfs$fare_rules, original_fare_rules)
+})
