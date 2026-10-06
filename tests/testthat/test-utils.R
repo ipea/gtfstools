@@ -184,3 +184,26 @@ test_that("always returns a dt_gtfs object", {
   result <- assert_and_assign_gtfs_object(gtfsio_gtfs)
   expect_s3_class(result, "dt_gtfs")
 })
+
+
+
+# warn_missing_ids --------------------------------------------------------
+
+
+test_that("warn_missing_ids() warns about missing ids for its caller", {
+  f <- function(x) warn_missing_ids(x, c("a", "b"), "tbl", "x_id")
+
+  expect_silent(f("a"))
+  expect_silent(f(character(0)))
+  expect_identical(f("a"), character(0))
+
+  w <- tryCatch(f(c("a", "c", "c")), warning = function(w) w)
+  expect_identical(
+    conditionMessage(w),
+    "'tbl' doesn't contain the following x_id(s): 'c', 'c'"
+  )
+  expect_identical(conditionCall(w), quote(f(c("a", "c", "c"))))
+
+  expect_invisible(suppressWarnings(result <- f(c("a", "c", "c"))))
+  expect_identical(result, c("c", "c"))
+})

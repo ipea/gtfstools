@@ -104,14 +104,7 @@ get_stop_times_patterns <- function(gtfs,
   if (!is.null(trip_id)) {
     relevant_trips <- trip_id
 
-    invalid_trips <- trip_id[! trip_id %chin% gtfs$stop_times$trip_id]
-
-    if (!identical(invalid_trips, character(0))) {
-      warning(
-        "'stop_times' doesn't contain the following trip_id(s): ",
-        paste0("'", invalid_trips, "'", collapse = ", ")
-      )
-    }
+    warn_missing_ids(trip_id, gtfs$stop_times$trip_id, "stop_times", "trip_id")
 
     patterns <- gtfs$stop_times[trip_id %chin% relevant_trips]
   } else {

@@ -66,15 +66,7 @@ get_trip_duration <- function(gtfs, trip_id = NULL, unit = "min") {
   if (!is.null(trip_id)) {
     relevant_trips <- trip_id
 
-    invalid_trip_id <- trip_id[! trip_id %chin% gtfs$stop_times$trip_id]
-
-    if (!identical(invalid_trip_id, character(0))) {
-      warning(
-        paste0(
-          "'stop_times' doesn't contain the following trip_id(s): "),
-        paste0("'", invalid_trip_id, "'", collapse = ", ")
-      )
-    }
+    warn_missing_ids(trip_id, gtfs$stop_times$trip_id, "stop_times", "trip_id")
 
     if (all(gtfs$stop_times$trip_id %chin% relevant_trips)) {
       durations <- gtfs$stop_times

@@ -44,15 +44,12 @@ get_children_stops <- function(gtfs, stop_id = NULL) {
   # doesn't exist in 'stops'
 
   if (!is.null(stop_id)) {
-    invalid_stop_id <- stop_id[! stop_id %chin% gtfs$stops$stop_id]
-
-    if (!identical(invalid_stop_id, character(0))) {
-      warning(
-        paste0(
-          "'stops' doesn't contain the following stop_id(s): "),
-        paste0("'", invalid_stop_id, "'", collapse = ", ")
-      )
-    }
+    invalid_stop_id <- warn_missing_ids(
+      stop_id,
+      gtfs$stops$stop_id,
+      "stops",
+      "stop_id"
+    )
 
     stop_id <- setdiff(stop_id, invalid_stop_id)
   } else {

@@ -82,19 +82,14 @@ frequencies_to_stop_times <- function(gtfs, trip_id = NULL, force = FALSE) {
   # raise warning if a given trip_id doesn't exist in 'frequencies'
 
   if (!is.null(trip_id)) {
-    invalid_trip_id <- trip_id[
-      ! trip_id %chin% unique(gtfs$frequencies$trip_id)
-    ]
+    invalid_trip_id <- warn_missing_ids(
+      trip_id,
+      gtfs$frequencies$trip_id,
+      "frequencies",
+      "trip_id"
+    )
 
-    if (!identical(invalid_trip_id, character(0))) {
-      warning(
-        "'frequencies' doesn't contain the following trip_id(s): ",
-        paste0("'", invalid_trip_id, "'", collapse = ", "),
-        call. = FALSE
-      )
-
-      relevant_trips <- setdiff(relevant_trips, invalid_trip_id)
-    }
+    relevant_trips <- setdiff(relevant_trips, invalid_trip_id)
   }
 
   # check if a trip exists in 'frequencies' but not in 'stop_times', and

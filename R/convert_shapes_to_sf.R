@@ -58,15 +58,7 @@ convert_shapes_to_sf <- function(gtfs,
   if (!is.null(shape_id)) {
     relevant_shapes <- shape_id
 
-    invalid_shape_id <- shape_id[! shape_id %chin% unique(gtfs$shapes$shape_id)]
-
-    if (!identical(invalid_shape_id, character(0))) {
-      warning(
-        paste0(
-          "'shapes' doesn't contain the following shape_id(s): "),
-        paste0("'", invalid_shape_id, "'", collapse = ", ")
-      )
-    }
+    warn_missing_ids(shape_id, gtfs$shapes$shape_id, "shapes", "shape_id")
 
     shapes <- gtfs$shapes[shape_id %chin% relevant_shapes]
   } else {

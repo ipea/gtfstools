@@ -51,14 +51,7 @@ convert_sf_to_shapes <- function(sf_shapes,
   if (!is.null(shape_id)) {
     relevant_shapes <- shape_id
 
-    invalid_shape_id <- shape_id[! shape_id %chin% sf_shapes$shape_id]
-
-    if (!identical(invalid_shape_id, character(0))) {
-      warning(
-        "'sf_shapes' doesn't contain the following shape_id(s): ",
-        paste0("'", invalid_shape_id, "'", collapse = ", ")
-      )
-    }
+    warn_missing_ids(shape_id, sf_shapes$shape_id, "sf_shapes", "shape_id")
 
     sf_shapes <- subset(sf_shapes, shape_id %chin% relevant_shapes)
   }
