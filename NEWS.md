@@ -50,6 +50,20 @@
 - `filter_by_spatial_extent()` (and `filter_by_sf()`) is much faster and uses much less memory (about 25 times faster on a feed with 900,000 `stop_times` rows), as it filters the feed only once and doesn't create geometries for trips already selected by their shapes.
 - `convert_sf_to_shapes()` is much faster (about 30 times faster with `calculate_distance = FALSE` and 70 times faster with `calculate_distance = TRUE` on a feed with 50,000 shape points), as it no longer casts the linestrings to points and calculates `shape_dist_traveled` with a vectorised haversine formula. Distances are calculated on the same sphere used by `{s2}`, so they match the previous results (with `sf::sf_use_s2(TRUE)`, the default) to within a micrometre. With `sf::sf_use_s2(FALSE)`, the previous version calculated ellipsoidal distances, which differ from the spherical ones by up to about 0.4%; distances are now always spherical.
 - `get_trip_geometry()` is much faster when `crs` is not WGS 84, as each shape is now transformed only once, instead of once per trip that uses it (about 45 times faster for `file = "shapes"` on a feed with 15,000 trips and 160 shapes).
+- The table below shows how many times faster each function optimised above is, compared with the development version before these optimisations, on the example feeds shipped with the package (each stacked twice with `merge_gtfs()`). `get_trip_duration()` and `get_trip_segment_duration()` used `unit = "min"`, `get_trip_geometry()` used `crs = 31983`, and `filter_by_spatial_extent()` used the western half of each feed's extent. The poa feed has no `frequencies` table. Differences under about 1.2 times are within measurement noise.
+
+  | function | n times faster on poa | n times faster on spo |
+  |---|---|---|
+  | `convert_sf_to_shapes()` | 11.3 | 33.7 |
+  | `convert_time_to_seconds()` | 5.8 | 1.3 |
+  | `filter_by_spatial_extent()` | 2.9 | 1.9 |
+  | `filter_by_time_of_day()` | 2.9 | 1.2 |
+  | `frequencies_to_stop_times()` | – | 12.7 |
+  | `get_trip_duration()` | 4.0 | 1.5 |
+  | `get_trip_geometry()` | 2.5 | 1.0 |
+  | `get_trip_segment_duration()` | 50.1 | 2.8 |
+  | `get_trip_speed()` | 2.6 | 1.0 |
+  | `write_gtfs()` | 1.5 | 0.9 |
 - The package documentation website moved to <https://ipea.github.io/gtfstools/> and the GitHub repository to <https://github.com/ipea/gtfstools>. All links were updated.
 - The filtering vignette and the documentation now use `filter_by_spatial_extent()` instead of the deprecated `filter_by_sf()`, which was moved to a "Deprecated" section of the reference index.
 
