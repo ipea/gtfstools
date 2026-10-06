@@ -12,6 +12,13 @@ extern "C" SEXP _gtfstools_cpp_time_to_seconds(SEXP times_in) {
     return cpp11::as_sexp(cpp_time_to_seconds(cpp11::as_cpp<cpp11::decay_t<const strings>>(times_in)));
   END_CPP11
 }
+// distance_haversine.cpp
+doubles rcpp_distance_haversine(const doubles lat_from, const doubles lon_from, const doubles lat_to, const doubles lon_to);
+extern "C" SEXP _gtfstools_rcpp_distance_haversine(SEXP lat_from, SEXP lon_from, SEXP lat_to, SEXP lon_to) {
+  BEGIN_CPP11
+    return cpp11::as_sexp(rcpp_distance_haversine(cpp11::as_cpp<cpp11::decay_t<const doubles>>(lat_from), cpp11::as_cpp<cpp11::decay_t<const doubles>>(lon_from), cpp11::as_cpp<cpp11::decay_t<const doubles>>(lat_to), cpp11::as_cpp<cpp11::decay_t<const doubles>>(lon_to)));
+  END_CPP11
+}
 // seconds_to_string.cpp
 strings cpp_seconds_to_string(const integers seconds_from_midnight);
 extern "C" SEXP _gtfstools_cpp_seconds_to_string(SEXP seconds_from_midnight) {
@@ -22,8 +29,9 @@ extern "C" SEXP _gtfstools_cpp_seconds_to_string(SEXP seconds_from_midnight) {
 
 extern "C" {
 static const R_CallMethodDef CallEntries[] = {
-    {"_gtfstools_cpp_seconds_to_string", (DL_FUNC) &_gtfstools_cpp_seconds_to_string, 1},
-    {"_gtfstools_cpp_time_to_seconds",   (DL_FUNC) &_gtfstools_cpp_time_to_seconds,   1},
+    {"_gtfstools_cpp_seconds_to_string",   (DL_FUNC) &_gtfstools_cpp_seconds_to_string,   1},
+    {"_gtfstools_cpp_time_to_seconds",     (DL_FUNC) &_gtfstools_cpp_time_to_seconds,     1},
+    {"_gtfstools_rcpp_distance_haversine", (DL_FUNC) &_gtfstools_rcpp_distance_haversine, 4},
     {NULL, NULL, 0}
 };
 }

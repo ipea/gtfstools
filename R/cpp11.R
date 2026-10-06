@@ -4,6 +4,10 @@ cpp_time_to_seconds <- function(times_in) {
   .Call(`_gtfstools_cpp_time_to_seconds`, times_in)
 }
 
+rcpp_distance_haversine <- function(lat_from, lon_from, lat_to, lon_to) {
+  .Call(`_gtfstools_rcpp_distance_haversine`, lat_from, lon_from, lat_to, lon_to)
+}
+
 cpp_seconds_to_string <- function(seconds_from_midnight) {
   .Call(`_gtfstools_cpp_seconds_to_string`, seconds_from_midnight)
 }
