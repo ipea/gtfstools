@@ -102,8 +102,13 @@ set_trip_speed <- function(gtfs,
 
   if (length(speed) == 1) speed <- rep(speed, length(trip_id))
 
-  units(speed) <- unit
-  speed <- as.numeric(units::set_units(speed, "km/h"))
+  # issue #84 - only convert when needed, and never empty vectors (older
+  # {units} versions read out of bounds when converting zero-length input)
+
+  if (unit != "km/h" && length(speed) > 0) {
+    units(speed) <- unit
+    speed <- as.numeric(units::set_units(speed, "km/h"))
+  }
   names(speed) <- trip_id
 
   # calculate each trip duration (in hours) based on its length and given

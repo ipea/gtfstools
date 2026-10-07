@@ -65,6 +65,7 @@
 - The `file` argument of `get_trip_length()` and `get_trip_speed()` is deprecated in favour of `method` (`file = "stop_times"` corresponds to `method = "euclidean"`). It is still accepted, with a warning (class `deprecated_file`), but must be passed by name.
 
 ## Notes
+- gtfstools now requires `{units}` >= 1.0-1, which fixed an out-of-bounds read when converting empty vectors that was flagged by CRAN's sanitizer checks. `set_trip_speed()` also no longer converts speeds when `unit = "km/h"` or when no `trip_id` is given (#84).
 - Function `download_validator()` now automatically detects the latest version available. PR contribution by @baarthur
 - `get_children_stops()` is now much faster on large feeds (about 250x faster with 20,000 stops).
 - Converting date fields when reading and writing feeds (`read_gtfs()`, `write_gtfs()`, `as_dt_gtfs()`) is now much faster (about 200x faster for the date conversion itself), noticeably speeding up `read_gtfs()` on feeds with large `calendar_dates` tables.
