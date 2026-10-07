@@ -123,6 +123,9 @@ utils::globalVariables(
     "i.last_seq",
     "first_secs",
     "i.first_secs",
-    "secs_offset"
+    "secs_offset",
+    "slot",
+    "n_trips",
+    "..needed_cols"
   )
 )
