@@ -4,14 +4,17 @@
 \alias{build_linestrings}
 \title{Build linestrings from sequences of points}
 \usage{
-build_linestrings(points, id_col)
+build_linestrings(points, id_col, x_col = "lon", y_col = "lat")
 }
 \arguments{
-\item{points}{A \code{data.table} with the \code{lon} and \code{lat} of each point and an
+\item{points}{A \code{data.table} with the coordinates of each point and an
 integer column identifying the linestring of each point. The points of
 each linestring must be contiguous and the ids increasing.}
 
 \item{id_col}{The name of the column that identifies the linestrings.}
+
+\item{x_col, y_col}{The names of the columns with the longitude and the
+latitude of each point.}
 }
 \value{
 A \code{sfc_LINESTRING} in WGS 84, with one linestring per id.

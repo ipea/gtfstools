@@ -175,12 +175,17 @@ get_trip_geometry <- function(gtfs,
     built_trip <- unique(trip_index[has_coords])
     built_idx <- seq_along(built_trip)
 
-    stop_points <- data.table::data.table(
-      trip = trip_index[has_coords],
-      lon = st$stop_lon[has_coords],
-      lat = st$stop_lat[has_coords]
+    # 'st' is a new table, so the trip index can be added to it by reference.
+    # it's only subset when some stops don't have coordinates (usually none)
+
+    data.table::set(st, j = "trip_index", value = trip_index)
+    stop_points <- if (all(has_coords)) st else st[has_coords]
+    built <- build_linestrings(
+      stop_points,
+      "trip_index",
+      "stop_lon",
+      "stop_lat"
     )
-    built <- build_linestrings(stop_points, "trip")
   } else {
     position <- locate_stops_along_shapes(
       gtfs,
@@ -217,13 +222,15 @@ get_trip_geometry <- function(gtfs,
     built <- sf::st_transform(built, crs)
   }
 
-  # trips without a built geometry get an empty one
+  # trips without a built geometry get an empty one, appended after the built
+  # geometries, so that the geometry of every trip is selected at once
 
+  geometry_idx <- rep(length(built) + 1L, length(trip_ids))
+  geometry_idx[built_trip] <- built_idx
   geometry <- sf::st_sfc(
-    rep(list(sf::st_linestring()), length(trip_ids)),
+    c(unclass(built), list(sf::st_linestring()))[geometry_idx],
     crs = sf::st_crs(built)
   )
-  geometry[built_trip] <- built[built_idx]
   if (length(trip_ids) == 0) class(geometry)[1] <- "sfc_LINESTRING"
 
   trips_sf <- data.table::data.table(trip_id = trip_ids, geometry = geometry)
@@ -250,7 +257,7 @@ build_shape_cuts <- function(cuts, shape_points) {
   # rcpp_locate_stops_on_shape(). R's cumsum() accumulates in long double while
   # the C++ code accumulates in double, so the positions of the last stops may
   # slightly exceed the cumulative distance of the last shape point. hence the
-  # 'rule = 2' below
+  # interpolation factors are clamped to [0, 1] below
 
   if (nrow(cuts) == 0) return(build_linestrings(cuts, "shape_id"))
 
@@ -272,42 +279,77 @@ build_shape_cuts <- function(cuts, shape_points) {
   step[!duplicated(shape_group)] <- 0
   cum <- unlist(lapply(split(step, shape_group), cumsum), use.names = FALSE)
 
-  point_rows <- split(seq_len(n_points), shape_group)
+  shape_start <- which(!duplicated(shape_group))
+  shape_end <- c(shape_start[-1L] - 1L, n_points)
   cut_shape <- match(cuts$shape_id, relevant_shapes)
 
   # each part goes from the point at 'from' to the point at 'to', interpolated
-  # along the shape, through the shape points in between
+  # along the shape, through the shape points in between ('inner' points,
+  # whose cumulative distance is strictly between 'from' and 'to'). the shape
+  # segments that contain 'from' and 'to' and the range of inner points are
+  # found for all the parts of each shape at once. indices are global (into
+  # 'cum', 'lat' and 'lon')
 
-  cut_coords <- lapply(
-    seq_len(nrow(cuts)),
-    function(k) {
-      p <- point_rows[[cut_shape[k]]]
-      ends <- c(cuts$from[k], cuts$to[k])
-      is_inner <- cum[p] > ends[1] & cum[p] < ends[2]
+  n_cuts <- nrow(cuts)
+  from_segment <- to_segment <- first_inner <- last_inner <- integer(n_cuts)
 
-      interpolate <- function(y) {
-        stats::approx(
-          cum[p],
-          y[p],
-          ends,
-          rule = 2,
-          ties = list("ordered", mean)
-        )$y
-      }
-      end_lon <- interpolate(lon)
-      end_lat <- interpolate(lat)
+  for (cuts_k in split(seq_len(n_cuts), cut_shape)) {
+    s <- cut_shape[cuts_k[1L]]
+    offset <- shape_start[s] - 1L
+    shape_cum <- cum[shape_start[s]:shape_end[s]]
+    last_segment <- length(shape_cum) - 1L
 
-      cbind(
-        c(end_lon[1], lon[p][is_inner], end_lon[2]),
-        c(end_lat[1], lat[p][is_inner], end_lat[2])
-      )
-    }
-  )
+    n_up_to_from <- findInterval(cuts$from[cuts_k], shape_cum)
+    n_up_to_to <- findInterval(cuts$to[cuts_k], shape_cum)
+
+    from_segment[cuts_k] <- offset + pmin(pmax(n_up_to_from, 1L), last_segment)
+    to_segment[cuts_k] <- offset + pmin(pmax(n_up_to_to, 1L), last_segment)
+    first_inner[cuts_k] <- offset + n_up_to_from + 1L
+    last_inner[cuts_k] <- offset + findInterval(
+      cuts$to[cuts_k],
+      shape_cum,
+      left.open = TRUE
+    )
+  }
+
+  interpolate <- function(position, segment) {
+    segment_length <- cum[segment + 1L] - cum[segment]
+    fraction <- (position - cum[segment]) / segment_length
+    fraction[!(segment_length > 0)] <- 0
+    fraction <- pmin(pmax(fraction, 0), 1)
+
+    list(
+      lon = lon[segment] + fraction * (lon[segment + 1L] - lon[segment]),
+      lat = lat[segment] + fraction * (lat[segment + 1L] - lat[segment])
+    )
+  }
+  start_point <- interpolate(cuts$from, from_segment)
+  end_point <- interpolate(cuts$to, to_segment)
+
+  # the points of each part: its start point, its inner points and its end
+  # point
+
+  n_inner <- pmax(last_inner - first_inner + 1L, 0L)
+  n_cut_points <- n_inner + 2L
+  cut_id <- rep.int(seq_len(n_cuts), n_cut_points)
+  point_position <- sequence(n_cut_points)
+  is_start <- point_position == 1L
+  is_end <- point_position == n_cut_points[cut_id]
+
+  point_idx <- first_inner[cut_id] + point_position - 2L
+  point_idx[is_start | is_end] <- NA_integer_
+
+  cut_lon <- lon[point_idx]
+  cut_lat <- lat[point_idx]
+  cut_lon[is_start] <- start_point$lon
+  cut_lat[is_start] <- start_point$lat
+  cut_lon[is_end] <- end_point$lon
+  cut_lat[is_end] <- end_point$lat
 
   cut_points <- data.table::data.table(
-    cut = rep.int(seq_along(cut_coords), vapply(cut_coords, nrow, integer(1))),
-    lon = unlist(lapply(cut_coords, function(m) m[, 1]), use.names = FALSE),
-    lat = unlist(lapply(cut_coords, function(m) m[, 2]), use.names = FALSE)
+    cut = cut_id,
+    lon = cut_lon,
+    lat = cut_lat
   )
 
   return(build_linestrings(cut_points, "cut"))
@@ -317,15 +359,17 @@ build_shape_cuts <- function(cuts, shape_points) {
 
 #' Build linestrings from sequences of points
 #'
-#' @param points A `data.table` with the `lon` and `lat` of each point and an
+#' @param points A `data.table` with the coordinates of each point and an
 #'   integer column identifying the linestring of each point. The points of
 #'   each linestring must be contiguous and the ids increasing.
 #' @param id_col The name of the column that identifies the linestrings.
+#' @param x_col,y_col The names of the columns with the longitude and the
+#'   latitude of each point.
 #'
 #' @return A `sfc_LINESTRING` in WGS 84, with one linestring per id.
 #'
 #' @keywords internal
-build_linestrings <- function(points, id_col) {
+build_linestrings <- function(points, id_col, x_col = "lon", y_col = "lat") {
   # the condition for nrow == 0 prevents an sfheaders error
 
   if (nrow(points) == 0) {
@@ -336,8 +380,8 @@ build_linestrings <- function(points, id_col) {
 
   built <- sfheaders::sfc_linestring(
     points,
-    x = "lon",
-    y = "lat",
+    x = x_col,
+    y = y_col,
     linestring_id = id_col
   )
   built <- sf::st_set_crs(built, 4326)
