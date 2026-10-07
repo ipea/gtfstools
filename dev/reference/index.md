@@ -104,6 +104,8 @@
   : Convert time fields to seconds after midnight
 - [`frequencies_to_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/frequencies_to_stop_times.md)
   : Convert frequencies to stop times
+- [`interpolate_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_stop_times.md)
+  : Interpolate missing stop times
 - [`merge_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/merge_gtfs.md)
   : Merge GTFS files
 - [`remove_duplicates()`](https://ipea.github.io/gtfstools/dev/reference/remove_duplicates.md)
@@ -112,6 +114,8 @@
   : Remove unused ids
 - [`set_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.md)
   : Set trip average speed
+- [`stop_times_to_frequencies()`](https://ipea.github.io/gtfstools/dev/reference/stop_times_to_frequencies.md)
+  : Convert stop times to frequencies
 
 ## Validate GTFS feeds
 

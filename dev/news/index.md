@@ -319,6 +319,20 @@
 ### New features
 
 - New function
+  [`stop_times_to_frequencies()`](https://ipea.github.io/gtfstools/dev/reference/stop_times_to_frequencies.md),
+  the counterpart of
+  [`frequencies_to_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/frequencies_to_stop_times.md),
+  which converts scheduled trips into frequency-based ones
+  ([\#69](https://github.com/ipea/gtfstools/issues/69)). Trips that
+  share their route, service, direction, shape and sequence of stops are
+  summarised, in each one-hour slot of the clock, by the trip that
+  departs first and a `frequencies` entry whose `headway_secs` is based
+  on the number of trips in that slot. The other trips are removed, so
+  the conversion is a lossy approximation of the schedule. It is useful,
+  for example, to make the `time_window` of
+  [r5r](https://github.com/ipeaGIT/r5r) draw departure times for feeds
+  without a `frequencies` table.
+- New function
   [`list_validator_versions()`](https://ipea.github.io/gtfstools/dev/reference/list_validator_versions.md)
   which returns a df with the available CLI versions and their URLs. PR
   contribution by [@baarthur](https://github.com/baarthur)
@@ -383,6 +397,18 @@
   duration), and the `from` and `to` arguments, to change only trips
   that depart from the segment’s first stop within a time of day
   ([\#89](https://github.com/ipea/gtfstools/issues/89)).
+- New function
+  [`interpolate_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_stop_times.md),
+  which fills blank `arrival_time`s and `departure_time`s in
+  `stop_times`, assuming that vehicles travel at a constant speed
+  between consecutive stops with known times. Distances between stops
+  are measured along the trip’s shape (`method = "shapes"`, the default)
+  or as straight lines (`method = "euclidean"`), as in
+  [`get_trip_length()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_length.md).
+  Unlike `tidytransit::interpolate_stop_times()`, it doesn’t require a
+  `shape_dist_traveled` column. Interpolated times are rounded to the
+  nearest second, and stops before a trip’s first or after its last
+  known time are left blank, with a warning.
 
 ### Feature deprecation
 

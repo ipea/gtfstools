@@ -52,6 +52,7 @@
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/has_shapes.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/index.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/integer_to_date.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/interpolate_stop_times.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/list_validator_versions.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/locate_stops_along_shapes.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/map_deprecated_file.html</loc></url>
@@ -62,9 +63,11 @@
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/remove_unused_ids.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/seconds_to_string.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/stop_times_to_frequencies.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/string_to_seconds.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/validate_gtfs.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/warn_missing_ids.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/warn_times_not_interpolated.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/write_gtfs.html</loc></url>
 </urlset>
 
