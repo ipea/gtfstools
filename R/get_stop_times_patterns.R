@@ -104,14 +104,7 @@ get_stop_times_patterns <- function(gtfs,
   if (!is.null(trip_id)) {
     relevant_trips <- trip_id
 
-    invalid_trips <- trip_id[! trip_id %chin% gtfs$stop_times$trip_id]
-
-    if (!identical(invalid_trips, character(0))) {
-      warning(
-        "'stop_times' doesn't contain the following trip_id(s): ",
-        paste0("'", invalid_trips, "'", collapse = ", ")
-      )
-    }
+    warn_missing_ids(trip_id, gtfs$stop_times$trip_id, "stop_times", "trip_id")
 
     patterns <- gtfs$stop_times[trip_id %chin% relevant_trips]
   } else {
@@ -123,10 +116,17 @@ get_stop_times_patterns <- function(gtfs,
     patterns <- data.table::setorderv(patterns, c("trip_id", "stop_sequence"))
   }
 
+  # each trip's sequence of stops is described by integer codes instead of the
+  # stop_ids themselves, because ids may contain the characters used to
+  # separate them (e.g. the sequences "a;b" -> "c" and "a" -> "b;c" would both
+  # be described as "a;b;c")
+
+  stop_codes <- data.table::chmatch(patterns$stop_id, unique(patterns$stop_id))
+
   if (type == "spatial") {
     patterns <- patterns[
       ,
-      .(data = paste0(stop_id, collapse = ";")),
+      .(data = paste0(stop_codes[.I], collapse = ";")),
       keyby = trip_id
     ]
   } else {
@@ -151,7 +151,7 @@ get_stop_times_patterns <- function(gtfs,
 
         .(
           data = paste(
-            stop_id,
+            stop_codes[.I],
             departure_time_secs - first_departure,
             arrival_time_secs - first_departure,
             sep = "|",

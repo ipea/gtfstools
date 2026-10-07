@@ -173,3 +173,32 @@ assert_and_assign_gtfs_object <- function(gtfs) {
 
   return(gtfs)
 }
+
+
+
+#' Warn about ids missing from a table
+#'
+#' Raises a warning listing the elements of `id` not found in `existing_id`.
+#' The warning is attributed to the function that called this helper.
+#'
+#' @param id A character vector of ids given by the user.
+#' @param existing_id A character vector of the ids that exist in the table.
+#' @param table The name of the table, used in the warning message.
+#' @param id_name The name of the id field, used in the warning message.
+#'
+#' @return The missing ids, invisibly.
+#'
+#' @keywords internal
+warn_missing_ids <- function(id, existing_id, table, id_name) {
+  invalid_id <- id[! id %chin% existing_id]
+
+  if (length(invalid_id) > 0) {
+    msg <- paste0(
+      "'", table, "' doesn't contain the following ", id_name, "(s): ",
+      paste0("'", invalid_id, "'", collapse = ", ")
+    )
+    warning(simpleWarning(msg, call = sys.call(-1)))
+  }
+
+  return(invisible(invalid_id))
+}

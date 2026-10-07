@@ -105,6 +105,18 @@ utils::globalVariables(
     ".flagged",
     "new_trip_id",
     "first_departure",
-    "first_row"
+    "first_row",
+    "departure_secs",
+    "departures",
+    "mean_headway",
+    "stop_lat",
+    "stop_lon",
+    "distance",
+    "row_in_trip",
+    "pattern",
+    "trip_shape_id",
+    "position",
+    "i.position",
+    "n_points"
   )
 )

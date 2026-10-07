@@ -51,15 +51,7 @@ convert_stops_to_sf <- function(gtfs, stop_id = NULL, crs = 4326) {
 
   # raise warning/error if given 'stop_id's don't exist in 'stops'
   if (!is.null(stop_id)) {
-    invalid_stop_id <- stop_id[! stop_id %chin% unique(gtfs$stops$stop_id)]
-
-    if (!identical(invalid_stop_id, character(0))) {
-      warning(
-        paste0(
-          "'stops' doesn't contain the following stop_id(s): "),
-        paste0("'", invalid_stop_id, "'", collapse = ", ")
-      )
-    }
+    warn_missing_ids(stop_id, gtfs$stops$stop_id, "stops", "stop_id")
   }
 
   # filter 'stops' table and create sf from it

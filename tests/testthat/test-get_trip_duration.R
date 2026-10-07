@@ -74,7 +74,11 @@ test_that("calculates the duration of correct 'trip_id's", {
 })
 
 test_that("raises warnings if a non_existent trip_id is given", {
-  expect_warning(tester(trip_id = c("CPTM L07-0", "ola")))
+  expect_warning(
+    tester(trip_id = c("CPTM L07-0", "ola")),
+    regexp = "'stop_times' doesn't contain the following trip_id(s): 'ola'",
+    fixed = TRUE
+  )
   expect_warning(tester(trip_id = "ola"))
 })
 

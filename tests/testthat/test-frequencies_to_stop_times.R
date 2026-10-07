@@ -50,7 +50,7 @@ test_that("calculates first departure times and new trip_ids correctly", {
     departures := mapply(
       seq,
       start_time_secs,
-      end_time_secs,
+      end_time_secs - 1L,
       headway_secs
     )
   ]
@@ -294,6 +294,24 @@ test_that("an entry with equal start_time and end_time creates one trip", {
     new_trips[startsWith(new_trips, paste0(converted_trip, "_"))],
     paste0(converted_trip, "_1")
   )
+})
+
+test_that("no trip departs at an entry's end_time", {
+  # 06:00:00 to 07:00:00 every 30 minutes yields departures at 06:00:00 and
+  # 06:30:00 only, as end_time is exclusive in the GTFS specification
+
+  exclusive_gtfs <- read_gtfs(data_path)
+  exclusive_gtfs$frequencies <- data.table::data.table(
+    trip_id = "CPTM L07-0",
+    start_time = "06:00:00",
+    end_time = "07:00:00",
+    headway_secs = 1800L
+  )
+
+  converted_gtfs <- tester(exclusive_gtfs)
+  new_trips <- converted_gtfs$stop_times[startsWith(trip_id, "CPTM L07-0_")]
+  first_departures <- new_trips[, .(first = min(departure_time)), by = trip_id]
+  expect_identical(first_departures$first, c("06:00:00", "06:30:00"))
 })
 
 test_that("raises informative error if a trip has no departure times", {

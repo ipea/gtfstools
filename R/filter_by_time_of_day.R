@@ -33,7 +33,11 @@
 #' operators try to maintain the listed headways. In such cases, if
 #' `update_frequencies` is `TRUE` we just update `start_time` and `end_time` to
 #' the appropriate value of `from` or `to` (which of this value is used depends
-#' on `keep`).
+#' on `keep`). When `keep` is `TRUE`, `end_time` is set to one second after
+#' `to`: as required by the GTFS specification, no trip departs at the
+#' `end_time` of an entry, so this keeps a departure that happens exactly at
+#' `to` (e.g. when converting the filtered feed with
+#' [frequencies_to_stop_times()]).
 #'
 #' If `exact_times` is 1, however, operators try to strictly adhere to the start
 #' times and headway. As a result, when updating the `start_time` field we need
@@ -332,9 +336,12 @@ update_frequencies_times <- function(filtered_frequencies,
         from_within == TRUE,
         start_time := seconds_to_string(from_secs)
       ]
+      # end_time is exclusive, so it's set to one second after 'to' to keep the
+      # departure at 'to', if there is one
+
       filtered_frequencies[
         to_within == TRUE,
-        end_time := seconds_to_string(to_secs)
+        end_time := seconds_to_string(to_secs + 1L)
       ]
     } else {
       # when keep = FALSE, there may be cases in which the the time of day to
@@ -380,10 +387,11 @@ update_frequencies_times <- function(filtered_frequencies,
     if (keep) {
       # if exact_times is 0, the behaviour is like when exact_times doesn't
       # exist. if it's 1, the start_time should respect the headway. we can just
-      # set end_time to to_secs because what matters is the time the trips
-      # start, but not when the frequency period finishes
+      # set end_time to one second after to_secs (end_time is exclusive, so this
+      # keeps the departure at 'to', if there is one) because what matters is
+      # the time the trips start, but not when the frequency period finishes
 
-      filtered_frequencies[to_within == TRUE, end_time_secs := to_secs]
+      filtered_frequencies[to_within == TRUE, end_time_secs := to_secs + 1L]
       filtered_frequencies[
         to_within == TRUE,
         end_time := seconds_to_string(end_time_secs)
@@ -401,6 +409,14 @@ update_frequencies_times <- function(filtered_frequencies,
       filtered_frequencies[
         from_within == TRUE,
         start_time := seconds_to_string(start_time_secs)
+      ]
+
+      # the start_time adjusted to the headway may fall after 'to', in which
+      # case no departure happens within the time of day. this must be checked
+      # against 'to' because end_time is now one second after it
+
+      filtered_frequencies <- filtered_frequencies[
+        !(to_within == TRUE & start_time_secs > to_secs)
       ]
     } else {
       # we follow the same procedure to update the times when both from and to

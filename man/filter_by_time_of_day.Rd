@@ -55,7 +55,11 @@ present), the service does not follow a fixed schedule. Instead, the
 operators try to maintain the listed headways. In such cases, if
 \code{update_frequencies} is \code{TRUE} we just update \code{start_time} and \code{end_time} to
 the appropriate value of \code{from} or \code{to} (which of this value is used depends
-on \code{keep}).
+on \code{keep}). When \code{keep} is \code{TRUE}, \code{end_time} is set to one second after
+\code{to}: as required by the GTFS specification, no trip departs at the
+\code{end_time} of an entry, so this keeps a departure that happens exactly at
+\code{to} (e.g. when converting the filtered feed with
+\code{\link[=frequencies_to_stop_times]{frequencies_to_stop_times()}}).
 
 If \code{exact_times} is 1, however, operators try to strictly adhere to the start
 times and headway. As a result, when updating the \code{start_time} field we need

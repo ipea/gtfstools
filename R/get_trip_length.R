@@ -118,14 +118,7 @@ get_trip_length <- function(gtfs,
   if (!is.null(trip_id)) {
     relevant_trips <- trip_id
 
-    invalid_trip_id <- trip_id[! trip_id %chin% unique(gtfs$trips$trip_id)]
-
-    if (!identical(invalid_trip_id, character(0))) {
-      warning(
-        "'trips' doesn't contain the following trip_id(s): ",
-        paste0("'", invalid_trip_id, "'", collapse = ", ")
-      )
-    }
+    warn_missing_ids(trip_id, gtfs$trips$trip_id, "trips", "trip_id")
   }
 
   if ("shapes" %in% file) {

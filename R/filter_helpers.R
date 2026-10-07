@@ -130,20 +130,16 @@ filter_fare_rules_from_zone_id <- function(gtfs, relevant_zones, `%ffilter%`) {
 
     .all_but_contains <- setdiff(names(gtfs$fare_rules), "contains_id")
 
-    gtfs$fare_rules[
-      ,
-      .flagged := ifelse(
-        contains_id %chin% "" | contains_id %ffilter% relevant_zones,
-        TRUE,
-        FALSE
-      )
-    ]
+    # the flags are kept in a separate vector, instead of a column, because
+    # 'fare_rules' may still be the table of the original gtfs object, which
+    # must not be modified
+
+    contains_ids <- gtfs$fare_rules$contains_id
+    .flagged <- contains_ids %chin% "" | contains_ids %ffilter% relevant_zones
 
     gtfs$fare_rules <- gtfs$fare_rules[
-      gtfs$fare_rules[, .I[all(.flagged)], by = .all_but_contains]$V1
+      gtfs$fare_rules[, .I[all(.flagged[.I])], by = .all_but_contains]$V1
     ]
-
-    gtfs$fare_rules[, .flagged := NULL][]
   }
 
   return(gtfs)

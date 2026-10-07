@@ -225,3 +225,27 @@ test_that("sort_sequence works correctly", {
   default_patterns <- get_stop_times_patterns(unordered_gtfs, ids)
   expect_identical(default_patterns, patterns)
 })
+
+test_that("stop_ids containing separators don't make patterns collide", {
+  # the sequences "a;b" -> "c" and "a" -> "b;c" used to be described by the
+  # same "a;b;c" string, and were wrongly assigned the same pattern
+
+  spo_path <- system.file("extdata/spo_gtfs.zip", package = "gtfstools")
+  spo_gtfs <- read_gtfs(spo_path)
+  trips <- spo_gtfs$trips$trip_id[1:2]
+
+  first_trip <- spo_gtfs$stop_times[trip_id == trips[1]][1:2]
+  second_trip <- spo_gtfs$stop_times[trip_id == trips[2]][1:2]
+  first_trip[, stop_id := c("a;b", "c")]
+  second_trip[, stop_id := c("a", "b;c")]
+  spo_gtfs$stop_times <- rbind(first_trip, second_trip)
+
+  spo_gtfs$stops <- spo_gtfs$stops[1:4]
+  spo_gtfs$stops[, stop_id := c("a;b", "c", "a", "b;c")]
+
+  spatial_patterns <- tester(spo_gtfs, type = "spatial")
+  expect_identical(spatial_patterns$pattern_id, c(1L, 2L))
+
+  spatiotemporal_patterns <- tester(spo_gtfs, type = "spatiotemporal")
+  expect_identical(spatiotemporal_patterns$pattern_id, c(1L, 2L))
+})
