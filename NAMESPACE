@@ -39,11 +39,13 @@ export(remove_unused_ids)
 export(set_trip_speed)
 export(validate_gtfs)
 export(write_gtfs)
-importFrom(data.table,"%chin%")
-importFrom(data.table,":=")
-importFrom(data.table,.GRP)
-importFrom(data.table,.I)
-importFrom(data.table,.N)
-importFrom(data.table,.SD)
+importFrom(data.table,
+  "%chin%",
+  ":=",
+  .GRP,
+  .I,
+  .N,
+  .SD
+)
 importFrom(utils,globalVariables)
 useDynLib(gtfstools, .registration = TRUE)
