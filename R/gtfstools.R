@@ -119,6 +119,11 @@ utils::globalVariables(
     "dep_start",
     "arr_end",
     "start",
-    "end"
+    "end",
+    "last_seq",
+    "i.last_seq",
+    "first_secs",
+    "i.first_secs",
+    "secs_offset"
   )
 )

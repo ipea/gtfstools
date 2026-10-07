@@ -13,6 +13,8 @@ Authors@R: c(
     person("Joao", "Bazzo", role = "aut",
            comment = c(ORCID = "0000-0003-4536-5006")),
     person("Mark", "Padgham", role = "ctb"),
+    person(given = "Christopher", family = "Higgins", role = "ctb"),
+    person("Arthur", "Bazolli", , "baz.arthur@gmail.com", role = "ctb"),
     person("Marcus", "Saraiva", role = "ctb",
            comment = c(ORCID = "0000-0001-6218-2338")),
     person("Ipea - Institute for Applied Economic Research", role = c("cph", "fnd"))
