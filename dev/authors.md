@@ -15,6 +15,10 @@
 
 - **Mark Padgham**. Contributor.
 
+- **Christopher Higgins**. Contributor.
+
+- **Arthur Bazolli**. Contributor.
+
 - **Marcus Saraiva**. Contributor.
   [](https://orcid.org/0000-0001-6218-2338)
 

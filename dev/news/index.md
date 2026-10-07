@@ -4,6 +4,27 @@
 
 ### Potentially breaking changes
 
+- The new `first_stop`, `last_stop`, `from` and `to` arguments of
+  [`set_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.md)
+  come before `by_reference`, which must now be passed by name
+  ([\#89](https://github.com/ipea/gtfstools/issues/89)).
+- [`filter_by_sf()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_sf.md),
+  deprecated in version 1.3.0 in favour of
+  [`filter_by_spatial_extent()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_spatial_extent.md),
+  is now defunct: calling it raises an error (class
+  `gtfstools_defunct_filter_by_sf_error`). Use
+  [`filter_by_spatial_extent()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_spatial_extent.md)
+  instead, which takes the same arguments.
+- The `full_trips` argument of
+  [`filter_by_stop_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_stop_id.md),
+  deprecated in version 1.3.0, is now defunct: using it, with any value,
+  raises an error (class `gtfstools_defunct_full_trips_error`). The
+  function now always behaves as with the former `full_trips = FALSE`,
+  filtering by the specified stops instead of keeping the entire trips
+  that pass through them. To keep entire trips, subset `stop_times` by
+  `stop_id` and pass the resulting `trip_id`s to
+  [`filter_by_trip_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_trip_id.md)
+  ([\#75](https://github.com/ipea/gtfstools/issues/75)).
 - The trip length and speed functions were reorganised:
   - [`get_trip_length()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_length.md)
     now returns the length of each trip from its first to its last stop,
@@ -99,8 +120,6 @@
   obscure errors. Duplicated values in its `trip_id` argument are now
   converted only once.
 - [`filter_by_spatial_extent()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_spatial_extent.md)
-  (and
-  [`filter_by_sf()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_sf.md))
   now filters the feed by the selected trips only once, instead of
   filtering it by shapes and by trips separately and merging the
   results. As a consequence, shapes not used by any trip are no longer
@@ -240,8 +259,6 @@
   [@haneroglu](https://github.com/haneroglu).
 - Fixed bug in
   [`filter_by_spatial_extent()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_spatial_extent.md)
-  (and
-  [`filter_by_sf()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_sf.md))
   that, with `keep = FALSE`, kept trips selected only by their shapes or
   only by their stops, instead of dropping every selected trip.
 - Fixed bug in `filter_by_stop_id(full_trips = FALSE)` that added a
@@ -273,6 +290,20 @@
   departures after midnight can be counted with times past `"24:00:00"`
   ([\#53](https://github.com/ipea/gtfstools/issues/53)).
 - New function
+  [`get_stop_frequency()`](https://ipea.github.io/gtfstools/dev/reference/get_stop_frequency.md),
+  which returns the number of departures and the mean headway (in
+  minutes) at each stop within a time of day, by `service_id`, and
+  optionally by `route_id` and `direction_id` (`by_route = TRUE`). Each
+  `stop_times` entry with a departure time counts as a departure from
+  its stop, except for the last stop of each trip, and the entries of
+  trips listed in `frequencies` are repeated at each of their
+  departures. Unlike
+  [`get_route_frequency()`](https://ipea.github.io/gtfstools/dev/reference/get_route_frequency.md),
+  which counts trips, it counts the departures from each stop, but it
+  uses the same time of day as
+  [`get_route_frequency()`](https://ipea.github.io/gtfstools/dev/reference/get_route_frequency.md),
+  from `from` (included) to `to` (not included).
+- New function
   [`remove_unused_ids()`](https://ipea.github.io/gtfstools/dev/reference/remove_unused_ids.md),
   which removes unused ids from all files
   ([\#55](https://github.com/ipea/gtfstools/issues/55)).
@@ -301,6 +332,12 @@
   feed was always compressed at level 9), which makes writing a feed
   about 2 to 3 times faster for files of very similar size. The content
   of the written files is unchanged.
+- [`set_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.md)
+  gains the `first_stop` and `last_stop` arguments, to set the speed
+  only between two stops (later stops are shifted by the change in
+  duration), and the `from` and `to` arguments, to change only trips
+  that depart from the segment’s first stop within a time of day
+  ([\#89](https://github.com/ipea/gtfstools/issues/89)).
 
 ### Feature deprecation
 
@@ -361,8 +398,6 @@
   auxiliary columns from the tables of the given feed.
 
 - [`filter_by_spatial_extent()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_spatial_extent.md)
-  (and
-  [`filter_by_sf()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_sf.md))
   is much faster and uses much less memory (about 25 times faster on a
   feed with 900,000 `stop_times` rows), as it filters the feed only once
   and doesn’t create geometries for trips already selected by their
@@ -421,9 +456,9 @@
 
 - The filtering vignette and the documentation now use
   [`filter_by_spatial_extent()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_spatial_extent.md)
-  instead of the deprecated
+  instead of the defunct
   [`filter_by_sf()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_sf.md),
-  which was moved to a “Deprecated” section of the reference index.
+  which was moved to a “Defunct” section of the reference index.
 
 ## gtfstools 1.4.0
 

@@ -12,7 +12,7 @@ filter_by_stop_id(
   keep = TRUE,
   include_children = TRUE,
   include_parents = keep,
-  full_trips = TRUE
+  full_trips
 )
 ```
 
@@ -50,14 +50,12 @@ filter_by_stop_id(
 
 - full_trips:
 
-  A logical. Whether to keep all stops that compose trips that pass
-  through the stops specified in `stop_id`. Defaults to `TRUE`, in order
-  to preserve the behavior of the function in versions 1.2.0 and below.
-  Please note that when `TRUE`, the resultant filtered feed may contain
-  more stops than the ones specified in `stop_id` to preserve the
-  integrity of the trips. IMPORTANT: using `full_trips = TRUE` is
-  flagged as deprecated as of version 1.3.0 and this parameter will
-  default to `FALSE` from version 2.0.0 onward.
+  Defunct. Deprecated in version 1.3.0 and removed in the following
+  major version: using it, with any value, raises an error. The function
+  now always filters by the specified stops. To keep all stops of the
+  trips that pass through them, subset `stop_times` by `stop_id` and
+  pass the resulting `trip_id`s to
+  [`filter_by_trip_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_trip_id.md).
 
 ## Value
 
@@ -88,30 +86,12 @@ object.size(gtfs)
 #> 811304 bytes
 
 # keeps entries related to trips that pass through specified stop_ids
-smaller_gtfs <- filter_by_stop_id(gtfs, stop_ids, full_trips = FALSE)
+smaller_gtfs <- filter_by_stop_id(gtfs, stop_ids)
 object.size(smaller_gtfs)
 #> 64272 bytes
 
 # drops entries related to trips that pass through specified stop_ids
-smaller_gtfs <- filter_by_stop_id(
-  gtfs,
-  stop_ids,
-  keep = FALSE,
-  full_trips = FALSE
-)
+smaller_gtfs <- filter_by_stop_id(gtfs, stop_ids, keep = FALSE)
 object.size(smaller_gtfs)
 #> 809872 bytes
-
-# the old behavior of filtering trips that contained the specified stops has
-# been deprecated
-invisible(filter_by_stop_id(gtfs, stop_ids, full_trips = TRUE))
-#> Warning: The `filter_by_stop_id()` behavior of filtering by trips that contain the
-#> specified stops was deprecated in gtfstools 1.3.0.
-#> ℹ For backwards compatibility reasons, this behavior is still the default as of
-#>   version 1.3.0, and is controlled by the parameter `full_trips`.
-#> ℹ Please set `full_trips` to "FALSE" to actually filter by `stop_ids`. This
-#>   behavior will be the default from version 2.0.0 onward.
-#> ℹ To achieve the old behavior, manually subset the `stop_times` table by
-#>   `stop_id` and specify the `trip_ids` included in the output in
-#>   `filter_by_trip_id()`.
 ```

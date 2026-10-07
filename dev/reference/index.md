@@ -52,6 +52,8 @@
   : Get route frequency
 - [`get_shape_length()`](https://ipea.github.io/gtfstools/dev/reference/get_shape_length.md)
   : Get shape length
+- [`get_stop_frequency()`](https://ipea.github.io/gtfstools/dev/reference/get_stop_frequency.md)
+  : Get stop frequency
 - [`get_stop_times_patterns()`](https://ipea.github.io/gtfstools/dev/reference/get_stop_times_patterns.md)
   : Get stop times patterns
 - [`get_trip_duration()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_duration.md)
@@ -126,9 +128,9 @@
   : Coerce lists and GTFS objects from other packages into
   gtfstools-compatible GTFS objects
 
-## Deprecated
+## Defunct
 
 - [`filter_by_sf()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_sf.md)
   :
 
-  Filter a GTFS object using a `simple features` object (deprecated)
+  Filter a GTFS object using a `simple features` object (defunct)
