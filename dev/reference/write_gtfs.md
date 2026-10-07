@@ -12,7 +12,8 @@ write_gtfs(
   standard_only = FALSE,
   as_dir = FALSE,
   overwrite = TRUE,
-  quiet = TRUE
+  quiet = TRUE,
+  compression_level = 6
 )
 ```
 
@@ -21,7 +22,7 @@ write_gtfs(
 - gtfs:
 
   A GTFS object, as created by
-  [`read_gtfs()`](https://ipeagit.github.io/gtfstools/dev/reference/read_gtfs.md).
+  [`read_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/read_gtfs.md).
 
 - path:
 
@@ -52,6 +53,13 @@ write_gtfs(
 
   Whether to hide log messages and progress bars (defaults to `TRUE`).
 
+- compression_level:
+
+  A number between 1 and 9 indicating how much the `.zip` file should be
+  compressed. Lower levels write faster but create larger files.
+  Defaults to 6, which is usually several times faster than 9 and
+  creates files of very similar size. Ignored when `as_dir = TRUE`.
+
 ## Value
 
 Invisibly returns the same GTFS object passed to the `gtfs` parameter.
@@ -59,7 +67,7 @@ Invisibly returns the same GTFS object passed to the `gtfs` parameter.
 ## See also
 
 Other io functions:
-[`read_gtfs()`](https://ipeagit.github.io/gtfstools/dev/reference/read_gtfs.md)
+[`read_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/read_gtfs.md)
 
 ## Examples
 
@@ -74,7 +82,7 @@ list.files(tmp_dir) #'
 tmp_file <- tempfile(pattern = "gtfs", tmpdir = tmp_dir, fileext = ".zip")
 write_gtfs(gtfs, tmp_file)
 list.files(tmp_dir)
-#> [1] "gtfs1c077d349c4.zip"
+#> [1] "gtfs1a3aaa26487.zip"
 
 gtfs_all_files <- read_gtfs(tmp_file)
 names(gtfs_all_files)

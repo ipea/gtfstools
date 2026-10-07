@@ -14,7 +14,7 @@ copy_gtfs_diff_field_class(gtfs, file, field, class)
 - gtfs:
 
   A GTFS object, as created by
-  [`read_gtfs()`](https://ipeagit.github.io/gtfstools/dev/reference/read_gtfs.md).
+  [`read_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/read_gtfs.md).
 
 - file:
 

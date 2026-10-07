@@ -8,29 +8,29 @@ in the General Transit Feed Specification (GTFS) data format.
 Please check the vignettes for more on the package usage:
 
 - Basic usage: reading, analysing, manipulating and writing feeds. Run
-  [`vignette("gtfstools")`](https://ipeagit.github.io/gtfstools/dev/articles/gtfstools.md)
+  [`vignette("gtfstools")`](https://ipea.github.io/gtfstools/dev/articles/gtfstools.md)
   or check it on the
-  [website](https://ipeagit.github.io/gtfstools/articles/gtfstools.html).
+  [website](https://ipea.github.io/gtfstools/articles/gtfstools.html).
 
 - Filtering GTFS feeds. Run
-  [`vignette("filtering", package = "gtfstools")`](https://ipeagit.github.io/gtfstools/dev/articles/filtering.md)
+  [`vignette("filtering", package = "gtfstools")`](https://ipea.github.io/gtfstools/dev/articles/filtering.md)
   or check it on the
-  [website](https://ipeagit.github.io/gtfstools/articles/filtering.html).
+  [website](https://ipea.github.io/gtfstools/articles/filtering.html).
 
 - Validating GTFS feeds. Run
-  [`vignette("validating", package = "gtfstools")`](https://ipeagit.github.io/gtfstools/dev/articles/validating.md)
+  [`vignette("validating", package = "gtfstools")`](https://ipea.github.io/gtfstools/dev/articles/validating.md)
   or check it on the
-  [website](https://ipeagit.github.io/gtfstools/articles/validating.html).
+  [website](https://ipea.github.io/gtfstools/articles/validating.html).
 
 ## See also
 
 Useful links:
 
-- <https://ipeagit.github.io/gtfstools/>
+- <https://ipea.github.io/gtfstools/>
 
-- <https://github.com/ipeaGIT/gtfstools>
+- <https://github.com/ipea/gtfstools>
 
-- Report bugs at <https://github.com/ipeaGIT/gtfstools/issues>
+- Report bugs at <https://github.com/ipea/gtfstools/issues>
 
 ## Author
 
@@ -38,6 +38,9 @@ Useful links:
 ([ORCID](https://orcid.org/0000-0001-8066-1105))
 
 Authors:
+
+- Daniel Herszenhut <dhersz@gmail.com>
+  ([ORCID](https://orcid.org/0000-0001-8066-1105))
 
 - Rafael H. M. Pereira ([ORCID](https://orcid.org/0000-0003-2125-7465))
 

@@ -9,16 +9,16 @@ to analyze a specific subset of the data.
 allowing for faster and more convenient data processing. The filtering
 functions currently available are:
 
-- [`filter_by_agency_id()`](https://ipeagit.github.io/gtfstools/dev/reference/filter_by_agency_id.md)
-- [`filter_by_route_id()`](https://ipeagit.github.io/gtfstools/dev/reference/filter_by_route_id.md)
-- [`filter_by_service_id()`](https://ipeagit.github.io/gtfstools/dev/reference/filter_by_service_id.md)
-- [`filter_by_shape_id()`](https://ipeagit.github.io/gtfstools/dev/reference/filter_by_shape_id.md)
-- [`filter_by_stop_id()`](https://ipeagit.github.io/gtfstools/dev/reference/filter_by_stop_id.md)
-- [`filter_by_trip_id()`](https://ipeagit.github.io/gtfstools/dev/reference/filter_by_trip_id.md)
-- [`filter_by_route_type()`](https://ipeagit.github.io/gtfstools/dev/reference/filter_by_route_type.md)
-- [`filter_by_weekday()`](https://ipeagit.github.io/gtfstools/dev/reference/filter_by_weekday.md)
-- [`filter_by_time_of_day()`](https://ipeagit.github.io/gtfstools/dev/reference/filter_by_time_of_day.md)
-- [`filter_by_sf()`](https://ipeagit.github.io/gtfstools/dev/reference/filter_by_sf.md)
+- [`filter_by_agency_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_agency_id.md)
+- [`filter_by_route_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_route_id.md)
+- [`filter_by_service_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_service_id.md)
+- [`filter_by_shape_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_shape_id.md)
+- [`filter_by_stop_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_stop_id.md)
+- [`filter_by_trip_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_trip_id.md)
+- [`filter_by_route_type()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_route_type.md)
+- [`filter_by_weekday()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_weekday.md)
+- [`filter_by_time_of_day()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_time_of_day.md)
+- [`filter_by_spatial_extent()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_spatial_extent.md)
 
 This vignette will introduce you to these functions and will cover their
 usage in detail.
@@ -38,7 +38,7 @@ The first six work in a very similar fashion. You specify a vector of
 identifiers, and the function keeps (or drops, as we’ll see soon) all
 the entries that are in any way related to this id. Let’s see how that
 works using
-[`filter_by_trip_id()`](https://ipeagit.github.io/gtfstools/dev/reference/filter_by_trip_id.md):
+[`filter_by_trip_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_trip_id.md):
 
 ``` r
 
@@ -114,7 +114,7 @@ entries in the second case, the resulting GTFS object, though smaller
 than the original, is much larger than in the first case.
 
 The same logic demonstrated with
-[`filter_by_trip_id()`](https://ipeagit.github.io/gtfstools/dev/reference/filter_by_trip_id.md)
+[`filter_by_trip_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_trip_id.md)
 applies to the functions that filter feeds by `agency_id`, `route_id`,
 `service_id`, `shape_id`, `stop_id` and `route_type`.
 
@@ -122,9 +122,9 @@ applies to the functions that filter feeds by `agency_id`, `route_id`,
 
 Frequently enough one wants to analyze service levels on certain days of
 the week or during different times of the day. The functions
-[`filter_by_weekday()`](https://ipeagit.github.io/gtfstools/dev/reference/filter_by_weekday.md)
+[`filter_by_weekday()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_weekday.md)
 and
-[`filter_by_time_of_day()`](https://ipeagit.github.io/gtfstools/dev/reference/filter_by_time_of_day.md)
+[`filter_by_time_of_day()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_time_of_day.md)
 can be used to this purpose.
 
 The first one takes the days of the week you want to keep/drop and also
@@ -202,7 +202,7 @@ smaller_gtfs$calendar[, c("service_id", "sunday", "saturday")]
 ```
 
 Meanwhile,
-[`filter_by_time_of_day()`](https://ipeagit.github.io/gtfstools/dev/reference/filter_by_time_of_day.md)
+[`filter_by_time_of_day()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_time_of_day.md)
 takes the beginning and the end of a time block (the `from` and `to`
 arguments, respectively) and keeps the entries related to trips that run
 within the specified block. Please note that the function works a bit
@@ -303,7 +303,7 @@ head(smaller_gtfs$stop_times[, c("trip_id", "departure_time", "arrival_time")])
 #> 6: CPTM L09-0       04:15:00     04:15:00
 ```
 
-[`filter_by_time_of_day()`](https://ipeagit.github.io/gtfstools/dev/reference/filter_by_time_of_day.md)
+[`filter_by_time_of_day()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_time_of_day.md)
 also includes a `update_frequencies` argument, used to control whether
 the `frequencies` table should have its `start_time` and `end_time`
 fields updated to fit inside/outside the specified time of day. Please
@@ -314,7 +314,7 @@ interacts with the `exact_times` field.
 
 It’s not uncommon that one wants to analyze only the transit services of
 a smaller region contained inside a feed. The
-[`filter_by_sf()`](https://ipeagit.github.io/gtfstools/dev/reference/filter_by_sf.md)
+[`filter_by_spatial_extent()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_spatial_extent.md)
 function allows you to filter GTFS data using a given spatial extent.
 This functions takes a spatial `sf`/`sfc` object (or its bounding box)
 and keeps/drops the entries related to shapes and trips selected via a
@@ -330,7 +330,7 @@ plotter <- function(gtfs,
                     keep = TRUE,
                     do_filter = TRUE) {
   if (do_filter) {
-    gtfs <- filter_by_sf(gtfs, geom, spatial_operation, keep)
+    gtfs <- filter_by_spatial_extent(gtfs, geom, spatial_operation, keep)
   }
 
   shapes <- convert_shapes_to_sf(gtfs)
@@ -352,12 +352,12 @@ This function:
   respective tables;
 - Generates a polygon from the bounding box;
 - Plots all the `sf` objects cited above to show the effect of each
-  [`filter_by_sf()`](https://ipeagit.github.io/gtfstools/dev/reference/filter_by_sf.md)
+  [`filter_by_spatial_extent()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_spatial_extent.md)
   argument in the final result.
 
 Also, please note that our `plotter()` function takes the same arguments
 of
-[`filter_by_sf()`](https://ipeagit.github.io/gtfstools/dev/reference/filter_by_sf.md)
+[`filter_by_spatial_extent()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_spatial_extent.md)
 (with the exception of `do_filter`, which is used to show the unfiltered
 data), as well as the same defaults.
 
@@ -375,18 +375,13 @@ plotter(gtfs, bbox, do_filter = FALSE)
 ![](filtering_files/figure-html/unnamed-chunk-9-1.png)
 
 By default
-[`filter_by_sf()`](https://ipeagit.github.io/gtfstools/dev/reference/filter_by_sf.md)
+[`filter_by_spatial_extent()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_spatial_extent.md)
 (and `plotter()`, consequently) keeps all the data related to the trips
 and shapes that intersect the given geometry. Here’s how it looks like:
 
 ``` r
 
 plotter(gtfs, bbox)
-#> Warning: `filter_by_sf()` was deprecated in gtfstools 1.3.0.
-#> ℹ Please use `filter_by_spatial_extent()` instead.
-#> ℹ For backwards compatibility reasons, usage of `filter_by_sf()` is still
-#>   allowed as of the current version, but the function will be removed from the
-#>   package in version 2.0.0.
 ```
 
 ![](filtering_files/figure-html/unnamed-chunk-10-1.png)
@@ -396,11 +391,6 @@ Alternatively you can also *drop* such data:
 ``` r
 
 plotter(gtfs, bbox, keep = FALSE)
-#> Warning: `filter_by_sf()` was deprecated in gtfstools 1.3.0.
-#> ℹ Please use `filter_by_spatial_extent()` instead.
-#> ℹ For backwards compatibility reasons, usage of `filter_by_sf()` is still
-#>   allowed as of the current version, but the function will be removed from the
-#>   package in version 2.0.0.
 ```
 
 ![](filtering_files/figure-html/unnamed-chunk-11-1.png)
@@ -412,11 +402,6 @@ given geometry:
 ``` r
 
 plotter(gtfs, bbox, spatial_operation = sf::st_contains)
-#> Warning: `filter_by_sf()` was deprecated in gtfstools 1.3.0.
-#> ℹ Please use `filter_by_spatial_extent()` instead.
-#> ℹ For backwards compatibility reasons, usage of `filter_by_sf()` is still
-#>   allowed as of the current version, but the function will be removed from the
-#>   package in version 2.0.0.
 ```
 
 ![](filtering_files/figure-html/unnamed-chunk-12-1.png)
@@ -427,11 +412,6 @@ you’d drop the data contained inside the geometry:
 ``` r
 
 plotter(gtfs, bbox, spatial_operation = sf::st_contains, keep = FALSE)
-#> Warning: `filter_by_sf()` was deprecated in gtfstools 1.3.0.
-#> ℹ Please use `filter_by_spatial_extent()` instead.
-#> ℹ For backwards compatibility reasons, usage of `filter_by_sf()` is still
-#>   allowed as of the current version, but the function will be removed from the
-#>   package in version 2.0.0.
 ```
 
 ![](filtering_files/figure-html/unnamed-chunk-13-1.png)
@@ -440,4 +420,4 @@ All filtering functions return a GTFS object readily available to be
 manipulated and analyzed using the rest of **gtfstools**’ toolkit. For
 more information on how to use other functions made available by the
 package, please see the [introductory
-vignette](https://ipeagit.github.io/gtfstools/dev/articles/gtfstools.md).
+vignette](https://ipea.github.io/gtfstools/dev/articles/gtfstools.md).

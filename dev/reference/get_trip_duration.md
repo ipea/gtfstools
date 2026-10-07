@@ -13,7 +13,7 @@ get_trip_duration(gtfs, trip_id = NULL, unit = "min")
 - gtfs:
 
   A GTFS object, as created by
-  [`read_gtfs()`](https://ipeagit.github.io/gtfstools/dev/reference/read_gtfs.md).
+  [`read_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/read_gtfs.md).
 
 - trip_id:
 
@@ -36,6 +36,10 @@ A `data.table` containing the duration of each specified trip.
 The duration of a trip is defined as the time difference between its
 last arrival time and its first departure time, as specified in the
 `stop_times` table.
+
+Existing `_secs` columns in `stop_times` (e.g. created with
+[`convert_time_to_seconds()`](https://ipea.github.io/gtfstools/dev/reference/convert_time_to_seconds.md))
+are used as-is, not recalculated from the time strings.
 
 ## Examples
 

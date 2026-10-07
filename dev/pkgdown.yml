@@ -1,11 +1,11 @@
 pandoc: 3.8.3
-pkgdown: 2.2.0
+pkgdown: 2.2.1
 pkgdown_sha: ~
 articles:
   filtering: filtering.html
   gtfstools: gtfstools.html
   validating: validating.html
-last_built: 2026-05-21T23:52Z
+last_built: 2026-10-07T11:21Z
 urls:
-  reference: https://ipeagit.github.io/gtfstools/reference
-  article: https://ipeagit.github.io/gtfstools/articles
+  reference: https://ipea.github.io/gtfstools/reference
+  article: https://ipea.github.io/gtfstools/articles

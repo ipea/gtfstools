@@ -16,7 +16,7 @@ get_parent_station(gtfs, stop_id = NULL)
 - gtfs:
 
   A GTFS object, as created by
-  [`read_gtfs()`](https://ipeagit.github.io/gtfstools/dev/reference/read_gtfs.md).
+  [`read_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/read_gtfs.md).
 
 - stop_id:
 
@@ -32,7 +32,7 @@ is marked as `""`.
 
 ## See also
 
-[`get_children_stops()`](https://ipeagit.github.io/gtfstools/dev/reference/get_children_stops.md)
+[`get_children_stops()`](https://ipea.github.io/gtfstools/dev/reference/get_children_stops.md)
 
 ## Examples
 

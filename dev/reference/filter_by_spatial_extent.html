@@ -3,7 +3,7 @@
 keeping (or dropping) entries related to shapes and trips whose geometries
 are selected through a specified spatial operation."><meta property="og:description" content="Filters a GTFS object using a spatial extent (passed as an sf object),
 keeping (or dropping) entries related to shapes and trips whose geometries
-are selected through a specified spatial operation."><meta property="og:image" content="https://ipeagit.github.io/gtfstools/logo.png"><meta name="robots" content="noindex"></head><body>
+are selected through a specified spatial operation."><meta property="og:image" content="https://ipea.github.io/gtfstools/logo.png"><meta name="robots" content="noindex"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -29,7 +29,7 @@ are selected through a specified spatial operation."><meta property="og:image" c
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/ipeaGIT/gtfstools/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/ipea/gtfstools/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-lightswitch" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Light switch"><span class="fa fa-sun"></span></button>
   <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-lightswitch"><li><button class="dropdown-item" data-bs-theme-value="light"><span class="fa fa-sun"></span> Light</button></li>
@@ -44,7 +44,7 @@ are selected through a specified spatial operation."><meta property="og:image" c
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Filter a GTFS object using a spatial extent</h1>
-      <small class="dont-index">Source: <a href="https://github.com/ipeaGIT/gtfstools/blob/main/R/filter_by_spatial_extent.R" class="external-link"><code>R/filter_by_spatial_extent.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ipea/gtfstools/blob/main/R/filter_by_spatial_extent.R" class="external-link"><code>R/filter_by_spatial_extent.R</code></a></small>
       <div class="d-none name"><code>filter_by_spatial_extent.Rd</code></div>
     </div>
 
@@ -105,7 +105,6 @@ process.</p>
 <code><a href="filter_by_route_id.html">filter_by_route_id()</a></code>,
 <code><a href="filter_by_route_type.html">filter_by_route_type()</a></code>,
 <code><a href="filter_by_service_id.html">filter_by_service_id()</a></code>,
-<code><a href="filter_by_sf.html">filter_by_sf()</a></code>,
 <code><a href="filter_by_shape_id.html">filter_by_shape_id()</a></code>,
 <code><a href="filter_by_stop_id.html">filter_by_stop_id()</a></code>,
 <code><a href="filter_by_time_of_day.html">filter_by_time_of_day()</a></code>,
@@ -127,12 +126,12 @@ process.</p>
 <span class="r-in"><span><span class="co"># keeps entries that intersect with the specified polygon</span></span></span>
 <span class="r-in"><span><span class="va">smaller_gtfs</span> <span class="op">&lt;-</span> <span class="fu">filter_by_spatial_extent</span><span class="op">(</span><span class="va">gtfs</span>, <span class="va">bbox</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/object.size.html" class="external-link">object.size</a></span><span class="op">(</span><span class="va">smaller_gtfs</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 324952 bytes</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 325096 bytes</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># drops entries that intersect with the specified polygon</span></span></span>
 <span class="r-in"><span><span class="va">smaller_gtfs</span> <span class="op">&lt;-</span> <span class="fu">filter_by_spatial_extent</span><span class="op">(</span><span class="va">gtfs</span>, <span class="va">bbox</span>, keep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/object.size.html" class="external-link">object.size</a></span><span class="op">(</span><span class="va">smaller_gtfs</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 512288 bytes</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 512352 bytes</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># uses a different function to filter the gtfs</span></span></span>
 <span class="r-in"><span><span class="va">smaller_gtfs</span> <span class="op">&lt;-</span> <span class="fu">filter_by_spatial_extent</span><span class="op">(</span></span></span>
@@ -141,7 +140,7 @@ process.</p>
 <span class="r-in"><span>  spatial_operation <span class="op">=</span> <span class="fu">sf</span><span class="fu">::</span><span class="va"><a href="https://r-spatial.github.io/sf/reference/geos_binary_pred.html" class="external-link">st_contains</a></span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/object.size.html" class="external-link">object.size</a></span><span class="op">(</span><span class="va">smaller_gtfs</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 68976 bytes</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 69040 bytes</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
@@ -154,7 +153,7 @@ process.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

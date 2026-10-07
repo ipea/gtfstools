@@ -14,7 +14,7 @@ set_trip_speed(gtfs, trip_id, speed, unit = "km/h", by_reference = FALSE)
 - gtfs:
 
   A GTFS object, as created by
-  [`read_gtfs()`](https://ipeagit.github.io/gtfstools/dev/reference/read_gtfs.md).
+  [`read_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/read_gtfs.md).
 
 - trip_id:
 
@@ -45,19 +45,20 @@ invisibly (note that in this case the original GTFS object is altered).
 
 ## Details
 
-The average speed is calculated as the difference between the arrival
-time at the last stop minus the departure time at the first top, over
-the trip's length (as calculated via
-[`get_trip_geometry()`](https://ipeagit.github.io/gtfstools/dev/reference/get_trip_geometry.md),
-based on the `shapes` file). The arrival and departure times at all
-other stops (i.e. not the first neither the last) are set as `""`, which
-is written as `NA` with
-[`write_gtfs()`](https://ipeagit.github.io/gtfstools/dev/reference/write_gtfs.md).
-Some transport routing software, such as
-[OpenTripPlanner](http://www.opentripplanner.org/), support specifying
-stop times like so. In such cases, they estimate arrival/departure times
-at the others stops based on the average speed as well. We plan to add
-that feature to this function in the future.
+The duration of each trip (from the departure at its first stop to the
+arrival at its last stop) is set to its length, as calculated by
+[`get_trip_length()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_length.md)
+along the trip's shape (or as straight lines between stops, with a
+warning, if there are no shapes), divided by `speed`. The `stops` table
+is required. Trips whose length is `NA` (e.g. trips not linked to a
+shape) are left unchanged.
+
+The arrival and departure times at intermediate stops are set to `""`,
+which is written as `NA` by
+[`write_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/write_gtfs.md).
+Some routing software, such as
+[OpenTripPlanner](http://www.opentripplanner.org/), interpolates these
+times from the average speed.
 
 ## Examples
 
@@ -87,7 +88,7 @@ gtfs_new_speed$stop_times[trip_id == "CPTM L07-0"]
 #> 15: CPTM L07-0                               18972            15
 #> 16: CPTM L07-0                               18973            16
 #> 17: CPTM L07-0                               18974            17
-#> 18: CPTM L07-0     05:12:51       05:12:51   18975            18
+#> 18: CPTM L07-0     05:12:42       05:12:42   18975            18
 
 # use the unit argument to change the speed unit
 gtfs_new_speed <- set_trip_speed(
@@ -116,7 +117,7 @@ gtfs_new_speed$stop_times[trip_id == "CPTM L07-0"]
 #> 15: CPTM L07-0                               18972            15
 #> 16: CPTM L07-0                               18973            16
 #> 17: CPTM L07-0                               18974            17
-#> 18: CPTM L07-0     05:07:27       05:07:27   18975            18
+#> 18: CPTM L07-0     05:07:19       05:07:19   18975            18
 
 # original gtfs remains unchanged
 gtfs$stop_times[trip_id == "CPTM L07-0"]
@@ -163,5 +164,5 @@ gtfs$stop_times[trip_id == "CPTM L07-0"]
 #> 15: CPTM L07-0                               18972            15
 #> 16: CPTM L07-0                               18973            16
 #> 17: CPTM L07-0                               18974            17
-#> 18: CPTM L07-0     05:12:51       05:12:51   18975            18
+#> 18: CPTM L07-0     05:12:42       05:12:42   18975            18
 ```

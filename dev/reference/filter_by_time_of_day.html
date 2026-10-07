@@ -7,7 +7,7 @@ departure and arrival times."><meta property="og:description" content="Filters a
 entries in each file. Please see the details section for more information on
 how this function filters the frequencies and stop_times tables, as well
 as how it handles stop_times tables that contain trips with some empty
-departure and arrival times."><meta property="og:image" content="https://ipeagit.github.io/gtfstools/logo.png"><meta name="robots" content="noindex"></head><body>
+departure and arrival times."><meta property="og:image" content="https://ipea.github.io/gtfstools/logo.png"><meta name="robots" content="noindex"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -33,7 +33,7 @@ departure and arrival times."><meta property="og:image" content="https://ipeagit
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/ipeaGIT/gtfstools/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/ipea/gtfstools/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-lightswitch" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Light switch"><span class="fa fa-sun"></span></button>
   <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-lightswitch"><li><button class="dropdown-item" data-bs-theme-value="light"><span class="fa fa-sun"></span> Light</button></li>
@@ -48,7 +48,7 @@ departure and arrival times."><meta property="og:image" content="https://ipeagit
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Filter GTFS object by time of day</h1>
-      <small class="dont-index">Source: <a href="https://github.com/ipeaGIT/gtfstools/blob/main/R/filter_by_time_of_day.R" class="external-link"><code>R/filter_by_time_of_day.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ipea/gtfstools/blob/main/R/filter_by_time_of_day.R" class="external-link"><code>R/filter_by_time_of_day.R</code></a></small>
       <div class="d-none name"><code>filter_by_time_of_day.Rd</code></div>
     </div>
 
@@ -106,7 +106,7 @@ this parameter changes the function behaviour.</p></dd>
 <dt id="arg-update-frequencies">update_frequencies<a class="anchor" aria-label="anchor" href="#arg-update-frequencies"></a></dt>
 <dd><p>A logical. Whether the <code>frequencies</code> table should
 have its <code>start_time</code> and <code>end_time</code> fields updated to fit inside/outside the
-specified time of day (defaults to <code>FALSE</code>, which doesn't update the fields).</p></dd>
+specified time of day (defaults to <code>TRUE</code>, which updates the fields).</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -125,7 +125,11 @@ present), the service does not follow a fixed schedule. Instead, the
 operators try to maintain the listed headways. In such cases, if
 <code>update_frequencies</code> is <code>TRUE</code> we just update <code>start_time</code> and <code>end_time</code> to
 the appropriate value of <code>from</code> or <code>to</code> (which of this value is used depends
-on <code>keep</code>).</p>
+on <code>keep</code>). When <code>keep</code> is <code>TRUE</code>, <code>end_time</code> is set to one second after
+<code>to</code>: as required by the GTFS specification, no trip departs at the
+<code>end_time</code> of an entry, so this keeps a departure that happens exactly at
+<code>to</code> (e.g. when converting the filtered feed with
+<code><a href="frequencies_to_stop_times.html">frequencies_to_stop_times()</a></code>).</p>
 <p>If <code>exact_times</code> is 1, however, operators try to strictly adhere to the start
 times and headway. As a result, when updating the <code>start_time</code> field we need
 to follow the listed headway. For example, take a trip that has its start
@@ -169,6 +173,9 @@ stops are visited outside the specified time of day.</p>
 with empty departure and arrival times. In such cases, filtering by time of
 day with <code>full_trips</code> as <code>FALSE</code> will drop the entries with empty times.
 Please set <code>full_trips</code> to <code>TRUE</code> to preserve these entries.</p>
+<p>Existing <code>_secs</code> columns in <code>stop_times</code> and <code>frequencies</code> (e.g. created
+with <code><a href="convert_time_to_seconds.html">convert_time_to_seconds()</a></code>) are used as-is, not recalculated from the
+time strings.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -177,7 +184,6 @@ Please set <code>full_trips</code> to <code>TRUE</code> to preserve these entrie
 <code><a href="filter_by_route_id.html">filter_by_route_id()</a></code>,
 <code><a href="filter_by_route_type.html">filter_by_route_type()</a></code>,
 <code><a href="filter_by_service_id.html">filter_by_service_id()</a></code>,
-<code><a href="filter_by_sf.html">filter_by_sf()</a></code>,
 <code><a href="filter_by_shape_id.html">filter_by_shape_id()</a></code>,
 <code><a href="filter_by_spatial_extent.html">filter_by_spatial_extent()</a></code>,
 <code><a href="filter_by_stop_id.html">filter_by_stop_id()</a></code>,
@@ -312,7 +318,7 @@ Please set <code>full_trips</code> to <code>TRUE</code> to preserve these entrie
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

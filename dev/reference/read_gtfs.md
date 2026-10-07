@@ -69,12 +69,12 @@ Exceptions are date-related columns (such as `calendar.txt`'s
 objects, instead of being kept as `integer`s, allowing for easier data
 manipulation. These columns are converted back to `integer`s when
 writing the GTFS object to a `.zip` file using
-[`write_gtfs()`](https://ipeagit.github.io/gtfstools/dev/reference/write_gtfs.md).
+[`write_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/write_gtfs.md).
 
 ## See also
 
 Other io functions:
-[`write_gtfs()`](https://ipeagit.github.io/gtfstools/dev/reference/write_gtfs.md)
+[`write_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/write_gtfs.md)
 
 ## Examples
 

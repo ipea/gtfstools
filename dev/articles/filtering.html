@@ -45,7 +45,7 @@
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/ipeaGIT/gtfstools/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/ipea/gtfstools/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-lightswitch" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Light switch"><span class="fa fa-sun"></span></button>
   <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-lightswitch">
@@ -69,7 +69,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Filtering GTFS feeds</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/ipeaGIT/gtfstools/blob/main/vignettes/filtering.Rmd" class="external-link"><code>vignettes/filtering.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ipea/gtfstools/blob/main/vignettes/filtering.Rmd" class="external-link"><code>vignettes/filtering.Rmd</code></a></small>
       <div class="d-none name"><code>filtering.Rmd</code></div>
     </div>
 
@@ -92,14 +92,14 @@ filtering functions currently available are:</p>
 <li><code><a href="../reference/filter_by_route_type.html">filter_by_route_type()</a></code></li>
 <li><code><a href="../reference/filter_by_weekday.html">filter_by_weekday()</a></code></li>
 <li><code><a href="../reference/filter_by_time_of_day.html">filter_by_time_of_day()</a></code></li>
-<li><code><a href="../reference/filter_by_sf.html">filter_by_sf()</a></code></li>
+<li><code><a href="../reference/filter_by_spatial_extent.html">filter_by_spatial_extent()</a></code></li>
 </ul>
 <p>This vignette will introduce you to these functions and will cover
 their usage in detail.</p>
 <p>We will start by loading the packages required by this demonstration
 into the current <strong>R</strong> session:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ipeagit.github.io/gtfstools/">gtfstools</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ipea.github.io/gtfstools/">gtfstools</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="filtering-by-agency_id-route_id-service_id-shape_id-stop_id-trip_id-or-route_type">Filtering by <code>agency_id</code>, <code>route_id</code>,
@@ -367,8 +367,8 @@ field.</p>
 </h2>
 <p>It’s not uncommon that one wants to analyze only the transit services
 of a smaller region contained inside a feed. The
-<code><a href="../reference/filter_by_sf.html">filter_by_sf()</a></code> function allows you to filter GTFS data
-using a given spatial extent. This functions takes a spatial
+<code><a href="../reference/filter_by_spatial_extent.html">filter_by_spatial_extent()</a></code> function allows you to filter
+GTFS data using a given spatial extent. This functions takes a spatial
 <code>sf</code>/<code>sfc</code> object (or its bounding box) and
 keeps/drops the entries related to shapes and trips selected via a
 specified spatial operation. It may sound a bit complicated, but it’s
@@ -381,7 +381,7 @@ to save us some typing:</p>
 <span>                    <span class="va">keep</span> <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>                    <span class="va">do_filter</span> <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="va">do_filter</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">gtfs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/filter_by_sf.html">filter_by_sf</a></span><span class="op">(</span><span class="va">gtfs</span>, <span class="va">geom</span>, <span class="va">spatial_operation</span>, <span class="va">keep</span><span class="op">)</span></span>
+<span>    <span class="va">gtfs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/filter_by_spatial_extent.html">filter_by_spatial_extent</a></span><span class="op">(</span><span class="va">gtfs</span>, <span class="va">geom</span>, <span class="va">spatial_operation</span>, <span class="va">keep</span><span class="op">)</span></span>
 <span>  <span class="op">}</span></span>
 <span></span>
 <span>  <span class="va">shapes</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/convert_shapes_to_sf.html">convert_shapes_to_sf</a></span><span class="op">(</span><span class="va">gtfs</span><span class="op">)</span></span>
@@ -401,12 +401,13 @@ to save us some typing:</p>
 respective tables;</li>
 <li>Generates a polygon from the bounding box;</li>
 <li>Plots all the <code>sf</code> objects cited above to show the effect
-of each <code><a href="../reference/filter_by_sf.html">filter_by_sf()</a></code> argument in the final result.</li>
+of each <code><a href="../reference/filter_by_spatial_extent.html">filter_by_spatial_extent()</a></code> argument in the final
+result.</li>
 </ul>
 <p>Also, please note that our <code>plotter()</code> function takes the
-same arguments of <code><a href="../reference/filter_by_sf.html">filter_by_sf()</a></code> (with the exception of
-<code>do_filter</code>, which is used to show the unfiltered data), as
-well as the same defaults.</p>
+same arguments of <code><a href="../reference/filter_by_spatial_extent.html">filter_by_spatial_extent()</a></code> (with the
+exception of <code>do_filter</code>, which is used to show the
+unfiltered data), as well as the same defaults.</p>
 <p>Let’s say that we want to filter GTFS data using the bounding box of
 the shape <code>68962</code>. Here’s how the unfiltered data looks like,
 with the bounding box placed on top of it.</p>
@@ -415,47 +416,28 @@ with the bounding box placed on top of it.</p>
 <span></span>
 <span><span class="fu">plotter</span><span class="op">(</span><span class="va">gtfs</span>, <span class="va">bbox</span>, do_filter <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="filtering_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" alt="" width="700"></p>
-<p>By default <code><a href="../reference/filter_by_sf.html">filter_by_sf()</a></code> (and <code>plotter()</code>,
-consequently) keeps all the data related to the trips and shapes that
-intersect the given geometry. Here’s how it looks like:</p>
+<p>By default <code><a href="../reference/filter_by_spatial_extent.html">filter_by_spatial_extent()</a></code> (and
+<code>plotter()</code>, consequently) keeps all the data related to the
+trips and shapes that intersect the given geometry. Here’s how it looks
+like:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">plotter</span><span class="op">(</span><span class="va">gtfs</span>, <span class="va">bbox</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: `filter_by_sf()` was deprecated in gtfstools 1.3.0.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use `filter_by_spatial_extent()` instead.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> For backwards compatibility reasons, usage of `filter_by_sf()` is still</span></span>
-<span><span class="co">#&gt;   allowed as of the current version, but the function will be removed from the</span></span>
-<span><span class="co">#&gt;   package in version 2.0.0.</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">plotter</span><span class="op">(</span><span class="va">gtfs</span>, <span class="va">bbox</span><span class="op">)</span></span></code></pre></div>
 <p><img src="filtering_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" alt="" width="700"></p>
 <p>Alternatively you can also <em>drop</em> such data:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">plotter</span><span class="op">(</span><span class="va">gtfs</span>, <span class="va">bbox</span>, keep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: `filter_by_sf()` was deprecated in gtfstools 1.3.0.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use `filter_by_spatial_extent()` instead.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> For backwards compatibility reasons, usage of `filter_by_sf()` is still</span></span>
-<span><span class="co">#&gt;   allowed as of the current version, but the function will be removed from the</span></span>
-<span><span class="co">#&gt;   package in version 2.0.0.</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">plotter</span><span class="op">(</span><span class="va">gtfs</span>, <span class="va">bbox</span>, keep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="filtering_files/figure-html/unnamed-chunk-11-1.png" class="r-plt" alt="" width="700"></p>
 <p>You can also control which spatial operation you want to use to
 filter the data. This is how you’d keep the data that is contained
 inside the given geometry:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">plotter</span><span class="op">(</span><span class="va">gtfs</span>, <span class="va">bbox</span>, spatial_operation <span class="op">=</span> <span class="fu">sf</span><span class="fu">::</span><span class="va"><a href="https://r-spatial.github.io/sf/reference/geos_binary_pred.html" class="external-link">st_contains</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: `filter_by_sf()` was deprecated in gtfstools 1.3.0.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use `filter_by_spatial_extent()` instead.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> For backwards compatibility reasons, usage of `filter_by_sf()` is still</span></span>
-<span><span class="co">#&gt;   allowed as of the current version, but the function will be removed from the</span></span>
-<span><span class="co">#&gt;   package in version 2.0.0.</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">plotter</span><span class="op">(</span><span class="va">gtfs</span>, <span class="va">bbox</span>, spatial_operation <span class="op">=</span> <span class="fu">sf</span><span class="fu">::</span><span class="va"><a href="https://r-spatial.github.io/sf/reference/geos_binary_pred.html" class="external-link">st_contains</a></span><span class="op">)</span></span></code></pre></div>
 <p><img src="filtering_files/figure-html/unnamed-chunk-12-1.png" class="r-plt" alt="" width="700"></p>
 <p>And, simultaneously using <code>spatial_operation</code> and
 <code>keep</code>, this is how you’d drop the data contained inside the
 geometry:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">plotter</span><span class="op">(</span><span class="va">gtfs</span>, <span class="va">bbox</span>, spatial_operation <span class="op">=</span> <span class="fu">sf</span><span class="fu">::</span><span class="va"><a href="https://r-spatial.github.io/sf/reference/geos_binary_pred.html" class="external-link">st_contains</a></span>, keep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: `filter_by_sf()` was deprecated in gtfstools 1.3.0.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use `filter_by_spatial_extent()` instead.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> For backwards compatibility reasons, usage of `filter_by_sf()` is still</span></span>
-<span><span class="co">#&gt;   allowed as of the current version, but the function will be removed from the</span></span>
-<span><span class="co">#&gt;   package in version 2.0.0.</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">plotter</span><span class="op">(</span><span class="va">gtfs</span>, <span class="va">bbox</span>, spatial_operation <span class="op">=</span> <span class="fu">sf</span><span class="fu">::</span><span class="va"><a href="https://r-spatial.github.io/sf/reference/geos_binary_pred.html" class="external-link">st_contains</a></span>, keep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="filtering_files/figure-html/unnamed-chunk-13-1.png" class="r-plt" alt="" width="700"></p>
 <p>All filtering functions return a GTFS object readily available to be
 manipulated and analyzed using the rest of <strong>gtfstools</strong>’
@@ -473,7 +455,7 @@ available by the package, please see the <a href="gtfstools.html">introductory v
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

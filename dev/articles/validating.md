@@ -10,7 +10,7 @@ reasonable (vehicle speeds, stop locations, etc.)? These are some of the
 questions that may arise when dealing with GTFS data.
 
 In order to answer these puzzling questions, **gtfstools** includes
-[`validate_gtfs()`](https://ipeagit.github.io/gtfstools/dev/reference/validate_gtfs.md),
+[`validate_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/validate_gtfs.md),
 a function that wraps the [Canonical GTFS
 Validator](https://github.com/MobilityData/gtfs-validator) developed by
 MobilityData. The validator requires Java 11 or higher to run - you can
@@ -21,11 +21,11 @@ download Java 11 from
 <https://www.oracle.com/java/technologies/downloads>.
 
 Using
-[`validate_gtfs()`](https://ipeagit.github.io/gtfstools/dev/reference/validate_gtfs.md)
+[`validate_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/validate_gtfs.md)
 is very simple and requires no more than a few function calls. First we
 need to download the validator command-line tool. We can do it manually
 from MobilityData releases, or we can use
-[`download_validator()`](https://ipeagit.github.io/gtfstools/dev/reference/download_validator.md).
+[`download_validator()`](https://ipea.github.io/gtfstools/dev/reference/download_validator.md).
 This function takes a path to a directory where the validator should be
 saved to and a validator version, which defaults to the latest release,
 and returns the path to the downloaded validator. Please note that
@@ -41,19 +41,19 @@ library(gtfstools)
 
 latest_validator <- download_validator(tempdir())
 latest_validator
-#> [1] "/tmp/Rtmp72WZbM/gtfs-validator-v6.0.0.jar"
+#> [1] "/tmp/RtmpjrNJn1/gtfs-validator-v8.0.1.jar"
 ```
 
 The second (and final) step is actually running
-[`validate_gtfs()`](https://ipeagit.github.io/gtfstools/dev/reference/validate_gtfs.md).
+[`validate_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/validate_gtfs.md).
 To do that we need some GTFS data, which the function accepts in varying
 formats: it can be a GTFS object, as created with
-[`read_gtfs()`](https://ipeagit.github.io/gtfstools/dev/reference/read_gtfs.md),
+[`read_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/read_gtfs.md),
 a path to local GTFS file, an URL to a feed or a path to a local
 directory containing the GTFS data. It also takes a path to the
 directory where the validator output should be saved to and the path to
 the validator, previously generated with
-[`download_validator()`](https://ipeagit.github.io/gtfstools/dev/reference/download_validator.md).
+[`download_validator()`](https://ipea.github.io/gtfstools/dev/reference/download_validator.md).
 Let’s see how it works, using the same GTFS data in three different
 formats:
 
@@ -92,7 +92,7 @@ same:
 
 ``` r
 
-gtfs_url <- "https://github.com/ipeaGIT/gtfstools/raw/main/inst/extdata/spo_gtfs.zip"
+gtfs_url <- "https://github.com/ipea/gtfstools/raw/main/inst/extdata/spo_gtfs.zip"
 gtfs <- read_gtfs(data_path)
 
 url_output_dir <- tempfile("validation_from_url")
@@ -118,7 +118,7 @@ identical(path_output_content, object_output_content)
 ```
 
 Once again, it’s important to acknowledge that
-[`validate_gtfs()`](https://ipeagit.github.io/gtfstools/dev/reference/validate_gtfs.md)
+[`validate_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/validate_gtfs.md)
 only exists thanks to the hard-work of folks at
 [MobilityData/gtfs-validator](https://github.com/MobilityData/gtfs-validator).
 A huge shoutout to them!

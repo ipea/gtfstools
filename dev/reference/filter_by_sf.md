@@ -2,7 +2,7 @@
 
 This function has been deprecated as of the current package version and
 will be completely removed from version 2.0.0 onward. Please use
-[`filter_by_spatial_extent()`](https://ipeagit.github.io/gtfstools/dev/reference/filter_by_spatial_extent.md)
+[`filter_by_spatial_extent()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_spatial_extent.md)
 instead.
 
 Filters a GTFS object using the geometry of an `sf` object, keeping (or
@@ -20,7 +20,7 @@ filter_by_sf(gtfs, geom, spatial_operation = sf::st_intersects, keep = TRUE)
 - gtfs:
 
   A GTFS object, as created by
-  [`read_gtfs()`](https://ipeagit.github.io/gtfstools/dev/reference/read_gtfs.md).
+  [`read_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/read_gtfs.md).
 
 - geom:
 
@@ -50,17 +50,8 @@ process.
 
 ## See also
 
-Other filtering functions:
-[`filter_by_agency_id()`](https://ipeagit.github.io/gtfstools/dev/reference/filter_by_agency_id.md),
-[`filter_by_route_id()`](https://ipeagit.github.io/gtfstools/dev/reference/filter_by_route_id.md),
-[`filter_by_route_type()`](https://ipeagit.github.io/gtfstools/dev/reference/filter_by_route_type.md),
-[`filter_by_service_id()`](https://ipeagit.github.io/gtfstools/dev/reference/filter_by_service_id.md),
-[`filter_by_shape_id()`](https://ipeagit.github.io/gtfstools/dev/reference/filter_by_shape_id.md),
-[`filter_by_spatial_extent()`](https://ipeagit.github.io/gtfstools/dev/reference/filter_by_spatial_extent.md),
-[`filter_by_stop_id()`](https://ipeagit.github.io/gtfstools/dev/reference/filter_by_stop_id.md),
-[`filter_by_time_of_day()`](https://ipeagit.github.io/gtfstools/dev/reference/filter_by_time_of_day.md),
-[`filter_by_trip_id()`](https://ipeagit.github.io/gtfstools/dev/reference/filter_by_trip_id.md),
-[`filter_by_weekday()`](https://ipeagit.github.io/gtfstools/dev/reference/filter_by_weekday.md)
+[`filter_by_spatial_extent()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_spatial_extent.md),
+which replaces this function.
 
 ## Examples
 
@@ -82,7 +73,7 @@ smaller_gtfs <- filter_by_sf(gtfs, bbox)
 #>   allowed as of the current version, but the function will be removed from the
 #>   package in version 2.0.0.
 object.size(smaller_gtfs)
-#> 324952 bytes
+#> 325096 bytes
 
 # drops entries that intersect with the specified polygon
 smaller_gtfs <- filter_by_sf(gtfs, bbox, keep = FALSE)
@@ -92,7 +83,7 @@ smaller_gtfs <- filter_by_sf(gtfs, bbox, keep = FALSE)
 #>   allowed as of the current version, but the function will be removed from the
 #>   package in version 2.0.0.
 object.size(smaller_gtfs)
-#> 512288 bytes
+#> 512352 bytes
 
 # uses a different function to filter the gtfs
 smaller_gtfs <- filter_by_sf(gtfs, bbox, spatial_operation = sf::st_contains)
@@ -102,5 +93,5 @@ smaller_gtfs <- filter_by_sf(gtfs, bbox, spatial_operation = sf::st_contains)
 #>   allowed as of the current version, but the function will be removed from the
 #>   package in version 2.0.0.
 object.size(smaller_gtfs)
-#> 68976 bytes
+#> 69040 bytes
 ```

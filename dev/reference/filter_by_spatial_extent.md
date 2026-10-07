@@ -20,7 +20,7 @@ filter_by_spatial_extent(
 - gtfs:
 
   A GTFS object, as created by
-  [`read_gtfs()`](https://ipeagit.github.io/gtfstools/dev/reference/read_gtfs.md).
+  [`read_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/read_gtfs.md).
 
 - geom:
 
@@ -51,16 +51,15 @@ process.
 ## See also
 
 Other filtering functions:
-[`filter_by_agency_id()`](https://ipeagit.github.io/gtfstools/dev/reference/filter_by_agency_id.md),
-[`filter_by_route_id()`](https://ipeagit.github.io/gtfstools/dev/reference/filter_by_route_id.md),
-[`filter_by_route_type()`](https://ipeagit.github.io/gtfstools/dev/reference/filter_by_route_type.md),
-[`filter_by_service_id()`](https://ipeagit.github.io/gtfstools/dev/reference/filter_by_service_id.md),
-[`filter_by_sf()`](https://ipeagit.github.io/gtfstools/dev/reference/filter_by_sf.md),
-[`filter_by_shape_id()`](https://ipeagit.github.io/gtfstools/dev/reference/filter_by_shape_id.md),
-[`filter_by_stop_id()`](https://ipeagit.github.io/gtfstools/dev/reference/filter_by_stop_id.md),
-[`filter_by_time_of_day()`](https://ipeagit.github.io/gtfstools/dev/reference/filter_by_time_of_day.md),
-[`filter_by_trip_id()`](https://ipeagit.github.io/gtfstools/dev/reference/filter_by_trip_id.md),
-[`filter_by_weekday()`](https://ipeagit.github.io/gtfstools/dev/reference/filter_by_weekday.md)
+[`filter_by_agency_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_agency_id.md),
+[`filter_by_route_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_route_id.md),
+[`filter_by_route_type()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_route_type.md),
+[`filter_by_service_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_service_id.md),
+[`filter_by_shape_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_shape_id.md),
+[`filter_by_stop_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_stop_id.md),
+[`filter_by_time_of_day()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_time_of_day.md),
+[`filter_by_trip_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_trip_id.md),
+[`filter_by_weekday()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_weekday.md)
 
 ## Examples
 
@@ -77,12 +76,12 @@ object.size(gtfs)
 # keeps entries that intersect with the specified polygon
 smaller_gtfs <- filter_by_spatial_extent(gtfs, bbox)
 object.size(smaller_gtfs)
-#> 324952 bytes
+#> 325096 bytes
 
 # drops entries that intersect with the specified polygon
 smaller_gtfs <- filter_by_spatial_extent(gtfs, bbox, keep = FALSE)
 object.size(smaller_gtfs)
-#> 512288 bytes
+#> 512352 bytes
 
 # uses a different function to filter the gtfs
 smaller_gtfs <- filter_by_spatial_extent(
@@ -91,5 +90,5 @@ smaller_gtfs <- filter_by_spatial_extent(
   spatial_operation = sf::st_contains
 )
 object.size(smaller_gtfs)
-#> 68976 bytes
+#> 69040 bytes
 ```

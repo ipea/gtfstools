@@ -11,7 +11,7 @@ get_stop_times_patterns(
   gtfs,
   trip_id = NULL,
   type = "spatial",
-  sort_sequence = FALSE
+  sort_sequence = TRUE
 )
 ```
 
@@ -20,7 +20,7 @@ get_stop_times_patterns(
 - gtfs:
 
   A GTFS object, as created by
-  [`read_gtfs()`](https://ipeagit.github.io/gtfstools/dev/reference/read_gtfs.md).
+  [`read_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/read_gtfs.md).
 
 - trip_id:
 
@@ -36,11 +36,11 @@ get_stop_times_patterns(
 - sort_sequence:
 
   A logical specifying whether to sort timetables by `stop_sequence`.
-  Defaults to `FALSE`, otherwise spec-compliant feeds, in which
-  timetables points are already ordered by `stop_sequence`, would be
-  penalized through longer processing times. Pattern identification
-  based on unordered timetables may result in multiple ids identifying
-  what would be the same pattern, had the table been ordered.
+  Defaults to `TRUE`. Sorting an already ordered table is cheap, and
+  pattern identification based on unordered timetables may result in
+  multiple ids identifying what would be the same pattern, had the table
+  been ordered. Set to `FALSE` only if the timetables are known to be
+  ordered.
 
 ## Value
 
@@ -64,6 +64,10 @@ table (e.g. if trip X lists stops A followed by stop B with
 `stop_sequence`s 1 and 2, and trip Y lists stops A followed by stop B
 with `stop_sequence`s 1 and 3, they are assigned to the same
 `pattern_id`).
+
+Existing `_secs` columns in `stop_times` (e.g. created with
+[`convert_time_to_seconds()`](https://ipea.github.io/gtfstools/dev/reference/convert_time_to_seconds.md))
+are used as-is, not recalculated from the time strings.
 
 ## Examples
 

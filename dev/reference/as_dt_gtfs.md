@@ -5,7 +5,7 @@ from other packages (`{tidytransit}` and `{gtfsio}`, for example) into a
 gtfstools-compatible GTFS object - i.e. one whose internal tables are
 represented with `data.table`s and whose fields are formatted like the
 fields of a feed read with
-[`read_gtfs()`](https://ipeagit.github.io/gtfstools/dev/reference/read_gtfs.md).
+[`read_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/read_gtfs.md).
 
 `as_dt_gtfs()` is an S3 generic, with methods for:
 
@@ -21,9 +21,9 @@ fields of a feed read with
 
 - `list`: this method tries to convert the elements of a list into
   `data.table`s. Please note that all list elements must inherit from
-  `data.frame` and must be named. This method does not try not convert
-  fields to the representation used in `{gtfstools}`, as it does not
-  have any information on how they are formatted in the first place.
+  `data.frame` and must be named. Like the `gtfs` method, it converts
+  date fields represented as `integer`s (`YYYYMMDD`) to `Date` objects;
+  other fields are kept as they are.
 
 ## Usage
 
@@ -53,7 +53,7 @@ as_dt_gtfs(gtfs, ...)
 - calculate_distance:
 
   A logical. Passed to
-  [`convert_sf_to_shapes()`](https://ipeagit.github.io/gtfstools/dev/reference/convert_sf_to_shapes.md),
+  [`convert_sf_to_shapes()`](https://ipea.github.io/gtfstools/dev/reference/convert_sf_to_shapes.md),
   which only affects the output when the object to be converted includes
   a `shapes` element. Controls whether this function, used to convert a
   `LINESTRING sf` into a GTFS `shapes` table, should calculate and

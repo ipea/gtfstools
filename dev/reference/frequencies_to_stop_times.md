@@ -6,7 +6,12 @@ Creates `stop_times` entries based on the frequencies specified in the
 ## Usage
 
 ``` r
-frequencies_to_stop_times(gtfs, trip_id = NULL, force = FALSE)
+frequencies_to_stop_times(
+  gtfs,
+  trip_id = NULL,
+  force = FALSE,
+  strategy = "exact"
+)
 ```
 
 ## Arguments
@@ -14,7 +19,7 @@ frequencies_to_stop_times(gtfs, trip_id = NULL, force = FALSE)
 - gtfs:
 
   A GTFS object, as created by
-  [`read_gtfs()`](https://ipeagit.github.io/gtfstools/dev/reference/read_gtfs.md).
+  [`read_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/read_gtfs.md).
 
 - trip_id:
 
@@ -30,6 +35,32 @@ frequencies_to_stop_times(gtfs, trip_id = NULL, force = FALSE)
   table and their correspondent entries in `trips` are substituted by
   what would be their converted counterpart.
 
+- strategy:
+
+  A string. The strategy used to set the departure times of the trips
+  created from frequency-based entries of the `frequencies` table (i.e.
+  those whose `exact_times` is not `1`). One of:
+
+  - `"exact"` (the default): trips depart every `headway_secs` from
+    `start_time`;
+
+  - `"half_headway"`: departures are shifted by half the headway,
+    rounded down to whole seconds;
+
+  - `"random"`: departures are shifted by a random whole number of
+    seconds, from 0 up to (but not including) the headway, drawn
+    independently for each entry. Uses R's random number generator, so
+    results can be made reproducible with
+    [`set.seed()`](https://rdrr.io/r/base/Random.html).
+
+  In entries shorter than their headway, the duration of the entry (from
+  `start_time` to `end_time`) is used in place of the headway, so that
+  no departure is shifted to or past `end_time` and each entry still
+  yields at least one trip. As departures are shifted towards
+  `end_time`, an entry may yield one trip fewer than with `"exact"`.
+  Entries whose `exact_times` is `1` follow an exact schedule and are
+  always converted as with `"exact"`.
+
 ## Value
 
 A GTFS object with updated `frequencies`, `stop_times` and `trips`
@@ -42,12 +73,20 @@ trips after converting the GTFS. Let's say, for example, that the
 `frequencies` table describes a trip called `"example_trip"`, that
 starts at 08:00 and stops at 09:00, with a 30 minutes headway.
 
-In practice, that means that one trip will depart at 08:00, another at
-08:30 and yet another at 09:00. `frequencies_to_stop_times()` appends a
-`"_<n>"` suffix to the newly created trips to differentiate each one of
-them (e.g. in this case, the new trips, described in the `trips` and
-`stop_times` tables, would be called `"example_trip_1"`,
-`"example_trip_2"` and `"example_trip_3"`).
+In practice, with the default `strategy = "exact"`, that means that one
+trip will depart at 08:00 and another at 08:30. As required by the GTFS
+specification, no trip departs at the `end_time` (09:00), which is when
+the headway changes or the service ceases. An entry whose `start_time`
+and `end_time` are equal yields a single trip, departing at that time.
+`frequencies_to_stop_times()` appends a `"_<n>"` suffix to the newly
+created trips to differentiate each one of them (e.g. in this case, the
+new trips, described in the `trips` and `stop_times` tables, would be
+called `"example_trip_1"` and `"example_trip_2"`).
+
+Existing `_secs` columns in `stop_times` and `frequencies` (e.g. created
+with
+[`convert_time_to_seconds()`](https://ipea.github.io/gtfstools/dev/reference/convert_time_to_seconds.md))
+are used as-is, not recalculated from the time strings.
 
 ## Examples
 

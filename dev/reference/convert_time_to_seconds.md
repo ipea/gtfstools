@@ -15,7 +15,7 @@ convert_time_to_seconds(gtfs, file = NULL, by_reference = FALSE)
 - gtfs:
 
   A GTFS object, as created by
-  [`read_gtfs()`](https://ipeagit.github.io/gtfstools/dev/reference/read_gtfs.md).
+  [`read_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/read_gtfs.md).
 
 - file:
 
@@ -34,6 +34,16 @@ If `by_reference` is `FALSE`, returns a GTFS object with additional time
 in seconds columns (identified by a `_secs` suffix). Else, returns a
 GTFS object invisibly (please note that in such case the original GTFS
 object is altered).
+
+## Details
+
+Other gtfstools functions use existing `_secs` columns as-is. Only the
+functions that edit times
+([`set_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.md)
+and
+[`filter_by_time_of_day()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_time_of_day.md))
+keep them in sync, so re-run `convert_time_to_seconds()` after other
+edits.
 
 ## Examples
 

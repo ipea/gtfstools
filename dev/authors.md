@@ -24,16 +24,16 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/ipeaGIT/gtfstools/blob/main/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/ipea/gtfstools/blob/main/DESCRIPTION)
 
 Herszenhut D, Pereira R, Andrade P, Bazzo J (2026). *gtfstools: General
 Transit Feed Specification (GTFS) Editing and Analysing Tools*. R
-package version 1.4.0.9000, <https://ipeagit.github.io/gtfstools/>.
+package version 1.4.0.9000, <https://ipea.github.io/gtfstools/>.
 
     @Manual{,
       title = {gtfstools: General Transit Feed Specification (GTFS) Editing and Analysing Tools},
       author = {Daniel Herszenhut and Rafael H. M. Pereira and Pedro R. Andrade and Joao Bazzo},
       year = {2026},
       note = {R package version 1.4.0.9000},
-      url = {https://ipeagit.github.io/gtfstools/},
+      url = {https://ipea.github.io/gtfstools/},
     }

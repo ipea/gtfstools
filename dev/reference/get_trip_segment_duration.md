@@ -10,7 +10,7 @@ get_trip_segment_duration(
   gtfs,
   trip_id = NULL,
   unit = "min",
-  sort_sequence = FALSE
+  sort_sequence = TRUE
 )
 ```
 
@@ -19,7 +19,7 @@ get_trip_segment_duration(
 - gtfs:
 
   A GTFS object, as created by
-  [`read_gtfs()`](https://ipeagit.github.io/gtfstools/dev/reference/read_gtfs.md).
+  [`read_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/read_gtfs.md).
 
 - trip_id:
 
@@ -36,11 +36,10 @@ get_trip_segment_duration(
 - sort_sequence:
 
   A logical specifying whether to sort timetables by `stop_sequence`.
-  Defaults to `FALSE`, otherwise spec-compliant feeds, in which
-  timetables points are already ordered by `stop_sequence`, would be
-  penalized through longer processing times. Durations calculated from
-  unordered timetables do not correctly depict the real life segment
-  durations.
+  Defaults to `TRUE`. Sorting an already ordered table is cheap, and
+  durations calculated from unordered timetables do not correctly depict
+  the real life segment durations. Set to `FALSE` only if the timetables
+  are known to be ordered.
 
 ## Value
 
@@ -53,6 +52,10 @@ the same trip. The duration of a segment is defined as the time
 difference between its arrival time and its departure time, as specified
 in the `stop_times` file.
 
+Existing `_secs` columns in `stop_times` (e.g. created with
+[`convert_time_to_seconds()`](https://ipea.github.io/gtfstools/dev/reference/convert_time_to_seconds.md))
+are used as-is, not recalculated from the time strings.
+
 ## Examples
 
 ``` r
@@ -62,14 +65,14 @@ gtfs <- read_gtfs(data_path)
 
 trip_segment_dur <- get_trip_segment_duration(gtfs)
 head(trip_segment_dur)
-#>       trip_id segment duration
-#>        <char>   <int>    <num>
-#> 1: CPTM L07-0       1        8
-#> 2: CPTM L07-0       2        8
-#> 3: CPTM L07-0       3        8
-#> 4: CPTM L07-0       4        8
-#> 5: CPTM L07-0       5        8
-#> 6: CPTM L07-0       6        8
+#>      trip_id segment duration
+#>       <char>   <int>    <num>
+#> 1: 2002-10-0       1 2.166667
+#> 2: 2002-10-0       2 2.166667
+#> 3: 2002-10-0       3 2.166667
+#> 4: 2002-10-0       4 2.166667
+#> 5: 2002-10-0       5 2.166667
+#> 6: 2002-10-0       6 2.166667
 
 # use the trip_id argument to control which trips are analyzed
 trip_segment_dur <- get_trip_segment_duration(gtfs, trip_id = "CPTM L07-0")

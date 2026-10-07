@@ -40,7 +40,8 @@ Invisibly returns the normalized path to the downloaded validator.
 ## See also
 
 Other validation:
-[`validate_gtfs()`](https://ipeagit.github.io/gtfstools/dev/reference/validate_gtfs.md)
+[`list_validator_versions()`](https://ipea.github.io/gtfstools/dev/reference/list_validator_versions.md),
+[`validate_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/validate_gtfs.md)
 
 ## Examples
 

@@ -3,7 +3,7 @@
 seconds after midnight. Instead of overwritting the existing fields, creates
 new fields with the _secs suffix."><meta property="og:description" content="Converts stop_times' and frequencies' fields in the &quot;HH:MM:SS&quot; format to
 seconds after midnight. Instead of overwritting the existing fields, creates
-new fields with the _secs suffix."><meta property="og:image" content="https://ipeagit.github.io/gtfstools/logo.png"><meta name="robots" content="noindex"></head><body>
+new fields with the _secs suffix."><meta property="og:image" content="https://ipea.github.io/gtfstools/logo.png"><meta name="robots" content="noindex"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -29,7 +29,7 @@ new fields with the _secs suffix."><meta property="og:image" content="https://ip
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/ipeaGIT/gtfstools/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/ipea/gtfstools/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-lightswitch" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Light switch"><span class="fa fa-sun"></span></button>
   <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-lightswitch"><li><button class="dropdown-item" data-bs-theme-value="light"><span class="fa fa-sun"></span> Light</button></li>
@@ -44,7 +44,7 @@ new fields with the _secs suffix."><meta property="og:image" content="https://ip
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Convert time fields to seconds after midnight</h1>
-      <small class="dont-index">Source: <a href="https://github.com/ipeaGIT/gtfstools/blob/main/R/convert_time_to_seconds.R" class="external-link"><code>R/convert_time_to_seconds.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ipea/gtfstools/blob/main/R/convert_time_to_seconds.R" class="external-link"><code>R/convert_time_to_seconds.R</code></a></small>
       <div class="d-none name"><code>convert_time_to_seconds.Rd</code></div>
     </div>
 
@@ -84,6 +84,12 @@ times from both files, but only raises an error if none of them exist.</p></dd>
 time in seconds columns (identified by a <code>_secs</code> suffix). Else, returns a
 GTFS object invisibly (please note that in such case the original GTFS object
 is altered).</p>
+    </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>Other gtfstools functions use existing <code>_secs</code> columns as-is. Only the
+functions that edit times (<code><a href="set_trip_speed.html">set_trip_speed()</a></code> and <code><a href="filter_by_time_of_day.html">filter_by_time_of_day()</a></code>)
+keep them in sync, so re-run <code>convert_time_to_seconds()</code> after other edits.</p>
     </div>
 
     <div class="section level2">
@@ -183,7 +189,7 @@ is altered).</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

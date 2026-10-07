@@ -39,7 +39,7 @@ validate_gtfs(
 - validator_path:
 
   A string. The path to the GTFS validator, previously downloaded with
-  [`download_validator()`](https://ipeagit.github.io/gtfstools/dev/reference/download_validator.md).
+  [`download_validator()`](https://ipea.github.io/gtfstools/dev/reference/download_validator.md).
 
 - overwrite:
 
@@ -75,7 +75,8 @@ validation results were saved to.
 ## See also
 
 Other validation:
-[`download_validator()`](https://ipeagit.github.io/gtfstools/dev/reference/download_validator.md)
+[`download_validator()`](https://ipea.github.io/gtfstools/dev/reference/download_validator.md),
+[`list_validator_versions()`](https://ipea.github.io/gtfstools/dev/reference/list_validator_versions.md)
 
 ## Examples
 
@@ -99,7 +100,7 @@ list.files(new_output_path)
 
 # and with feeds pointed by an url
 newer_output_path <- tempfile("newer_validation_result")
-gtfs_url <- "https://github.com/ipeaGIT/gtfstools/raw/main/inst/extdata/spo_gtfs.zip"
+gtfs_url <- "https://github.com/ipea/gtfstools/raw/main/inst/extdata/spo_gtfs.zip"
 validate_gtfs(gtfs_url, newer_output_path, validator_path)
 list.files(newer_output_path)
 #> [1] "report.html"           "report.json"           "system_errors.json"   

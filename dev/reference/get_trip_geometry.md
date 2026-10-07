@@ -11,7 +11,7 @@ get_trip_geometry(
   trip_id = NULL,
   file = NULL,
   crs = 4326,
-  sort_sequence = FALSE
+  sort_sequence = TRUE
 )
 ```
 
@@ -20,7 +20,7 @@ get_trip_geometry(
 - gtfs:
 
   A GTFS object, as created by
-  [`read_gtfs()`](https://ipeagit.github.io/gtfstools/dev/reference/read_gtfs.md).
+  [`read_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/read_gtfs.md).
 
 - trip_id:
 
@@ -44,10 +44,9 @@ get_trip_geometry(
 
   A logical specifying whether to sort shapes and timetables by
   `shape_pt_sequence` and `stop_sequence`, respectively. Defaults to
-  `FALSE`, otherwise spec-compliant feeds, in which shape/timetables
-  points are already ordered by `shape_pt_sequence`/`stop_sequence`,
-  would be penalized through longer processing times. Geometries
-  generated from unordered sequences do not correctly depict the trip
+  `TRUE`. Sorting an already ordered table is cheap. Set to `FALSE` only
+  if shapes and timetables are known to be ordered. Geometries generated
+  from unordered sequences do not correctly depict the trip
   trajectories.
 
 ## Value
@@ -113,8 +112,8 @@ trip_geometry
 #>      trip_id origin_file                       geometry
 #> 1 CPTM L07-0      shapes LINESTRING (-46.63535 -23.5...
 #> 2  2002-10-0      shapes LINESTRING (-46.62963 -23.5...
-#> 3 CPTM L07-0  stop_times LINESTRING (-46.63544 -23.5...
-#> 4  2002-10-0  stop_times LINESTRING (-46.62962 -23.5...
+#> 3  2002-10-0  stop_times LINESTRING (-46.62962 -23.5...
+#> 4 CPTM L07-0  stop_times LINESTRING (-46.63544 -23.5...
 plot(trip_geometry["origin_file"])
 
 ```

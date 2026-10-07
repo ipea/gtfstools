@@ -11,7 +11,7 @@ validator v3.1.0 or higher is used) and in JSON format. Please check the
 complete set of rules used in the validation
 here.
 Please note that this function requires a working installation of Java 11 or
-higher to work."><meta property="og:image" content="https://ipeagit.github.io/gtfstools/logo.png"><meta name="robots" content="noindex"></head><body>
+higher to work."><meta property="og:image" content="https://ipea.github.io/gtfstools/logo.png"><meta name="robots" content="noindex"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -37,7 +37,7 @@ higher to work."><meta property="og:image" content="https://ipeagit.github.io/gt
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/ipeaGIT/gtfstools/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/ipea/gtfstools/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-lightswitch" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Light switch"><span class="fa fa-sun"></span></button>
   <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-lightswitch"><li><button class="dropdown-item" data-bs-theme-value="light"><span class="fa fa-sun"></span> Light</button></li>
@@ -52,7 +52,7 @@ higher to work."><meta property="og:image" content="https://ipeagit.github.io/gt
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Validate GTFS feed</h1>
-      <small class="dont-index">Source: <a href="https://github.com/ipeaGIT/gtfstools/blob/main/R/validate_gtfs.R" class="external-link"><code>R/validate_gtfs.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ipea/gtfstools/blob/main/R/validate_gtfs.R" class="external-link"><code>R/validate_gtfs.R</code></a></small>
       <div class="d-none name"><code>validate_gtfs.Rd</code></div>
     </div>
 
@@ -135,7 +135,8 @@ validation results were saved to.</p>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other validation:
-<code><a href="download_validator.html">download_validator()</a></code></p></div>
+<code><a href="download_validator.html">download_validator()</a></code>,
+<code><a href="list_validator_versions.html">list_validator_versions()</a></code></p></div>
     </div>
 
     <div class="section level2">
@@ -159,7 +160,7 @@ validation results were saved to.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># and with feeds pointed by an url</span></span></span>
 <span class="r-in"><span><span class="va">newer_output_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="st">"newer_validation_result"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">gtfs_url</span> <span class="op">&lt;-</span> <span class="st">"https://github.com/ipeaGIT/gtfstools/raw/main/inst/extdata/spo_gtfs.zip"</span></span></span>
+<span class="r-in"><span><span class="va">gtfs_url</span> <span class="op">&lt;-</span> <span class="st">"https://github.com/ipea/gtfstools/raw/main/inst/extdata/spo_gtfs.zip"</span></span></span>
 <span class="r-in"><span><span class="fu">validate_gtfs</span><span class="op">(</span><span class="va">gtfs_url</span>, <span class="va">newer_output_path</span>, <span class="va">validator_path</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">newer_output_path</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "report.html"           "report.json"           "system_errors.json"   </span>
@@ -175,7 +176,7 @@ validation results were saved to.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

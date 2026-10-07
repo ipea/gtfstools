@@ -13,7 +13,7 @@ convert_stops_to_sf(gtfs, stop_id = NULL, crs = 4326)
 - gtfs:
 
   A GTFS object, as created by
-  [`read_gtfs()`](https://ipeagit.github.io/gtfstools/dev/reference/read_gtfs.md).
+  [`read_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/read_gtfs.md).
 
 - stop_id:
 
