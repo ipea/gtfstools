@@ -116,7 +116,7 @@ filter_by_spatial_extent <- function(gtfs,
     untested_gtfs <- gtfs
     untested_gtfs$stop_times <- gtfs$stop_times[to_test]
 
-    trips_sf <- get_trip_geometry(untested_gtfs, file = "stop_times")
+    trips_sf <- get_trip_geometry(untested_gtfs, method = "euclidean")
     did_succeed_operation <- spatial_operation(geom, trips_sf, sparse = FALSE)
 
     relevant_trips <- c(relevant_trips, trips_sf$trip_id[did_succeed_operation])

@@ -19,7 +19,12 @@ the rows of each trip are contiguous.}
 \value{
 A numeric vector with the position of each stop along its trip's
 shape, in meters from the start of the shape. Stops whose trip is not
-linked to a usable shape, or that don't have coordinates, get \code{NA}.
+linked to a usable shape, or that don't have coordinates, get \code{NA}. Its
+\code{"shape_points"} attribute is a list with the shape points on which the
+positions were measured (\code{shapes}, without missing coordinates and
+sorted if \code{sort_sequence} is \code{TRUE}), the rows of each shape in \code{shapes}
+(\code{rows}) and the \code{shape_id} of each trip (\code{trip_shape_id}), in order of
+appearance in \code{st}.
 }
 \description{
 Locate stops along their trips' shapes

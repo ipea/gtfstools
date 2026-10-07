@@ -12,29 +12,32 @@ reference:
   - contents:
     - read_gtfs
     - write_gtfs
-  - title: "Manipulation"
+  - title: "Query information from GTFS feeds"
+  - contents:
+    - starts_with("get_")
+  - title: "Filter GTFS feeds"
+  - contents:
+    - starts_with("filter_by_")
+    - -filter_by_sf
+  - title: "Spatial operations"
   - contents:
     - convert_sf_to_shapes
     - convert_shapes_to_sf
     - convert_stops_to_sf
+    - filter_by_spatial_extent
+  - title: "Manipulation"
+  - contents:
     - convert_time_to_seconds
     - frequencies_to_stop_times
     - merge_gtfs
     - remove_duplicates
     - remove_unused_ids
     - set_trip_speed
-  - title: "Analysis"
-  - contents:
-    - starts_with("get_")
-  - title: "Validation"
+  - title: "Validate GTFS feeds"
   - contents:
     - download_validator
     - list_validator_versions
     - validate_gtfs
-  - title: "Filters"
-  - contents:
-    - starts_with("filter_by_")
-    - -filter_by_sf
   - title: "Interoperability between GTFS packages"
   - contents:
     - "as_dt_gtfs"

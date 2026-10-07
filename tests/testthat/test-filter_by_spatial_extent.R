@@ -65,7 +65,7 @@ test_that("'keep' and 'spatial_operation' arguments work correctly", {
   shapes_intersected <- sf::st_intersects(polygon, shapes, sparse = FALSE)
   shapes_intersected <- shapes[shapes_intersected, ]$shape_id
 
-  trips <- get_trip_geometry(spo_gtfs, file = "stop_times")
+  trips <- get_trip_geometry(spo_gtfs, method = "euclidean")
   trips_intersected <- sf::st_intersects(polygon, trips, sparse = FALSE)
   trips_intersected <- trips[trips_intersected, ]$trip_id
 
@@ -121,7 +121,7 @@ test_that("selects the union of trips selected by shapes and by stop_times", {
   shapes_hit <- shapes[shapes_hit, ]$shape_id
   trips_hit_by_shape <- spo_gtfs$trips[shape_id %chin% shapes_hit]$trip_id
 
-  trips <- get_trip_geometry(spo_gtfs, file = "stop_times")
+  trips <- get_trip_geometry(spo_gtfs, method = "euclidean")
   trips_hit_by_stops <- sf::st_intersects(half_polygon, trips, sparse = FALSE)
   trips_hit_by_stops <- trips[trips_hit_by_stops, ]$trip_id
 
@@ -170,4 +170,19 @@ test_that("error if gtfs doesn't contain neither shapes nor stop_times table", {
   spo_gtfs$shapes <- NULL
   spo_gtfs$stop_times <- NULL
   expect_error(tester(spo_gtfs, bbox))
+})
+
+test_that("ignores stops with missing coordinates", {
+  na_gtfs <- read_gtfs(spo_path)
+  na_gtfs$shapes <- NULL
+  na_stops <- na_gtfs$stop_times[trip_id == "CPTM L07-0"]$stop_id[1:3]
+  na_gtfs$stops[stop_id %chin% na_stops, stop_lat := NA]
+
+  expect_s3_class(tester(na_gtfs), "dt_gtfs")
+
+  # the trip is still selected by its stops with coordinates
+
+  feed_bbox <- sf::st_bbox(convert_stops_to_sf(spo_gtfs))
+  result <- tester(na_gtfs, geom = feed_bbox)
+  expect_true("CPTM L07-0" %chin% result$trips$trip_id)
 })

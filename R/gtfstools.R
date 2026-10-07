@@ -41,7 +41,6 @@ utils::globalVariables(
     "shape_id",
     "shape_pt_sequence",
     "stop_sequence",
-    "origin_file",
     "file_spec",
     "file_provided_status",
     "field_provided_status",

@@ -7,9 +7,10 @@
 get_trip_geometry(
   gtfs,
   trip_id = NULL,
-  file = NULL,
+  method = "shapes",
   crs = 4326,
-  sort_sequence = TRUE
+  sort_sequence = TRUE,
+  file = NULL
 )
 }
 \arguments{
@@ -19,36 +20,56 @@ get_trip_geometry(
 geometries generated. If \code{NULL} (the default), the function generates
 geometries for every \code{trip_id} in the GTFS.}
 
-\item{file}{A character vector specifying the file from which geometries
-should be generated (either one of or both \code{shapes} and \code{stop_times}). If
-\code{NULL} (the default), the function attemps to generate the geometries from
-both files, but only raises an error if none of the files exist.}
+\item{method}{A string, either \code{"shapes"} (the default) or \code{"euclidean"}.
+\code{"shapes"} returns the part of the trip's shape, described in the \code{shapes}
+table, between its first and last stops, while \code{"euclidean"} links the
+consecutive stops of the trip along straight lines. If the GTFS object
+doesn't have a \code{shapes} table, or if its \code{trips} table doesn't have a
+\code{shape_id} column, \code{"euclidean"} is used instead, with a warning.}
 
 \item{crs}{The CRS of the resulting object, either as an EPSG code or as an
 \code{crs} object. Defaults to 4326 (WGS 84).}
 
-\item{sort_sequence}{A logical specifying whether to sort shapes and
-timetables by \code{shape_pt_sequence} and \code{stop_sequence}, respectively.
-Defaults to \code{TRUE}. Sorting an already ordered table is cheap. Set to
-\code{FALSE} only if shapes and timetables are known to be ordered. Geometries
-generated from unordered sequences do not correctly depict the trip
-trajectories.}
+\item{sort_sequence}{A logical specifying whether to sort timetables and
+shapes by \code{stop_sequence} and \code{shape_pt_sequence}, respectively. Defaults
+to \code{TRUE}. Set to \code{FALSE} only if these tables are known to be ordered.
+Geometries generated from unordered sequences do not correctly depict the
+trip trajectories.}
+
+\item{file}{Deprecated. Use \code{method} instead (\code{file = "stop_times"}
+corresponds to \code{method = "euclidean"}).}
 }
 \value{
-A \verb{LINESTRING sf}.
+A \verb{LINESTRING sf} with the \code{trip_id} and the \code{geometry} of each trip
+listed in \code{stop_times}.
 }
 \description{
-Returns the geometry of each specified \code{trip_id}, based either on the
-\code{shapes} or the \code{stop_times} file (or both).
+Returns the geometry of each specified \code{trip_id}, from its first to its last
+stop, either along the trip's shape or as straight lines between stops.
 }
 \section{Details}{
 
-The geometry generation works differently for the two files. In the case of
-\code{shapes}, the shape as described in the text file is converted to an \code{sf}
-object. For \code{stop_times} the geometry is the result of linking subsequent
-stops along a straight line (stops' coordinates are retrieved from the
-\code{stops} file). Thus, the resolution of the geometry when generated with
-\code{shapes} tends to be much higher than when created with \code{stop_times}.
+With \code{method = "shapes"}, the first and last stops of each trip are
+projected onto its shape, as in \code{\link[=get_trip_length]{get_trip_length()}}, and the geometry is the
+part of the shape between them. Thus, its length matches the length
+returned by \code{\link[=get_trip_length]{get_trip_length()}} (when this length is not \code{NA}, see below),
+and the limitations described there apply. Trips whose stops are all
+located at the same point of the shape get a zero-length geometry.
+Use \code{\link[=convert_shapes_to_sf]{convert_shapes_to_sf()}} for the geometry of entire shapes.
+
+With \code{method = "euclidean"}, the geometry links the consecutive stops of
+each trip along straight lines (stops' coordinates are retrieved from the
+\code{stops} table), so its resolution tends to be much lower than that of the
+geometry generated from the shapes. Trips with a single stop get a
+single-point geometry.
+
+Both methods ignore stops with missing coordinates, or not listed in
+\code{stops} (for which \code{\link[=get_trip_length]{get_trip_length()}} returns \code{NA} lengths). Trips
+without any stop with coordinates get an empty geometry, as do, with
+\code{method = "shapes"}, trips with fewer than two stops with coordinates or
+not linked to a shape with at least two distinct points (the
+latter with a warning). Geometries along shapes that cross the antimeridian
+are not handled correctly.
 }
 
 \examples{
@@ -60,16 +81,21 @@ data_path <- system.file("extdata/spo_gtfs.zip", package = "gtfstools")
 
 gtfs <- read_gtfs(data_path)
 
+# geometry along the shape from the first to the last stop of each trip
 trip_geometry <- get_trip_geometry(gtfs)
 head(trip_geometry)
 
-# the above is identical to
-trip_geometry <- get_trip_geometry(gtfs, file = c("shapes", "stop_times"))
-head(trip_geometry)
-
+# straight lines between consecutive stops
 trip_ids <- c("CPTM L07-0", "2002-10-0")
-trip_geometry <- get_trip_geometry(gtfs, trip_id = trip_ids)
-trip_geometry
-plot(trip_geometry["origin_file"])
+straight_geometry <- get_trip_geometry(
+  gtfs,
+  trip_id = trip_ids,
+  method = "euclidean"
+)
+straight_geometry
+plot(straight_geometry["trip_id"])
 
+}
+\seealso{
+\code{\link[=get_trip_length]{get_trip_length()}}, \code{\link[=convert_shapes_to_sf]{convert_shapes_to_sf()}}
 }
