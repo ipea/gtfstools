@@ -7,12 +7,7 @@
 #' @param trip_id A character vector including the `trip_id`s to have their
 #'   speeds calculated. If `NULL` (the default), the function calculates the
 #'   speed of every `trip_id` in the GTFS.
-#' @param method A string, either `"shapes"` (the default) or `"euclidean"`,
-#'   passed to [get_trip_length()]. `"shapes"` measures lengths along the
-#'   trip's shape, while `"euclidean"` measures the straight-line distances
-#'   between consecutive stops. If the GTFS object doesn't have a `shapes`
-#'   table, or if its `trips` table doesn't have a `shape_id` column,
-#'   `"euclidean"` is used instead, with a warning.
+#' @template method
 #' @param by A string, either `"trip"` (the default) or `"segment"`. `"trip"`
 #'   returns the average speed from the first to the last stop of each trip,
 #'   while `"segment"` returns the average speed between each pair of
@@ -21,12 +16,9 @@
 #'   Either `"km/h"` (the default) or `"m/s"`.
 #' @param sort_sequence A logical specifying whether to sort timetables and
 #'   shapes by `stop_sequence` and `shape_pt_sequence`, respectively. Defaults
-#'   to `TRUE`. Sorting an already ordered table is cheap. Set to `FALSE`
-#'   only if these tables are known to be ordered.
-#' @param file Deprecated. Use `method` instead: `file = "shapes"` corresponds
-#'   to `method = "shapes"` and `file = "stop_times"` to `method =
-#'   "euclidean"`. If given, `file` takes precedence over `method`. If both
-#'   files are given, only `"shapes"` is used.
+#'   to `TRUE`. Set to `FALSE` only if these tables are known to be ordered.
+#' @param file Deprecated. Use `method` instead (`file = "stop_times"`
+#'   corresponds to `method = "euclidean"`).
 #'
 #' @return With `by = "trip"`, a `data.table` with the `trip_id` and the
 #'   average `speed` of each trip. With `by = "segment"`, a `data.table` with

@@ -9,12 +9,7 @@
 #' @param trip_id A character vector including the `trip_id`s to have their
 #'   lengths calculated. If `NULL` (the default), the function calculates the
 #'   lengths of every `trip_id` in the GTFS.
-#' @param method A string, either `"shapes"` (the default) or `"euclidean"`.
-#'   `"shapes"` measures lengths along the trip's shape, described in the
-#'   `shapes` table, while `"euclidean"` measures the straight-line
-#'   (great-circle) distances between consecutive stops. If the GTFS object
-#'   doesn't have a `shapes` table, or if its `trips` table doesn't have a
-#'   `shape_id` column, `"euclidean"` is used instead, with a warning.
+#' @template method
 #' @param by A string, either `"trip"` (the default) or `"segment"`. `"trip"`
 #'   returns the length from the first to the last stop of each trip, while
 #'   `"segment"` returns the length between each pair of consecutive stops.
@@ -22,12 +17,9 @@
 #'   Either `"km"` (the default) or `"m"`.
 #' @param sort_sequence A logical specifying whether to sort timetables and
 #'   shapes by `stop_sequence` and `shape_pt_sequence`, respectively. Defaults
-#'   to `TRUE`. Sorting an already ordered table is cheap. Set to `FALSE`
-#'   only if these tables are known to be ordered.
-#' @param file Deprecated. Use `method` instead: `file = "shapes"` corresponds
-#'   to `method = "shapes"` and `file = "stop_times"` to `method =
-#'   "euclidean"`. If given, `file` takes precedence over `method`. If both
-#'   files are given, only `"shapes"` is used.
+#'   to `TRUE`. Set to `FALSE` only if these tables are known to be ordered.
+#' @param file Deprecated. Use `method` instead (`file = "stop_times"`
+#'   corresponds to `method = "euclidean"`).
 #'
 #' @return With `by = "trip"`, a `data.table` with the `trip_id` and the
 #'   `length` of each trip. With `by = "segment"`, a `data.table` with the
@@ -35,39 +27,31 @@
 #'   delimit the segment and its `length`.
 #'
 #' @section Details:
-#' A segment is the path between two consecutive stops of the same trip. The
-#' segments of each trip are numbered from 1 to the number of stops minus 1,
-#' in the same way as in [get_trip_segment_duration()], so the results of both
-#' functions can be joined by `trip_id` and `segment` to calculate segment
-#' speeds (see [get_trip_speed()]). With `by = "trip"`, the length of a trip is
-#' the sum of the lengths of its segments, and trips with a single stop have a
+#' Segments are numbered as in [get_trip_segment_duration()], so both outputs
+#' can be joined by `trip_id` and `segment`. Trips with a single stop have a
 #' length of 0.
 #'
 #' With `method = "shapes"`, each stop is projected onto the closest point of
-#' its trip's shape, with the restriction that the stops must advance along
-#' the shape in the order given by `stop_sequence`. This correctly handles
-#' loops and shapes that pass by the same place more than once. When a stop is
-#' located slightly before the previous one along the shape (e.g. because of
-#' imprecise coordinates), the distance between them is usually 0, and the
-#' length of the trip usually varies by at most the gap between the two stops,
-#' depending on where the shape's points are. However, if the shape passes by
-#' the same place more than once in the same direction (e.g. a shape that goes
-#' around a loop twice), such a stop may be matched to a later pass, which
-#' increases the length of the trip. Stops are
-#' projected regardless of how far they are from the shape, and the
-#' `shape_dist_traveled` columns of `shapes` and `stop_times`, if present, are
-#' ignored. Shape points with missing coordinates are ignored. Trips that are
-#' not linked to a shape, or whose shape has fewer than two distinct points
-#' with coordinates, have `NA` lengths, and a warning is raised. The length
-#' along the shape between the first and the last stop of a trip is usually
-#' shorter than the length of its entire shape, which is returned by
-#' [get_shape_length()].
+#' its trip's shape, with stops advancing along the shape in `stop_sequence`
+#' order, so loops and shapes that pass by the same place more than once are
+#' handled. Some limitations remain:
 #'
-#' Lengths are great-circle distances calculated with the haversine formula,
-#' on a sphere with the same radius used by `{s2}` (6,371,010 meters),
-#' regardless of whether `sf::sf_use_s2()` is enabled. Stops with missing
-#' coordinates, or that are not listed in the `stops` table, result in `NA`
-#' lengths for the segments they delimit and for the trips they belong to.
+#' - a stop slightly behind the previous one along the shape (e.g. due to
+#'   imprecise coordinates) is placed at the previous stop's position, so their
+#'   segment has a length of 0. On shapes that pass the same place twice in the
+#'   same direction, such a stop may be matched to the later pass instead;
+#' - on shapes whose outbound and return legs overlap exactly, the stops just
+#'   before and after the turnaround may be placed at the same position. The
+#'   trip length is unaffected, but the segment between them gets a length of
+#'   0 and the next one is longer.
+#'
+#' `shape_dist_traveled` is ignored. Trips not linked to a shape with at least
+#' two distinct points have `NA` lengths, with a warning. Use
+#' [get_shape_length()] for the length of entire shapes.
+#'
+#' Lengths are great-circle (haversine) distances on the sphere used by
+#' `{s2}`. Stops with missing coordinates, or not listed in `stops`, result in
+#' `NA` lengths for their segments and trips.
 #'
 #' @seealso [get_shape_length()], [get_trip_speed()],
 #'   [get_trip_segment_duration()]

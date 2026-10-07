@@ -21,12 +21,12 @@ get_trip_speed(
 speeds calculated. If \code{NULL} (the default), the function calculates the
 speed of every \code{trip_id} in the GTFS.}
 
-\item{method}{A string, either \code{"shapes"} (the default) or \code{"euclidean"},
-passed to \code{\link[=get_trip_length]{get_trip_length()}}. \code{"shapes"} measures lengths along the
-trip's shape, while \code{"euclidean"} measures the straight-line distances
-between consecutive stops. If the GTFS object doesn't have a \code{shapes}
-table, or if its \code{trips} table doesn't have a \code{shape_id} column,
-\code{"euclidean"} is used instead, with a warning.}
+\item{method}{A string, either \code{"shapes"} (the default) or \code{"euclidean"}.
+\code{"shapes"} measures lengths along the trip's shape, described in the
+\code{shapes} table, while \code{"euclidean"} measures the straight-line
+(great-circle) distances between consecutive stops. If the GTFS object
+doesn't have a \code{shapes} table, or if its \code{trips} table doesn't have a
+\code{shape_id} column, \code{"euclidean"} is used instead, with a warning.}
 
 \item{by}{A string, either \code{"trip"} (the default) or \code{"segment"}. \code{"trip"}
 returns the average speed from the first to the last stop of each trip,
@@ -38,12 +38,10 @@ Either \code{"km/h"} (the default) or \code{"m/s"}.}
 
 \item{sort_sequence}{A logical specifying whether to sort timetables and
 shapes by \code{stop_sequence} and \code{shape_pt_sequence}, respectively. Defaults
-to \code{TRUE}. Sorting an already ordered table is cheap. Set to \code{FALSE}
-only if these tables are known to be ordered.}
+to \code{TRUE}. Set to \code{FALSE} only if these tables are known to be ordered.}
 
-\item{file}{Deprecated. Use \code{method} instead: \code{file = "shapes"} corresponds
-to \code{method = "shapes"} and \code{file = "stop_times"} to \code{method = "euclidean"}. If given, \code{file} takes precedence over \code{method}. If both
-files are given, only \code{"shapes"} is used.}
+\item{file}{Deprecated. Use \code{method} instead (\code{file = "stop_times"}
+corresponds to \code{method = "euclidean"}).}
 }
 \value{
 With \code{by = "trip"}, a \code{data.table} with the \code{trip_id} and the

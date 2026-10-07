@@ -37,12 +37,10 @@ Either \code{"km"} (the default) or \code{"m"}.}
 
 \item{sort_sequence}{A logical specifying whether to sort timetables and
 shapes by \code{stop_sequence} and \code{shape_pt_sequence}, respectively. Defaults
-to \code{TRUE}. Sorting an already ordered table is cheap. Set to \code{FALSE}
-only if these tables are known to be ordered.}
+to \code{TRUE}. Set to \code{FALSE} only if these tables are known to be ordered.}
 
-\item{file}{Deprecated. Use \code{method} instead: \code{file = "shapes"} corresponds
-to \code{method = "shapes"} and \code{file = "stop_times"} to \code{method = "euclidean"}. If given, \code{file} takes precedence over \code{method}. If both
-files are given, only \code{"shapes"} is used.}
+\item{file}{Deprecated. Use \code{method} instead (\code{file = "stop_times"}
+corresponds to \code{method = "euclidean"}).}
 }
 \value{
 With \code{by = "trip"}, a \code{data.table} with the \code{trip_id} and the
@@ -58,39 +56,32 @@ between stops.
 }
 \section{Details}{
 
-A segment is the path between two consecutive stops of the same trip. The
-segments of each trip are numbered from 1 to the number of stops minus 1,
-in the same way as in \code{\link[=get_trip_segment_duration]{get_trip_segment_duration()}}, so the results of both
-functions can be joined by \code{trip_id} and \code{segment} to calculate segment
-speeds (see \code{\link[=get_trip_speed]{get_trip_speed()}}). With \code{by = "trip"}, the length of a trip is
-the sum of the lengths of its segments, and trips with a single stop have a
+Segments are numbered as in \code{\link[=get_trip_segment_duration]{get_trip_segment_duration()}}, so both outputs
+can be joined by \code{trip_id} and \code{segment}. Trips with a single stop have a
 length of 0.
 
 With \code{method = "shapes"}, each stop is projected onto the closest point of
-its trip's shape, with the restriction that the stops must advance along
-the shape in the order given by \code{stop_sequence}. This correctly handles
-loops and shapes that pass by the same place more than once. When a stop is
-located slightly before the previous one along the shape (e.g. because of
-imprecise coordinates), the distance between them is usually 0, and the
-length of the trip usually varies by at most the gap between the two stops,
-depending on where the shape's points are. However, if the shape passes by
-the same place more than once in the same direction (e.g. a shape that goes
-around a loop twice), such a stop may be matched to a later pass, which
-increases the length of the trip. Stops are
-projected regardless of how far they are from the shape, and the
-\code{shape_dist_traveled} columns of \code{shapes} and \code{stop_times}, if present, are
-ignored. Shape points with missing coordinates are ignored. Trips that are
-not linked to a shape, or whose shape has fewer than two distinct points
-with coordinates, have \code{NA} lengths, and a warning is raised. The length
-along the shape between the first and the last stop of a trip is usually
-shorter than the length of its entire shape, which is returned by
-\code{\link[=get_shape_length]{get_shape_length()}}.
+its trip's shape, with stops advancing along the shape in \code{stop_sequence}
+order, so loops and shapes that pass by the same place more than once are
+handled. Some limitations remain:
+\itemize{
+\item a stop slightly behind the previous one along the shape (e.g. due to
+imprecise coordinates) is placed at the previous stop's position, so their
+segment has a length of 0. On shapes that pass the same place twice in the
+same direction, such a stop may be matched to the later pass instead;
+\item on shapes whose outbound and return legs overlap exactly, the stops just
+before and after the turnaround may be placed at the same position. The
+trip length is unaffected, but the segment between them gets a length of
+0 and the next one is longer.
+}
 
-Lengths are great-circle distances calculated with the haversine formula,
-on a sphere with the same radius used by \code{{s2}} (6,371,010 meters),
-regardless of whether \code{sf::sf_use_s2()} is enabled. Stops with missing
-coordinates, or that are not listed in the \code{stops} table, result in \code{NA}
-lengths for the segments they delimit and for the trips they belong to.
+\code{shape_dist_traveled} is ignored. Trips not linked to a shape with at least
+two distinct points have \code{NA} lengths, with a warning. Use
+\code{\link[=get_shape_length]{get_shape_length()}} for the length of entire shapes.
+
+Lengths are great-circle (haversine) distances on the sphere used by
+\code{{s2}}. Stops with missing coordinates, or not listed in \code{stops}, result in
+\code{NA} lengths for their segments and trips.
 }
 
 \examples{

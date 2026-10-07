@@ -33,21 +33,17 @@ Sets the average speed of each specified \code{trip_id} by changing the
 }
 \section{Details}{
 
-The average speed is calculated as the difference between the arrival time
-at the last stop minus the departure time at the first top, over the trip's
-length, as calculated by \code{\link[=get_trip_length]{get_trip_length()}}: the length along the trip's
-shape from its first to its last stop or, if the GTFS object doesn't have
-a \code{shapes} table, the sum of the straight-line distances between
-consecutive stops (a warning is raised in this case). The \code{stops} table is
-therefore required. Trips whose length can't be calculated (e.g. trips not
-linked to a shape) are left unchanged.
-The arrival and departure times at all other stops (i.e. not the
-first neither the last) are set as \code{""}, which is written as \code{NA} with
-\code{\link[=write_gtfs]{write_gtfs()}}. Some transport routing software, such as
-\href{http://www.opentripplanner.org/}{OpenTripPlanner}, support specifying stop
-times like so. In such cases, they estimate arrival/departure times at the
-others stops based on the average speed as well. We plan to add that feature
-to this function in the future.
+The duration of each trip (from the departure at its first stop to the
+arrival at its last stop) is set to its length, as calculated by
+\code{\link[=get_trip_length]{get_trip_length()}} along the trip's shape (or as straight lines between
+stops, with a warning, if there are no shapes), divided by \code{speed}. The
+\code{stops} table is required. Trips whose length is \code{NA} (e.g.
+trips not linked to a shape) are left unchanged.
+
+The arrival and departure times at intermediate stops are set to \code{""},
+which is written as \code{NA} by \code{\link[=write_gtfs]{write_gtfs()}}. Some routing software, such as
+\href{http://www.opentripplanner.org/}{OpenTripPlanner}, interpolates these
+times from the average speed.
 }
 
 \examples{
