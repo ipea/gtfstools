@@ -1,36 +1,51 @@
 #' Get trip speed
 #'
-#' Returns the speed of each specified `trip_id`, based on the geometry created
-#' from either the `shapes` or the `stop_times` file (or both).
+#' Returns the average speed of each specified `trip_id`, either from the first
+#' to the last stop of the trip or between each pair of consecutive stops.
 #'
 #' @template gtfs
 #' @param trip_id A character vector including the `trip_id`s to have their
 #'   speeds calculated. If `NULL` (the default), the function calculates the
 #'   speed of every `trip_id` in the GTFS.
-#' @param file The file from which geometries should be generated, either
-#'   `shapes` or `stop_times` (geometries are used to calculate the length of a
-#'   trip). Defaults to `shapes`.
+#' @param method A string, either `"shapes"` (the default) or `"euclidean"`,
+#'   passed to [get_trip_length()]. `"shapes"` measures lengths along the
+#'   trip's shape, while `"euclidean"` measures the straight-line distances
+#'   between consecutive stops. If the GTFS object doesn't have a `shapes`
+#'   table, or if its `trips` table doesn't have a `shape_id` column,
+#'   `"euclidean"` is used instead, with a warning.
+#' @param by A string, either `"trip"` (the default) or `"segment"`. `"trip"`
+#'   returns the average speed from the first to the last stop of each trip,
+#'   while `"segment"` returns the average speed between each pair of
+#'   consecutive stops.
 #' @param unit A string representing the unit in which the speeds are desired.
 #'   Either `"km/h"` (the default) or `"m/s"`.
-#' @param sort_sequence Ultimately passed to [get_trip_length()], a logical
-#'   specifying whether to sort shapes and timetables by `shape_pt_sequence` and
-#'   `stop_sequence`, respectively. Speeds calculated from trip trajectories
-#'   generated with unordered sequences do not correctly depict the actual trip
-#'   speeds. Defaults to `TRUE`. Sorting an already ordered table is cheap. Set
-#'   to `FALSE` only if shapes and timetables are known to be ordered.
+#' @param sort_sequence A logical specifying whether to sort timetables and
+#'   shapes by `stop_sequence` and `shape_pt_sequence`, respectively. Defaults
+#'   to `TRUE`. Sorting an already ordered table is cheap. Set to `FALSE`
+#'   only if these tables are known to be ordered.
+#' @param file Deprecated. Use `method` instead: `file = "shapes"` corresponds
+#'   to `method = "shapes"` and `file = "stop_times"` to `method =
+#'   "euclidean"`. If given, `file` takes precedence over `method`. If both
+#'   files are given, only `"shapes"` is used.
 #'
-#' @return A `data.table` containing the duration of each specified trip and the
-#'   file from which geometries were generated.
+#' @return With `by = "trip"`, a `data.table` with the `trip_id` and the
+#'   average `speed` of each trip. With `by = "segment"`, a `data.table` with
+#'   the `trip_id`, the `segment` number, the `from_stop_id` and `to_stop_id`
+#'   that delimit the segment and its average `speed`.
 #'
 #' @section Details:
-#' Please check [get_trip_geometry()] documentation to understand how geometry
-#' generation differs depending on the chosen file.
+#' The speed is the length calculated by [get_trip_length()] divided by the
+#' duration calculated by [get_trip_duration()] (with `by = "trip"`) or by
+#' [get_trip_segment_duration()] (with `by = "segment"`). Speeds are `NA` when
+#' the length is `NA` (e.g. trips not linked to a shape) or when the duration
+#' is missing (e.g. blank times at intermediate stops) or not positive.
 #'
 #' Existing `_secs` columns in `stop_times` (e.g. created with
 #' [convert_time_to_seconds()]) are used as-is, not recalculated from the time
 #' strings.
 #'
-#' @seealso [get_trip_geometry()]
+#' @seealso [get_trip_length()], [get_trip_duration()],
+#'   [get_trip_segment_duration()]
 #'
 #' @examples
 #' \dontshow{
@@ -48,25 +63,30 @@
 #' trip_speed <- get_trip_speed(gtfs, trip_ids)
 #' trip_speed
 #'
-#' trip_speed <- get_trip_speed(
-#'   gtfs,
-#'   trip_ids,
-#'   file = c("shapes", "stop_times")
-#' )
+#' trip_speed <- get_trip_speed(gtfs, trip_ids, method = "euclidean")
 #' trip_speed
 #'
 #' trip_speed <- get_trip_speed(gtfs, trip_ids, unit = "m/s")
 #' trip_speed
 #'
+#' segment_speed <- get_trip_speed(gtfs, "CPTM L07-0", by = "segment")
+#' head(segment_speed)
+#'
 #' @export
 get_trip_speed <- function(gtfs,
                            trip_id = NULL,
-                           file = "shapes",
+                           method = "shapes",
+                           by = "trip",
                            unit = "km/h",
-                           sort_sequence = TRUE) {
+                           sort_sequence = TRUE,
+                           file = NULL) {
   gtfs <- assert_and_assign_gtfs_object(gtfs)
   checkmate::assert_character(trip_id, null.ok = TRUE, any.missing = FALSE)
-  checkmate::assert_names(file, subset.of = c("shapes", "stop_times"))
+  checkmate::assert(
+    checkmate::check_string(by),
+    checkmate::check_names(by, subset.of = c("trip", "segment")),
+    combine = "and"
+  )
   checkmate::assert(
     checkmate::check_string(unit),
     checkmate::check_names(unit, subset.of = c("km/h", "m/s")),
@@ -74,11 +94,8 @@ get_trip_speed <- function(gtfs,
   )
   checkmate::assert_logical(sort_sequence, any.missing = FALSE, len = 1)
 
-  # check if fields and files required to estimate trip duration exist (a bit of
-  # an overlap, since these are also checked in a later get_trip_duration call,
-  # but it prevents cases where the files required to generate geometries are
-  # present but those required to estimate trip duration are not, which would
-  # cause errors to be thrown very late)
+  # check the fields required to calculate durations before calculating
+  # lengths, so errors are not thrown very late
 
   gtfsio::assert_field_class(
     gtfs,
@@ -88,44 +105,54 @@ get_trip_speed <- function(gtfs,
   )
 
   length_unit <- ifelse(unit == "km/h", "km", "m")
-  trips_length <- get_trip_length(
+  duration_unit <- ifelse(unit == "km/h", "h", "s")
+
+  if (!is.null(file)) method <- map_deprecated_file(file, "get_trip_speed")
+
+  lengths <- get_trip_length(
     gtfs,
     trip_id,
-    file,
+    method,
+    by,
     length_unit,
     sort_sequence
   )
 
-  # calculate trips' duration
-  # - a warning might be raised in get_trip_duration() if a trip in
-  # existing_trips doesn't exist in stop_times table. if 'trip_id' is NULL, we
-  # don't want to raise that warning, so we remove missing stop_times trips from
-  # existing_trips
-
-  existing_trips <- unique(trips_length$trip_id)
-  if (is.null(trip_id)) {
-    stop_times_trips <- unique(gtfs$stop_times$trip_id)
-    existing_trips <- existing_trips[existing_trips %chin% stop_times_trips]
+  if (nrow(lengths) == 0) {
+    data.table::setnames(lengths, "length", "speed")
+    return(lengths[])
   }
 
-  duration_unit <- data.table::fifelse(unit == "km/h", "h", "s")
-  trips_duration <- get_trip_duration(gtfs, existing_trips, duration_unit)
+  # durations are calculated only for the trips whose lengths were calculated,
+  # so a warning about a trip_id that doesn't exist is raised only once (by
+  # get_trip_length())
 
-  # join trips_length and trips_duration
-  # a trip may be missing from trips_duration and not from trips_length (when
-  # stop_times doesn't contain a trip listed in trips_length), but not the other
-  # way around (because only trips listed in trips_length have their durations
-  # calculated). so we do a right join here, instead of a left join
+  duration_trips <- NULL
+  if (!is.null(trip_id)) duration_trips <- unique(lengths$trip_id)
 
-  trips_speed <- trips_length[trips_duration, on = "trip_id"]
+  if (by == "trip") {
+    durations <- get_trip_duration(gtfs, duration_trips, duration_unit)
+    join_cols <- "trip_id"
+  } else {
+    durations <- get_trip_segment_duration(
+      gtfs,
+      duration_trips,
+      duration_unit,
+      sort_sequence
+    )
+    join_cols <- c("trip_id", "segment")
+  }
 
-  # calculate speed as length/duration
+  # left join, so trips whose lengths couldn't be calculated (e.g. trips not
+  # linked to a shape) are kept, with NA speeds
 
-  trips_speed[, speed := length / duration]
+  speeds <- durations[lengths, on = join_cols]
 
-  # remove length and duration columns
+  speeds[, speed := length / duration]
+  speeds[!is.finite(duration) | duration <= 0, speed := NA_real_]
 
-  trips_speed[, `:=`(length = NULL, duration = NULL)]
+  speeds[, c("length", "duration") := NULL]
+  data.table::setcolorder(speeds, setdiff(names(lengths), "length"))
 
-  return(trips_speed[])
+  return(speeds[])
 }

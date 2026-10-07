@@ -7,45 +7,90 @@
 get_trip_length(
   gtfs,
   trip_id = NULL,
-  file = NULL,
+  method = "shapes",
+  by = "trip",
   unit = "km",
-  sort_sequence = TRUE
+  sort_sequence = TRUE,
+  file = NULL
 )
 }
 \arguments{
 \item{gtfs}{A GTFS object, as created by \code{\link[=read_gtfs]{read_gtfs()}}.}
 
 \item{trip_id}{A character vector including the \code{trip_id}s to have their
-length calculated If \code{NULL} (the default), the function calculates the
-length of each \code{trip_id} in the GTFS.}
+lengths calculated. If \code{NULL} (the default), the function calculates the
+lengths of every \code{trip_id} in the GTFS.}
 
-\item{file}{A character vector specifying the file from which lengths should
-be calculated (either one of or both \code{shapes} and \code{stop_times}). If \code{NULL}
-(the default), the function attempts to calculate the lengths from both
-files, but only raises an error if none of the files exist.}
+\item{method}{A string, either \code{"shapes"} (the default) or \code{"euclidean"}.
+\code{"shapes"} measures lengths along the trip's shape, described in the
+\code{shapes} table, while \code{"euclidean"} measures the straight-line
+(great-circle) distances between consecutive stops. If the GTFS object
+doesn't have a \code{shapes} table, or if its \code{trips} table doesn't have a
+\code{shape_id} column, \code{"euclidean"} is used instead, with a warning.}
+
+\item{by}{A string, either \code{"trip"} (the default) or \code{"segment"}. \code{"trip"}
+returns the length from the first to the last stop of each trip, while
+\code{"segment"} returns the length between each pair of consecutive stops.}
 
 \item{unit}{A string representing the unit in which lengths are desired.
 Either \code{"km"} (the default) or \code{"m"}.}
 
-\item{sort_sequence}{A logical specifying whether to sort shapes and
-timetables by \code{shape_pt_sequence} and \code{stop_sequence}, respectively.
-Defaults to \code{TRUE}. Sorting an already ordered table is cheap. Set to
-\code{FALSE} only if shapes and timetables are known to be ordered. Lengths
-calculated from trip trajectories generated with unordered sequences do
-not correctly depict the actual trip lengths.}
+\item{sort_sequence}{A logical specifying whether to sort timetables and
+shapes by \code{stop_sequence} and \code{shape_pt_sequence}, respectively. Defaults
+to \code{TRUE}. Sorting an already ordered table is cheap. Set to \code{FALSE}
+only if these tables are known to be ordered.}
+
+\item{file}{Deprecated. Use \code{method} instead: \code{file = "shapes"} corresponds
+to \code{method = "shapes"} and \code{file = "stop_times"} to \code{method = "euclidean"}. If given, \code{file} takes precedence over \code{method}. If both
+files are given, only \code{"shapes"} is used.}
 }
 \value{
-A \code{data.table} containing the length of each specified trip.
+With \code{by = "trip"}, a \code{data.table} with the \code{trip_id} and the
+\code{length} of each trip. With \code{by = "segment"}, a \code{data.table} with the
+\code{trip_id}, the \code{segment} number, the \code{from_stop_id} and \code{to_stop_id} that
+delimit the segment and its \code{length}.
 }
 \description{
-Returns the length of each specified \code{trip_id}, based either on the \code{shapes}
-or the \code{stop_times} file (or both).
+Returns the length of each specified \code{trip_id}, measured either from the
+first to the last stop of the trip or between each pair of consecutive
+stops. Lengths can be measured along the trip's shape or as straight lines
+between stops.
 }
 \section{Details}{
 
-Please check \code{\link[=get_trip_geometry]{get_trip_geometry()}} documentation to understand how geometry
-generation, and consequently length calculation, differs depending on the
-chosen file.
+A segment is the path between two consecutive stops of the same trip. The
+segments of each trip are numbered from 1 to the number of stops minus 1,
+in the same way as in \code{\link[=get_trip_segment_duration]{get_trip_segment_duration()}}, so the results of both
+functions can be joined by \code{trip_id} and \code{segment} to calculate segment
+speeds (see \code{\link[=get_trip_speed]{get_trip_speed()}}). With \code{by = "trip"}, the length of a trip is
+the sum of the lengths of its segments, and trips with a single stop have a
+length of 0.
+
+With \code{method = "shapes"}, each stop is projected onto the closest point of
+its trip's shape, with the restriction that the stops must advance along
+the shape in the order given by \code{stop_sequence}. This correctly handles
+loops and shapes that pass by the same place more than once. When a stop is
+located slightly before the previous one along the shape (e.g. because of
+imprecise coordinates), the distance between them is usually 0, and the
+length of the trip usually varies by at most the gap between the two stops,
+depending on where the shape's points are. However, if the shape passes by
+the same place more than once in the same direction (e.g. a shape that goes
+around a loop twice), such a stop may be matched to a later pass, which
+increases the length of the trip. Stops are
+projected regardless of how far they are from the shape, and the
+\code{shape_dist_traveled} columns of \code{shapes} and \code{stop_times}, if present, are
+ignored. Shape points with missing coordinates are ignored. Trips that are
+not linked to a shape, or whose shape has fewer than two distinct points
+with coordinates, have \code{NA} lengths, and a warning is raised. The length
+along the shape between the first and the last stop of a trip is usually
+shorter than the length of its entire shape, which is returned by
+\code{\link[=get_shape_length]{get_shape_length()}}.
+
+Lengths are great-circle distances calculated with the haversine formula,
+on a sphere with the same radius used by \code{{s2}} (6,371,010 meters),
+regardless of whether \code{sf::sf_use_s2()} is enabled. Stops with missing
+coordinates, or that are not listed in the \code{stops} table, result in \code{NA}
+lengths for the segments they delimit and for the trips they belong to.
 }
 
 \examples{
@@ -54,18 +99,28 @@ chosen file.
   on.exit(data.table::setDTthreads(old_dt_threads), add = TRUE)
 }
 data_path <- system.file("extdata/spo_gtfs.zip", package = "gtfstools")
-
 gtfs <- read_gtfs(data_path)
 
+# length along the shape from the first to the last stop of each trip
 trip_length <- get_trip_length(gtfs)
 head(trip_length)
 
-# the above is identical to
-trip_length <- get_trip_length(gtfs, file = c("shapes", "stop_times"))
-head(trip_length)
+# length along the shape between consecutive stops
+segment_length <- get_trip_length(gtfs, "CPTM L07-0", by = "segment")
+head(segment_length)
 
-trip_ids <- c("CPTM L07-0", "2002-10-0")
-trip_length <- get_trip_length(gtfs, trip_id = trip_ids)
-trip_length
+# straight-line distances between consecutive stops, in meters
+straight_length <- get_trip_length(
+  gtfs,
+  "CPTM L07-0",
+  method = "euclidean",
+  by = "segment",
+  unit = "m"
+)
+head(straight_length)
 
+}
+\seealso{
+\code{\link[=get_shape_length]{get_shape_length()}}, \code{\link[=get_trip_speed]{get_trip_speed()}},
+\code{\link[=get_trip_segment_duration]{get_trip_segment_duration()}}
 }

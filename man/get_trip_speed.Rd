@@ -7,9 +7,11 @@
 get_trip_speed(
   gtfs,
   trip_id = NULL,
-  file = "shapes",
+  method = "shapes",
+  by = "trip",
   unit = "km/h",
-  sort_sequence = TRUE
+  sort_sequence = TRUE,
+  file = NULL
 )
 }
 \arguments{
@@ -19,32 +21,47 @@ get_trip_speed(
 speeds calculated. If \code{NULL} (the default), the function calculates the
 speed of every \code{trip_id} in the GTFS.}
 
-\item{file}{The file from which geometries should be generated, either
-\code{shapes} or \code{stop_times} (geometries are used to calculate the length of a
-trip). Defaults to \code{shapes}.}
+\item{method}{A string, either \code{"shapes"} (the default) or \code{"euclidean"},
+passed to \code{\link[=get_trip_length]{get_trip_length()}}. \code{"shapes"} measures lengths along the
+trip's shape, while \code{"euclidean"} measures the straight-line distances
+between consecutive stops. If the GTFS object doesn't have a \code{shapes}
+table, or if its \code{trips} table doesn't have a \code{shape_id} column,
+\code{"euclidean"} is used instead, with a warning.}
+
+\item{by}{A string, either \code{"trip"} (the default) or \code{"segment"}. \code{"trip"}
+returns the average speed from the first to the last stop of each trip,
+while \code{"segment"} returns the average speed between each pair of
+consecutive stops.}
 
 \item{unit}{A string representing the unit in which the speeds are desired.
 Either \code{"km/h"} (the default) or \code{"m/s"}.}
 
-\item{sort_sequence}{Ultimately passed to \code{\link[=get_trip_length]{get_trip_length()}}, a logical
-specifying whether to sort shapes and timetables by \code{shape_pt_sequence} and
-\code{stop_sequence}, respectively. Speeds calculated from trip trajectories
-generated with unordered sequences do not correctly depict the actual trip
-speeds. Defaults to \code{TRUE}. Sorting an already ordered table is cheap. Set
-to \code{FALSE} only if shapes and timetables are known to be ordered.}
+\item{sort_sequence}{A logical specifying whether to sort timetables and
+shapes by \code{stop_sequence} and \code{shape_pt_sequence}, respectively. Defaults
+to \code{TRUE}. Sorting an already ordered table is cheap. Set to \code{FALSE}
+only if these tables are known to be ordered.}
+
+\item{file}{Deprecated. Use \code{method} instead: \code{file = "shapes"} corresponds
+to \code{method = "shapes"} and \code{file = "stop_times"} to \code{method = "euclidean"}. If given, \code{file} takes precedence over \code{method}. If both
+files are given, only \code{"shapes"} is used.}
 }
 \value{
-A \code{data.table} containing the duration of each specified trip and the
-file from which geometries were generated.
+With \code{by = "trip"}, a \code{data.table} with the \code{trip_id} and the
+average \code{speed} of each trip. With \code{by = "segment"}, a \code{data.table} with
+the \code{trip_id}, the \code{segment} number, the \code{from_stop_id} and \code{to_stop_id}
+that delimit the segment and its average \code{speed}.
 }
 \description{
-Returns the speed of each specified \code{trip_id}, based on the geometry created
-from either the \code{shapes} or the \code{stop_times} file (or both).
+Returns the average speed of each specified \code{trip_id}, either from the first
+to the last stop of the trip or between each pair of consecutive stops.
 }
 \section{Details}{
 
-Please check \code{\link[=get_trip_geometry]{get_trip_geometry()}} documentation to understand how geometry
-generation differs depending on the chosen file.
+The speed is the length calculated by \code{\link[=get_trip_length]{get_trip_length()}} divided by the
+duration calculated by \code{\link[=get_trip_duration]{get_trip_duration()}} (with \code{by = "trip"}) or by
+\code{\link[=get_trip_segment_duration]{get_trip_segment_duration()}} (with \code{by = "segment"}). Speeds are \code{NA} when
+the length is \code{NA} (e.g. trips not linked to a shape) or when the duration
+is missing (e.g. blank times at intermediate stops) or not positive.
 
 Existing \verb{_secs} columns in \code{stop_times} (e.g. created with
 \code{\link[=convert_time_to_seconds]{convert_time_to_seconds()}}) are used as-is, not recalculated from the time
@@ -67,17 +84,17 @@ trip_ids <- c("CPTM L07-0", "2002-10-0")
 trip_speed <- get_trip_speed(gtfs, trip_ids)
 trip_speed
 
-trip_speed <- get_trip_speed(
-  gtfs,
-  trip_ids,
-  file = c("shapes", "stop_times")
-)
+trip_speed <- get_trip_speed(gtfs, trip_ids, method = "euclidean")
 trip_speed
 
 trip_speed <- get_trip_speed(gtfs, trip_ids, unit = "m/s")
 trip_speed
 
+segment_speed <- get_trip_speed(gtfs, "CPTM L07-0", by = "segment")
+head(segment_speed)
+
 }
 \seealso{
-\code{\link[=get_trip_geometry]{get_trip_geometry()}}
+\code{\link[=get_trip_length]{get_trip_length()}}, \code{\link[=get_trip_duration]{get_trip_duration()}},
+\code{\link[=get_trip_segment_duration]{get_trip_segment_duration()}}
 }

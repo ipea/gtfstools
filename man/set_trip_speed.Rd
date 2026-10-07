@@ -35,8 +35,13 @@ Sets the average speed of each specified \code{trip_id} by changing the
 
 The average speed is calculated as the difference between the arrival time
 at the last stop minus the departure time at the first top, over the trip's
-length (as calculated via \code{\link[=get_trip_geometry]{get_trip_geometry()}}, based on the \code{shapes}
-file). The arrival and departure times at all other stops (i.e. not the
+length, as calculated by \code{\link[=get_trip_length]{get_trip_length()}}: the length along the trip's
+shape from its first to its last stop or, if the GTFS object doesn't have
+a \code{shapes} table, the sum of the straight-line distances between
+consecutive stops (a warning is raised in this case). The \code{stops} table is
+therefore required. Trips whose length can't be calculated (e.g. trips not
+linked to a shape) are left unchanged.
+The arrival and departure times at all other stops (i.e. not the
 first neither the last) are set as \code{""}, which is written as \code{NA} with
 \code{\link[=write_gtfs]{write_gtfs()}}. Some transport routing software, such as
 \href{http://www.opentripplanner.org/}{OpenTripPlanner}, support specifying stop

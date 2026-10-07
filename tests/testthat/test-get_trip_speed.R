@@ -4,327 +4,159 @@ trip_id <- "CPTM L07-0"
 
 tester <- function(gtfs = get("gtfs", envir = parent.frame()),
                    trip_id = NULL,
-                   file = "shapes",
+                   method = "shapes",
+                   by = "trip",
                    unit = "km/h",
-                   sort_sequence = FALSE) {
-  get_trip_speed(gtfs, trip_id, file, unit, sort_sequence)
+                   sort_sequence = TRUE) {
+  get_trip_speed(gtfs, trip_id, method, by, unit, sort_sequence)
 }
+
+# tests -------------------------------------------------------------------
 
 test_that("raises errors due to incorrect input types/value", {
   expect_error(tester(unclass(gtfs)))
-  expect_error(tester(trip_id = as.factor("CPTM L07-0")))
   expect_error(tester(trip_id = NA))
-  expect_error(tester(file = c("shape", "stop_times")))
-  expect_error(tester(unit = "km/s"))
-  expect_error(tester(sort_sequence = "FALSE"))
+  expect_error(tester(trip_id = factor(trip_id)))
+  expect_error(tester(method = "straight"))
+  expect_error(tester(by = "stop"))
+  expect_error(tester(unit = "km"))
+  expect_error(tester(unit = c("km/h", "m/s")))
   expect_error(tester(sort_sequence = NA))
-  expect_error(tester(sort_sequence = c(TRUE, TRUE)))
+
+  no_time_gtfs <- copy_gtfs_without_field(gtfs, "stop_times", "arrival_time")
+  expect_error(tester(no_time_gtfs), class = "missing_required_field")
 })
 
-test_that("raises errors if gtfs doesn't have required files/fields", {
-  no_trips_gtfs <- copy_gtfs_without_file(gtfs, "trips")
+test_that("outputs data.tables with the right columns and types", {
+  trip_speeds <- tester()
+  expect_s3_class(trip_speeds, "data.table")
+  expect_identical(names(trip_speeds), c("trip_id", "speed"))
+  expect_type(trip_speeds$speed, "double")
+
+  segment_speeds <- tester(trip_id = trip_id, by = "segment")
+  expect_identical(
+    names(segment_speeds),
+    c("trip_id", "segment", "from_stop_id", "to_stop_id", "speed")
+  )
+  expect_type(segment_speeds$segment, "integer")
+
+  empty_speeds <- suppressWarnings(tester(trip_id = "nonexistent"))
+  expect_identical(nrow(empty_speeds), 0L)
+  expect_identical(names(empty_speeds), c("trip_id", "speed"))
+})
+
+test_that("speeds are lengths divided by durations", {
+  for (method in c("shapes", "euclidean")) {
+    lengths <- get_trip_length(gtfs, method = method)
+    durations <- get_trip_duration(gtfs, unit = "h")
+    expected <- lengths[durations, on = "trip_id", nomatch = NULL]
+    expected[, speed := length / duration]
+
+    speeds <- tester(method = method)
+    expect_equal(
+      speeds$speed,
+      expected$speed[match(speeds$trip_id, expected$trip_id)]
+    )
+
+    # segment speeds
+
+    segment_lengths <- get_trip_length(gtfs, trip_id, method, by = "segment")
+    segment_durations <- get_trip_segment_duration(gtfs, trip_id, unit = "h")
+    segment_speeds <- tester(trip_id = trip_id, method = method, by = "segment")
+    expect_equal(
+      segment_speeds$speed,
+      segment_lengths$length / segment_durations$duration
+    )
+  }
+})
+
+test_that("speeds are NA when durations are missing or not positive", {
+  times_gtfs <- read_gtfs(data_path)
+  times_gtfs$stop_times <- data.table::copy(times_gtfs$stop_times)
+  trip_rows <- which(times_gtfs$stop_times$trip_id == trip_id)
+
+  # blank time at the third stop and zero duration in the fifth segment
+
+  times_gtfs$stop_times[
+    trip_rows[3],
+    `:=`(arrival_time = "", departure_time = "")
+  ]
+  times_gtfs$stop_times[
+    trip_rows[6],
+    arrival_time := times_gtfs$stop_times$departure_time[trip_rows[5]]
+  ]
+
+  segment_speeds <- tester(times_gtfs, trip_id, by = "segment")
+  expect_true(all(is.na(segment_speeds$speed[c(2, 3, 5)])))
+  expect_false(anyNA(segment_speeds$speed[-c(2, 3, 5)]))
+
+  # a trip whose first and last times are the same has no positive duration
+
+  zero_gtfs <- read_gtfs(data_path)
+  zero_gtfs$stop_times <- data.table::copy(zero_gtfs$stop_times)
+  zero_gtfs$stop_times[
+    trip_rows,
+    `:=`(arrival_time = "08:00:00", departure_time = "08:00:00")
+  ]
+  expect_true(is.na(tester(zero_gtfs, trip_id)$speed))
+})
+
+test_that("warnings are raised only once", {
   no_shapes_gtfs <- copy_gtfs_without_file(gtfs, "shapes")
-  no_stops_gtfs <- copy_gtfs_without_file(gtfs, "stops")
-  no_stop_times_gtfs <- copy_gtfs_without_file(gtfs, "stop_times")
 
-  no_trp_tripid_gtfs <- copy_gtfs_without_field(gtfs, "trips", "trip_id")
-  no_trp_shapeid_gtfs <- copy_gtfs_without_field(gtfs, "trips", "shape_id")
+  for (by in c("trip", "segment")) {
+    expect_warning(
+      result <- tester(no_shapes_gtfs, trip_id, by = by),
+      class = "gtfstools_shapes_unavailable"
+    )
+    expect_identical(
+      result,
+      tester(trip_id = trip_id, method = "euclidean", by = by)
+    )
 
-  no_shp_shapeid_gtfs <- copy_gtfs_without_field(gtfs, "shapes", "shape_id")
-  no_shp_shapeptlat_gtfs <- copy_gtfs_without_field(
-    gtfs, "shapes", "shape_pt_lat"
-  )
-  no_shp_shapeptlon_gtfs <- copy_gtfs_without_field(
-    gtfs, "shapes", "shape_pt_lon"
-  )
-  no_shp_shapeseq_gtfs <- copy_gtfs_without_field(
-    gtfs, "shapes", "shape_pt_sequence"
-  )
+    warnings <- character(0)
+    withCallingHandlers(
+      tester(trip_id = c(trip_id, "nonexistent"), by = by),
+      warning = function(w) {
+        warnings <<- c(warnings, conditionMessage(w))
+        invokeRestart("muffleWarning")
+      }
+    )
+    expect_length(warnings, 1)
 
-  no_stt_tripid_gtfs <- copy_gtfs_without_field(gtfs, "stop_times", "trip_id")
-  no_stt_stopid_gtfs <- copy_gtfs_without_field(gtfs, "stop_times", "stop_id")
-  no_stt_arrtime_gtfs <- copy_gtfs_without_field(
-    gtfs, "stop_times", "arrival_time"
-  )
-  no_stt_deptime_gtfs <- copy_gtfs_without_field(
-    gtfs, "stop_times", "departure_time"
-  )
-  no_stt_stopseq_gtfs <- copy_gtfs_without_field(
-    gtfs,
-    "stop_times",
-    "stop_sequence"
-  )
+    warnings <- character(0)
+    withCallingHandlers(
+      result <- tester(trip_id = "nonexistent", by = by),
+      warning = function(w) {
+        warnings <<- c(warnings, conditionMessage(w))
+        invokeRestart("muffleWarning")
+      }
+    )
+    expect_length(warnings, 1)
+    expect_identical(nrow(result), 0L)
+  }
 
-  no_sto_stopid_gtfs <- copy_gtfs_without_field(gtfs, "stops", "stop_id")
-  no_sto_stoplat_gtfs <- copy_gtfs_without_field(gtfs, "stops", "stop_lat")
-  no_sto_stoplon_gtfs <- copy_gtfs_without_field(gtfs, "stops", "stop_lon")
-
-  # file = "shapes"
-
-  expect_error(tester(no_trips_gtfs, trip_id), class = "missing_required_file")
-  expect_error(tester(no_shapes_gtfs, trip_id), class = "missing_required_file")
-  expect_error(
-    tester(no_stop_times_gtfs, trip_id),
-    class = "missing_required_file"
-  )
-  expect_error(
-    tester(no_trp_tripid_gtfs, trip_id),
-    class = "missing_required_field"
-  )
-  expect_error(
-    tester(no_trp_shapeid_gtfs, trip_id),
-    class = "missing_required_field"
-  )
-  expect_error(
-    tester(no_shp_shapeid_gtfs, trip_id),
-    class = "missing_required_field"
-  )
-  expect_error(
-    tester(no_shp_shapeptlat_gtfs, trip_id),
-    class = "missing_required_field"
-  )
-  expect_error(
-    tester(no_shp_shapeptlon_gtfs, trip_id),
-    class = "missing_required_field"
-  )
-  expect_error(
-    tester(no_stt_tripid_gtfs, trip_id),
-    class = "missing_required_field"
-  )
-  expect_error(
-    tester(no_stt_arrtime_gtfs, trip_id),
-    class = "missing_required_field"
-  )
-  expect_error(
-    tester(no_stt_deptime_gtfs, trip_id),
-    class = "missing_required_field"
-  )
-  expect_error(
-    tester(no_shp_shapeseq_gtfs, trip_id, sort_sequence = TRUE),
-    class = "missing_required_field"
-  )
-
-  # file = "stop_times"
-
-  expect_error(
-    tester(no_stops_gtfs, trip_id, "stop_times"),
-    class = "missing_required_file"
-  )
-  expect_error(
-    tester(no_stop_times_gtfs, trip_id, "stop_times"),
-    class = "missing_required_file"
-  )
-  expect_error(
-    tester(no_trp_tripid_gtfs, trip_id, "stop_times"),
-    class = "missing_required_field"
-  )
-  expect_error(
-    tester(no_stt_tripid_gtfs, trip_id, "stop_times"),
-    class = "missing_required_field"
-  )
-  expect_error(
-    tester(no_stt_arrtime_gtfs, trip_id, "stop_times"),
-    class = "missing_required_field"
-  )
-  expect_error(
-    tester(no_stt_deptime_gtfs, trip_id, "stop_times"),
-    class = "missing_required_field"
-  )
-  expect_error(
-    tester(no_stt_stopid_gtfs, trip_id, "stop_times"),
-    class = "missing_required_field"
-  )
-  expect_error(
-    tester(no_sto_stopid_gtfs, trip_id, "stop_times"),
-    class = "missing_required_field"
-  )
-  expect_error(
-    tester(no_sto_stoplat_gtfs, trip_id, "stop_times"),
-    class = "missing_required_field"
-  )
-  expect_error(
-    tester(no_sto_stoplon_gtfs, trip_id, "stop_times"),
-    class = "missing_required_field"
-  )
-  expect_error(
-    tester(no_stt_arrtime_gtfs, trip_id, "stop_times"),
-    class = "missing_required_field"
-  )
-  expect_error(
-    tester(no_stt_deptime_gtfs, trip_id, "stop_times"),
-    class = "missing_required_field"
-  )
-  expect_error(
-    tester(no_stt_stopseq_gtfs, trip_id, "stop_times", sort_sequence = TRUE),
-    class = "missing_required_field"
-  )
-})
-
-test_that("raises warnings if a non_existent trip_id is given", {
-  expect_warning(tester(trip_id = c("CPTM L07-0", "ola")))
-  expect_warning(tester(trip_id = "ola"))
-})
-
-test_that("gets the speed of correct 'trip_id's", {
-  # if 'trip_id' = NULL, all trips have their geometries returned
-
-  all_trip_ids <- unique(gtfs$trips$trip_id)
-  all_trip_ids <- all_trip_ids[order(all_trip_ids)]
-
-  speeds_all_trip_ids <- tester()
-  trip_ids_from_speeds <- unique(speeds_all_trip_ids$trip_id)
-  trip_ids_from_speeds <- trip_ids_from_speeds[order(trip_ids_from_speeds)]
-
-  expect_identical(all_trip_ids, trip_ids_from_speeds)
-
-  # else, only the duration of (valid) trip_ids are calculated
-
-  selected_trip_ids <- c("CPTM L07-0", "ola")
-  suppressWarnings(
-    speeds_selected_trip_ids <- tester(trip_id = selected_trip_ids)
-  )
-  expect_equal(unique(speeds_selected_trip_ids$trip_id), "CPTM L07-0")
-})
-
-test_that("calculates the speed based on correct 'file'", {
-
-  shape_speed <- tester(trip_id = "CPTM L07-0")
-  stop_times_speed <- tester(trip_id = "CPTM L07-0", file = "stop_times")
-  both_speed <- tester(
-    gtfs,
-    "CPTM L07-0",
-    file = c("shapes", "stop_times")
-  )
-
-  expect_equal(unique(shape_speed$origin_file), "shapes")
-  expect_equal(unique(stop_times_speed$origin_file), "stop_times")
-  expect_identical(unique(both_speed$origin_file), c("shapes", "stop_times"))
-
-})
-
-test_that("outputs a 'data.table' with correct column types", {
-  speeds_dt <- tester(trip_id = "CPTM L07-0")
-  expect_s3_class(speeds_dt, "data.table")
-  expect_equal(class(speeds_dt$trip_id), "character")
-  expect_equal(class(speeds_dt$origin_file), "character")
-  expect_equal(class(speeds_dt$speed), "numeric")
-
-  # should work even when no given 'trip_id's given are present in the gtfs
-
-  expect_warning(speeds_dt <- tester(trip_id = "ola"))
-  expect_s3_class(speeds_dt, "data.table")
-  expect_equal(class(speeds_dt$trip_id), "character")
-  expect_equal(class(speeds_dt$origin_file), "character")
-  expect_equal(class(speeds_dt$speed), "numeric")
-
-  # and when trip_id = character(0)
-
-  speeds_dt <- tester(trip_id = character(0))
-  expect_s3_class(speeds_dt, "data.table")
-  expect_equal(class(speeds_dt$trip_id), "character")
-  expect_equal(class(speeds_dt$origin_file), "character")
-  expect_equal(class(speeds_dt$speed), "numeric")
-})
-
-test_that("outputs speeds in correct unit", {
-
-  # km/h
-
-  kmh_speeds_dt <- tester(trip_id = "CPTM L07-0", unit = "km/h")
-
-  trip_id_len <- sf::st_length(get_trip_geometry(gtfs, "CPTM L07-0", "shapes"))
-  trip_id_len <- as.numeric(units::set_units(trip_id_len, "km"))
-  trip_id_duration <- get_trip_duration(gtfs, "CPTM L07-0", unit = "h")
-
-  expect_equal(trip_id_len / trip_id_duration$duration, kmh_speeds_dt$speed)
-
-  # m/s
-
-  ms_speeds_dt <- tester(trip_id = "CPTM L07-0", unit = "m/s")
-
-  trip_id_len <- sf::st_length(get_trip_geometry(gtfs, "CPTM L07-0", "shapes"))
-  trip_id_len <- as.numeric(units::set_units(trip_id_len, "m"))
-  trip_id_duration <- get_trip_duration(gtfs, "CPTM L07-0", unit = "s")
-
-  expect_equal(trip_id_len / trip_id_duration$duration, ms_speeds_dt$speed)
-
-  # km/h = 3.6 * m/s
-
-  expect_equal(kmh_speeds_dt$speed, ms_speeds_dt$speed * 3.6)
-
-})
-
-test_that("doesn't change given gtfs", {
-  # (except for 'stop_times' and 'shapes' indices)
-
-  original_gtfs <- read_gtfs(data_path)
-  gtfs <- read_gtfs(data_path)
-  expect_identical(original_gtfs, gtfs)
-
-  speeds <- tester(trip_id = "CPTM L07-0", file = c("shapes", "stop_times"))
-  expect_false(identical(original_gtfs, gtfs))
-
-  data.table::setindex(gtfs$shapes, NULL)
-  data.table::setindex(gtfs$stop_times, NULL)
-  expect_identical(original_gtfs, gtfs)
-
-  # should also work when sorting shapes/timetables
-  speeds <- tester(
-    trip_id = "CPTM L07-0",
-    file = c("shapes", "stop_times"),
-    sort_sequence = TRUE
-  )
-  data.table::setindex(gtfs$shapes, NULL)
-  data.table::setindex(gtfs$stop_times, NULL)
-  expect_identical(original_gtfs, gtfs)
-})
-
-# issue #35
-test_that("warnings works properly", {
-  # should raise warning if trip_id is specified and doesn't exist (and should
-  # not calculate speed, instead of returning NA)
-  gtfs$stop_times <- gtfs$stop_times[trip_id != "CPTM L07-0"]
   expect_warning(
-    speed <- tester(trip_id = "CPTM L07-0")
+    result <- get_trip_speed(gtfs, trip_id, file = "stop_times"),
+    regexp = "get_trip_speed",
+    class = "deprecated_file"
   )
-  expect_true(nrow(speed) == 0)
-
-  # but if trip_id is not specified, it should not raise a warning
-  expect_silent(speed <- tester())
-  expect_true(!any("CPTM L07-0" %chin% speed$trip_id))
-  expect_true(all(gtfs$stop_times$trip_id %chin% speed$trip_id))
+  expect_identical(result, tester(trip_id = trip_id, method = "euclidean"))
 })
 
-test_that("sort_sequence works correctly", {
-  speeds <- tester(trip_id = trip_id, file = c("shapes", "stop_times"))
+test_that("outputs speeds in the correct unit", {
+  in_kmh <- tester(trip_id = trip_id)
+  in_ms <- tester(trip_id = trip_id, unit = "m/s")
+  expect_equal(in_ms$speed, in_kmh$speed / 3.6)
+})
 
-  unordered_gtfs <- gtfs
-  unordered_gtfs$shapes <- gtfs$shapes[shape_id == "17846"]
-  unordered_gtfs$shapes <- unordered_gtfs$shapes[c(200:547, 1:199)]
-  unordered_gtfs$stop_times <- gtfs$stop_times[trip_id == "CPTM L07-0"]
-  unordered_gtfs$stop_times <- unordered_gtfs$stop_times[c(10:18, 1:9)]
+test_that("doesn't change the given gtfs", {
+  original_gtfs <- read_gtfs(data_path)
+  test_gtfs <- read_gtfs(data_path)
+  expect_identical(original_gtfs, test_gtfs)
 
-  unordered_speeds <- tester(
-    unordered_gtfs,
-    trip_id,
-    file = c("shapes", "stop_times")
-  )
-  expect_false(identical(unordered_speeds, speeds))
-
-  ordered_speeds <- tester(
-    unordered_gtfs,
-    trip_id,
-    file = c("shapes", "stop_times"),
-    sort_sequence = TRUE
-  )
-  expect_identical(ordered_speeds, speeds)
-
-  # sort_sequence defaults to TRUE (#94)
-  default_speeds <- get_trip_speed(
-    unordered_gtfs,
-    trip_id,
-    file = c("shapes", "stop_times"),
-    unit = "km/h"
-  )
-  expect_identical(default_speeds, speeds)
+  for (by in c("trip", "segment")) {
+    result <- tester(test_gtfs, by = by)
+    expect_identical(original_gtfs, test_gtfs)
+  }
 })

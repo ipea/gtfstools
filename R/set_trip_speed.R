@@ -21,8 +21,13 @@
 #' @section Details:
 #' The average speed is calculated as the difference between the arrival time
 #' at the last stop minus the departure time at the first top, over the trip's
-#' length (as calculated via [get_trip_geometry()], based on the `shapes`
-#' file). The arrival and departure times at all other stops (i.e. not the
+#' length, as calculated by [get_trip_length()]: the length along the trip's
+#' shape from its first to its last stop or, if the GTFS object doesn't have
+#' a `shapes` table, the sum of the straight-line distances between
+#' consecutive stops (a warning is raised in this case). The `stops` table is
+#' therefore required. Trips whose length can't be calculated (e.g. trips not
+#' linked to a shape) are left unchanged.
+#' The arrival and departure times at all other stops (i.e. not the
 #' first neither the last) are set as `""`, which is written as `NA` with
 #' [write_gtfs()]. Some transport routing software, such as
 #' [OpenTripPlanner](http://www.opentripplanner.org/), support specifying stop
@@ -87,12 +92,14 @@ set_trip_speed <- function(gtfs,
     c("character", "character", "character", "integer")
   )
 
-  # calculate the length of each given trip_id
+  # calculate the length of each given trip_id, from its first to its last
+  # stop. trips whose length couldn't be calculated (e.g. trips not linked to
+  # a shape) are left unchanged
 
-  trip_length <- get_trip_geometry(gtfs, trip_id, file = "shapes")
+  trip_length <- get_trip_length(gtfs, trip_id, unit = "km")
+  trip_length <- trip_length[!is.na(length)]
   trip_length_ids <- trip_length$trip_id
-  trip_length <- sf::st_length(trip_length)
-  trip_length <- as.numeric(units::set_units(trip_length, "km"))
+  trip_length <- trip_length$length
   names(trip_length) <- trip_length_ids
 
   # set speed adequate unit (use km/h for calculations)

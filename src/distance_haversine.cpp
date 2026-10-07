@@ -1,4 +1,6 @@
 #include <cmath>
+#include <utility>
+#include <vector>
 
 #include <cpp11.hpp>
 using namespace cpp11;
@@ -8,8 +10,8 @@ using namespace cpp11;
 // radius used by {s2}, {sf}'s default engine for geographic coordinates, so
 // the results match sf::st_distance() on lon/lat data
 
-double distance_haversine(double lat_from, double lon_from,
-                          double lat_to, double lon_to) {
+static double distance_haversine(double lat_from, double lon_from,
+                                 double lat_to, double lon_to) {
   const double earth_radius = 6371010.0; // = s2::s2_earth_radius_meters()
   const double to_radians = 3.14159265358979323846 / 180.0;
 
@@ -60,4 +62,224 @@ doubles rcpp_distance_haversine(const doubles lat_from,
   }
 
   return distance;
+}
+
+// wraps a longitude to the interval [reference - 180, reference + 180), so
+// that shapes and stops crossing the antimeridian are handled correctly
+
+static double unwrap_longitude(double lon, double reference) {
+  double diff = lon - reference;
+  diff -= 360.0 * std::floor((diff + 180.0) / 360.0);
+  return reference + diff;
+}
+
+//' rcpp_locate_stops_on_shape
+//'
+//' Locates a sequence of stops along a shape, returning the distance, in
+//' meters, from the start of the shape to the point of the shape where each
+//' stop is projected. Each stop is projected onto the line segments of the
+//' shape (not only onto its vertices), and the stops are forced to advance
+//' along the shape in the order they are given, so that loops and shapes that
+//' pass by the same place more than once are handled correctly.
+//'
+//' The stops are placed, with dynamic programming, so as to (approximately)
+//' minimize the sum of the squared distances between the stops and their
+//' points on the shape, under the ordering constraint. A stop located before
+//' the previous one on the same segment is placed at the previous stop's
+//' position (the previous stop is never moved back to make room for it).
+//' Squared distances are calculated in a local
+//' equirectangular frame of each shape segment, while the lengths along the
+//' shape are great-circle distances calculated with the haversine formula.
+//'
+//' All coordinates must be non-missing, and the shape must have at least two
+//' points.
+//'
+//' @noRd
+[[cpp11::register]]
+doubles rcpp_locate_stops_on_shape(const doubles shape_lat,
+                                   const doubles shape_lon,
+                                   const doubles stop_lat,
+                                   const doubles stop_lon) {
+  const R_xlen_t n_points = shape_lat.size();
+  const R_xlen_t n_stops = stop_lat.size();
+  if (shape_lon.size() != n_points || stop_lon.size() != n_stops) {
+    stop("Latitude and longitude vectors must have the same length.");
+  }
+  if (n_points < 2) stop("The shape must have at least two points.");
+  if (n_stops == 0) return writable::doubles((R_xlen_t) 0);
+
+  for (R_xlen_t k = 0; k < n_points; k++) {
+    if (ISNAN(shape_lat[k]) || ISNAN(shape_lon[k])) {
+      stop("Shape coordinates must not be missing.");
+    }
+  }
+  for (R_xlen_t i = 0; i < n_stops; i++) {
+    if (ISNAN(stop_lat[i]) || ISNAN(stop_lon[i])) {
+      stop("Stop coordinates must not be missing.");
+    }
+  }
+
+  const R_xlen_t n_segments = n_points - 1;
+  const double earth_radius = 6371010.0;
+  const double to_radians = 3.14159265358979323846 / 180.0;
+  const double meters_per_degree = earth_radius * to_radians;
+
+  // shape preparation: unwrapped longitudes, segment lengths, cumulative
+  // distances and the east-west scale of each segment
+
+  std::vector<double> lon(n_points);
+  for (R_xlen_t k = 0; k < n_points; k++) {
+    lon[k] = unwrap_longitude(shape_lon[k], shape_lon[0]);
+  }
+
+  std::vector<double> seg_length(n_segments);
+  std::vector<double> cum_dist(n_segments);
+  std::vector<double> x_scale(n_segments);
+  double total = 0.0;
+
+  for (R_xlen_t j = 0; j < n_segments; j++) {
+    seg_length[j] = distance_haversine(
+      shape_lat[j], shape_lon[j], shape_lat[j + 1], shape_lon[j + 1]
+    );
+    cum_dist[j] = total;
+    total += seg_length[j];
+
+    const double mid_lat = (shape_lat[j] + shape_lat[j + 1]) / 2.0;
+    x_scale[j] = meters_per_degree * std::cos(mid_lat * to_radians);
+  }
+
+  std::vector<double> stop_x(n_stops);
+  for (R_xlen_t i = 0; i < n_stops; i++) {
+    stop_x[i] = unwrap_longitude(stop_lon[i], shape_lon[0]);
+  }
+
+  // squared distance between stop i and the point at relative position 't' of
+  // segment j. when 'project' is true, 't' is set to the position of the
+  // stop's projection onto the segment (0 = start, 1 = end)
+
+  auto squared_distance = [&](R_xlen_t i, R_xlen_t j, double& t, bool project) {
+    const double bx = (lon[j + 1] - lon[j]) * x_scale[j];
+    const double by = (shape_lat[j + 1] - shape_lat[j]) * meters_per_degree;
+    const double px = (stop_x[i] - lon[j]) * x_scale[j];
+    const double py = (stop_lat[i] - shape_lat[j]) * meters_per_degree;
+
+    if (project) {
+      const double length_sq = bx * bx + by * by;
+      t = 0.0;
+      if (length_sq > 0.0) {
+        t = (px * bx + py * by) / length_sq;
+        if (t < 0.0) t = 0.0;
+        if (t > 1.0) t = 1.0;
+      }
+    }
+
+    const double dx = px - t * bx;
+    const double dy = py - t * by;
+    return dx * dx + dy * dy;
+  };
+
+  auto project = [&](R_xlen_t i, R_xlen_t j, double& t) {
+    return squared_distance(i, j, t, true);
+  };
+
+  // dynamic programming: prev[j] holds the minimum total cost of placing the
+  // stops up to the previous one, with the previous one on segment j, at the
+  // relative position prev_t[j]. the current stop may follow a stop placed on
+  // an earlier segment, or a stop placed on the same segment. in the latter
+  // case, if the stop is projected before the previous stop, it is placed at
+  // the previous stop's position and the cost is the distance to that point,
+  // so stops slightly out of order are handled in the same way on every
+  // segment. ties keep the earliest segment. costs that differ by less than
+  // 'tie_tolerance' (squared meters) are considered ties, otherwise rounding
+  // errors would decide between overlapping parts of a shape (e.g. the two
+  // directions of an out-and-back shape)
+
+  const double tie_tolerance = 1e-6;
+  std::vector<double> prev(n_segments);
+  std::vector<double> cur(n_segments);
+  std::vector<double> prev_t(n_segments);
+  std::vector<double> cur_t(n_segments);
+  std::vector<int> back((size_t) n_stops * (size_t) n_segments);
+  double t;
+
+  for (R_xlen_t j = 0; j < n_segments; j++) {
+    prev[j] = project(0, j, t);
+    prev_t[j] = t;
+  }
+
+  for (R_xlen_t i = 1; i < n_stops; i++) {
+    check_user_interrupt();
+
+    // minimum cost (and its segment) among the segments before segment j
+    double earlier_min = 0.0;
+    int earlier_arg = -1;
+
+    for (R_xlen_t j = 0; j < n_segments; j++) {
+      double t_free;
+      const double cost_free = project(i, j, t_free);
+
+      // staying on the same segment as the previous stop: the stop can't be
+      // placed before it
+      double t_stay = t_free;
+      double cost_stay = cost_free;
+      if (t_free < prev_t[j]) {
+        t_stay = prev_t[j];
+        cost_stay = squared_distance(i, j, t_stay, false);
+      }
+
+      double total = prev[j] + cost_stay;
+      double total_t = t_stay;
+      int best_arg = (int) j;
+
+      if (earlier_arg >= 0 &&
+          earlier_min + cost_free <= total + tie_tolerance) {
+        total = earlier_min + cost_free;
+        total_t = t_free;
+        best_arg = earlier_arg;
+      }
+
+      cur[j] = total;
+      cur_t[j] = total_t;
+      back[(size_t) i * (size_t) n_segments + (size_t) j] = best_arg;
+
+      if (earlier_arg < 0 || prev[j] < earlier_min - tie_tolerance) {
+        earlier_min = prev[j];
+        earlier_arg = (int) j;
+      }
+    }
+
+    std::swap(prev, cur);
+    std::swap(prev_t, cur_t);
+  }
+
+  R_xlen_t best_segment = 0;
+  for (R_xlen_t j = 1; j < n_segments; j++) {
+    if (prev[j] < prev[best_segment] - tie_tolerance) best_segment = j;
+  }
+
+  // traceback, from the last stop to the first one
+
+  std::vector<R_xlen_t> segment(n_stops);
+  segment[n_stops - 1] = best_segment;
+  for (R_xlen_t i = n_stops - 1; i > 0; i--) {
+    segment[i - 1] = back[(size_t) i * (size_t) n_segments + (size_t) segment[i]];
+  }
+
+  // positions along the shape. a stop projected onto the same segment as the
+  // previous stop, but before it, is moved to the previous stop's position, so
+  // distances between consecutive stops are never negative
+
+  writable::doubles position(n_stops);
+  double previous_pos = 0.0;
+
+  for (R_xlen_t i = 0; i < n_stops; i++) {
+    const R_xlen_t j = segment[i];
+    project(i, j, t);
+    double pos = cum_dist[j] + t * seg_length[j];
+    if (i > 0 && pos < previous_pos) pos = previous_pos;
+    position[i] = pos;
+    previous_pos = pos;
+  }
+
+  return position;
 }

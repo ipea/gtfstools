@@ -19,6 +19,13 @@ extern "C" SEXP _gtfstools_rcpp_distance_haversine(SEXP lat_from, SEXP lon_from,
     return cpp11::as_sexp(rcpp_distance_haversine(cpp11::as_cpp<cpp11::decay_t<const doubles>>(lat_from), cpp11::as_cpp<cpp11::decay_t<const doubles>>(lon_from), cpp11::as_cpp<cpp11::decay_t<const doubles>>(lat_to), cpp11::as_cpp<cpp11::decay_t<const doubles>>(lon_to)));
   END_CPP11
 }
+// distance_haversine.cpp
+doubles rcpp_locate_stops_on_shape(const doubles shape_lat, const doubles shape_lon, const doubles stop_lat, const doubles stop_lon);
+extern "C" SEXP _gtfstools_rcpp_locate_stops_on_shape(SEXP shape_lat, SEXP shape_lon, SEXP stop_lat, SEXP stop_lon) {
+  BEGIN_CPP11
+    return cpp11::as_sexp(rcpp_locate_stops_on_shape(cpp11::as_cpp<cpp11::decay_t<const doubles>>(shape_lat), cpp11::as_cpp<cpp11::decay_t<const doubles>>(shape_lon), cpp11::as_cpp<cpp11::decay_t<const doubles>>(stop_lat), cpp11::as_cpp<cpp11::decay_t<const doubles>>(stop_lon)));
+  END_CPP11
+}
 // seconds_to_string.cpp
 strings cpp_seconds_to_string(const integers seconds_from_midnight);
 extern "C" SEXP _gtfstools_cpp_seconds_to_string(SEXP seconds_from_midnight) {
@@ -29,9 +36,10 @@ extern "C" SEXP _gtfstools_cpp_seconds_to_string(SEXP seconds_from_midnight) {
 
 extern "C" {
 static const R_CallMethodDef CallEntries[] = {
-    {"_gtfstools_cpp_seconds_to_string",   (DL_FUNC) &_gtfstools_cpp_seconds_to_string,   1},
-    {"_gtfstools_cpp_time_to_seconds",     (DL_FUNC) &_gtfstools_cpp_time_to_seconds,     1},
-    {"_gtfstools_rcpp_distance_haversine", (DL_FUNC) &_gtfstools_rcpp_distance_haversine, 4},
+    {"_gtfstools_cpp_seconds_to_string",      (DL_FUNC) &_gtfstools_cpp_seconds_to_string,      1},
+    {"_gtfstools_cpp_time_to_seconds",        (DL_FUNC) &_gtfstools_cpp_time_to_seconds,        1},
+    {"_gtfstools_rcpp_distance_haversine",    (DL_FUNC) &_gtfstools_rcpp_distance_haversine,    4},
+    {"_gtfstools_rcpp_locate_stops_on_shape", (DL_FUNC) &_gtfstools_rcpp_locate_stops_on_shape, 4},
     {NULL, NULL, 0}
 };
 }
