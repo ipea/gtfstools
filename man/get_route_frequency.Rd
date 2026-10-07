@@ -34,6 +34,12 @@ Returns the number of departures and the mean headway of each specified
 }
 \section{Details}{
 
+The function counts trips, not stop visits: each trip is counted once, at
+its departure time, however many stops it visits within the time of day.
+Its results are therefore not comparable to those of functions that count
+the departures from each stop of a route, such as
+\code{tidytransit::get_route_frequency()}.
+
 The departure time of a trip is the earliest departure time listed for it in
 \code{stop_times} (blank times are ignored). Trips listed in the \code{frequencies}
 table depart every \code{headway_secs} from \code{start_time} until (but not

@@ -21,6 +21,12 @@
 #'   within the time of day are not included.
 #'
 #' @section Details:
+#' The function counts trips, not stop visits: each trip is counted once, at
+#' its departure time, however many stops it visits within the time of day.
+#' Its results are therefore not comparable to those of functions that count
+#' the departures from each stop of a route, such as
+#' `tidytransit::get_route_frequency()`.
+#'
 #' The departure time of a trip is the earliest departure time listed for it in
 #' `stop_times` (blank times are ignored). Trips listed in the `frequencies`
 #' table depart every `headway_secs` from `start_time` until (but not
