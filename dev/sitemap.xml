@@ -9,6 +9,8 @@
 <url><loc>https://ipea.github.io/gtfstools/dev/index.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/news/index.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/as_dt_gtfs.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/build_linestrings.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/build_shape_cuts.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/convert_from_standard.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/convert_sf_to_shapes.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/convert_shapes_to_sf.html</loc></url>
@@ -54,6 +56,7 @@
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/locate_stops_along_shapes.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/map_deprecated_file.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/merge_gtfs.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/prepare_trip_stops.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/read_gtfs.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/remove_duplicates.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/remove_unused_ids.html</loc></url>

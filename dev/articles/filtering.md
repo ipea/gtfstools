@@ -334,7 +334,7 @@ plotter <- function(gtfs,
   }
 
   shapes <- convert_shapes_to_sf(gtfs)
-  trips <- get_trip_geometry(gtfs, file = "stop_times")
+  trips <- get_trip_geometry(gtfs, method = "euclidean")
   geom <- sf::st_as_sfc(geom)
 
   ggplot() +

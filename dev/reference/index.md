@@ -7,42 +7,7 @@
 - [`write_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/write_gtfs.md)
   : Write GTFS files
 
-## Manipulation
-
-- [`convert_sf_to_shapes()`](https://ipea.github.io/gtfstools/dev/reference/convert_sf_to_shapes.md)
-  :
-
-  Convert a simple feature object into a `shapes` table
-
-- [`convert_shapes_to_sf()`](https://ipea.github.io/gtfstools/dev/reference/convert_shapes_to_sf.md)
-  :
-
-  Convert `shapes` table to simple feature object
-
-- [`convert_stops_to_sf()`](https://ipea.github.io/gtfstools/dev/reference/convert_stops_to_sf.md)
-  :
-
-  Convert `stops` table to simple feature object
-
-- [`convert_time_to_seconds()`](https://ipea.github.io/gtfstools/dev/reference/convert_time_to_seconds.md)
-  : Convert time fields to seconds after midnight
-
-- [`frequencies_to_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/frequencies_to_stop_times.md)
-  : Convert frequencies to stop times
-
-- [`merge_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/merge_gtfs.md)
-  : Merge GTFS files
-
-- [`remove_duplicates()`](https://ipea.github.io/gtfstools/dev/reference/remove_duplicates.md)
-  : Remove duplicated entries
-
-- [`remove_unused_ids()`](https://ipea.github.io/gtfstools/dev/reference/remove_unused_ids.md)
-  : Remove unused ids
-
-- [`set_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.md)
-  : Set trip average speed
-
-## Analysis
+## Query information from GTFS feeds
 
 - [`get_children_stops()`](https://ipea.github.io/gtfstools/dev/reference/get_children_stops.md)
   : Get children stops recursively
@@ -67,16 +32,7 @@
 - [`get_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_speed.md)
   : Get trip speed
 
-## Validation
-
-- [`download_validator()`](https://ipea.github.io/gtfstools/dev/reference/download_validator.md)
-  : Download MobilityData's GTFS validator
-- [`list_validator_versions()`](https://ipea.github.io/gtfstools/dev/reference/list_validator_versions.md)
-  : List MobilityData's GTFS validator versions
-- [`validate_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/validate_gtfs.md)
-  : Validate GTFS feed
-
-## Filters
+## Filter GTFS feeds
 
 - [`filter_by_agency_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_agency_id.md)
   :
@@ -121,6 +77,50 @@
 
 - [`filter_by_weekday()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_weekday.md)
   : Filter GTFS object by weekday
+
+## Spatial operations
+
+- [`convert_sf_to_shapes()`](https://ipea.github.io/gtfstools/dev/reference/convert_sf_to_shapes.md)
+  :
+
+  Convert a simple feature object into a `shapes` table
+
+- [`convert_shapes_to_sf()`](https://ipea.github.io/gtfstools/dev/reference/convert_shapes_to_sf.md)
+  :
+
+  Convert `shapes` table to simple feature object
+
+- [`convert_stops_to_sf()`](https://ipea.github.io/gtfstools/dev/reference/convert_stops_to_sf.md)
+  :
+
+  Convert `stops` table to simple feature object
+
+- [`filter_by_spatial_extent()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_spatial_extent.md)
+  : Filter a GTFS object using a spatial extent
+
+## Manipulation
+
+- [`convert_time_to_seconds()`](https://ipea.github.io/gtfstools/dev/reference/convert_time_to_seconds.md)
+  : Convert time fields to seconds after midnight
+- [`frequencies_to_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/frequencies_to_stop_times.md)
+  : Convert frequencies to stop times
+- [`merge_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/merge_gtfs.md)
+  : Merge GTFS files
+- [`remove_duplicates()`](https://ipea.github.io/gtfstools/dev/reference/remove_duplicates.md)
+  : Remove duplicated entries
+- [`remove_unused_ids()`](https://ipea.github.io/gtfstools/dev/reference/remove_unused_ids.md)
+  : Remove unused ids
+- [`set_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.md)
+  : Set trip average speed
+
+## Validate GTFS feeds
+
+- [`download_validator()`](https://ipea.github.io/gtfstools/dev/reference/download_validator.md)
+  : Download MobilityData's GTFS validator
+- [`list_validator_versions()`](https://ipea.github.io/gtfstools/dev/reference/list_validator_versions.md)
+  : List MobilityData's GTFS validator versions
+- [`validate_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/validate_gtfs.md)
+  : Validate GTFS feed
 
 ## Interoperability between GTFS packages
 

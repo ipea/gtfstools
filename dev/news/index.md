@@ -63,6 +63,46 @@
     They match the previous ones with `sf_use_s2(TRUE)`; with
     `sf_use_s2(FALSE)`, the previous ellipsoidal lengths differed by up
     to 0.4%.
+- [`get_trip_geometry()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_geometry.md)
+  was reorganised in the same way, so that its geometries match the
+  lengths returned by
+  [`get_trip_length()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_length.md):
+  - The new `method` argument replaces `file`. With `method = "shapes"`
+    (the default), geometries are now the part of the trip’s shape
+    between its first and last stops, instead of the entire shape. With
+    `method = "euclidean"`, geometries link the trip’s stops along
+    straight lines, as with the former `file = "stop_times"`. Use
+    [`convert_shapes_to_sf()`](https://ipea.github.io/gtfstools/dev/reference/convert_shapes_to_sf.md)
+    for the geometry of entire shapes.
+  - Each trip now gets a single geometry, so the output no longer has an
+    `origin_file` column. To compare both methods, call the function
+    once with each of them.
+  - `method` comes right after `trip_id`, so a `file` passed by position
+    is now taken as `method` (`"stop_times"` raises an error). The
+    deprecated `file` must be passed by name.
+  - Both methods now require the `stop_times` and `stops` tables, and
+    `method = "euclidean"` no longer requires `trips`. Without a
+    `shapes` table or a `trips$shape_id` column, `method = "shapes"`
+    uses straight lines between stops, with a warning (class
+    `gtfstools_shapes_unavailable`), instead of raising an error.
+  - Only trips listed in `stop_times` are returned, and the warning
+    about `trip_id`s that don’t exist now checks `stop_times` instead of
+    `trips`.
+  - Stops with missing coordinates, or not listed in `stops`, are now
+    ignored, instead of producing geometries with `NA` coordinates.
+    Trips without a usable shape (including those whose `shape_id` is
+    blank) now get an empty geometry with `method = "shapes"`, with a
+    warning (class `gtfstools_trips_without_shape`). Previously, trips
+    whose `shape_id` was blank were dropped.
+  - With `method = "shapes"`, the stops of each trip are now located
+    along its shape, so the function takes about as long as
+    [`get_trip_length()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_length.md):
+    on a feed with 15,000 trips and 920,000 `stop_times` rows, about 0.8
+    seconds instead of 0.02 seconds for the entire shapes.
+    [`convert_shapes_to_sf()`](https://ipea.github.io/gtfstools/dev/reference/convert_shapes_to_sf.md)
+    is still the fastest way to get the geometry of entire shapes. With
+    `method = "euclidean"`, the function is slightly slower than with
+    the former `file = "stop_times"` (about 1.2 times on the same feed).
 - `filter_by_time_of_day(keep = TRUE, update_frequencies = TRUE)` now
   sets the `end_time` of `frequencies` entries that cross `to` to one
   second after `to` (e.g. `"07:00:01"` instead of `"07:00:00"`), see Bug
@@ -259,6 +299,11 @@
   [@haneroglu](https://github.com/haneroglu).
 - Fixed bug in
   [`filter_by_spatial_extent()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_spatial_extent.md)
+  that raised an error (`Can't unproject point with nan`) when a trip’s
+  stops had missing coordinates, or were not listed in `stops`. These
+  stops are now ignored when selecting trips by their stops.
+- Fixed bug in
+  [`filter_by_spatial_extent()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_spatial_extent.md)
   that, with `keep = FALSE`, kept trips selected only by their shapes or
   only by their stops, instead of dropping every selected trip.
 - Fixed bug in `filter_by_stop_id(full_trips = FALSE)` that added a
@@ -342,6 +387,7 @@
 ### Feature deprecation
 
 - The `file` argument of
+  [`get_trip_geometry()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_geometry.md),
   [`get_trip_length()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_length.md)
   and
   [`get_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_speed.md)
@@ -416,12 +462,6 @@
   calculated ellipsoidal distances, which differ from the spherical ones
   by up to about 0.4%; distances are now always spherical.
 
-- [`get_trip_geometry()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_geometry.md)
-  is much faster when `crs` is not WGS 84, as each shape is now
-  transformed only once, instead of once per trip that uses it (about 45
-  times faster for `file = "shapes"` on a feed with 15,000 trips and 160
-  shapes).
-
 - The table below shows how many times faster each function optimised
   above is, compared with the development version before these
   optimisations, on the example feeds shipped with the package (each
@@ -430,9 +470,7 @@
   [`get_trip_duration()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_duration.md)
   and
   [`get_trip_segment_duration()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_segment_duration.md)
-  used `unit = "min"`,
-  [`get_trip_geometry()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_geometry.md)
-  used `crs = 31983`, and
+  used `unit = "min"`, and
   [`filter_by_spatial_extent()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_spatial_extent.md)
   used the western half of each feed’s extent. The poa feed has no
   `frequencies` table. Differences under about 1.2 times are within
@@ -446,7 +484,6 @@
   | [`filter_by_time_of_day()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_time_of_day.md) | 2.9 | 1.2 |
   | [`frequencies_to_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/frequencies_to_stop_times.md) | – | 12.7 |
   | [`get_trip_duration()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_duration.md) | 4.0 | 1.5 |
-  | [`get_trip_geometry()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_geometry.md) | 2.5 | 1.0 |
   | [`get_trip_segment_duration()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_segment_duration.md) | 50.1 | 2.8 |
   | [`write_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/write_gtfs.md) | 1.5 | 0.9 |
 

@@ -1,7 +1,8 @@
 # Get trip geometry
 
-Returns the geometry of each specified `trip_id`, based either on the
-`shapes` or the `stop_times` file (or both).
+Returns the geometry of each specified `trip_id`, from its first to its
+last stop, either along the trip's shape or as straight lines between
+stops.
 
 ## Usage
 
@@ -9,9 +10,10 @@ Returns the geometry of each specified `trip_id`, based either on the
 get_trip_geometry(
   gtfs,
   trip_id = NULL,
-  file = NULL,
+  method = "shapes",
   crs = 4326,
-  sort_sequence = TRUE
+  sort_sequence = TRUE,
+  file = NULL
 )
 ```
 
@@ -28,12 +30,14 @@ get_trip_geometry(
   generated. If `NULL` (the default), the function generates geometries
   for every `trip_id` in the GTFS.
 
-- file:
+- method:
 
-  A character vector specifying the file from which geometries should be
-  generated (either one of or both `shapes` and `stop_times`). If `NULL`
-  (the default), the function attemps to generate the geometries from
-  both files, but only raises an error if none of the files exist.
+  A string, either `"shapes"` (the default) or `"euclidean"`. `"shapes"`
+  returns the part of the trip's shape, described in the `shapes` table,
+  between its first and last stops, while `"euclidean"` links the
+  consecutive stops of the trip along straight lines. If the GTFS object
+  doesn't have a `shapes` table, or if its `trips` table doesn't have a
+  `shape_id` column, `"euclidean"` is used instead, with a warning.
 
 - crs:
 
@@ -42,26 +46,55 @@ get_trip_geometry(
 
 - sort_sequence:
 
-  A logical specifying whether to sort shapes and timetables by
-  `shape_pt_sequence` and `stop_sequence`, respectively. Defaults to
-  `TRUE`. Sorting an already ordered table is cheap. Set to `FALSE` only
-  if shapes and timetables are known to be ordered. Geometries generated
-  from unordered sequences do not correctly depict the trip
-  trajectories.
+  A logical specifying whether to sort timetables and shapes by
+  `stop_sequence` and `shape_pt_sequence`, respectively. Defaults to
+  `TRUE`. Set to `FALSE` only if these tables are known to be ordered.
+  Geometries generated from unordered sequences do not correctly depict
+  the trip trajectories.
+
+- file:
+
+  Deprecated. Use `method` instead (`file = "stop_times"` corresponds to
+  `method = "euclidean"`).
 
 ## Value
 
-A `LINESTRING sf`.
+A `LINESTRING sf` with the `trip_id` and the `geometry` of each trip
+listed in `stop_times`.
 
 ## Details
 
-The geometry generation works differently for the two files. In the case
-of `shapes`, the shape as described in the text file is converted to an
-`sf` object. For `stop_times` the geometry is the result of linking
-subsequent stops along a straight line (stops' coordinates are retrieved
-from the `stops` file). Thus, the resolution of the geometry when
-generated with `shapes` tends to be much higher than when created with
-`stop_times`.
+With `method = "shapes"`, the first and last stops of each trip are
+projected onto its shape, as in
+[`get_trip_length()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_length.md),
+and the geometry is the part of the shape between them. Thus, its length
+matches the length returned by
+[`get_trip_length()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_length.md)
+(when this length is not `NA`, see below), and the limitations described
+there apply. Trips whose stops are all located at the same point of the
+shape get a zero-length geometry. Use
+[`convert_shapes_to_sf()`](https://ipea.github.io/gtfstools/dev/reference/convert_shapes_to_sf.md)
+for the geometry of entire shapes.
+
+With `method = "euclidean"`, the geometry links the consecutive stops of
+each trip along straight lines (stops' coordinates are retrieved from
+the `stops` table), so its resolution tends to be much lower than that
+of the geometry generated from the shapes. Trips with a single stop get
+a single-point geometry.
+
+Both methods ignore stops with missing coordinates, or not listed in
+`stops` (for which
+[`get_trip_length()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_length.md)
+returns `NA` lengths). Trips without any stop with coordinates get an
+empty geometry, as do, with `method = "shapes"`, trips with fewer than
+two stops with coordinates or not linked to a shape with at least two
+distinct points (the latter with a warning). Geometries along shapes
+that cross the antimeridian are not handled correctly.
+
+## See also
+
+[`get_trip_length()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_length.md),
+[`convert_shapes_to_sf()`](https://ipea.github.io/gtfstools/dev/reference/convert_shapes_to_sf.md)
 
 ## Examples
 
@@ -70,50 +103,38 @@ data_path <- system.file("extdata/spo_gtfs.zip", package = "gtfstools")
 
 gtfs <- read_gtfs(data_path)
 
+# geometry along the shape from the first to the last stop of each trip
 trip_geometry <- get_trip_geometry(gtfs)
 head(trip_geometry)
-#> Simple feature collection with 6 features and 2 fields
+#> Simple feature collection with 6 features and 1 field
 #> Geometry type: LINESTRING
 #> Dimension:     XY
-#> Bounding box:  xmin: -46.98404 ymin: -23.73644 xmax: -46.63535 ymax: -23.19474
+#> Bounding box:  xmin: -46.64446 ymin: -23.65102 xmax: -46.56817 ymax: -23.43291
 #> Geodetic CRS:  WGS 84
-#>      trip_id origin_file                       geometry
-#> 1 CPTM L07-0      shapes LINESTRING (-46.63535 -23.5...
-#> 2 CPTM L07-1      shapes LINESTRING (-46.87255 -23.1...
-#> 3 CPTM L08-0      shapes LINESTRING (-46.64073 -23.5...
-#> 4 CPTM L08-1      shapes LINESTRING (-46.98404 -23.5...
-#> 5 CPTM L09-0      shapes LINESTRING (-46.77604 -23.5...
-#> 6 CPTM L09-1      shapes LINESTRING (-46.69711 -23.7...
+#>     trip_id                       geometry
+#> 1 2002-10-0 LINESTRING (-46.62959 -23.5...
+#> 2 2105-10-0 LINESTRING (-46.58098 -23.4...
+#> 3 2105-10-1 LINESTRING (-46.61683 -23.5...
+#> 4 2161-10-0 LINESTRING (-46.56992 -23.4...
+#> 5 2161-10-1 LINESTRING (-46.63553 -23.5...
+#> 6 4491-10-0 LINESTRING (-46.62075 -23.6...
 
-# the above is identical to
-trip_geometry <- get_trip_geometry(gtfs, file = c("shapes", "stop_times"))
-head(trip_geometry)
-#> Simple feature collection with 6 features and 2 fields
-#> Geometry type: LINESTRING
-#> Dimension:     XY
-#> Bounding box:  xmin: -46.98404 ymin: -23.73644 xmax: -46.63535 ymax: -23.19474
-#> Geodetic CRS:  WGS 84
-#>      trip_id origin_file                       geometry
-#> 1 CPTM L07-0      shapes LINESTRING (-46.63535 -23.5...
-#> 2 CPTM L07-1      shapes LINESTRING (-46.87255 -23.1...
-#> 3 CPTM L08-0      shapes LINESTRING (-46.64073 -23.5...
-#> 4 CPTM L08-1      shapes LINESTRING (-46.98404 -23.5...
-#> 5 CPTM L09-0      shapes LINESTRING (-46.77604 -23.5...
-#> 6 CPTM L09-1      shapes LINESTRING (-46.69711 -23.7...
-
+# straight lines between consecutive stops
 trip_ids <- c("CPTM L07-0", "2002-10-0")
-trip_geometry <- get_trip_geometry(gtfs, trip_id = trip_ids)
-trip_geometry
-#> Simple feature collection with 4 features and 2 fields
+straight_geometry <- get_trip_geometry(
+  gtfs,
+  trip_id = trip_ids,
+  method = "euclidean"
+)
+straight_geometry
+#> Simple feature collection with 2 features and 1 field
 #> Geometry type: LINESTRING
 #> Dimension:     XY
-#> Bounding box:  xmin: -46.87255 ymin: -23.55262 xmax: -46.62922 ymax: -23.19474
+#> Bounding box:  xmin: -46.8719 ymin: -23.55212 xmax: -46.62962 ymax: -23.19564
 #> Geodetic CRS:  WGS 84
-#>      trip_id origin_file                       geometry
-#> 1 CPTM L07-0      shapes LINESTRING (-46.63535 -23.5...
-#> 2  2002-10-0      shapes LINESTRING (-46.62963 -23.5...
-#> 3  2002-10-0  stop_times LINESTRING (-46.62962 -23.5...
-#> 4 CPTM L07-0  stop_times LINESTRING (-46.63544 -23.5...
-plot(trip_geometry["origin_file"])
+#>      trip_id                       geometry
+#> 1  2002-10-0 LINESTRING (-46.62962 -23.5...
+#> 2 CPTM L07-0 LINESTRING (-46.63544 -23.5...
+plot(straight_geometry["trip_id"])
 
 ```

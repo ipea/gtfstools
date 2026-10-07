@@ -129,18 +129,19 @@ stuck with repetitive tasks:
 [`get_trip_geometry()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_geometry.md)
 returns the geometry of each trip in a GTFS object as an `sf` object
 (please check [`{sf}` webpage](https://r-spatial.github.io/sf/) for more
-details). GTFS data allows you to generate geometries using two
-different methods: either converting the shapes described in the
-`shapes.txt` file to an `sf`, or linking the subsequent stops of each
-trip as described in the `stop_times.txt` along a straight line. While
-the former tends to yield more reliable and higher resolution
-geometries, it may be useful to compare the results of both methods to
-check if the trips described in `stop_times` actually resemble their
-actual shape:
+details), from its first to its last stop. GTFS data allows you to
+generate geometries using two different methods: either cutting the
+trip’s shape, described in the `shapes.txt` file, between its first and
+last stops (`method = "shapes"`, the default), or linking the subsequent
+stops of each trip as described in the `stop_times.txt` along straight
+lines (`method = "euclidean"`). While the former tends to yield more
+reliable and higher resolution geometries, it may be useful to compare
+the results of both methods to check if the trips described in
+`stop_times` actually resemble their actual shape:
 
 ``` r
 
-trip_geom <- get_trip_geometry(spo_gtfs, file = "shapes")
+trip_geom <- get_trip_geometry(spo_gtfs)
 plot(trip_geom$geometry)
 ```
 
@@ -152,9 +153,14 @@ single_trip <- spo_gtfs$trips$trip_id[1]
 single_trip
 #> [1] "CPTM L07-0"
 
-# 'file' argument defaults to c("shapes", "stop_times")
-both_geom <- get_trip_geometry(spo_gtfs, trip_id = single_trip)
-plot(both_geom["origin_file"])
+shape_geom <- get_trip_geometry(spo_gtfs, trip_id = single_trip)
+straight_geom <- get_trip_geometry(
+  spo_gtfs,
+  trip_id = single_trip,
+  method = "euclidean"
+)
+plot(shape_geom$geometry)
+plot(straight_geom$geometry, add = TRUE, col = "red")
 ```
 
 ![](gtfstools_files/figure-html/unnamed-chunk-7-2.png)

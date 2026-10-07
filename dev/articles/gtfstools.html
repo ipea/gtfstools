@@ -194,17 +194,18 @@ package always conform to the specification.</p>
 you from getting stuck with repetitive tasks:</p>
 <p><code><a href="../reference/get_trip_geometry.html">get_trip_geometry()</a></code> returns the geometry of each trip in
 a GTFS object as an <code>sf</code> object (please check <a href="https://r-spatial.github.io/sf/" class="external-link"><code>{sf}</code> webpage</a> for
-more details). GTFS data allows you to generate geometries using two
-different methods: either converting the shapes described in the
-<code>shapes.txt</code> file to an <code>sf</code>, or linking the
-subsequent stops of each trip as described in the
-<code>stop_times.txt</code> along a straight line. While the former
-tends to yield more reliable and higher resolution geometries, it may be
-useful to compare the results of both methods to check if the trips
-described in <code>stop_times</code> actually resemble their actual
-shape:</p>
+more details), from its first to its last stop. GTFS data allows you to
+generate geometries using two different methods: either cutting the
+trip’s shape, described in the <code>shapes.txt</code> file, between its
+first and last stops (<code>method = "shapes"</code>, the default), or
+linking the subsequent stops of each trip as described in the
+<code>stop_times.txt</code> along straight lines
+(<code>method = "euclidean"</code>). While the former tends to yield
+more reliable and higher resolution geometries, it may be useful to
+compare the results of both methods to check if the trips described in
+<code>stop_times</code> actually resemble their actual shape:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">trip_geom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_trip_geometry.html">get_trip_geometry</a></span><span class="op">(</span><span class="va">spo_gtfs</span>, file <span class="op">=</span> <span class="st">"shapes"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">trip_geom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_trip_geometry.html">get_trip_geometry</a></span><span class="op">(</span><span class="va">spo_gtfs</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">trip_geom</span><span class="op">$</span><span class="va">geometry</span><span class="op">)</span></span></code></pre></div>
 <p><img src="gtfstools_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="" width="700"></p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
@@ -212,9 +213,14 @@ shape:</p>
 <span><span class="va">single_trip</span></span>
 <span><span class="co">#&gt; [1] "CPTM L07-0"</span></span>
 <span></span>
-<span><span class="co"># 'file' argument defaults to c("shapes", "stop_times")</span></span>
-<span><span class="va">both_geom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_trip_geometry.html">get_trip_geometry</a></span><span class="op">(</span><span class="va">spo_gtfs</span>, trip_id <span class="op">=</span> <span class="va">single_trip</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">both_geom</span><span class="op">[</span><span class="st">"origin_file"</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">shape_geom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_trip_geometry.html">get_trip_geometry</a></span><span class="op">(</span><span class="va">spo_gtfs</span>, trip_id <span class="op">=</span> <span class="va">single_trip</span><span class="op">)</span></span>
+<span><span class="va">straight_geom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_trip_geometry.html">get_trip_geometry</a></span><span class="op">(</span></span>
+<span>  <span class="va">spo_gtfs</span>,</span>
+<span>  trip_id <span class="op">=</span> <span class="va">single_trip</span>,</span>
+<span>  method <span class="op">=</span> <span class="st">"euclidean"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">shape_geom</span><span class="op">$</span><span class="va">geometry</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">straight_geom</span><span class="op">$</span><span class="va">geometry</span>, add <span class="op">=</span> <span class="cn">TRUE</span>, col <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="gtfstools_files/figure-html/unnamed-chunk-7-2.png" class="r-plt" alt="" width="700"></p>
 <p><code><a href="../reference/get_trip_duration.html">get_trip_duration()</a></code> returns the duration of each trip in
 a GTFS object, as specified in the <code>stop_times</code> file, in the
