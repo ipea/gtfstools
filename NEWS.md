@@ -2,6 +2,8 @@
 
 ## Potentially breaking changes
 
+- `filter_by_time_of_day(keep = TRUE, update_frequencies = TRUE)` now sets the `end_time` of `frequencies` entries that cross `to` to one second after `to` (e.g. `"07:00:01"` instead of `"07:00:00"`), see Bug fixes.
+- `frequencies_to_stop_times()` no longer creates a trip departing at the `end_time` of `frequencies` entries, so entries whose duration is a multiple of `headway_secs` now yield one trip fewer (see Bug fixes).
 - The `sort_sequence` argument of `convert_shapes_to_sf()`, `get_trip_geometry()`, `get_trip_length()`, `get_trip_speed()`, `get_trip_segment_duration()` and `get_stop_times_patterns()` now defaults to `TRUE`. Results only change for feeds whose `shapes` or `stop_times` are not ordered by `shape_pt_sequence`/`stop_sequence`, in which case the previous output was incorrect. As a consequence, these columns are now required by default. Use `sort_sequence = FALSE` to restore the previous behaviour (#94).
 - Malformed time strings (e.g. `"5:30"`, `"abc"`, `"12:60:00"`, hours too large to be stored) are now converted to `NA` with a warning by all functions that convert times to seconds, instead of silently becoming wrong values. Blank times still become `NA` silently. `filter_by_time_of_day()` now also rejects `from`/`to` values with minutes or seconds of 60 or more.
 - `get_stop_times_patterns(type = "spatiotemporal")` may return different pattern ids for feeds with blank intermediate stop times, which are now correctly accounted for (see Bug fixes).
@@ -12,6 +14,8 @@
 
 ## Bug fixes
 
+- Fixed bug in `filter_by_time_of_day()` that, with `keep = TRUE`, set the `end_time` of `frequencies` entries that cross `to` to `to`. Since `end_time` is exclusive, a departure exactly at `to` was lost when converting the filtered feed with `frequencies_to_stop_times()`, although `filter_by_time_of_day()` keeps times equal to `to`. `end_time` is now set to one second after `to`.
+- Fixed bug in `frequencies_to_stop_times()` that created a trip departing at the `end_time` of `frequencies` entries whose duration is a multiple of `headway_secs`. As required by the GTFS specification, `end_time` is now exclusive: an entry from 08:00 to 09:00 with a 30 minutes headway yields trips departing at 08:00 and 08:30 only. Entries with equal `start_time` and `end_time` still yield a single trip.
 - Fixed bug in `filter_by_route_id()` (and therefore `filter_by_route_type()`) that filtered `fare_rules` by `level_id`s instead of `route_id`s, dropping the kept routes' fares with `keep = TRUE` and keeping the dropped routes' fares with `keep = FALSE`.
 - Fixed bug in `get_stop_times_patterns()` that ignored stop timing when identifying spatiotemporal patterns of trips with any blank stop time.
 - Fixed bug in `filter_by_time_of_day()` that, with `keep = FALSE` and `full_trips = TRUE`, dropped every trip with an untimed stop, even trips entirely outside the time window.
@@ -40,6 +44,7 @@
 ## New features
 
 - New function `list_validator_versions()` which returns a df with the available CLI versions and their URLs. PR contribution by @baarthur
+- New function `get_route_frequency()`, which returns the number of departures and the mean headway of each route within a time of day, by service (and direction). It handles both trips listed in `frequencies` and scheduled trips (#53).
 - `write_gtfs()` gains a `compression_level` argument. It defaults to 6 (previously the feed was always compressed at level 9), which makes writing a feed about 2 to 3 times faster for files of very similar size. The content of the written files is unchanged.
 
 ## Notes

@@ -34,12 +34,14 @@ after converting the GTFS. Let's say, for example, that the \code{frequencies}
 table describes a trip called \code{"example_trip"}, that starts at 08:00 and
 stops at 09:00, with a 30 minutes headway.
 
-In practice, that means that one trip will depart at 08:00, another at 08:30
-and yet another at 09:00. \code{frequencies_to_stop_times()} appends a \code{"_<n>"}
+In practice, that means that one trip will depart at 08:00 and another at
+08:30. As required by the GTFS specification, no trip departs at the
+\code{end_time} (09:00), which is when the headway changes or the service ceases.
+An entry whose \code{start_time} and \code{end_time} are equal yields a single trip,
+departing at that time. \code{frequencies_to_stop_times()} appends a \code{"_<n>"}
 suffix to the newly created trips to differentiate each one of them (e.g. in
 this case, the new trips, described in the \code{trips} and \code{stop_times} tables,
-would be called \code{"example_trip_1"}, \code{"example_trip_2"} and
-\code{"example_trip_3"}).
+would be called \code{"example_trip_1"} and \code{"example_trip_2"}).
 
 Existing \verb{_secs} columns in \code{stop_times} and \code{frequencies} (e.g. created
 with \code{\link[=convert_time_to_seconds]{convert_time_to_seconds()}}) are used as-is, not recalculated from the
