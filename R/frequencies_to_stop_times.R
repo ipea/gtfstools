@@ -12,6 +12,24 @@
 #' set to `TRUE`, these mismatched trip are removed from the `frequencies` table
 #' and their correspondent entries in `trips` are substituted by what would be
 #' their converted counterpart.
+#' @param strategy A string. The strategy used to set the departure times of
+#' the trips created from frequency-based entries of the `frequencies` table
+#' (i.e. those whose `exact_times` is not `1`). One of:
+#' - `"exact"` (the default): trips depart every `headway_secs` from
+#'   `start_time`;
+#' - `"half_headway"`: departures are shifted by half the headway, rounded
+#'   down to whole seconds;
+#' - `"random"`: departures are shifted by a random whole number of seconds,
+#'   from 0 up to (but not including) the headway, drawn independently for
+#'   each entry. Uses R's random number generator, so results can be made
+#'   reproducible with [set.seed()].
+#'
+#' In entries shorter than their headway, the duration of the entry (from
+#' `start_time` to `end_time`) is used in place of the headway, so that no
+#' departure is shifted to or past `end_time` and each entry still yields at
+#' least one trip. As departures are shifted towards `end_time`, an entry may
+#' yield one trip fewer than with `"exact"`. Entries whose `exact_times` is
+#' `1` follow an exact schedule and are always converted as with `"exact"`.
 #'
 #' @return A GTFS object with updated `frequencies`, `stop_times` and `trips`
 #' tables.
@@ -22,9 +40,10 @@
 #' table describes a trip called `"example_trip"`, that starts at 08:00 and
 #' stops at 09:00, with a 30 minutes headway.
 #'
-#' In practice, that means that one trip will depart at 08:00 and another at
-#' 08:30. As required by the GTFS specification, no trip departs at the
-#' `end_time` (09:00), which is when the headway changes or the service ceases.
+#' In practice, with the default `strategy = "exact"`, that means that one trip
+#' will depart at 08:00 and another at 08:30. As required by the GTFS
+#' specification, no trip departs at the `end_time` (09:00), which is when the
+#' headway changes or the service ceases.
 #' An entry whose `start_time` and `end_time` are equal yields a single trip,
 #' departing at that time. `frequencies_to_stop_times()` appends a `"_<n>"`
 #' suffix to the newly created trips to differentiate each one of them (e.g. in
@@ -58,10 +77,18 @@
 #' equivalent_stop_times[equivalent_stop_times[, .I[1], by = trip_id]$V1]
 #'
 #' @export
-frequencies_to_stop_times <- function(gtfs, trip_id = NULL, force = FALSE) {
+frequencies_to_stop_times <- function(gtfs,
+                                      trip_id = NULL,
+                                      force = FALSE,
+                                      strategy = "exact") {
   gtfs <- assert_and_assign_gtfs_object(gtfs)
   checkmate::assert_character(trip_id, null.ok = TRUE, any.missing = FALSE)
   checkmate::assert_logical(force, len = 1, any.missing = FALSE)
+  checkmate::assert_string(strategy)
+  checkmate::assert_names(
+    strategy,
+    subset.of = c("exact", "half_headway", "random")
+  )
   gtfsio::assert_field_class(
     gtfs,
     "frequencies",
@@ -145,6 +172,37 @@ frequencies_to_stop_times <- function(gtfs, trip_id = NULL, force = FALSE) {
   # departure times of each trip to be added to the 'stop_times' table.
   # each entry generates departures every headway_secs from start_time until
   # (but not including) end_time
+  #
+  # with a strategy other than "exact", the departures of each entry are
+  # shifted by an offset of at most its headway or its duration, whichever is
+  # smaller, so that every entry still yields at least one departure before its
+  # end_time. entries with exact_times = 1 follow an exact schedule and are not
+  # shifted. invalid entries (NA times, end_time before start_time, non-positive
+  # headway) get a NA or 0 offset, so they are still caught by
+  # get_frequencies_departures()
+
+  if (strategy != "exact") {
+    max_offset <- pmax(
+      0L,
+      pmin(freqs$headway_secs, freqs$end_time_secs - freqs$start_time_secs)
+    )
+
+    if ("exact_times" %chin% names(freqs)) {
+      max_offset[freqs$exact_times %in% 1L] <- 0L
+    }
+
+    if (strategy == "half_headway") {
+      offset <- max_offset %/% 2L
+    } else {
+      offset <- as.integer(stats::runif(nrow(freqs)) * max_offset)
+    }
+
+    data.table::set(
+      freqs,
+      j = "start_time_secs",
+      value = freqs$start_time_secs + offset
+    )
+  }
 
   departures <- get_frequencies_departures(freqs)
 
