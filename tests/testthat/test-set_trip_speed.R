@@ -248,18 +248,20 @@ test_that("results in identical gtfs if none of the specified trip_ids exist", {
   expect_identical(gtfs, same_speeds_gtfs)
 
   # when receives character(0) remain silent
-  #expect_silent(same_speeds_gtfs <- set_trip_speed(gtfs, character(0), 1)) # AQUI
-  #expect_false(identical(gtfs, same_speeds_gtfs))
-  #data.table::setindex(same_speeds_gtfs$stop_times, NULL)
-  #expect_identical(gtfs, same_speeds_gtfs)
+  expect_silent(same_speeds_gtfs <- set_trip_speed(gtfs, character(0), 1))
+  expect_equal(gtfs, same_speeds_gtfs, ignore_attr = TRUE)
 
-  # also when speed = numeric(0)
-  #expect_silent(
-  #  same_speeds_gtfs <- set_trip_speed(gtfs, character(0), numeric(0)) # AQUI
-  #)
-  #expect_false(identical(gtfs, same_speeds_gtfs))
-  #data.table::setindex(same_speeds_gtfs$stop_times, NULL)
-  #expect_identical(gtfs, same_speeds_gtfs)
+  # also when speed = numeric(0), even if it requires a unit conversion
+  # (issue #84)
+  expect_silent(
+    same_speeds_gtfs <- set_trip_speed(
+      gtfs,
+      character(0),
+      numeric(0),
+      unit = "m/s"
+    )
+  )
+  expect_equal(gtfs, same_speeds_gtfs, ignore_attr = TRUE)
 })
 
 # issue #63

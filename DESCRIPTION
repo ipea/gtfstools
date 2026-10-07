@@ -38,7 +38,7 @@ Imports:
     sf,
     sfheaders,
     stats,
-    units,
+    units (>= 1.0-1),
     utils,
     zip
 Suggests: 

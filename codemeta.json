@@ -294,6 +294,7 @@
       "@type": "SoftwareApplication",
       "identifier": "units",
       "name": "units",
+      "version": ">= 1.0-1",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -321,7 +322,7 @@
     },
     "SystemRequirements": null
   },
-  "fileSize": "5795.686KB",
+  "fileSize": "5807.032KB",
   "releaseNotes": "https://github.com/ipea/gtfstools/blob/main/NEWS.md",
   "readme": "https://github.com/ipea/gtfstools/blob/main/README.md",
   "contIntegration": ["https://github.com/ipea/gtfstools/actions?query=workflow%3Acheck", "https://app.codecov.io/gh/ipeaGIT/gtfstools?branch=main"],
