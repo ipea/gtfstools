@@ -21,6 +21,7 @@ reference:
     - frequencies_to_stop_times
     - merge_gtfs
     - remove_duplicates
+    - remove_unused_ids
     - set_trip_speed
   - title: "Analysis"
   - contents:
