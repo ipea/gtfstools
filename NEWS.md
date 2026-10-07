@@ -2,6 +2,9 @@
 
 ## Potentially breaking changes
 
+- The new `first_stop`, `last_stop`, `from` and `to` arguments of `set_trip_speed()` come before `by_reference`, which must now be passed by name (#89).
+- `filter_by_sf()`, deprecated in version 1.3.0 in favour of `filter_by_spatial_extent()`, is now defunct: calling it raises an error (class `gtfstools_defunct_filter_by_sf_error`). Use `filter_by_spatial_extent()` instead, which takes the same arguments.
+- The `full_trips` argument of `filter_by_stop_id()`, deprecated in version 1.3.0, is now defunct: using it, with any value, raises an error (class `gtfstools_defunct_full_trips_error`). The function now always behaves as with the former `full_trips = FALSE`, filtering by the specified stops instead of keeping the entire trips that pass through them. To keep entire trips, subset `stop_times` by `stop_id` and pass the resulting `trip_id`s to `filter_by_trip_id()` (#75).
 - The trip length and speed functions were reorganised:
   - `get_trip_length()` now returns the length of each trip from its first to its last stop, so lengths along shapes are usually shorter than before. The length of entire shapes is now returned by the new `get_shape_length()`.
   - `get_trip_speed()` and `set_trip_speed()` use these lengths, so they ignore the parts of the shapes before the first and after the last stop: speeds are usually slightly lower than before, and `set_trip_speed()` sets slightly shorter durations for the same speed.
@@ -18,7 +21,7 @@
 - The `filter_by_*()` functions may now return more rows, as they no longer drop rows with blank optional keys, station entrances, generic nodes and boarding areas of kept stations and platforms, and the `agency` of single-agency feeds (see Bug fixes). `filter_by_trip_id()`, `filter_by_stop_id()`, `filter_by_spatial_extent()` and `filter_by_time_of_day()` may also return fewer `fare_attributes` and `agency` rows, as they now drop the fares whose `fare_rules` are all dropped by zone.
 - Invalid dates (e.g. `20240230`) are still converted to `NA` when reading or converting feeds, but now raise a warning (class `gtfstools_invalid_date`) listing the invalid values.
 - `frequencies_to_stop_times()` now raises an informative error (class `gtfstools_invalid_frequencies`) when `frequencies` has invalid entries (missing or malformed `start_time`/`end_time`, `end_time` before `start_time`, or a missing or non-positive `headway_secs` while `start_time` and `end_time` differ), and another one (class `gtfstools_empty_template`) when a trip to be converted has no `departure_time` in `stop_times`. Previously, these cases failed with obscure errors. Duplicated values in its `trip_id` argument are now converted only once.
-- `filter_by_spatial_extent()` (and `filter_by_sf()`) now filters the feed by the selected trips only once, instead of filtering it by shapes and by trips separately and merging the results. As a consequence, shapes not used by any trip are no longer kept, duplicated rows of the given feed are no longer removed, and rows keep the order of the given feed (see Bug fixes).
+- `filter_by_spatial_extent()` now filters the feed by the selected trips only once, instead of filtering it by shapes and by trips separately and merging the results. As a consequence, shapes not used by any trip are no longer kept, duplicated rows of the given feed are no longer removed, and rows keep the order of the given feed (see Bug fixes).
 
 ## Bug fixes
 
@@ -46,7 +49,7 @@
 - Fixed the documentation of `filter_by_time_of_day()`, which stated that `update_frequencies` defaults to `FALSE` (it defaults to `TRUE`).
 - Fixed bug in `merge_gtfs()` that errored when columns were are of type character (unknown). PR contribution by @gmatosferreira.
 - Fixed bug that was leading to drop parent station ids in `merge_gtfs()`. PR contribution by @gmatosferreira and @haneroglu.
-- Fixed bug in `filter_by_spatial_extent()` (and `filter_by_sf()`) that, with `keep = FALSE`, kept trips selected only by their shapes or only by their stops, instead of dropping every selected trip.
+- Fixed bug in `filter_by_spatial_extent()` that, with `keep = FALSE`, kept trips selected only by their shapes or only by their stops, instead of dropping every selected trip.
 - Fixed bug in `filter_by_stop_id(full_trips = FALSE)` that added a `.flagged` column to the `fare_rules` table of the given GTFS object when this table had a `contains_id` column but no `origin_id` and `destination_id` columns.
 - Fixed bug in `get_stop_times_patterns()` that assigned the same pattern to trips with different sequences of stops when their `stop_id`s contained the `;` character (or `|`, with `type = "spatiotemporal"`).
 
@@ -54,11 +57,13 @@
 
 - New function `list_validator_versions()` which returns a df with the available CLI versions and their URLs. PR contribution by @baarthur
 - New function `get_route_frequency()`, which returns the number of departures and the mean headway (in minutes) of each route within a time of day, by `service_id` (and by `direction_id`, when present in `trips`). It handles both trips listed in `frequencies`, whose departures are generated from their `start_time`, `end_time` and `headway_secs`, and scheduled trips, which depart at their earliest `stop_times` departure time. Departures are counted from `from` (included) to `to` (not included), so consecutive time windows don't count the same departure twice, and departures after midnight can be counted with times past `"24:00:00"` (#53).
+- New function `get_stop_frequency()`, which returns the number of departures and the mean headway (in minutes) at each stop within a time of day, by `service_id`, and optionally by `route_id` and `direction_id` (`by_route = TRUE`). Each `stop_times` entry with a departure time counts as a departure from its stop, except for the last stop of each trip, and the entries of trips listed in `frequencies` are repeated at each of their departures. Unlike `get_route_frequency()`, which counts trips, it counts the departures from each stop, but it uses the same time of day as `get_route_frequency()`, from `from` (included) to `to` (not included).
 - New function `remove_unused_ids()`, which removes unused ids from all files (#55).
 - `frequencies_to_stop_times()` gains a `strategy` argument, which controls the departure times of the trips created from frequency-based `frequencies` entries (those whose `exact_times` is not `1`): `"exact"` (the default and previous behaviour) makes trips depart every `headway_secs` from `start_time`, while `"half_headway"` and `"random"` shift these departures by half the headway or by a random offset (#56).
 - New function `get_shape_length()`, which returns the length of each shape.
 - `get_trip_length()` and `get_trip_speed()` gain the `by` argument, to calculate lengths and speeds between each pair of consecutive stops (`by = "segment"`, numbered as in `get_trip_segment_duration()`), and the `method` argument, to measure along the trip's shape (`"shapes"`, handling loops correctly) or as straight lines between stops (`"euclidean"`).
 - `write_gtfs()` gains a `compression_level` argument. It defaults to 6 (previously the feed was always compressed at level 9), which makes writing a feed about 2 to 3 times faster for files of very similar size. The content of the written files is unchanged.
+- `set_trip_speed()` gains the `first_stop` and `last_stop` arguments, to set the speed only between two stops (later stops are shifted by the change in duration), and the `from` and `to` arguments, to change only trips that depart from the segment's first stop within a time of day (#89).
 
 ## Feature deprecation
 
@@ -72,7 +77,7 @@
 - Converting times between `"HH:MM:SS"` strings and seconds is now faster, as each distinct time is converted only once. This speeds up `convert_time_to_seconds()` (about 20 times faster on a feed with 900,000 `stop_times` rows), `filter_by_time_of_day()` (about 7 times faster on the same feed) and, to a lesser extent, the other functions that convert times.
 - `get_trip_segment_duration()` and `get_trip_duration()` are much faster when `unit` is not `"s"` (about 60 and 10 times faster, respectively, on a feed with 900,000 `stop_times` rows).
 - `frequencies_to_stop_times()` is much faster (about 13 times faster when converting a feed into 300,000 `stop_times` rows), as it creates all new trips at once instead of one at a time. It also no longer adds and then removes auxiliary columns from the tables of the given feed.
-- `filter_by_spatial_extent()` (and `filter_by_sf()`) is much faster and uses much less memory (about 25 times faster on a feed with 900,000 `stop_times` rows), as it filters the feed only once and doesn't create geometries for trips already selected by their shapes.
+- `filter_by_spatial_extent()` is much faster and uses much less memory (about 25 times faster on a feed with 900,000 `stop_times` rows), as it filters the feed only once and doesn't create geometries for trips already selected by their shapes.
 - `convert_sf_to_shapes()` is much faster (about 30 times faster with `calculate_distance = FALSE` and 70 times faster with `calculate_distance = TRUE` on a feed with 50,000 shape points), as it no longer casts the linestrings to points and calculates `shape_dist_traveled` with a vectorised haversine formula. Distances are calculated on the same sphere used by `{s2}`, so they match the previous results (with `sf::sf_use_s2(TRUE)`, the default) to within a micrometre. With `sf::sf_use_s2(FALSE)`, the previous version calculated ellipsoidal distances, which differ from the spherical ones by up to about 0.4%; distances are now always spherical.
 - `get_trip_geometry()` is much faster when `crs` is not WGS 84, as each shape is now transformed only once, instead of once per trip that uses it (about 45 times faster for `file = "shapes"` on a feed with 15,000 trips and 160 shapes).
 - The table below shows how many times faster each function optimised above is, compared with the development version before these optimisations, on the example feeds shipped with the package (each stacked twice with `merge_gtfs()`). `get_trip_duration()` and `get_trip_segment_duration()` used `unit = "min"`, `get_trip_geometry()` used `crs = 31983`, and `filter_by_spatial_extent()` used the western half of each feed's extent. The poa feed has no `frequencies` table. Differences under about 1.2 times are within measurement noise.
@@ -89,7 +94,7 @@
   | `get_trip_segment_duration()` | 50.1 | 2.8 |
   | `write_gtfs()` | 1.5 | 0.9 |
 - The package documentation website moved to <https://ipea.github.io/gtfstools/> and the GitHub repository to <https://github.com/ipea/gtfstools>. All links were updated.
-- The filtering vignette and the documentation now use `filter_by_spatial_extent()` instead of the deprecated `filter_by_sf()`, which was moved to a "Deprecated" section of the reference index.
+- The filtering vignette and the documentation now use `filter_by_spatial_extent()` instead of the defunct `filter_by_sf()`, which was moved to a "Defunct" section of the reference index.
 
 
 

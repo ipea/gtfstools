@@ -38,6 +38,6 @@ reference:
   - title: "Interoperability between GTFS packages"
   - contents:
     - "as_dt_gtfs"
-  - title: "Deprecated"
+  - title: "Defunct"
   - contents:
     - filter_by_sf

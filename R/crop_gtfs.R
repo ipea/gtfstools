@@ -48,8 +48,7 @@ crop_gtfs <- function(gtfs,
     gtfs,
     relevant_stops,
     include_children = ifelse(preserve_stops_hierarchy, TRUE, FALSE),
-    include_parents = ifelse(preserve_stops_hierarchy, TRUE, FALSE),
-    full_trips = FALSE
+    include_parents = ifelse(preserve_stops_hierarchy, TRUE, FALSE)
   )
 
   return(gtfs)

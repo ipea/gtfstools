@@ -108,6 +108,22 @@ utils::globalVariables(
     "first_row",
     "departure_secs",
     "departures",
-    "mean_headway"
+    "mean_headway",
+    "row",
+    "pos",
+    "seg_length",
+    "is_last",
+    "new_arr",
+    "delta",
+    "dep_secs",
+    "dep_start",
+    "arr_end",
+    "start",
+    "end",
+    "last_seq",
+    "i.last_seq",
+    "first_secs",
+    "i.first_secs",
+    "secs_offset"
   )
 )
