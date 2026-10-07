@@ -38,6 +38,7 @@ export(read_gtfs)
 export(remove_duplicates)
 export(remove_unused_ids)
 export(set_trip_speed)
+export(stop_times_to_frequencies)
 export(validate_gtfs)
 export(write_gtfs)
 importFrom(data.table,
