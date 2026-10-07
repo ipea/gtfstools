@@ -2,6 +2,7 @@
 
 ## Potentially breaking changes
 
+- The `full_trips` argument of `filter_by_stop_id()`, deprecated in version 1.3.0, is now defunct: using it, with any value, raises an error (class `gtfstools_defunct_full_trips_error`). The function now always behaves as with the former `full_trips = FALSE`, filtering by the specified stops instead of keeping the entire trips that pass through them. To keep entire trips, subset `stop_times` by `stop_id` and pass the resulting `trip_id`s to `filter_by_trip_id()` (#75).
 - The trip length and speed functions were reorganised:
   - `get_trip_length()` now returns the length of each trip from its first to its last stop, so lengths along shapes are usually shorter than before. The length of entire shapes is now returned by the new `get_shape_length()`.
   - `get_trip_speed()` and `set_trip_speed()` use these lengths, so they ignore the parts of the shapes before the first and after the last stop: speeds are usually slightly lower than before, and `set_trip_speed()` sets slightly shorter durations for the same speed.

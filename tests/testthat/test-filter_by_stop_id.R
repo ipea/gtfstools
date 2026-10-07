@@ -6,31 +6,43 @@ tester <- function(gtfs = spo_gtfs,
                    stop_id = spo_stops,
                    keep = TRUE,
                    include_children = TRUE,
-                   include_parents = keep,
-                   full_trips = TRUE) {
+                   include_parents = keep) {
   filter_by_stop_id(
     gtfs,
     stop_id,
     keep,
     include_children,
-    include_parents,
-    full_trips
+    include_parents
   )
 }
 
 # tests -------------------------------------------------------------------
 
-# full_trips = TRUE
+test_that("full_trips is defunct", {
+  expect_error(
+    filter_by_stop_id(spo_gtfs, spo_stops, full_trips = TRUE),
+    class = "gtfstools_defunct_full_trips_error"
+  )
+  expect_error(
+    filter_by_stop_id(spo_gtfs, spo_stops, full_trips = FALSE),
+    class = "gtfstools_defunct_full_trips_error"
+  )
+  expect_error(
+    filter_by_stop_id(spo_gtfs, spo_stops, TRUE, TRUE, TRUE, FALSE),
+    class = "gtfstools_defunct_full_trips_error"
+  )
+
+  expect_snapshot(
+    filter_by_stop_id(spo_gtfs, spo_stops, full_trips = TRUE),
+    error = TRUE
+  )
+})
 
 test_that("raises error due to incorrect input types", {
   expect_error(tester(unclass(spo_gtfs)))
 
   expect_error(tester(stop_id = factor(spo_stops)))
   expect_error(tester(stop_id = NA))
-
-  expect_error(tester(keep = "TRUE"))
-  expect_error(tester(keep = c(TRUE, TRUE)))
-  expect_error(tester(keep = NA))
 
   expect_error(tester(include_children = "TRUE"))
   expect_error(tester(include_children = c(TRUE, TRUE)))
@@ -40,84 +52,15 @@ test_that("raises error due to incorrect input types", {
   expect_error(tester(include_parents = c(TRUE, TRUE)))
   expect_error(tester(include_parents = NA))
 
-  expect_error(tester(full_trips = "TRUE"))
-  expect_error(tester(full_trips = c(TRUE, TRUE)))
-  expect_error(tester(full_trips = NA))
-})
-
-test_that("full_trips = TRUE is deprecated", {
-  expect_warning(tester(), class = "deprecated_full_trips_filter")
-
-  expect_snapshot_warning(tester())
+  expect_error(tester(keep = "TRUE"))
+  expect_error(tester(keep = c(TRUE, TRUE)))
+  expect_error(tester(keep = NA))
 })
 
 test_that("results in a dt_gtfs object", {
   dt_gtfs_class <- c("dt_gtfs", "gtfs", "list")
 
-  suppressWarnings(
-    smaller_gtfs <- tester(),
-    classes = "deprecated_full_trips_filter"
-  )
-  expect_s3_class(smaller_gtfs, dt_gtfs_class)
-  expect_type(smaller_gtfs, "list")
-  invisible(lapply(smaller_gtfs, expect_s3_class, "data.table"))
-})
-
-test_that("doesn't change given gtfs", {
-  original_gtfs <- read_gtfs(spo_path)
-  gtfs <- read_gtfs(spo_path)
-  expect_identical(original_gtfs, gtfs)
-
-  suppressWarnings(
-    smaller_gtfs <- tester(gtfs),
-    classes = "deprecated_full_trips_filter"
-  )
-  expect_equal(original_gtfs, gtfs, ignore_attr = TRUE)
-})
-
-test_that("'stop_id' and 'keep' arguments work correctly", {
-  relevant_trips <- spo_gtfs$stop_times[stop_id %chin% spo_stops]$trip_id
-
-  suppressWarnings(
-    smaller_gtfs_keeping <- tester(),
-    classes = "deprecated_full_trips_filter"
-  )
-  expect_true(all(smaller_gtfs_keeping$trips$trip_id %in% relevant_trips))
-
-  suppressWarnings(
-    smaller_gtfs_not_keeping <- tester(keep = FALSE),
-    classes = "deprecated_full_trips_filter"
-  )
-  expect_true(!any(smaller_gtfs_not_keeping$trips$trip_id %in% relevant_trips))
-})
-
-# full_trips = FALSE
-
-tester2 <- function(...) tester(..., full_trips = FALSE)
-
-test_that("raises error due to incorrect input types", {
-  expect_error(tester2(unclass(spo_gtfs)))
-
-  expect_error(tester2(stop_id = factor(spo_stops)))
-  expect_error(tester2(stop_id = NA))
-
-  expect_error(tester2(include_children = "TRUE"))
-  expect_error(tester2(include_children = c(TRUE, TRUE)))
-  expect_error(tester2(include_children = NA))
-
-  expect_error(tester2(include_parents = "TRUE"))
-  expect_error(tester2(include_parents = c(TRUE, TRUE)))
-  expect_error(tester2(include_parents = NA))
-
-  expect_error(tester2(keep = "TRUE"))
-  expect_error(tester2(keep = c(TRUE, TRUE)))
-  expect_error(tester2(keep = NA))
-})
-
-test_that("results in a dt_gtfs object", {
-  dt_gtfs_class <- c("dt_gtfs", "gtfs", "list")
-
-  smaller_gtfs <- tester2()
+  smaller_gtfs <- tester()
   expect_s3_class(smaller_gtfs, dt_gtfs_class)
   expect_type(smaller_gtfs, "list")
   invisible(lapply(smaller_gtfs, expect_s3_class, "data.table"))
@@ -130,16 +73,16 @@ test_that("doesn't change given gtfs", {
   gtfs <- read_gtfs(spo_path)
   expect_identical(original_gtfs, gtfs)
 
-  smaller_gtfs <- tester2(gtfs)
+  smaller_gtfs <- tester(gtfs)
   expect_equal(original_gtfs, gtfs, ignore_attr = TRUE)
 })
 
 test_that("'stop_id' and 'keep' arguments work correctly", {
-  smaller_keeping <- tester2()
+  smaller_keeping <- tester()
   expect_true(all(smaller_keeping$stops$stop_id %chin% spo_stops))
   expect_true(all(smaller_keeping$stop_times$stop_id %chin% spo_stops))
 
-  smaller_not_keeping <- tester2(keep = FALSE)
+  smaller_not_keeping <- tester(keep = FALSE)
   expect_true(!any(smaller_not_keeping$stops$stop_id %chin% spo_stops))
   expect_true(!any(smaller_not_keeping$stop_times$stop_id %chin% spo_stops))
 })
@@ -149,7 +92,7 @@ test_that("the function filters berlin's gtfs correctly", {
   ber_gtfs <- read_gtfs(ber_path)
   ber_stops <- c("100000710203", "100000410202")
 
-  smaller_ber <- tester2(ber_gtfs, ber_stops)
+  smaller_ber <- tester(ber_gtfs, ber_stops)
 
   # stops
   expect_true(nrow(smaller_ber$stops) == 2)
@@ -183,7 +126,7 @@ test_that("the function filters berlin's gtfs correctly", {
 })
 
 test_that("the function filters sao paulo's gtfs correctly", {
-  smaller_spo <- tester2()
+  smaller_spo <- tester()
 
   # stops
   expect_true(nrow(smaller_spo$stops) == 2)
@@ -223,7 +166,7 @@ test_that("the function filters google's gtfs correctly", {
     unique(c(ggl_stops, get_parent_station(ggl_gtfs, ggl_stops)$stop_id))
   )
 
-  smaller_ggl <- tester2(ggl_gtfs, ggl_stops)
+  smaller_ggl <- tester(ggl_gtfs, ggl_stops)
 
   # stops, stop_times, pathways and transfers
   expect_true(all(smaller_ggl$stops$stop_id %chin% included_stops))
@@ -279,7 +222,7 @@ test_that("behaves correctly when stop_id = character(0)", {
   ber_gtfs <- read_gtfs(ber_path)
 
   # if keep = TRUE, gtfs should be empty
-  empty <- tester2(ber_gtfs, character(0))
+  empty <- tester(ber_gtfs, character(0))
   n_rows <- vapply(empty, nrow, FUN.VALUE = integer(1))
   expect_true(all(n_rows == 0))
 
@@ -287,7 +230,7 @@ test_that("behaves correctly when stop_id = character(0)", {
   # this is actually not true because the calendar, calendar_dates and agency
   # tables contain ids not listed in the routes and trips tables, which end up
   # removed anyway (I like this behaviour, so not considering a bug)
-  full <- tester2(ber_gtfs, character(0), keep = FALSE)
+  full <- tester(ber_gtfs, character(0), keep = FALSE)
   modified_ber <- read_gtfs(ber_path)
   modified_ber$calendar <- modified_ber$calendar[
     service_id %in% modified_ber$trips$service_id
@@ -306,7 +249,7 @@ test_that("include_parents and include_children arguments work correctly", {
   ggl_gtfs <- read_gtfs(ggl_path)
   ggl_stop <- "F12S"
 
-  only_stop <- tester2(
+  only_stop <- tester(
     ggl_gtfs,
     ggl_stop,
     include_children = FALSE,
@@ -314,7 +257,7 @@ test_that("include_parents and include_children arguments work correctly", {
   )
   expect_true(only_stop$stops$stop_id == ggl_stop)
 
-  stop_and_parent <- tester2(
+  stop_and_parent <- tester(
     ggl_gtfs,
     ggl_stop,
     include_children = FALSE,
@@ -322,7 +265,7 @@ test_that("include_parents and include_children arguments work correctly", {
   )
   expect_true(all(stop_and_parent$stops$stop_id %in% c("F12S", "F12")))
 
-  stop_and_children <- tester2(
+  stop_and_children <- tester(
     ggl_gtfs,
     ggl_stop,
     include_children = TRUE,
@@ -330,7 +273,7 @@ test_that("include_parents and include_children arguments work correctly", {
   )
   expect_true(all(stop_and_children$stops$stop_id %in% c("F12S", "B1", "B3")))
 
-  parent_and_children <- tester2(
+  parent_and_children <- tester(
     ggl_gtfs,
     ggl_stop,
     include_children = TRUE,
@@ -342,11 +285,11 @@ test_that("include_parents and include_children arguments work correctly", {
 
   # by default include_parents = keep and include_children = TRUE
 
-  only_stop_dropping <- tester2(ggl_gtfs, ggl_stop, keep = FALSE)
+  only_stop_dropping <- tester(ggl_gtfs, ggl_stop, keep = FALSE)
   expect_true("F12" %in% only_stop_dropping$stops$stop_id)
   expect_true(!any(c("F12S", "B1", "B3") %in% only_stop_dropping$stops$stop_id))
 
-  only_stop_dropping <- tester2(ggl_gtfs, ggl_stop, keep = FALSE)
+  only_stop_dropping <- tester(ggl_gtfs, ggl_stop, keep = FALSE)
   expect_true("F12" %in% only_stop_dropping$stops$stop_id)
   expect_true(!any(c("F12S", "B1", "B3") %in% only_stop_dropping$stops$stop_id))
 })
@@ -362,6 +305,6 @@ test_that("doesn't add columns to the fare_rules of the given gtfs", {
   ggl_gtfs$fare_rules[, c("origin_id", "destination_id") := NULL]
   original_fare_rules <- data.table::copy(ggl_gtfs$fare_rules)
 
-  smaller_ggl <- tester2(ggl_gtfs, c("S1", "N1", "N2", "S6", "S7"))
+  smaller_ggl <- tester(ggl_gtfs, c("S1", "N1", "N2", "S6", "S7"))
   expect_identical(ggl_gtfs$fare_rules, original_fare_rules)
 })
