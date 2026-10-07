@@ -10,7 +10,7 @@
 #'
 #' `as_dt_gtfs()` is an S3 generic, with methods for:
 #'
-#' - `tidygtfs`: the class of GTFS objects read with [tidytransit::read_gtfs()].
+#' - `tidygtfs`: the class of GTFS objects read with `tidytransit::read_gtfs()`.
 #' This method converts all `tibble`s to `data.table`s and convert time columns,
 #' represented as `hms` objects in a `tidygtfs`, to strings in the `"HH:MM:SS"`
 #' format.

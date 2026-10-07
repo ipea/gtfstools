@@ -79,25 +79,6 @@ filter_by_trip_id <- function(gtfs, trip_id, keep = TRUE) {
   gtfs <- filter_fare_rules_from_route_id(gtfs, relevant_routes, `%chin%`)
   relevant_agencies_from_routes <- unique(gtfs$routes$agency_id)
 
-  # 'fare_rules' allows us to filter by 'fare_id'
-
-  relevant_fares <- unique(gtfs$fare_rules$fare_id)
-
-  # 'fare_attributes' (fare_id)
-
-  gtfs <- filter_fare_attr_from_fare_id(gtfs, relevant_fares, `%chin%`)
-  relevant_agencies_from_fare_attr <- unique(gtfs$fare_attributes$agency_id)
-
-  # 'agency' (agency_id, that comes both from routes and fare_attributes)
-
-  relevant_agencies <- c(
-    relevant_agencies_from_routes,
-    relevant_agencies_from_fare_attr
-  )
-  relevant_agencies <- unique(relevant_agencies)
-
-  gtfs <- filter_agency_from_derived_agency_id(gtfs, relevant_agencies)
-
   # 'stop_times' (trip_id)
 
   gtfs <- filter_stop_times_from_trip_id(gtfs, trip_id, `%ffilter%`)
@@ -123,6 +104,25 @@ filter_by_trip_id <- function(gtfs, trip_id, keep = TRUE) {
   # 'fare_rules' (zone_id)
 
   gtfs <- filter_fare_rules_from_zone_id(gtfs, relevant_zones, `%chin%`)
+
+  # 'fare_rules' allows us to filter by 'fare_id'
+
+  relevant_fares <- unique(gtfs$fare_rules$fare_id)
+
+  # 'fare_attributes' (fare_id)
+
+  gtfs <- filter_fare_attr_from_fare_id(gtfs, relevant_fares, `%chin%`)
+  relevant_agencies_from_fare_attr <- unique(gtfs$fare_attributes$agency_id)
+
+  # 'agency' (agency_id, that comes both from routes and fare_attributes)
+
+  relevant_agencies <- c(
+    relevant_agencies_from_routes,
+    relevant_agencies_from_fare_attr
+  )
+  relevant_agencies <- unique(relevant_agencies)
+
+  gtfs <- filter_agency_from_derived_agency_id(gtfs, relevant_agencies)
 
   # 'levels' (level_id)
 

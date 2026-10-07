@@ -41,7 +41,7 @@ of a feed read with \code{\link[=read_gtfs]{read_gtfs()}}.
 
 \code{as_dt_gtfs()} is an S3 generic, with methods for:
 \itemize{
-\item \code{tidygtfs}: the class of GTFS objects read with \code{\link[tidytransit:read_gtfs]{tidytransit::read_gtfs()}}.
+\item \code{tidygtfs}: the class of GTFS objects read with \code{tidytransit::read_gtfs()}.
 This method converts all \code{tibble}s to \code{data.table}s and convert time columns,
 represented as \code{hms} objects in a \code{tidygtfs}, to strings in the \code{"HH:MM:SS"}
 format.

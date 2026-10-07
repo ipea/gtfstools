@@ -222,3 +222,19 @@ test_that("agency table is kept intact if routes not list agency_id", {
 
   expect_identical(agencyless$agency, filtered_agencyless$agency)
 })
+
+test_that("drops fare_attributes whose fare_rules are all dropped by zone", {
+  # fare "2" only applies to a zone that no kept stop is in
+  gtfs <- read_gtfs(ggl_path)
+  gtfs$stop_times[, stop_id := "F12S"]
+  gtfs$stops[, zone_id := "z1"]
+  gtfs$fare_rules <- data.table::data.table(
+    fare_id = c("1", "2"),
+    route_id = c("A", ""),
+    origin_id = c("", "z9")
+  )
+
+  smaller_gtfs <- tester(gtfs, "AWE1")
+  expect_identical(smaller_gtfs$fare_rules$fare_id, "1")
+  expect_identical(smaller_gtfs$fare_attributes$fare_id, "1")
+})
