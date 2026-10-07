@@ -2,6 +2,7 @@
 
 ## Potentially breaking changes
 
+- The new `first_stop`, `last_stop`, `from` and `to` arguments of `set_trip_speed()` come before `by_reference`, which must now be passed by name (#89).
 - `filter_by_sf()`, deprecated in version 1.3.0 in favour of `filter_by_spatial_extent()`, is now defunct: calling it raises an error (class `gtfstools_defunct_filter_by_sf_error`). Use `filter_by_spatial_extent()` instead, which takes the same arguments.
 - The `full_trips` argument of `filter_by_stop_id()`, deprecated in version 1.3.0, is now defunct: using it, with any value, raises an error (class `gtfstools_defunct_full_trips_error`). The function now always behaves as with the former `full_trips = FALSE`, filtering by the specified stops instead of keeping the entire trips that pass through them. To keep entire trips, subset `stop_times` by `stop_id` and pass the resulting `trip_id`s to `filter_by_trip_id()` (#75).
 - The trip length and speed functions were reorganised:
@@ -61,6 +62,7 @@
 - New function `get_shape_length()`, which returns the length of each shape.
 - `get_trip_length()` and `get_trip_speed()` gain the `by` argument, to calculate lengths and speeds between each pair of consecutive stops (`by = "segment"`, numbered as in `get_trip_segment_duration()`), and the `method` argument, to measure along the trip's shape (`"shapes"`, handling loops correctly) or as straight lines between stops (`"euclidean"`).
 - `write_gtfs()` gains a `compression_level` argument. It defaults to 6 (previously the feed was always compressed at level 9), which makes writing a feed about 2 to 3 times faster for files of very similar size. The content of the written files is unchanged.
+- `set_trip_speed()` gains the `first_stop` and `last_stop` arguments, to set the speed only between two stops (later stops are shifted by the change in duration), and the `from` and `to` arguments, to change only trips that depart from the segment's first stop within a time of day (#89).
 
 ## Feature deprecation
 
