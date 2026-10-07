@@ -14,7 +14,7 @@
     "name": "R",
     "url": "https://r-project.org"
   },
-  "runtimePlatform": "R version 4.4.2 (2024-10-31 ucrt)",
+  "runtimePlatform": "R version 4.6.0 (2026-04-24 ucrt)",
   "provider": {
     "@id": "https://cran.r-project.org",
     "@type": "Organization",
@@ -227,6 +227,18 @@
     },
     "7": {
       "@type": "SoftwareApplication",
+      "identifier": "httr2",
+      "name": "httr2",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=httr2"
+    },
+    "8": {
+      "@type": "SoftwareApplication",
       "identifier": "parallelly",
       "name": "parallelly",
       "provider": {
@@ -237,7 +249,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=parallelly"
     },
-    "8": {
+    "9": {
       "@type": "SoftwareApplication",
       "identifier": "processx",
       "name": "processx",
@@ -249,7 +261,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=processx"
     },
-    "9": {
+    "10": {
       "@type": "SoftwareApplication",
       "identifier": "sf",
       "name": "sf",
@@ -261,7 +273,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=sf"
     },
-    "10": {
+    "11": {
       "@type": "SoftwareApplication",
       "identifier": "sfheaders",
       "name": "sfheaders",
@@ -273,7 +285,12 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=sfheaders"
     },
-    "11": {
+    "12": {
+      "@type": "SoftwareApplication",
+      "identifier": "stats",
+      "name": "stats"
+    },
+    "13": {
       "@type": "SoftwareApplication",
       "identifier": "units",
       "name": "units",
@@ -285,12 +302,12 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=units"
     },
-    "12": {
+    "14": {
       "@type": "SoftwareApplication",
       "identifier": "utils",
       "name": "utils"
     },
-    "13": {
+    "15": {
       "@type": "SoftwareApplication",
       "identifier": "zip",
       "name": "zip",
@@ -304,10 +321,10 @@
     },
     "SystemRequirements": null
   },
-  "fileSize": "4597.473KB",
-  "releaseNotes": "https://github.com/ipea/gtfstools/blob/master/NEWS.md",
+  "fileSize": "5795.686KB",
+  "releaseNotes": "https://github.com/ipea/gtfstools/blob/main/NEWS.md",
   "readme": "https://github.com/ipea/gtfstools/blob/main/README.md",
-  "contIntegration": ["https://github.com/ipea/gtfstools/actions?query=workflow%3Acheck", "https://app.codecov.io/gh/ipeaGIT/gtfstools?branch=master"],
+  "contIntegration": ["https://github.com/ipea/gtfstools/actions?query=workflow%3Acheck", "https://app.codecov.io/gh/ipeaGIT/gtfstools?branch=main"],
   "developmentStatus": "https://lifecycle.r-lib.org/articles/stages.html",
   "keywords": ["r", "gtfs", "public-transport", "publictransport"]
 }

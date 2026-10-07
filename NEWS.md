@@ -2,6 +2,14 @@
 
 ## Potentially breaking changes
 
+- The trip length and speed functions were reorganised:
+  - `get_trip_length()` now returns the length of each trip from its first to its last stop, so lengths along shapes are usually shorter than before. The length of entire shapes is now returned by the new `get_shape_length()`.
+  - `get_trip_speed()` and `set_trip_speed()` use these lengths, so they ignore the parts of the shapes before the first and after the last stop: speeds are usually slightly lower than before, and `set_trip_speed()` sets slightly shorter durations for the same speed.
+  - The outputs of `get_trip_length()` and `get_trip_speed()` no longer have an `origin_file` column.
+  - The new `method` and `by` arguments come right after `trip_id`, so `unit`, `sort_sequence` and the deprecated `file` must now be passed by name (e.g. `get_trip_length(gtfs, trip_id, unit = "m")`).
+  - Without a `shapes` table or a `trips$shape_id` column, these functions now use straight-line lengths between stops, with a warning (class `gtfstools_shapes_unavailable`), instead of raising an error. Trips without a usable shape get `NA` lengths and speeds, with a warning, and are left unchanged by `set_trip_speed()`.
+  - `get_trip_speed()` and `set_trip_speed()` now also require the `stops` table.
+  - Lengths are now haversine distances on the `{s2}` sphere, regardless of `sf::sf_use_s2()`. They match the previous ones with `sf_use_s2(TRUE)`; with `sf_use_s2(FALSE)`, the previous ellipsoidal lengths differed by up to 0.4%.
 - `filter_by_time_of_day(keep = TRUE, update_frequencies = TRUE)` now sets the `end_time` of `frequencies` entries that cross `to` to one second after `to` (e.g. `"07:00:01"` instead of `"07:00:00"`), see Bug fixes.
 - `frequencies_to_stop_times()` no longer creates a trip departing at the `end_time` of `frequencies` entries, so entries whose duration is a multiple of `headway_secs` now yield one trip fewer (see Bug fixes).
 - The `sort_sequence` argument of `convert_shapes_to_sf()`, `get_trip_geometry()`, `get_trip_length()`, `get_trip_speed()`, `get_trip_segment_duration()` and `get_stop_times_patterns()` now defaults to `TRUE`. Results only change for feeds whose `shapes` or `stop_times` are not ordered by `shape_pt_sequence`/`stop_sequence`, in which case the previous output was incorrect. As a consequence, these columns are now required by default. Use `sort_sequence = FALSE` to restore the previous behaviour (#94).
@@ -44,8 +52,15 @@
 ## New features
 
 - New function `list_validator_versions()` which returns a df with the available CLI versions and their URLs. PR contribution by @baarthur
-- New function `get_route_frequency()`, which returns the number of departures and the mean headway of each route within a time of day, by service (and direction). It handles both trips listed in `frequencies` and scheduled trips (#53).
+- New function `get_route_frequency()`, which returns the number of departures and the mean headway (in minutes) of each route within a time of day, by `service_id` (and by `direction_id`, when present in `trips`). It handles both trips listed in `frequencies`, whose departures are generated from their `start_time`, `end_time` and `headway_secs`, and scheduled trips, which depart at their earliest `stop_times` departure time. Departures are counted from `from` (included) to `to` (not included), so consecutive time windows don't count the same departure twice, and departures after midnight can be counted with times past `"24:00:00"` (#53).
+- `frequencies_to_stop_times()` gains a `strategy` argument, which controls the departure times of the trips created from frequency-based `frequencies` entries (those whose `exact_times` is not `1`): `"exact"` (the default and previous behaviour) makes trips depart every `headway_secs` from `start_time`, while `"half_headway"` and `"random"` shift these departures by half the headway or by a random offset (#56).
+- New function `get_shape_length()`, which returns the length of each shape.
+- `get_trip_length()` and `get_trip_speed()` gain the `by` argument, to calculate lengths and speeds between each pair of consecutive stops (`by = "segment"`, numbered as in `get_trip_segment_duration()`), and the `method` argument, to measure along the trip's shape (`"shapes"`, handling loops correctly) or as straight lines between stops (`"euclidean"`).
 - `write_gtfs()` gains a `compression_level` argument. It defaults to 6 (previously the feed was always compressed at level 9), which makes writing a feed about 2 to 3 times faster for files of very similar size. The content of the written files is unchanged.
+
+## Feature deprecation
+
+- The `file` argument of `get_trip_length()` and `get_trip_speed()` is deprecated in favour of `method` (`file = "stop_times"` corresponds to `method = "euclidean"`). It is still accepted, with a warning (class `deprecated_file`), but must be passed by name.
 
 ## Notes
 - Function `download_validator()` now automatically detects the latest version available. PR contribution by @baarthur
@@ -69,7 +84,6 @@
   | `get_trip_duration()` | 4.0 | 1.5 |
   | `get_trip_geometry()` | 2.5 | 1.0 |
   | `get_trip_segment_duration()` | 50.1 | 2.8 |
-  | `get_trip_speed()` | 2.6 | 1.0 |
   | `write_gtfs()` | 1.5 | 0.9 |
 - The package documentation website moved to <https://ipea.github.io/gtfstools/> and the GitHub repository to <https://github.com/ipea/gtfstools>. All links were updated.
 - The filtering vignette and the documentation now use `filter_by_spatial_extent()` instead of the deprecated `filter_by_sf()`, which was moved to a "Deprecated" section of the reference index.

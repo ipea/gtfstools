@@ -126,7 +126,17 @@ head(single_seg_durtn)
 
 The quick example above shows how this function may help you diagnosing some problems in your GTFS data: apparently every single trip in `spo_gtfs` is composed by several equally long segments, which looks unreasonable.
 
-Finally, `get_trip_speed()` is a helper around `get_trip_geometry()` and `get_trip_duration()` that returns the average speed of each trip in a GTFS object:
+`get_trip_length()` returns the length of each trip, from its first to its last stop, either along the trip's shape (the default) or as straight lines between consecutive stops (`method = "euclidean"`). Like `get_trip_segment_duration()`, it can also return the length of each trip segment, with `by = "segment"`. `get_shape_length()` returns the length of entire shapes.
+
+```{r}
+trip_length <- get_trip_length(spo_gtfs)
+head(trip_length)
+
+segment_length <- get_trip_length(spo_gtfs, single_trip, by = "segment")
+head(segment_length)
+```
+
+Finally, `get_trip_speed()` combines `get_trip_length()` with `get_trip_duration()` (or `get_trip_segment_duration()`, with `by = "segment"`) to return the average speed of each trip or segment:
 
 ```{r}
 trip_speed <- get_trip_speed(spo_gtfs, unit = "m/s")
@@ -135,6 +145,9 @@ head(trip_speed)
 # 'unit' argument defaults to "km/h"
 single_trip_speed <- get_trip_speed(spo_gtfs, trip_id = single_trip)
 single_trip_speed
+
+segment_speed <- get_trip_speed(spo_gtfs, single_trip, by = "segment")
+head(segment_speed)
 ```
 
 ## Manipulate feeds

@@ -108,7 +108,7 @@ test_that("calculates speeds correctly", {
   trips_speeds <- get_trip_speed(
     new_speeds_gtfs,
     selected_trip_ids,
-    file = "shapes",
+    method = "shapes",
     unit = "m/s"
   )
 
@@ -137,7 +137,7 @@ test_that("calculates speeds correctly", {
   trips_speeds <- get_trip_speed(
     new_speeds_gtfs,
     selected_trip_ids,
-    file = "shapes",
+    method = "shapes",
     unit = "m/s"
   )
 
@@ -203,15 +203,9 @@ test_that("'by_reference' parameter works adequately", {
   gtfs <- read_gtfs(data_path)
   expect_identical(original_gtfs, gtfs)
 
-  # if by_reference = FALSE then the given gtfs should not be changed ('shapes'
-  # and 'trips' indices aside)
+  # if by_reference = FALSE then the given gtfs should not be changed
 
   new_speed_gtfs <- set_trip_speed(gtfs, "CPTM L07-0", 50)
-  expect_false(identical(original_gtfs, gtfs))
-
-  data.table::setindex(gtfs$trips, NULL)
-  data.table::setindex(gtfs$shapes, NULL)
-
   expect_identical(original_gtfs, gtfs)
 
   # if by_reference == TRUE then the given gtfs' 'stop_times' is altered
@@ -298,4 +292,37 @@ test_that("sets correct speed independent of id order in trips & stop_times", {
 
   speeds <- get_trip_speed(new_speed)
   expect_true(all(round(speeds$speed) == 20))
+})
+
+test_that("leaves trips without a usable shape unchanged", {
+  shapeless_gtfs <- read_gtfs(data_path)
+  shapeless_gtfs$trips <- data.table::copy(shapeless_gtfs$trips)
+  shapeless_gtfs$trips[trip_id == "CPTM L07-0", shape_id := ""]
+  shapeless_gtfs$trips[trip_id == "CPTM L07-1", shape_id := "nonexistent"]
+
+  trip_ids <- c("CPTM L07-0", "CPTM L07-1", "CPTM L08-0")
+  expect_warning(
+    new_speed_gtfs <- set_trip_speed(shapeless_gtfs, trip_ids, 50),
+    class = "gtfstools_trips_without_shape"
+  )
+
+  unchanged <- c("CPTM L07-0", "CPTM L07-1")
+  expect_identical(
+    new_speed_gtfs$stop_times[trip_id %chin% unchanged],
+    shapeless_gtfs$stop_times[trip_id %chin% unchanged]
+  )
+
+  speed <- get_trip_speed(new_speed_gtfs, "CPTM L08-0")
+  expect_identical(round(speed$speed), 50)
+})
+
+test_that("uses straight-line lengths when there are no shapes", {
+  no_shapes_gtfs <- copy_gtfs_without_file(gtfs, "shapes")
+
+  expect_warning(
+    new_speed_gtfs <- set_trip_speed(no_shapes_gtfs, "CPTM L07-0", 50),
+    class = "gtfstools_shapes_unavailable"
+  )
+  speed <- get_trip_speed(new_speed_gtfs, "CPTM L07-0", method = "euclidean")
+  expect_identical(round(speed$speed), 50)
 })
