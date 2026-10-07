@@ -13,6 +13,13 @@
   - Without a `shapes` table or a `trips$shape_id` column, these functions now use straight-line lengths between stops, with a warning (class `gtfstools_shapes_unavailable`), instead of raising an error. Trips without a usable shape get `NA` lengths and speeds, with a warning, and are left unchanged by `set_trip_speed()`.
   - `get_trip_speed()` and `set_trip_speed()` now also require the `stops` table.
   - Lengths are now haversine distances on the `{s2}` sphere, regardless of `sf::sf_use_s2()`. They match the previous ones with `sf_use_s2(TRUE)`; with `sf_use_s2(FALSE)`, the previous ellipsoidal lengths differed by up to 0.4%.
+- `get_trip_geometry()` was reorganised in the same way, so that its geometries match the lengths returned by `get_trip_length()`:
+  - The new `method` argument replaces `file`. With `method = "shapes"` (the default), geometries are now the part of the trip's shape between its first and last stops, instead of the entire shape. With `method = "euclidean"`, geometries link the trip's stops along straight lines, as with the former `file = "stop_times"`. Use `convert_shapes_to_sf()` for the geometry of entire shapes.
+  - Each trip now gets a single geometry, so the output no longer has an `origin_file` column. To compare both methods, call the function once with each of them.
+  - `method` comes right after `trip_id`, so a `file` passed by position is now taken as `method` (`"stop_times"` raises an error). The deprecated `file` must be passed by name.
+  - Both methods now require the `stop_times` and `stops` tables, and `method = "euclidean"` no longer requires `trips`. Without a `shapes` table or a `trips$shape_id` column, `method = "shapes"` uses straight lines between stops, with a warning (class `gtfstools_shapes_unavailable`), instead of raising an error.
+  - Only trips listed in `stop_times` are returned, and the warning about `trip_id`s that don't exist now checks `stop_times` instead of `trips`.
+  - Stops with missing coordinates, or not listed in `stops`, are now ignored, instead of producing geometries with `NA` coordinates. Trips without a usable shape (including those whose `shape_id` is blank) now get an empty geometry with `method = "shapes"`, with a warning (class `gtfstools_trips_without_shape`). Previously, trips whose `shape_id` was blank were dropped.
 - `filter_by_time_of_day(keep = TRUE, update_frequencies = TRUE)` now sets the `end_time` of `frequencies` entries that cross `to` to one second after `to` (e.g. `"07:00:01"` instead of `"07:00:00"`), see Bug fixes.
 - `frequencies_to_stop_times()` no longer creates a trip departing at the `end_time` of `frequencies` entries, so entries whose duration is a multiple of `headway_secs` now yield one trip fewer (see Bug fixes).
 - The `sort_sequence` argument of `convert_shapes_to_sf()`, `get_trip_geometry()`, `get_trip_length()`, `get_trip_speed()`, `get_trip_segment_duration()` and `get_stop_times_patterns()` now defaults to `TRUE`. Results only change for feeds whose `shapes` or `stop_times` are not ordered by `shape_pt_sequence`/`stop_sequence`, in which case the previous output was incorrect. As a consequence, these columns are now required by default. Use `sort_sequence = FALSE` to restore the previous behaviour (#94).
@@ -49,6 +56,7 @@
 - Fixed the documentation of `filter_by_time_of_day()`, which stated that `update_frequencies` defaults to `FALSE` (it defaults to `TRUE`).
 - Fixed bug in `merge_gtfs()` that errored when columns were are of type character (unknown). PR contribution by @gmatosferreira.
 - Fixed bug that was leading to drop parent station ids in `merge_gtfs()`. PR contribution by @gmatosferreira and @haneroglu.
+- Fixed bug in `filter_by_spatial_extent()` that raised an error (`Can't unproject point with nan`) when a trip's stops had missing coordinates, or were not listed in `stops`. These stops are now ignored when selecting trips by their stops.
 - Fixed bug in `filter_by_spatial_extent()` that, with `keep = FALSE`, kept trips selected only by their shapes or only by their stops, instead of dropping every selected trip.
 - Fixed bug in `filter_by_stop_id(full_trips = FALSE)` that added a `.flagged` column to the `fare_rules` table of the given GTFS object when this table had a `contains_id` column but no `origin_id` and `destination_id` columns.
 - Fixed bug in `get_stop_times_patterns()` that assigned the same pattern to trips with different sequences of stops when their `stop_id`s contained the `;` character (or `|`, with `type = "spatiotemporal"`).
@@ -67,7 +75,7 @@
 
 ## Feature deprecation
 
-- The `file` argument of `get_trip_length()` and `get_trip_speed()` is deprecated in favour of `method` (`file = "stop_times"` corresponds to `method = "euclidean"`). It is still accepted, with a warning (class `deprecated_file`), but must be passed by name.
+- The `file` argument of `get_trip_geometry()`, `get_trip_length()` and `get_trip_speed()` is deprecated in favour of `method` (`file = "stop_times"` corresponds to `method = "euclidean"`). It is still accepted, with a warning (class `deprecated_file`), but must be passed by name.
 
 ## Notes
 - gtfstools now requires `{units}` >= 1.0-1, which fixed an out-of-bounds read when converting empty vectors that was flagged by CRAN's sanitizer checks. `set_trip_speed()` also no longer converts speeds when `unit = "km/h"` or when no `trip_id` is given (#84).
@@ -79,8 +87,8 @@
 - `frequencies_to_stop_times()` is much faster (about 13 times faster when converting a feed into 300,000 `stop_times` rows), as it creates all new trips at once instead of one at a time. It also no longer adds and then removes auxiliary columns from the tables of the given feed.
 - `filter_by_spatial_extent()` is much faster and uses much less memory (about 25 times faster on a feed with 900,000 `stop_times` rows), as it filters the feed only once and doesn't create geometries for trips already selected by their shapes.
 - `convert_sf_to_shapes()` is much faster (about 30 times faster with `calculate_distance = FALSE` and 70 times faster with `calculate_distance = TRUE` on a feed with 50,000 shape points), as it no longer casts the linestrings to points and calculates `shape_dist_traveled` with a vectorised haversine formula. Distances are calculated on the same sphere used by `{s2}`, so they match the previous results (with `sf::sf_use_s2(TRUE)`, the default) to within a micrometre. With `sf::sf_use_s2(FALSE)`, the previous version calculated ellipsoidal distances, which differ from the spherical ones by up to about 0.4%; distances are now always spherical.
-- `get_trip_geometry()` is much faster when `crs` is not WGS 84, as each shape is now transformed only once, instead of once per trip that uses it (about 45 times faster for `file = "shapes"` on a feed with 15,000 trips and 160 shapes).
-- The table below shows how many times faster each function optimised above is, compared with the development version before these optimisations, on the example feeds shipped with the package (each stacked twice with `merge_gtfs()`). `get_trip_duration()` and `get_trip_segment_duration()` used `unit = "min"`, `get_trip_geometry()` used `crs = 31983`, and `filter_by_spatial_extent()` used the western half of each feed's extent. The poa feed has no `frequencies` table. Differences under about 1.2 times are within measurement noise.
+- `get_trip_geometry()` is much faster when `crs` is not WGS 84, as each shape is now transformed only once, instead of once per trip that uses it (about 45 times faster for geometries generated from the shapes on a feed with 15,000 trips and 160 shapes).
+- The table below shows how many times faster each function optimised above is, compared with the development version before these optimisations, on the example feeds shipped with the package (each stacked twice with `merge_gtfs()`). `get_trip_duration()` and `get_trip_segment_duration()` used `unit = "min"`, `get_trip_geometry()` used `crs = 31983` (and generated geometries from both `shapes` and `stop_times`, before the introduction of `method`), and `filter_by_spatial_extent()` used the western half of each feed's extent. The poa feed has no `frequencies` table. Differences under about 1.2 times are within measurement noise.
 
   | function | n times faster on poa | n times faster on spo |
   |---|---|---|

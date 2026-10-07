@@ -166,42 +166,14 @@ get_trip_length <- function(gtfs,
     gtfsio::assert_field_class(gtfs, "shapes", shapes_cols, shapes_classes)
   }
 
-  # select the relevant stop_times rows into a new table, so the tables of the
-  # given gtfs are never modified. the selection index is created outside of
-  # `[` so that {data.table} doesn't add an index to the original table
-
-  if (!is.null(trip_id)) {
-    warn_missing_ids(trip_id, gtfs$stop_times$trip_id, "stop_times", "trip_id")
-    is_relevant <- gtfs$stop_times$trip_id %chin% trip_id
-  } else {
-    is_relevant <- rep(TRUE, nrow(gtfs$stop_times))
-  }
-
-  st <- gtfs$stop_times[is_relevant, .SD, .SDcols = stop_times_cols]
-
-  if (sort_sequence) {
-    data.table::setorderv(st, c("trip_id", "stop_sequence"))
-  }
-
-  # the calculations below are vectorised over all rows, which requires the
-  # rows of each trip to be contiguous. ordering the trips by their first
-  # appearance (a stable order) keeps the order of the rows within each trip,
-  # and the order of the output, unchanged
-
-  trip_order <- data.table::chmatch(st$trip_id, unique(st$trip_id))
-  if (is.unsorted(trip_order)) st <- st[order(trip_order, method = "radix")]
+  st <- prepare_trip_stops(gtfs, trip_id, sort_sequence)
 
   n_rows <- nrow(st)
   if (n_rows == 0) return(empty_trip_length(by))
 
   is_last_stop <- c(st$trip_id[-1L] != st$trip_id[-n_rows], TRUE)
-
-  # stops' coordinates are looked up by their first match, instead of joined, so
-  # duplicated stop_ids in 'stops' can't duplicate stop_times rows
-
-  stop_idx <- data.table::chmatch(st$stop_id, gtfs$stops$stop_id)
-  stop_lat <- gtfs$stops$stop_lat[stop_idx]
-  stop_lon <- gtfs$stops$stop_lon[stop_idx]
+  stop_lat <- st$stop_lat
+  stop_lon <- st$stop_lon
 
   # calculate the distance from each stop to the next stop of the same trip
   # (the last stop of each trip gets NA)
@@ -221,6 +193,7 @@ get_trip_length <- function(gtfs,
       stop_lon,
       sort_sequence
     )
+    attr(position, "shape_points") <- NULL
     distance <- c(position[-1L], NA_real_) - position
   }
 
@@ -285,6 +258,65 @@ empty_trip_length <- function(by) {
 
 
 
+#' Select and prepare the stop_times of the relevant trips
+#'
+#' @param gtfs A GTFS object.
+#' @param trip_id The `trip_id`s whose stop_times should be selected, or `NULL`
+#'   to select every trip.
+#' @param sort_sequence Whether to sort the stop_times by `stop_sequence`.
+#'
+#' @return A new `data.table` with the `trip_id`, `stop_id` (and, if
+#'   `sort_sequence` is `TRUE`, `stop_sequence`) of the selected stop_times,
+#'   in which the rows of each trip are contiguous, plus the `stop_lat` and
+#'   `stop_lon` of each stop.
+#'
+#' @keywords internal
+prepare_trip_stops <- function(gtfs, trip_id, sort_sequence) {
+  stop_times_cols <- c("trip_id", "stop_id")
+  if (sort_sequence) stop_times_cols <- c(stop_times_cols, "stop_sequence")
+
+  # select the relevant stop_times rows into a new table, so the tables of the
+  # given gtfs are never modified. the selection index is created outside of
+  # `[` so that {data.table} doesn't add an index to the original table
+
+  if (!is.null(trip_id)) {
+    warn_missing_ids(trip_id, gtfs$stop_times$trip_id, "stop_times", "trip_id")
+    is_relevant <- gtfs$stop_times$trip_id %chin% trip_id
+  } else {
+    is_relevant <- rep(TRUE, nrow(gtfs$stop_times))
+  }
+
+  st <- gtfs$stop_times[is_relevant, .SD, .SDcols = stop_times_cols]
+
+  if (sort_sequence) {
+    data.table::setorderv(st, c("trip_id", "stop_sequence"))
+  }
+
+  # the calculations below are vectorised over all rows, which requires the
+  # rows of each trip to be contiguous. ordering the trips by their first
+  # appearance (a stable order) keeps the order of the rows within each trip,
+  # and the order of the output, unchanged
+
+  trip_order <- data.table::chmatch(st$trip_id, unique(st$trip_id))
+  if (is.unsorted(trip_order)) st <- st[order(trip_order, method = "radix")]
+
+  # stops' coordinates are looked up by their first match, instead of joined, so
+  # duplicated stop_ids in 'stops' can't duplicate stop_times rows
+
+  stop_idx <- data.table::chmatch(st$stop_id, gtfs$stops$stop_id)
+  st[
+    ,
+    `:=`(
+      stop_lat = gtfs$stops$stop_lat[stop_idx],
+      stop_lon = gtfs$stops$stop_lon[stop_idx]
+    )
+  ]
+
+  return(st[])
+}
+
+
+
 #' Locate stops along their trips' shapes
 #'
 #' @param gtfs A GTFS object.
@@ -295,7 +327,12 @@ empty_trip_length <- function(by) {
 #'
 #' @return A numeric vector with the position of each stop along its trip's
 #'   shape, in meters from the start of the shape. Stops whose trip is not
-#'   linked to a usable shape, or that don't have coordinates, get `NA`.
+#'   linked to a usable shape, or that don't have coordinates, get `NA`. Its
+#'   `"shape_points"` attribute is a list with the shape points on which the
+#'   positions were measured (`shapes`, without missing coordinates and
+#'   sorted if `sort_sequence` is `TRUE`), the rows of each shape in `shapes`
+#'   (`rows`) and the `shape_id` of each trip (`trip_shape_id`), in order of
+#'   appearance in `st`.
 #'
 #' @keywords internal
 locate_stops_along_shapes <- function(gtfs,
@@ -343,8 +380,8 @@ locate_stops_along_shapes <- function(gtfs,
     cli::cli_warn(
       paste0(
         "{length(trips_without_shape)} trip{?s} {?is/are} not linked to a ",
-        "shape with at least two distinct points, so {?its/their} ",
-        "length{?s} {?is/are} {.val {NA}}: {.val {trips_without_shape}}."
+        "shape with at least two distinct points: ",
+        "{.val {trips_without_shape}}."
       ),
       class = "gtfstools_trips_without_shape"
     )
@@ -396,7 +433,14 @@ locate_stops_along_shapes <- function(gtfs,
   # the positions of each trip are those of its pattern. since the rows of each
   # trip are contiguous, they can simply be concatenated in trip order
 
-  position <- unlist(pattern_positions[pattern_id], use.names = FALSE)
+  position <- as.numeric(
+    unlist(pattern_positions[pattern_id], use.names = FALSE)
+  )
+  attr(position, "shape_points") <- list(
+    shapes = shapes,
+    rows = shape_rows,
+    trip_shape_id = trip_shape_id
+  )
 
   return(position)
 }
@@ -427,12 +471,21 @@ has_shapes <- function(gtfs) {
 #'
 #' @param file The value given to the deprecated `file` argument.
 #' @param fn_name The name of the function whose argument is deprecated.
+#' @param details A string describing how the results differ from those
+#'   obtained with `file`.
 #'
 #' @return Either `"shapes"`, if `"shapes"` is included in `file`, or
 #'   `"euclidean"`.
 #'
 #' @keywords internal
-map_deprecated_file <- function(file, fn_name) {
+map_deprecated_file <- function(file,
+                                fn_name,
+                                details = paste0(
+                                  "Lengths are now measured from the first ",
+                                  "to the last stop of each trip. Use ",
+                                  "{.fun get_shape_length} to calculate the ",
+                                  "length of the entire shapes."
+                                )) {
   checkmate::assert_character(file, min.len = 1, any.missing = FALSE)
   checkmate::assert_names(file, subset.of = c("shapes", "stop_times"))
 
@@ -441,11 +494,7 @@ map_deprecated_file <- function(file, fn_name) {
   message <- c(
     "The {.arg file} argument of {.fun {fn_name}} is deprecated.",
     "i" = "Please use {.arg method} = {.val {method}} instead.",
-    "i" = paste0(
-      "Lengths are now measured from the first to the last stop of each ",
-      "trip. Use {.fun get_shape_length} to calculate the length of the ",
-      "entire shapes."
-    )
+    "i" = details
   )
   if (length(file) > 1) {
     message <- c(

@@ -4,12 +4,21 @@
 \alias{map_deprecated_file}
 \title{Map the deprecated \code{file} argument to \code{method}}
 \usage{
-map_deprecated_file(file, fn_name)
+map_deprecated_file(
+  file,
+  fn_name,
+  details = paste0("Lengths are now measured from the first ",
+    "to the last stop of each trip. Use ", "{.fun get_shape_length} to calculate the ",
+    "length of the entire shapes.")
+)
 }
 \arguments{
 \item{file}{The value given to the deprecated \code{file} argument.}
 
 \item{fn_name}{The name of the function whose argument is deprecated.}
+
+\item{details}{A string describing how the results differ from those
+obtained with \code{file}.}
 }
 \value{
 Either \code{"shapes"}, if \code{"shapes"} is included in \code{file}, or
