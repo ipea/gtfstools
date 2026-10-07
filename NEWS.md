@@ -74,6 +74,7 @@
 - `get_trip_length()` and `get_trip_speed()` gain the `by` argument, to calculate lengths and speeds between each pair of consecutive stops (`by = "segment"`, numbered as in `get_trip_segment_duration()`), and the `method` argument, to measure along the trip's shape (`"shapes"`, handling loops correctly) or as straight lines between stops (`"euclidean"`).
 - `write_gtfs()` gains a `compression_level` argument. It defaults to 6 (previously the feed was always compressed at level 9), which makes writing a feed about 2 to 3 times faster for files of very similar size. The content of the written files is unchanged.
 - `set_trip_speed()` gains the `first_stop` and `last_stop` arguments, to set the speed only between two stops (later stops are shifted by the change in duration), and the `from` and `to` arguments, to change only trips that depart from the segment's first stop within a time of day (#89).
+- New function `interpolate_stop_times()`, which fills blank `arrival_time`s and `departure_time`s in `stop_times`, assuming that vehicles travel at a constant speed between consecutive stops with known times. Distances between stops are measured along the trip's shape (`method = "shapes"`, the default) or as straight lines (`method = "euclidean"`), as in `get_trip_length()`. Unlike `tidytransit::interpolate_stop_times()`, it doesn't require a `shape_dist_traveled` column. Interpolated times are rounded to the nearest second, and stops before a trip's first or after its last known time are left blank, with a warning.
 
 ## Feature deprecation
 

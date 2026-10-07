@@ -29,6 +29,7 @@ reference:
   - contents:
     - convert_time_to_seconds
     - frequencies_to_stop_times
+    - interpolate_stop_times
     - merge_gtfs
     - remove_duplicates
     - remove_unused_ids
