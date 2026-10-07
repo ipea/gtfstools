@@ -21,6 +21,9 @@ check it on the \href{https://ipea.github.io/gtfstools/articles/filtering.html}{
 \item Validating GTFS feeds. Run \code{vignette("validating", package = "gtfstools")}
 or check it on the
 \href{https://ipea.github.io/gtfstools/articles/validating.html}{website}.
+\item Checking the calendar overlap of GTFS feeds. Run
+\code{vignette("calendar_overlap", package = "gtfstools")} or check it on the
+\href{https://ipea.github.io/gtfstools/articles/calendar_overlap.html}{website}.
 }
 }
 
