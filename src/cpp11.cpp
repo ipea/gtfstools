@@ -33,10 +33,18 @@ extern "C" SEXP _gtfstools_cpp_seconds_to_string(SEXP seconds_from_midnight) {
     return cpp11::as_sexp(cpp_seconds_to_string(cpp11::as_cpp<cpp11::decay_t<const integers>>(seconds_from_midnight)));
   END_CPP11
 }
+// sequence_pattern.cpp
+integers cpp_sequence_pattern_id(const integers group_size, const list columns);
+extern "C" SEXP _gtfstools_cpp_sequence_pattern_id(SEXP group_size, SEXP columns) {
+  BEGIN_CPP11
+    return cpp11::as_sexp(cpp_sequence_pattern_id(cpp11::as_cpp<cpp11::decay_t<const integers>>(group_size), cpp11::as_cpp<cpp11::decay_t<const list>>(columns)));
+  END_CPP11
+}
 
 extern "C" {
 static const R_CallMethodDef CallEntries[] = {
     {"_gtfstools_cpp_seconds_to_string",      (DL_FUNC) &_gtfstools_cpp_seconds_to_string,      1},
+    {"_gtfstools_cpp_sequence_pattern_id",    (DL_FUNC) &_gtfstools_cpp_sequence_pattern_id,    2},
     {"_gtfstools_cpp_time_to_seconds",        (DL_FUNC) &_gtfstools_cpp_time_to_seconds,        1},
     {"_gtfstools_rcpp_distance_haversine",    (DL_FUNC) &_gtfstools_rcpp_distance_haversine,    4},
     {"_gtfstools_rcpp_locate_stops_on_shape", (DL_FUNC) &_gtfstools_rcpp_locate_stops_on_shape, 4},

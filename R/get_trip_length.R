@@ -389,21 +389,16 @@ locate_stops_along_shapes <- function(gtfs,
 
   # trips sharing the same shape and the same sequence of stops (a pattern)
   # have the same stop positions along the shape, so each pattern is located
-  # only once. shapes and stops are described by integer codes, which can't
-  # collide when pasted together
+  # only once. shapes and stops are described by integer codes, which are
+  # compared by cpp_sequence_pattern_id()
 
   shape_code <- data.table::chmatch(trip_shape_id, unique(trip_shape_id))
   stop_code <- data.table::chmatch(st$stop_id, unique(st$stop_id))
 
-  trip_stop_codes <- split(
-    stop_code,
-    rep.int(seq_along(trip_start), n_stops)
+  pattern_id <- cpp_sequence_pattern_id(
+    n_stops,
+    list(rep.int(shape_code, n_stops), stop_code)
   )
-  pattern <- paste(
-    shape_code,
-    vapply(trip_stop_codes, paste, character(1), collapse = " ")
-  )
-  pattern_id <- match(pattern, unique(pattern))
   pattern_trip <- which(!duplicated(pattern_id))
 
   pattern_positions <- lapply(

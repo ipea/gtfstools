@@ -15,3 +15,7 @@ rcpp_locate_stops_on_shape <- function(shape_lat, shape_lon, stop_lat, stop_lon)
 cpp_seconds_to_string <- function(seconds_from_midnight) {
   .Call(`_gtfstools_cpp_seconds_to_string`, seconds_from_midnight)
 }
+
+cpp_sequence_pattern_id <- function(group_size, columns) {
+  .Call(`_gtfstools_cpp_sequence_pattern_id`, group_size, columns)
+}
