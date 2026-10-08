@@ -17,6 +17,7 @@
 - New function `stop_times_to_frequencies()`, the counterpart of `frequencies_to_stop_times()`, which approximates scheduled trips by frequency-based ones (#69).
 - New function `interpolate_stop_times()`, which fills blank `arrival_time`s and `departure_time`s in `stop_times`, assuming a constant speed between stops with known times.
 - New function `set_route_frequency()`, the editing counterpart of `get_route_frequency()`, which sets the headway of routes within a time of day by replacing their trips in it with a frequency-based template trip. Departures outside the time of day don't change.
+- New functions `get_dwell_time()` and `set_dwell_time()`, which return and set how long vehicles stay at stops, optionally within a time of day. `set_dwell_time()` shifts the later times of each trip accordingly.
 - New function `get_shape_length()`, which returns the length of each shape.
 - New function `remove_unused_ids()`, which removes unused ids from all files (#55).
 - New function `list_validator_versions()`, which lists the available validator versions. PR contribution by @baarthur.
