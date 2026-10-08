@@ -237,7 +237,8 @@ in the repo, in no fixed order:
 - `## New features`
 - `## Bug fixes`
 - `## Feature deprecation`
-- `## Potentially breaking changes`
+- `## Breaking changes` (only changes that break existing code or change
+  correct results; never "Potentially breaking")
 - `## Notes`
 
 ```

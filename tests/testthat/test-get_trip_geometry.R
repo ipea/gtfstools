@@ -548,3 +548,37 @@ test_that("sort_sequence works correctly", {
     expect_identical(default_geoms, geoms)
   }
 })
+
+test_that("geometries along shapes handle repeated points and shape ends", {
+  # straight shape along the equator whose middle point is repeated, so that
+  # some points have the same cumulative distance
+
+  shape_lon <- c(0, 0.05, 0.05, 0.05, 0.1)
+  shape_lat <- c(0, 0, 0, 0, 0)
+
+  # the repeated points are kept between the first and last stops
+
+  feed <- synthetic_feed(shape_lon, shape_lat, c(0.02, 0.08), c(0, 0))
+  expect_equal(
+    coords(tester(feed)),
+    cbind(c(0.02, 0.05, 0.05, 0.05, 0.08), 0)
+  )
+
+  # a trip starting at the repeated point doesn't include it again
+
+  feed <- synthetic_feed(shape_lon, shape_lat, c(0.05, 0.08), c(0, 0))
+  expect_equal(coords(tester(feed)), cbind(c(0.05, 0.08), 0))
+
+  # a trip whose stops are located at the same point gets a degenerate line
+
+  feed <- synthetic_feed(shape_lon, shape_lat, c(0.02, 0.02), c(0, 0))
+  expect_equal(coords(tester(feed)), cbind(c(0.02, 0.02), 0))
+
+  # a stop beyond the end of the shape is placed at the shape's last point
+
+  feed <- synthetic_feed(shape_lon, shape_lat, c(0.02, 0.12), c(0, 0))
+  expect_equal(
+    coords(tester(feed)),
+    cbind(c(0.02, 0.05, 0.05, 0.05, 0.1), 0)
+  )
+})

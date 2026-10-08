@@ -26,6 +26,13 @@ extern "C" SEXP _gtfstools_rcpp_locate_stops_on_shape(SEXP shape_lat, SEXP shape
     return cpp11::as_sexp(rcpp_locate_stops_on_shape(cpp11::as_cpp<cpp11::decay_t<const doubles>>(shape_lat), cpp11::as_cpp<cpp11::decay_t<const doubles>>(shape_lon), cpp11::as_cpp<cpp11::decay_t<const doubles>>(stop_lat), cpp11::as_cpp<cpp11::decay_t<const doubles>>(stop_lon)));
   END_CPP11
 }
+// distance_haversine.cpp
+list cpp_shape_cut_segments(const doubles lat, const doubles lon, const integers shape_size, const integers cut_shape, const doubles from, const doubles to);
+extern "C" SEXP _gtfstools_cpp_shape_cut_segments(SEXP lat, SEXP lon, SEXP shape_size, SEXP cut_shape, SEXP from, SEXP to) {
+  BEGIN_CPP11
+    return cpp11::as_sexp(cpp_shape_cut_segments(cpp11::as_cpp<cpp11::decay_t<const doubles>>(lat), cpp11::as_cpp<cpp11::decay_t<const doubles>>(lon), cpp11::as_cpp<cpp11::decay_t<const integers>>(shape_size), cpp11::as_cpp<cpp11::decay_t<const integers>>(cut_shape), cpp11::as_cpp<cpp11::decay_t<const doubles>>(from), cpp11::as_cpp<cpp11::decay_t<const doubles>>(to)));
+  END_CPP11
+}
 // seconds_to_string.cpp
 strings cpp_seconds_to_string(const integers seconds_from_midnight);
 extern "C" SEXP _gtfstools_cpp_seconds_to_string(SEXP seconds_from_midnight) {
@@ -33,10 +40,19 @@ extern "C" SEXP _gtfstools_cpp_seconds_to_string(SEXP seconds_from_midnight) {
     return cpp11::as_sexp(cpp_seconds_to_string(cpp11::as_cpp<cpp11::decay_t<const integers>>(seconds_from_midnight)));
   END_CPP11
 }
+// sequence_pattern.cpp
+integers cpp_sequence_pattern_id(const integers group_size, const list columns);
+extern "C" SEXP _gtfstools_cpp_sequence_pattern_id(SEXP group_size, SEXP columns) {
+  BEGIN_CPP11
+    return cpp11::as_sexp(cpp_sequence_pattern_id(cpp11::as_cpp<cpp11::decay_t<const integers>>(group_size), cpp11::as_cpp<cpp11::decay_t<const list>>(columns)));
+  END_CPP11
+}
 
 extern "C" {
 static const R_CallMethodDef CallEntries[] = {
     {"_gtfstools_cpp_seconds_to_string",      (DL_FUNC) &_gtfstools_cpp_seconds_to_string,      1},
+    {"_gtfstools_cpp_sequence_pattern_id",    (DL_FUNC) &_gtfstools_cpp_sequence_pattern_id,    2},
+    {"_gtfstools_cpp_shape_cut_segments",     (DL_FUNC) &_gtfstools_cpp_shape_cut_segments,     6},
     {"_gtfstools_cpp_time_to_seconds",        (DL_FUNC) &_gtfstools_cpp_time_to_seconds,        1},
     {"_gtfstools_rcpp_distance_haversine",    (DL_FUNC) &_gtfstools_rcpp_distance_haversine,    4},
     {"_gtfstools_rcpp_locate_stops_on_shape", (DL_FUNC) &_gtfstools_rcpp_locate_stops_on_shape, 4},

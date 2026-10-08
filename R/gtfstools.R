@@ -92,7 +92,6 @@ utils::globalVariables(
     "n_stops",
     "i.length",
     "pattern_id",
-    "data",
     "template_departure",
     "template_arrival",
     "origin_gtfs",
