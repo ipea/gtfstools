@@ -93,6 +93,14 @@
   which sets the headway of routes within a time of day by replacing
   their trips in it with a frequency-based template trip. Departures
   outside the time of day don’t change.
+- New functions
+  [`get_dwell_time()`](https://ipea.github.io/gtfstools/dev/reference/get_dwell_time.md)
+  and
+  [`set_dwell_time()`](https://ipea.github.io/gtfstools/dev/reference/set_dwell_time.md),
+  which return and set how long vehicles stay at stops, optionally
+  within a time of day.
+  [`set_dwell_time()`](https://ipea.github.io/gtfstools/dev/reference/set_dwell_time.md)
+  shifts the later times of each trip accordingly.
 - New function
   [`get_shape_length()`](https://ipea.github.io/gtfstools/dev/reference/get_shape_length.md),
   which returns the length of each shape.

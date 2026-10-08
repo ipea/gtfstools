@@ -93,6 +93,8 @@ Economic Research (Ipea), Brazil.
   : Get calendar overlap
 - [`get_children_stops()`](https://ipea.github.io/gtfstools/dev/reference/get_children_stops.md)
   : Get children stops recursively
+- [`get_dwell_time()`](https://ipea.github.io/gtfstools/dev/reference/get_dwell_time.md)
+  : Get dwell time
 - [`get_parent_station()`](https://ipea.github.io/gtfstools/dev/reference/get_parent_station.md)
   : Get parent stations recursively
 - [`get_route_frequency()`](https://ipea.github.io/gtfstools/dev/reference/get_route_frequency.md)
@@ -194,6 +196,8 @@ Economic Research (Ipea), Brazil.
   : Remove duplicated entries
 - [`remove_unused_ids()`](https://ipea.github.io/gtfstools/dev/reference/remove_unused_ids.md)
   : Remove unused ids
+- [`set_dwell_time()`](https://ipea.github.io/gtfstools/dev/reference/set_dwell_time.md)
+  : Set dwell time
 - [`set_route_frequency()`](https://ipea.github.io/gtfstools/dev/reference/set_route_frequency.md)
   : Set route frequency
 - [`set_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.md)

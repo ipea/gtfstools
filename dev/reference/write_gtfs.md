@@ -82,7 +82,7 @@ list.files(tmp_dir) #'
 tmp_file <- tempfile(pattern = "gtfs", tmpdir = tmp_dir, fileext = ".zip")
 write_gtfs(gtfs, tmp_file)
 list.files(tmp_dir)
-#> [1] "gtfs1b404f8cd437.zip"
+#> [1] "gtfs1ab64243e065.zip"
 
 gtfs_all_files <- read_gtfs(tmp_file)
 names(gtfs_all_files)

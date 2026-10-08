@@ -39,6 +39,7 @@
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/frequencies_to_stop_times.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/get_calendar_overlap.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/get_children_stops.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/get_dwell_time.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/get_frequencies_departures.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/get_parent_station.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/get_route_frequency.html</loc></url>
@@ -66,6 +67,7 @@
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/remove_duplicates.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/remove_unused_ids.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/seconds_to_string.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/set_dwell_time.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/set_route_frequency.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/stop_times_to_frequencies.html</loc></url>
