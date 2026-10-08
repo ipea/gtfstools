@@ -142,6 +142,10 @@ utils::globalVariables(
     "i.date",
     "day",
     "change",
-    "x.n_running"
+    "x.n_running",
+    "group",
+    "i.group",
+    "i.pattern_id",
+    "n"
   )
 )

@@ -33,6 +33,7 @@ reference:
     - merge_gtfs
     - remove_duplicates
     - remove_unused_ids
+    - set_route_frequency
     - set_trip_speed
     - stop_times_to_frequencies
   - title: "Validate GTFS feeds"
