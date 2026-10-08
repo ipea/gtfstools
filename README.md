@@ -60,6 +60,10 @@ Please read **gtfstools** vignettes for more on the package usage:
   `vignette("validating", package = "gtfstools")` or check it on the
   website ([Validating GTFS
   feeds](https://ipea.github.io/gtfstools/articles/validating.html)).
+- Checking the calendar overlap of GTFS feeds. Run
+  `vignette("calendar_overlap", package = "gtfstools")` or check it on
+  the website ([Checking the calendar overlap of GTFS
+  feeds](https://ipea.github.io/gtfstools/articles/calendar_overlap.html)).
 
 ## Related packages
 

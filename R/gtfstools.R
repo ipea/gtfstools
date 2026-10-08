@@ -15,6 +15,9 @@
 #' - Validating GTFS feeds. Run `vignette("validating", package = "gtfstools")`
 #' or check it on the
 #' [website](https://ipea.github.io/gtfstools/articles/validating.html).
+#' - Checking the calendar overlap of GTFS feeds. Run
+#' `vignette("calendar_overlap", package = "gtfstools")` or check it on the
+#' [website](https://ipea.github.io/gtfstools/articles/calendar_overlap.html).
 #'
 #' @docType package
 #' @name gtfstools
@@ -126,6 +129,20 @@ utils::globalVariables(
     "secs_offset",
     "slot",
     "n_trips",
-    "..needed_cols"
+    "..needed_cols",
+    "feed",
+    "exception_type",
+    "n_days",
+    "weekday",
+    "runs",
+    "first_day",
+    "last_day",
+    "period",
+    "n_running",
+    "n_removed",
+    "i.date",
+    "day",
+    "change",
+    "x.n_running"
   )
 )
