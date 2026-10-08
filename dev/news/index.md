@@ -2,425 +2,198 @@
 
 ## gtfstools (development version)
 
-### Potentially breaking changes
+### Breaking changes
 
-- The new `first_stop`, `last_stop`, `from` and `to` arguments of
-  [`set_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.md)
-  come before `by_reference`, which must now be passed by name
-  ([\#89](https://github.com/ipea/gtfstools/issues/89)).
 - [`filter_by_sf()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_sf.md),
-  deprecated in version 1.3.0 in favour of
+  deprecated in version 1.3.0, is now defunct. Use
   [`filter_by_spatial_extent()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_spatial_extent.md),
-  is now defunct: calling it raises an error (class
-  `gtfstools_defunct_filter_by_sf_error`). Use
-  [`filter_by_spatial_extent()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_spatial_extent.md)
-  instead, which takes the same arguments.
+  which takes the same arguments.
 - The `full_trips` argument of
   [`filter_by_stop_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_stop_id.md),
-  deprecated in version 1.3.0, is now defunct: using it, with any value,
-  raises an error (class `gtfstools_defunct_full_trips_error`). The
-  function now always behaves as with the former `full_trips = FALSE`,
-  filtering by the specified stops instead of keeping the entire trips
-  that pass through them. To keep entire trips, subset `stop_times` by
-  `stop_id` and pass the resulting `trip_id`s to
+  deprecated in version 1.3.0, is now defunct, and the function always
+  filters by the given stops. To keep entire trips, pass the `trip_id`s
+  that serve these stops to
   [`filter_by_trip_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_trip_id.md)
   ([\#75](https://github.com/ipea/gtfstools/issues/75)).
-- The trip length and speed functions were reorganised:
-  - [`get_trip_length()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_length.md)
-    now returns the length of each trip from its first to its last stop,
-    so lengths along shapes are usually shorter than before. The length
-    of entire shapes is now returned by the new
-    [`get_shape_length()`](https://ipea.github.io/gtfstools/dev/reference/get_shape_length.md).
-  - [`get_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_speed.md)
-    and
-    [`set_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.md)
-    use these lengths, so they ignore the parts of the shapes before the
-    first and after the last stop: speeds are usually slightly lower
-    than before, and
-    [`set_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.md)
-    sets slightly shorter durations for the same speed.
-  - The outputs of
-    [`get_trip_length()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_length.md)
-    and
-    [`get_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_speed.md)
-    no longer have an `origin_file` column.
-  - The new `method` and `by` arguments come right after `trip_id`, so
-    `unit`, `sort_sequence` and the deprecated `file` must now be passed
-    by name (e.g. `get_trip_length(gtfs, trip_id, unit = "m")`).
-  - Without a `shapes` table or a `trips$shape_id` column, these
-    functions now use straight-line lengths between stops, with a
-    warning (class `gtfstools_shapes_unavailable`), instead of raising
-    an error. Trips without a usable shape get `NA` lengths and speeds,
-    with a warning, and are left unchanged by
-    [`set_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.md).
-  - [`get_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_speed.md)
-    and
-    [`set_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.md)
-    now also require the `stops` table.
-  - Lengths are now haversine distances on the
-    [s2](https://r-spatial.github.io/s2/) sphere, regardless of
-    [`sf::sf_use_s2()`](https://r-spatial.github.io/sf/reference/s2.html).
-    They match the previous ones with `sf_use_s2(TRUE)`; with
-    `sf_use_s2(FALSE)`, the previous ellipsoidal lengths differed by up
-    to 0.4%.
+- [`get_trip_length()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_length.md)
+  now measures each trip from its first to its last stop, instead of
+  along its entire shape, so lengths are usually shorter.
+  [`get_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_speed.md)
+  and
+  [`set_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.md)
+  use these lengths, so speeds are usually slightly lower, and they now
+  also require the `stops` table. Use the new
+  [`get_shape_length()`](https://ipea.github.io/gtfstools/dev/reference/get_shape_length.md)
+  for the length of entire shapes.
 - [`get_trip_geometry()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_geometry.md)
-  was reorganised in the same way, so that its geometries match the
-  lengths returned by
-  [`get_trip_length()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_length.md):
-  - The new `method` argument replaces `file`. With `method = "shapes"`
-    (the default), geometries are now the part of the trip’s shape
-    between its first and last stops, instead of the entire shape. With
-    `method = "euclidean"`, geometries link the trip’s stops along
-    straight lines, as with the former `file = "stop_times"`. Use
-    [`convert_shapes_to_sf()`](https://ipea.github.io/gtfstools/dev/reference/convert_shapes_to_sf.md)
-    for the geometry of entire shapes.
-  - Each trip now gets a single geometry, so the output no longer has an
-    `origin_file` column. To compare both methods, call the function
-    once with each of them.
-  - `method` comes right after `trip_id`, so a `file` passed by position
-    is now taken as `method` (`"stop_times"` raises an error). The
-    deprecated `file` must be passed by name.
-  - Both methods now require the `stop_times` and `stops` tables, and
-    `method = "euclidean"` no longer requires `trips`. Without a
-    `shapes` table or a `trips$shape_id` column, `method = "shapes"`
-    uses straight lines between stops, with a warning (class
-    `gtfstools_shapes_unavailable`), instead of raising an error.
-  - Only trips listed in `stop_times` are returned, and the warning
-    about `trip_id`s that don’t exist now checks `stop_times` instead of
-    `trips`.
-  - Stops with missing coordinates, or not listed in `stops`, are now
-    ignored, instead of producing geometries with `NA` coordinates.
-    Trips without a usable shape (including those whose `shape_id` is
-    blank) now get an empty geometry with `method = "shapes"`, with a
-    warning (class `gtfstools_trips_without_shape`). Previously, trips
-    whose `shape_id` was blank were dropped.
-  - With `method = "shapes"`, the stops of each trip are now located
-    along its shape, so the function takes about as long as
-    [`get_trip_length()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_length.md):
-    on a feed with 15,000 trips and 920,000 `stop_times` rows, about 0.8
-    seconds instead of 0.02 seconds for the entire shapes.
-    [`convert_shapes_to_sf()`](https://ipea.github.io/gtfstools/dev/reference/convert_shapes_to_sf.md)
-    is still the fastest way to get the geometry of entire shapes. With
-    `method = "euclidean"`, the function is slightly slower than with
-    the former `file = "stop_times"` (about 1.2 times on the same feed).
-- `filter_by_time_of_day(keep = TRUE, update_frequencies = TRUE)` now
-  sets the `end_time` of `frequencies` entries that cross `to` to one
-  second after `to` (e.g. `"07:00:01"` instead of `"07:00:00"`), see Bug
-  fixes.
-- [`frequencies_to_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/frequencies_to_stop_times.md)
-  no longer creates a trip departing at the `end_time` of `frequencies`
-  entries, so entries whose duration is a multiple of `headway_secs` now
-  yield one trip fewer (see Bug fixes).
-- The `sort_sequence` argument of
+  now returns, by default, the part of each trip’s shape between its
+  first and last stops, matching
+  [`get_trip_length()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_length.md),
+  and requires the `stop_times` and `stops` tables. Use
+  [`convert_shapes_to_sf()`](https://ipea.github.io/gtfstools/dev/reference/convert_shapes_to_sf.md)
+  for entire shapes.
+- [`get_trip_geometry()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_geometry.md),
+  [`get_trip_length()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_length.md)
+  and
+  [`get_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_speed.md)
+  now return one result per trip, without the `origin_file` column.
+  Their new `method` argument (and `by`, in the last two) comes right
+  after `trip_id`, so `unit`, `sort_sequence` and `file` must now be
+  passed by name.
+- The `by_reference` argument of
+  [`set_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.md)
+  must now be passed by name
+  ([\#89](https://github.com/ipea/gtfstools/issues/89)).
+- `sort_sequence` now defaults to `TRUE` in
   [`convert_shapes_to_sf()`](https://ipea.github.io/gtfstools/dev/reference/convert_shapes_to_sf.md),
   [`get_trip_geometry()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_geometry.md),
   [`get_trip_length()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_length.md),
   [`get_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_speed.md),
   [`get_trip_segment_duration()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_segment_duration.md)
   and
-  [`get_stop_times_patterns()`](https://ipea.github.io/gtfstools/dev/reference/get_stop_times_patterns.md)
-  now defaults to `TRUE`. Results only change for feeds whose `shapes`
-  or `stop_times` are not ordered by
-  `shape_pt_sequence`/`stop_sequence`, in which case the previous output
-  was incorrect. As a consequence, these columns are now required by
-  default. Use `sort_sequence = FALSE` to restore the previous behaviour
+  [`get_stop_times_patterns()`](https://ipea.github.io/gtfstools/dev/reference/get_stop_times_patterns.md),
+  so the `shape_pt_sequence`/`stop_sequence` columns are required by
+  default. Results only change for feeds not ordered by these columns,
+  whose previous results were incorrect. Use `sort_sequence = FALSE` to
+  restore the previous behaviour
   ([\#94](https://github.com/ipea/gtfstools/issues/94)).
-- Malformed time strings (e.g. `"5:30"`, `"abc"`, `"12:60:00"`, hours
-  too large to be stored) are now converted to `NA` with a warning by
-  all functions that convert times to seconds, instead of silently
-  becoming wrong values. Blank times still become `NA` silently.
-  [`filter_by_time_of_day()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_time_of_day.md)
-  now also rejects `from`/`to` values with minutes or seconds of 60 or
-  more.
-- `get_stop_times_patterns(type = "spatiotemporal")` may return
-  different pattern ids for feeds with blank intermediate stop times,
-  which are now correctly accounted for (see Bug fixes).
-- The `filter_by_*()` functions may now return more rows, as they no
-  longer drop rows with blank optional keys, station entrances, generic
-  nodes and boarding areas of kept stations and platforms, and the
-  `agency` of single-agency feeds (see Bug fixes).
-  [`filter_by_trip_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_trip_id.md),
-  [`filter_by_stop_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_stop_id.md),
-  [`filter_by_spatial_extent()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_spatial_extent.md)
-  and
-  [`filter_by_time_of_day()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_time_of_day.md)
-  may also return fewer `fare_attributes` and `agency` rows, as they now
-  drop the fares whose `fare_rules` are all dropped by zone.
-- Invalid dates (e.g. `20240230`) are still converted to `NA` when
-  reading or converting feeds, but now raise a warning (class
-  `gtfstools_invalid_date`) listing the invalid values.
-- [`frequencies_to_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/frequencies_to_stop_times.md)
-  now raises an informative error (class
-  `gtfstools_invalid_frequencies`) when `frequencies` has invalid
-  entries (missing or malformed `start_time`/`end_time`, `end_time`
-  before `start_time`, or a missing or non-positive `headway_secs` while
-  `start_time` and `end_time` differ), and another one (class
-  `gtfstools_empty_template`) when a trip to be converted has no
-  `departure_time` in `stop_times`. Previously, these cases failed with
-  obscure errors. Duplicated values in its `trip_id` argument are now
-  converted only once.
-- [`filter_by_spatial_extent()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_spatial_extent.md)
-  now filters the feed by the selected trips only once, instead of
-  filtering it by shapes and by trips separately and merging the
-  results. As a consequence, shapes not used by any trip are no longer
-  kept, duplicated rows of the given feed are no longer removed, and
-  rows keep the order of the given feed (see Bug fixes).
-
-### Bug fixes
-
-- Fixed bug in
-  [`filter_by_trip_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_trip_id.md)
-  (and the filters built on it:
-  [`filter_by_stop_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_stop_id.md),
-  [`filter_by_spatial_extent()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_spatial_extent.md)
-  and
-  [`filter_by_time_of_day()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_time_of_day.md))
-  that kept `fare_attributes` (and their agencies) whose `fare_rules`
-  were all dropped by zone.
-- Fixed bug in
-  [`filter_by_time_of_day()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_time_of_day.md)
-  that, with `keep = TRUE`, set the `end_time` of `frequencies` entries
-  that cross `to` to `to`. Since `end_time` is exclusive, a departure
-  exactly at `to` was lost when converting the filtered feed with
-  [`frequencies_to_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/frequencies_to_stop_times.md),
-  although
-  [`filter_by_time_of_day()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_time_of_day.md)
-  keeps times equal to `to`. `end_time` is now set to one second after
-  `to`.
-- Fixed bug in
-  [`frequencies_to_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/frequencies_to_stop_times.md)
-  that created a trip departing at the `end_time` of `frequencies`
-  entries whose duration is a multiple of `headway_secs`. As required by
-  the GTFS specification, `end_time` is now exclusive: an entry from
-  08:00 to 09:00 with a 30 minutes headway yields trips departing at
-  08:00 and 08:30 only. Entries with equal `start_time` and `end_time`
-  still yield a single trip.
-- Fixed bug in
-  [`filter_by_route_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_route_id.md)
-  (and therefore
-  [`filter_by_route_type()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_route_type.md))
-  that filtered `fare_rules` by `level_id`s instead of `route_id`s,
-  dropping the kept routes’ fares with `keep = TRUE` and keeping the
-  dropped routes’ fares with `keep = FALSE`.
-- Fixed bug in
-  [`get_stop_times_patterns()`](https://ipea.github.io/gtfstools/dev/reference/get_stop_times_patterns.md)
-  that ignored stop timing when identifying spatiotemporal patterns of
-  trips with any blank stop time.
-- Fixed bug in
-  [`filter_by_time_of_day()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_time_of_day.md)
-  that, with `keep = FALSE` and `full_trips = TRUE`, dropped every trip
-  with an untimed stop, even trips entirely outside the time window.
-- Fixed bug in
-  [`as_dt_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/as_dt_gtfs.md)
-  that turned date fields that were already `Date` into `NA`.
-- Fixed bug in the `filter_by_*()` functions that dropped zone
-  `fare_rules` without `route_id`, `transfers` without
-  `from_stop_id`/`to_stop_id` and `attributions` without `agency_id`,
-  whose blank keys mean “applies to all”.
-- Fixed bug in
-  [`filter_by_trip_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_trip_id.md)
-  and the other filters built on trips and routes that emptied `agency`
-  in single-agency feeds whose `routes.agency_id` is blank or absent.
-- Fixed bug in
-  [`filter_by_trip_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_trip_id.md),
-  [`filter_by_route_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_route_id.md),
-  [`filter_by_service_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_service_id.md),
-  [`filter_by_shape_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_shape_id.md)
-  and
-  [`filter_by_agency_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_agency_id.md)
-  (and the filters built on them) that dropped station entrances,
-  generic nodes and boarding areas of kept stations and platforms,
-  together with their pathways and levels.
-- Fixed bug in
-  [`set_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.md)
-  that identified the first stop of each trip by its row position
-  instead of its `stop_sequence`, producing wrong times for feeds whose
-  `stop_times` are not ordered.
-- Fixed bug in
-  [`get_children_stops()`](https://ipea.github.io/gtfstools/dev/reference/get_children_stops.md)
-  that returned rows with `NA` values for stops whose `parent_station`
-  is `NA`.
-- Fixed bug in
-  [`read_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/read_gtfs.md)
-  that kept doubled quotes (`""`) inside quoted text fields, which
-  [`write_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/write_gtfs.md)
-  then doubled again on every read/write round trip.
-- Fixed bug in
-  [`set_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.md)
-  that left existing `*_secs` columns (e.g. created by
-  [`convert_time_to_seconds()`](https://ipea.github.io/gtfstools/dev/reference/convert_time_to_seconds.md))
-  out of sync with the updated times, so functions such as
-  [`get_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_speed.md)
-  reported the old speeds.
-- Fixed bug in
-  [`merge_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/merge_gtfs.md)
-  that prefixed the `field_value` and `record_sub_id` columns of
-  `translations`, so those translations no longer matched their records.
-- Fixed bug in
-  [`get_trip_segment_duration()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_segment_duration.md)
-  that mixed up trips whose `stop_times` rows are interleaved when
-  `sort_sequence = FALSE`. It also no longer deletes a user column named
-  `last_stop_departure`.
-- Fixed bug in
-  [`filter_by_time_of_day()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_time_of_day.md)
-  that did not update the `start_time` of `frequencies` entries with a
-  blank `exact_times`, which should be treated as `0`.
-- Fixed bug in
-  [`filter_by_time_of_day()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_time_of_day.md)
-  that returned frequency-based trips whose `frequencies` entries were
-  all filtered out, as if they were scheduled trips.
-- Fixed bug in
-  [`convert_time_to_seconds()`](https://ipea.github.io/gtfstools/dev/reference/convert_time_to_seconds.md)
-  that checked for the wrong column before converting `end_time` and
-  `arrival_time`, silently skipping them or raising an error when only
-  one column of a pair was present.
-- Fixed bug in
-  [`write_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/write_gtfs.md)
-  that wrote text read with `read_gtfs(encoding = "Latin-1")` back as
-  Latin-1 instead of UTF-8, as required by the GTFS specification.
-- Fixed bug in
-  [`as_dt_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/as_dt_gtfs.md)
-  that did not convert the date fields of lists to `Date`, producing
-  objects that
-  [`write_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/write_gtfs.md)
-  would reject.
-- Fixed the documentation of
-  [`filter_by_time_of_day()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_time_of_day.md),
-  which stated that `update_frequencies` defaults to `FALSE` (it
-  defaults to `TRUE`).
-- Fixed bug in
-  [`merge_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/merge_gtfs.md)
-  that errored when columns were are of type character (unknown). PR
-  contribution by [@gmatosferreira](https://github.com/gmatosferreira).
-- Fixed bug that was leading to drop parent station ids in
-  [`merge_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/merge_gtfs.md).
-  PR contribution by
-  [@gmatosferreira](https://github.com/gmatosferreira) and
-  [@haneroglu](https://github.com/haneroglu).
-- Fixed bug in
-  [`filter_by_spatial_extent()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_spatial_extent.md)
-  that raised an error (`Can't unproject point with nan`) when a trip’s
-  stops had missing coordinates, or were not listed in `stops`. These
-  stops are now ignored when selecting trips by their stops.
-- Fixed bug in
-  [`filter_by_spatial_extent()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_spatial_extent.md)
-  that, with `keep = FALSE`, kept trips selected only by their shapes or
-  only by their stops, instead of dropping every selected trip.
-- Fixed bug in `filter_by_stop_id(full_trips = FALSE)` that added a
-  `.flagged` column to the `fare_rules` table of the given GTFS object
-  when this table had a `contains_id` column but no `origin_id` and
-  `destination_id` columns.
-- Fixed bug in
-  [`get_stop_times_patterns()`](https://ipea.github.io/gtfstools/dev/reference/get_stop_times_patterns.md)
-  that assigned the same pattern to trips with different sequences of
-  stops when their `stop_id`s contained the `;` character (or `|`, with
-  `type = "spatiotemporal"`).
 
 ### New features
 
 - New function
+  [`get_calendar_overlap()`](https://ipea.github.io/gtfstools/dev/reference/get_calendar_overlap.md),
+  which returns the periods in which all the given feeds have service,
+  to help pick a date on which they can be analysed together. See the
+  new “Checking the calendar overlap of GTFS feeds” vignette
+  ([\#85](https://github.com/ipea/gtfstools/issues/85)). Thanks
+  [@higgicd](https://github.com/higgicd) for the suggestion and the
+  original code.
+- New functions
+  [`get_route_frequency()`](https://ipea.github.io/gtfstools/dev/reference/get_route_frequency.md)
+  and
+  [`get_stop_frequency()`](https://ipea.github.io/gtfstools/dev/reference/get_stop_frequency.md),
+  which return the number of departures and the mean headway of each
+  route and at each stop within a time of day
+  ([\#53](https://github.com/ipea/gtfstools/issues/53)).
+- New function
   [`stop_times_to_frequencies()`](https://ipea.github.io/gtfstools/dev/reference/stop_times_to_frequencies.md),
   the counterpart of
   [`frequencies_to_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/frequencies_to_stop_times.md),
-  which converts scheduled trips into frequency-based ones
-  ([\#69](https://github.com/ipea/gtfstools/issues/69)). Trips that
-  share their route, service, direction, shape and sequence of stops are
-  summarised, in each one-hour slot of the clock, by the trip that
-  departs first and a `frequencies` entry whose `headway_secs` is based
-  on the number of trips in that slot. The other trips are removed, so
-  the conversion is a lossy approximation of the schedule. It is useful,
-  for example, to make the `time_window` of
-  [r5r](https://github.com/ipeaGIT/r5r) draw departure times for feeds
-  without a `frequencies` table.
+  which approximates scheduled trips by frequency-based ones
+  ([\#69](https://github.com/ipea/gtfstools/issues/69)).
 - New function
-  [`list_validator_versions()`](https://ipea.github.io/gtfstools/dev/reference/list_validator_versions.md)
-  which returns a df with the available CLI versions and their URLs. PR
-  contribution by [@baarthur](https://github.com/baarthur)
+  [`interpolate_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_stop_times.md),
+  which fills blank `arrival_time`s and `departure_time`s in
+  `stop_times`, assuming a constant speed between stops with known
+  times.
 - New function
-  [`get_route_frequency()`](https://ipea.github.io/gtfstools/dev/reference/get_route_frequency.md),
-  which returns the number of departures and the mean headway (in
-  minutes) of each route within a time of day, by `service_id` (and by
-  `direction_id`, when present in `trips`). It handles both trips listed
-  in `frequencies`, whose departures are generated from their
-  `start_time`, `end_time` and `headway_secs`, and scheduled trips,
-  which depart at their earliest `stop_times` departure time. Departures
-  are counted from `from` (included) to `to` (not included), so
-  consecutive time windows don’t count the same departure twice, and
-  departures after midnight can be counted with times past `"24:00:00"`
-  ([\#53](https://github.com/ipea/gtfstools/issues/53)).
-- New function
-  [`get_stop_frequency()`](https://ipea.github.io/gtfstools/dev/reference/get_stop_frequency.md),
-  which returns the number of departures and the mean headway (in
-  minutes) at each stop within a time of day, by `service_id`, and
-  optionally by `route_id` and `direction_id` (`by_route = TRUE`). Each
-  `stop_times` entry with a departure time counts as a departure from
-  its stop, except for the last stop of each trip, and the entries of
-  trips listed in `frequencies` are repeated at each of their
-  departures. Unlike
-  [`get_route_frequency()`](https://ipea.github.io/gtfstools/dev/reference/get_route_frequency.md),
-  which counts trips, it counts the departures from each stop, but it
-  uses the same time of day as
-  [`get_route_frequency()`](https://ipea.github.io/gtfstools/dev/reference/get_route_frequency.md),
-  from `from` (included) to `to` (not included).
+  [`get_shape_length()`](https://ipea.github.io/gtfstools/dev/reference/get_shape_length.md),
+  which returns the length of each shape.
 - New function
   [`remove_unused_ids()`](https://ipea.github.io/gtfstools/dev/reference/remove_unused_ids.md),
   which removes unused ids from all files
   ([\#55](https://github.com/ipea/gtfstools/issues/55)).
 - New function
-  [`get_calendar_overlap()`](https://ipea.github.io/gtfstools/dev/reference/get_calendar_overlap.md),
-  which returns the periods in which all the given GTFS feeds have
-  service, helping to pick a date on which several feeds can be analysed
-  together (e.g. in routing and accessibility analyses). Feeds may be
-  given as paths or as a list of GTFS objects, and `output = "plot"`
-  returns a timeline of each feed’s service days (requires
-  [ggplot2](https://ggplot2.tidyverse.org)). See the new “Checking the
-  calendar overlap of GTFS feeds” vignette
-  ([\#85](https://github.com/ipea/gtfstools/issues/85)). Thanks
-  [@higgicd](https://github.com/higgicd) for the suggestion and the
-  original `check_gtfs_overlap()` code.
-- [`frequencies_to_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/frequencies_to_stop_times.md)
-  gains a `strategy` argument, which controls the departure times of the
-  trips created from frequency-based `frequencies` entries (those whose
-  `exact_times` is not `1`): `"exact"` (the default and previous
-  behaviour) makes trips depart every `headway_secs` from `start_time`,
-  while `"half_headway"` and `"random"` shift these departures by half
-  the headway or by a random offset
-  ([\#56](https://github.com/ipea/gtfstools/issues/56)).
-- New function
-  [`get_shape_length()`](https://ipea.github.io/gtfstools/dev/reference/get_shape_length.md),
-  which returns the length of each shape.
+  [`list_validator_versions()`](https://ipea.github.io/gtfstools/dev/reference/list_validator_versions.md),
+  which lists the available validator versions. PR contribution by
+  [@baarthur](https://github.com/baarthur).
 - [`get_trip_length()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_length.md)
   and
   [`get_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_speed.md)
-  gain the `by` argument, to calculate lengths and speeds between each
-  pair of consecutive stops (`by = "segment"`, numbered as in
-  [`get_trip_segment_duration()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_segment_duration.md)),
-  and the `method` argument, to measure along the trip’s shape
-  (`"shapes"`, handling loops correctly) or as straight lines between
-  stops (`"euclidean"`).
-- [`write_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/write_gtfs.md)
-  gains a `compression_level` argument. It defaults to 6 (previously the
-  feed was always compressed at level 9), which makes writing a feed
-  about 2 to 3 times faster for files of very similar size. The content
-  of the written files is unchanged.
+  gain the `by` argument, to calculate lengths and speeds between
+  consecutive stops. They and
+  [`get_trip_geometry()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_geometry.md)
+  gain the `method` argument, to measure along the trip’s shape or as
+  straight lines between stops. Without shapes, they now fall back to
+  straight lines with a warning, instead of raising an error.
 - [`set_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.md)
-  gains the `first_stop` and `last_stop` arguments, to set the speed
-  only between two stops (later stops are shifted by the change in
-  duration), and the `from` and `to` arguments, to change only trips
-  that depart from the segment’s first stop within a time of day
+  gains the `first_stop`, `last_stop`, `from` and `to` arguments, to
+  change speeds only between two stops and only for trips departing
+  within a time of day
   ([\#89](https://github.com/ipea/gtfstools/issues/89)).
-- New function
-  [`interpolate_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_stop_times.md),
-  which fills blank `arrival_time`s and `departure_time`s in
-  `stop_times`, assuming that vehicles travel at a constant speed
-  between consecutive stops with known times. Distances between stops
-  are measured along the trip’s shape (`method = "shapes"`, the default)
-  or as straight lines (`method = "euclidean"`), as in
-  [`get_trip_length()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_length.md).
-  Unlike `tidytransit::interpolate_stop_times()`, it doesn’t require a
-  `shape_dist_traveled` column. Interpolated times are rounded to the
-  nearest second, and stops before a trip’s first or after its last
-  known time are left blank, with a warning.
+- [`frequencies_to_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/frequencies_to_stop_times.md)
+  gains the `strategy` argument, to shift the departures of
+  frequency-based trips by half the headway or by a random offset
+  ([\#56](https://github.com/ipea/gtfstools/issues/56)).
+- [`write_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/write_gtfs.md)
+  gains the `compression_level` argument. Its default, 6 (previously
+  always 9), makes writing about 2 to 3 times faster for files of very
+  similar size.
+
+### Bug fixes
+
+- The `filter_by_*()` functions no longer drop:
+  - rows whose blank keys mean “applies to all”: zone `fare_rules`
+    without `route_id`, `transfers` without `from_stop_id`/`to_stop_id`
+    and `attributions` without `agency_id`;
+  - the `agency` of single-agency feeds whose `routes.agency_id` is
+    blank or absent;
+  - the station entrances, generic nodes and boarding areas of kept
+    stations and platforms, with their pathways and levels.
+- [`filter_by_trip_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_trip_id.md)
+  and the filters built on it no longer keep `fare_attributes` (and
+  their agencies) whose `fare_rules` were all dropped by zone.
+- [`filter_by_route_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_route_id.md)
+  and
+  [`filter_by_route_type()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_route_type.md)
+  filtered `fare_rules` by `level_id` instead of `route_id`.
+- [`filter_by_time_of_day()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_time_of_day.md):
+  - with `keep = TRUE`, now sets the `end_time` of `frequencies` entries
+    that cross `to` to one second after `to`, so that a departure at
+    `to` is no longer lost by
+    [`frequencies_to_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/frequencies_to_stop_times.md);
+  - updates the `start_time` of `frequencies` entries with a blank
+    `exact_times`;
+  - no longer returns frequency-based trips whose `frequencies` entries
+    were all filtered out;
+  - with `keep = FALSE` and `full_trips = TRUE`, no longer drops every
+    trip with an untimed stop;
+  - rejects `from`/`to` values with minutes or seconds of 60 or more.
+- [`filter_by_spatial_extent()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_spatial_extent.md)
+  no longer errors when stops have missing coordinates, and with
+  `keep = FALSE` drops every selected trip. It now filters the feed only
+  once, so shapes not used by any trip are no longer kept and duplicated
+  rows are no longer removed.
+- [`filter_by_stop_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_stop_id.md)
+  no longer adds a `.flagged` column to the `fare_rules` table of the
+  given feed.
+- [`frequencies_to_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/frequencies_to_stop_times.md)
+  treats `end_time` as exclusive, as required by the GTFS specification:
+  an entry from 08:00 to 09:00 with a 30-minute headway now yields trips
+  at 08:00 and 08:30 only.
+- Functions that convert times to seconds now convert malformed times
+  (e.g. `"5:30"`, `"12:60:00"`) to `NA` with a warning, instead of
+  silently returning wrong values.
+  [`convert_time_to_seconds()`](https://ipea.github.io/gtfstools/dev/reference/convert_time_to_seconds.md)
+  also no longer skips `arrival_time` and `end_time` when only one
+  column of a pair is present.
+- [`get_stop_times_patterns()`](https://ipea.github.io/gtfstools/dev/reference/get_stop_times_patterns.md)
+  no longer ignores stop timing for spatiotemporal patterns of trips
+  with blank stop times, and no longer merges different stop sequences
+  whose `stop_id`s contain `;` or `|`.
+- [`set_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.md)
+  now identifies the first stop of each trip by `stop_sequence` instead
+  of row position, and keeps existing `*_secs` columns in sync with the
+  updated times.
+- [`get_trip_segment_duration()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_segment_duration.md)
+  no longer mixes up trips with interleaved `stop_times` rows when
+  `sort_sequence = FALSE`.
+- [`get_children_stops()`](https://ipea.github.io/gtfstools/dev/reference/get_children_stops.md)
+  no longer returns `NA` rows for stops without a `parent_station`.
+- [`read_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/read_gtfs.md)
+  no longer keeps doubled quotes inside quoted text fields, and
+  [`write_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/write_gtfs.md)
+  always writes text as UTF-8, also when the feed was read with
+  `encoding = "Latin-1"`.
+- [`as_dt_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/as_dt_gtfs.md)
+  no longer turns `Date` fields into `NA`, and converts the date fields
+  of lists to `Date`.
+- [`merge_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/merge_gtfs.md)
+  no longer prefixes the `field_value` and `record_sub_id` columns of
+  `translations`, no longer errors with character columns of unknown
+  type, and keeps parent station ids. PR contributions by
+  [@gmatosferreira](https://github.com/gmatosferreira) and
+  [@haneroglu](https://github.com/haneroglu).
 
 ### Feature deprecation
 
@@ -430,23 +203,34 @@
   and
   [`get_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_speed.md)
   is deprecated in favour of `method` (`file = "stop_times"` corresponds
-  to `method = "euclidean"`). It is still accepted, with a warning
-  (class `deprecated_file`), but must be passed by name.
+  to `method = "euclidean"`).
 
 ### Notes
 
 - gtfstools now requires [units](https://r-quantities.github.io/units/)
-  \>= 1.0-1, which fixed an out-of-bounds read when converting empty
-  vectors that was flagged by CRAN’s sanitizer checks.
-  [`set_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.md)
-  also no longer converts speeds when `unit = "km/h"` or when no
-  `trip_id` is given
+  \>= 1.0-1, which fixed an out-of-bounds read flagged by CRAN’s
+  sanitizer checks
   ([\#84](https://github.com/ipea/gtfstools/issues/84)).
 
-- Function
-  [`download_validator()`](https://ipea.github.io/gtfstools/dev/reference/download_validator.md)
-  now automatically detects the latest version available. PR
-  contribution by [@baarthur](https://github.com/baarthur)
+- [`download_validator()`](https://ipea.github.io/gtfstools/dev/reference/download_validator.md)
+  now automatically detects the latest validator version. PR
+  contribution by [@baarthur](https://github.com/baarthur).
+
+- Invalid dates (e.g. `20240230`) are still converted to `NA` when
+  reading or converting feeds, but now with a warning.
+
+- [`frequencies_to_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/frequencies_to_stop_times.md)
+  now raises informative errors for invalid `frequencies` entries and
+  for trips without a `departure_time`.
+
+- Trip lengths are now always calculated on the
+  [s2](https://r-spatial.github.io/s2/) sphere, regardless of
+  [`sf::sf_use_s2()`](https://r-spatial.github.io/sf/reference/s2.html).
+
+- [`get_trip_geometry()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_geometry.md)
+  is slower with the default `method = "shapes"`, as it locates stops
+  along shapes: on a feed with 15,000 trips and 920,000 `stop_times`
+  rows, about 0.8 seconds instead of 0.02 seconds for the entire shapes.
 
 - [`get_children_stops()`](https://ipea.github.io/gtfstools/dev/reference/get_children_stops.md)
   is now much faster on large feeds (about 250x faster with 20,000
@@ -528,12 +312,6 @@
 - The package documentation website moved to
   <https://ipea.github.io/gtfstools/> and the GitHub repository to
   <https://github.com/ipea/gtfstools>. All links were updated.
-
-- The filtering vignette and the documentation now use
-  [`filter_by_spatial_extent()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_spatial_extent.md)
-  instead of the defunct
-  [`filter_by_sf()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_sf.md),
-  which was moved to a “Defunct” section of the reference index.
 
 ## gtfstools 1.4.0
 
