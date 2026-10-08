@@ -16,6 +16,7 @@
 - New functions `get_route_frequency()` and `get_stop_frequency()`, which return the number of departures and the mean headway of each route and at each stop within a time of day (#53).
 - New function `stop_times_to_frequencies()`, the counterpart of `frequencies_to_stop_times()`, which approximates scheduled trips by frequency-based ones (#69).
 - New function `interpolate_stop_times()`, which fills blank `arrival_time`s and `departure_time`s in `stop_times`, assuming a constant speed between stops with known times.
+- New function `set_route_frequency()`, the editing counterpart of `get_route_frequency()`, which sets the headway of routes within a time of day by replacing their trips in it with a frequency-based template trip. Departures outside the time of day don't change.
 - New function `get_shape_length()`, which returns the length of each shape.
 - New function `remove_unused_ids()`, which removes unused ids from all files (#55).
 - New function `list_validator_versions()`, which lists the available validator versions. PR contribution by @baarthur.
@@ -62,6 +63,7 @@
 - `frequencies_to_stop_times()` now raises informative errors for invalid `frequencies` entries and for trips without a `departure_time`.
 - Trip lengths are now always calculated on the `{s2}` sphere, regardless of `sf::sf_use_s2()`.
 - `get_trip_geometry()` is slower with the default `method = "shapes"`, as it locates stops along shapes: on a feed with 15,000 trips and 920,000 `stop_times` rows, about 0.8 seconds instead of 0.02 seconds for the entire shapes.
+- `get_stop_times_patterns()` is about 2 times faster on a feed with 1,700 `stop_times` rows, as trips are compared without building text keys from their stops and times. `get_trip_length()` and `get_trip_geometry()` also no longer build such keys when locating stops along shapes.
 - `get_children_stops()` is now much faster on large feeds (about 250x faster with 20,000 stops).
 - Converting date fields when reading and writing feeds (`read_gtfs()`, `write_gtfs()`, `as_dt_gtfs()`) is now much faster (about 200x faster for the date conversion itself), noticeably speeding up `read_gtfs()` on feeds with large `calendar_dates` tables.
 - Converting times between `"HH:MM:SS"` strings and seconds is now faster, as each distinct time is converted only once. This speeds up `convert_time_to_seconds()` (about 20 times faster on a feed with 900,000 `stop_times` rows), `filter_by_time_of_day()` (about 7 times faster on the same feed) and, to a lesser extent, the other functions that convert times.
@@ -69,18 +71,19 @@
 - `frequencies_to_stop_times()` is much faster (about 13 times faster when converting a feed into 300,000 `stop_times` rows), as it creates all new trips at once instead of one at a time. It also no longer adds and then removes auxiliary columns from the tables of the given feed.
 - `filter_by_spatial_extent()` is much faster and uses much less memory (about 25 times faster on a feed with 900,000 `stop_times` rows), as it filters the feed only once and doesn't create geometries for trips already selected by their shapes.
 - `convert_sf_to_shapes()` is much faster (about 30 times faster with `calculate_distance = FALSE` and 70 times faster with `calculate_distance = TRUE` on a feed with 50,000 shape points), as it no longer casts the linestrings to points and calculates `shape_dist_traveled` with a vectorised haversine formula. Distances are calculated on the same sphere used by `{s2}`, so they match the previous results (with `sf::sf_use_s2(TRUE)`, the default) to within a micrometre. With `sf::sf_use_s2(FALSE)`, the previous version calculated ellipsoidal distances, which differ from the spherical ones by up to about 0.4%; distances are now always spherical.
-- The table below shows how many times faster each function optimised above is, compared with the development version before these optimisations, on the example feeds shipped with the package (each stacked twice with `merge_gtfs()`). `get_trip_duration()` and `get_trip_segment_duration()` used `unit = "min"`, and `filter_by_spatial_extent()` used the western half of each feed's extent. The poa feed has no `frequencies` table. Differences under about 1.2 times are within measurement noise.
+- The table below shows how many times faster each function optimised above is, compared with the development version before these optimisations, on the example feeds shipped with the package (each stacked twice with `merge_gtfs()`). `get_trip_duration()` and `get_trip_segment_duration()` used `unit = "min"`, `filter_by_spatial_extent()` used the western half of each feed's extent, and `filter_by_time_of_day()` kept the period from 07:00 to 09:00. The poa feed has no `frequencies` table. Differences under about 1.2 times are within measurement noise.
 
   | function | n times faster on poa | n times faster on spo |
   |---|---|---|
-  | `convert_sf_to_shapes()` | 11.3 | 33.7 |
-  | `convert_time_to_seconds()` | 5.8 | 1.3 |
-  | `filter_by_spatial_extent()` | 2.9 | 1.9 |
-  | `filter_by_time_of_day()` | 2.9 | 1.2 |
-  | `frequencies_to_stop_times()` | – | 12.7 |
-  | `get_trip_duration()` | 4.0 | 1.5 |
-  | `get_trip_segment_duration()` | 50.1 | 2.8 |
-  | `write_gtfs()` | 1.5 | 0.9 |
+  | `convert_sf_to_shapes()` | 7.8 | 20.8 |
+  | `convert_time_to_seconds()` | 4.3 | 1.1 |
+  | `filter_by_spatial_extent()` | 5.9 | 2.3 |
+  | `filter_by_time_of_day()` | 2.6 | 1.0 |
+  | `frequencies_to_stop_times()` | – | 7.6 |
+  | `get_stop_times_patterns()` | 2.1 | 2.1 |
+  | `get_trip_duration()` | 3.6 | 1.1 |
+  | `get_trip_segment_duration()` | 21.7 | 2.1 |
+  | `write_gtfs()` | 1.5 | 1.6 |
 - The package documentation website moved to <https://ipea.github.io/gtfstools/> and the GitHub repository to <https://github.com/ipea/gtfstools>. All links were updated.
 
 # gtfstools 1.4.0

@@ -249,3 +249,120 @@ test_that("stop_ids containing separators don't make patterns collide", {
   spatiotemporal_patterns <- tester(spo_gtfs, type = "spatiotemporal")
   expect_identical(spatiotemporal_patterns$pattern_id, c(1L, 2L))
 })
+
+# builds a gtfs whose stop_times has the given trip_ids, stop_ids and
+# (optionally) time-in-seconds columns. time strings are left blank, so the
+# _secs columns are used as they are
+
+build_stop_times_gtfs <- function(trip_id, stop_id, dep_secs = NULL) {
+  stop_times <- data.table::data.table(
+    trip_id = trip_id,
+    stop_id = stop_id,
+    stop_sequence = data.table::rowid(trip_id),
+    arrival_time = "",
+    departure_time = ""
+  )
+  if (!is.null(dep_secs)) {
+    stop_times[, `:=`(
+      departure_time_secs = dep_secs,
+      arrival_time_secs = dep_secs
+    )]
+  }
+  new_gtfs <- gtfs
+  new_gtfs$stop_times <- stop_times
+  return(new_gtfs)
+}
+
+test_that("handles rows of different trips interleaved", {
+  contiguous <- build_stop_times_gtfs(
+    c("a", "a", "a", "b", "b", "b", "c", "c"),
+    c("x", "y", "z", "x", "y", "z", "x", "y")
+  )
+  interleaved <- contiguous
+  interleaved$stop_times <- contiguous$stop_times[c(1, 4, 7, 2, 5, 8, 3, 6)]
+
+  patterns <- tester(interleaved)
+  expect_identical(patterns$trip_id, c("a", "b", "c"))
+  expect_identical(patterns$pattern_id, c(1L, 1L, 2L))
+  expect_identical(patterns, tester(contiguous))
+})
+
+test_that("rows with NA trip_id are grouped together", {
+  na_gtfs <- build_stop_times_gtfs(
+    c("a", NA, "a", "b", NA, "b"),
+    c("x", "x", "y", "x", "y", "y")
+  )
+
+  for (sort_sequence in c(TRUE, FALSE)) {
+    patterns <- tester(na_gtfs, sort_sequence = sort_sequence)
+    expect_identical(patterns$trip_id, c(NA, "a", "b"))
+    expect_identical(patterns$pattern_id, c(1L, 1L, 1L))
+  }
+})
+
+test_that("sequences that start with the same stops are different patterns", {
+  prefix_gtfs <- build_stop_times_gtfs(
+    c("a", "a", "b", "b", "b"),
+    c("x", "y", "x", "y", "z")
+  )
+  expect_identical(tester(prefix_gtfs)$pattern_id, c(1L, 2L))
+})
+
+test_that("spatiotemporal patterns use times relative to the first departure", {
+  # a, b and c take 60 seconds between stops, regardless of when they depart.
+  # d has no departures and e only has its last one
+
+  int_gtfs <- build_stop_times_gtfs(
+    rep(c("a", "b", "c", "d", "e"), each = 2),
+    rep(c("x", "y"), 5),
+    c(0L, 60L, 100L, 160L, 60L, 120L, NA, NA, NA, 60L)
+  )
+  patterns <- tester(int_gtfs, type = "spatiotemporal")
+  expect_identical(patterns$pattern_id, c(1L, 1L, 1L, 2L, 3L))
+
+  # pre-existing double _secs columns are compared as they were written, so
+  # 0.4 - 0.1 and 0.3 - 0 are considered the same time
+
+  double_gtfs <- build_stop_times_gtfs(
+    rep(c("a", "b", "c"), each = 2),
+    rep(c("x", "y"), 3),
+    c(0.1, 0.4, 0, 0.3, 0, 0.5)
+  )
+  patterns <- tester(double_gtfs, type = "spatiotemporal")
+  expect_identical(patterns$pattern_id, c(1L, 1L, 2L))
+})
+
+test_that("returns an empty table when no trip is analysed", {
+  empty_patterns <- data.table::data.table(
+    trip_id = character(0),
+    pattern_id = integer(0),
+    key = "trip_id"
+  )
+
+  for (type in c("spatial", "spatiotemporal")) {
+    expect_warning(patterns <- tester(trip_id = "nope", type = type))
+    expect_identical(patterns, empty_patterns)
+  }
+})
+
+test_that("cpp_sequence_pattern_id() compares whole groups", {
+  # groups 1 and 2 are equal and group 3 is a prefix of them. groups 6 and 7
+  # are equal, as NAs are compared as any other value
+
+  ids <- cpp_sequence_pattern_id(
+    c(2L, 2L, 1L, 1L, 2L, 2L, 2L),
+    list(c(1L, 2L, 1L, 2L, 1L, 3L, 4L, 5L, NA, 6L, NA, 6L))
+  )
+  expect_identical(ids, c(1L, 1L, 2L, 3L, 4L, 5L, 5L))
+
+  expect_identical(
+    cpp_sequence_pattern_id(integer(0), list(integer(0))),
+    integer(0)
+  )
+
+  expect_error(cpp_sequence_pattern_id(1L, list()))
+  expect_error(cpp_sequence_pattern_id(c(1L, -1L), list(1L)))
+  expect_error(cpp_sequence_pattern_id(c(1L, NA), list(1L)))
+  expect_error(cpp_sequence_pattern_id(2L, list(c(1, 2))))
+  expect_error(cpp_sequence_pattern_id(2L, list(1L)))
+})

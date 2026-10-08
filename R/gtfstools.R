@@ -92,7 +92,6 @@ utils::globalVariables(
     "n_stops",
     "i.length",
     "pattern_id",
-    "data",
     "template_departure",
     "template_arrival",
     "origin_gtfs",
@@ -143,6 +142,10 @@ utils::globalVariables(
     "i.date",
     "day",
     "change",
-    "x.n_running"
+    "x.n_running",
+    "group",
+    "i.group",
+    "i.pattern_id",
+    "n"
   )
 )
