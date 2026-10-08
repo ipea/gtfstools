@@ -253,64 +253,43 @@ get_trip_geometry <- function(gtfs,
 #'
 #' @keywords internal
 build_shape_cuts <- function(cuts, shape_points) {
-  # cumulative distance of each point of the relevant shapes, calculated as in
-  # rcpp_locate_stops_on_shape(). R's cumsum() accumulates in long double while
-  # the C++ code accumulates in double, so the positions of the last stops may
-  # slightly exceed the cumulative distance of the last shape point. hence the
-  # interpolation factors are clamped to [0, 1] below
+  # the cumulative distance of each point of the relevant shapes is calculated
+  # in C++ with the same distances as rcpp_locate_stops_on_shape(), but summed
+  # in long double, as R's cumsum() does, while rcpp_locate_stops_on_shape()
+  # sums in double. so the positions of the last stops may slightly exceed the
+  # cumulative distance of the last shape point. hence the interpolation
+  # factors are clamped to [0, 1] below
 
   if (nrow(cuts) == 0) return(build_linestrings(cuts, "shape_id"))
 
   relevant_shapes <- unique(cuts$shape_id)
   shape_rows <- shape_points$rows[relevant_shapes]
   rows <- unlist(shape_rows, use.names = FALSE)
-  n_points <- length(rows)
-  shape_group <- rep.int(seq_along(shape_rows), lengths(shape_rows))
 
   lat <- shape_points$shapes$shape_pt_lat[rows]
   lon <- shape_points$shapes$shape_pt_lon[rows]
-
-  step <- rcpp_distance_haversine(
-    c(lat[1L], lat[-n_points]),
-    c(lon[1L], lon[-n_points]),
-    lat,
-    lon
-  )
-  step[!duplicated(shape_group)] <- 0
-  cum <- unlist(lapply(split(step, shape_group), cumsum), use.names = FALSE)
-
-  shape_start <- which(!duplicated(shape_group))
-  shape_end <- c(shape_start[-1L] - 1L, n_points)
-  cut_shape <- match(cuts$shape_id, relevant_shapes)
 
   # each part goes from the point at 'from' to the point at 'to', interpolated
   # along the shape, through the shape points in between ('inner' points,
   # whose cumulative distance is strictly between 'from' and 'to'). the shape
   # segments that contain 'from' and 'to' and the range of inner points are
-  # found for all the parts of each shape at once. indices are global (into
-  # 'cum', 'lat' and 'lon')
+  # found in C++ for all the parts at once. indices are global (into 'cum',
+  # 'lat' and 'lon')
 
   n_cuts <- nrow(cuts)
-  from_segment <- to_segment <- first_inner <- last_inner <- integer(n_cuts)
-
-  for (cuts_k in split(seq_len(n_cuts), cut_shape)) {
-    s <- cut_shape[cuts_k[1L]]
-    offset <- shape_start[s] - 1L
-    shape_cum <- cum[shape_start[s]:shape_end[s]]
-    last_segment <- length(shape_cum) - 1L
-
-    n_up_to_from <- findInterval(cuts$from[cuts_k], shape_cum)
-    n_up_to_to <- findInterval(cuts$to[cuts_k], shape_cum)
-
-    from_segment[cuts_k] <- offset + pmin(pmax(n_up_to_from, 1L), last_segment)
-    to_segment[cuts_k] <- offset + pmin(pmax(n_up_to_to, 1L), last_segment)
-    first_inner[cuts_k] <- offset + n_up_to_from + 1L
-    last_inner[cuts_k] <- offset + findInterval(
-      cuts$to[cuts_k],
-      shape_cum,
-      left.open = TRUE
-    )
-  }
+  segments <- cpp_shape_cut_segments(
+    lat,
+    lon,
+    lengths(shape_rows),
+    match(cuts$shape_id, relevant_shapes),
+    cuts$from,
+    cuts$to
+  )
+  cum <- segments$cum
+  from_segment <- segments$from_segment
+  to_segment <- segments$to_segment
+  first_inner <- segments$first_inner
+  last_inner <- segments$last_inner
 
   interpolate <- function(position, segment) {
     segment_length <- cum[segment + 1L] - cum[segment]
