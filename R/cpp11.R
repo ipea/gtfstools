@@ -12,6 +12,10 @@ rcpp_locate_stops_on_shape <- function(shape_lat, shape_lon, stop_lat, stop_lon)
   .Call(`_gtfstools_rcpp_locate_stops_on_shape`, shape_lat, shape_lon, stop_lat, stop_lon)
 }
 
+cpp_shape_cut_segments <- function(lat, lon, shape_size, cut_shape, from, to) {
+  .Call(`_gtfstools_cpp_shape_cut_segments`, lat, lon, shape_size, cut_shape, from, to)
+}
+
 cpp_seconds_to_string <- function(seconds_from_midnight) {
   .Call(`_gtfstools_cpp_seconds_to_string`, seconds_from_midnight)
 }
