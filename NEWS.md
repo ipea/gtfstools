@@ -70,18 +70,19 @@
 - `frequencies_to_stop_times()` is much faster (about 13 times faster when converting a feed into 300,000 `stop_times` rows), as it creates all new trips at once instead of one at a time. It also no longer adds and then removes auxiliary columns from the tables of the given feed.
 - `filter_by_spatial_extent()` is much faster and uses much less memory (about 25 times faster on a feed with 900,000 `stop_times` rows), as it filters the feed only once and doesn't create geometries for trips already selected by their shapes.
 - `convert_sf_to_shapes()` is much faster (about 30 times faster with `calculate_distance = FALSE` and 70 times faster with `calculate_distance = TRUE` on a feed with 50,000 shape points), as it no longer casts the linestrings to points and calculates `shape_dist_traveled` with a vectorised haversine formula. Distances are calculated on the same sphere used by `{s2}`, so they match the previous results (with `sf::sf_use_s2(TRUE)`, the default) to within a micrometre. With `sf::sf_use_s2(FALSE)`, the previous version calculated ellipsoidal distances, which differ from the spherical ones by up to about 0.4%; distances are now always spherical.
-- The table below shows how many times faster each function optimised above is, compared with the development version before these optimisations, on the example feeds shipped with the package (each stacked twice with `merge_gtfs()`). `get_trip_duration()` and `get_trip_segment_duration()` used `unit = "min"`, and `filter_by_spatial_extent()` used the western half of each feed's extent. The poa feed has no `frequencies` table. Differences under about 1.2 times are within measurement noise.
+- The table below shows how many times faster each function optimised above is, compared with the development version before these optimisations, on the example feeds shipped with the package (each stacked twice with `merge_gtfs()`). `get_trip_duration()` and `get_trip_segment_duration()` used `unit = "min"`, `filter_by_spatial_extent()` used the western half of each feed's extent, and `filter_by_time_of_day()` kept the period from 07:00 to 09:00. The poa feed has no `frequencies` table. Differences under about 1.2 times are within measurement noise.
 
   | function | n times faster on poa | n times faster on spo |
   |---|---|---|
-  | `convert_sf_to_shapes()` | 11.3 | 33.7 |
-  | `convert_time_to_seconds()` | 5.8 | 1.3 |
-  | `filter_by_spatial_extent()` | 2.9 | 1.9 |
-  | `filter_by_time_of_day()` | 2.9 | 1.2 |
-  | `frequencies_to_stop_times()` | – | 12.7 |
-  | `get_trip_duration()` | 4.0 | 1.5 |
-  | `get_trip_segment_duration()` | 50.1 | 2.8 |
-  | `write_gtfs()` | 1.5 | 0.9 |
+  | `convert_sf_to_shapes()` | 7.8 | 20.8 |
+  | `convert_time_to_seconds()` | 4.3 | 1.1 |
+  | `filter_by_spatial_extent()` | 5.9 | 2.3 |
+  | `filter_by_time_of_day()` | 2.6 | 1.0 |
+  | `frequencies_to_stop_times()` | – | 7.6 |
+  | `get_stop_times_patterns()` | 2.1 | 2.1 |
+  | `get_trip_duration()` | 3.6 | 1.1 |
+  | `get_trip_segment_duration()` | 21.7 | 2.1 |
+  | `write_gtfs()` | 1.5 | 1.6 |
 - The package documentation website moved to <https://ipea.github.io/gtfstools/> and the GitHub repository to <https://github.com/ipea/gtfstools>. All links were updated.
 
 # gtfstools 1.4.0
