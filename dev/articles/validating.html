@@ -35,7 +35,8 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/filtering.html">Filtering GTFS feeds</a></li>
+<li><a class="dropdown-item" href="../articles/calendar_overlap.html">Checking the calendar overlap of GTFS feeds</a></li>
+    <li><a class="dropdown-item" href="../articles/filtering.html">Filtering GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/validating.html">Validating GTFS feeds</a></li>
   </ul>
 </li>
@@ -106,7 +107,7 @@ the command-line tool version, which controls some of its behavior.</p>
 <span></span>
 <span><span class="va">latest_validator</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/download_validator.html">download_validator</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">latest_validator</span></span>
-<span><span class="co">#&gt; [1] "/tmp/Rtmpmn9Dni/gtfs-validator-v8.0.1.jar"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "/tmp/RtmpR3Tyng/gtfs-validator-v8.0.1.jar"</span></span></code></pre></div>
 <p>The second (and final) step is actually running
 <code><a href="../reference/validate_gtfs.html">validate_gtfs()</a></code>. To do that we need some GTFS data, which
 the function accepts in varying formats: it can be a GTFS object, as

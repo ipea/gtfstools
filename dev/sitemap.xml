@@ -1,6 +1,7 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>https://ipea.github.io/gtfstools/dev/CLAUDE.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/LICENSE-text.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/articles/calendar_overlap.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/articles/filtering.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/articles/gtfstools.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/articles/index.html</loc></url>
@@ -21,6 +22,7 @@
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/copy_gtfs_without_field.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/copy_gtfs_without_file.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/date_to_integer.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/dates_to_periods.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/download_validator.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/empty_trip_length.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/filter_by_agency_id.html</loc></url>
@@ -35,10 +37,12 @@
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/filter_by_trip_id.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/filter_by_weekday.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/frequencies_to_stop_times.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/get_calendar_overlap.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/get_children_stops.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/get_frequencies_departures.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/get_parent_station.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/get_route_frequency.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/get_service_period.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/get_shape_length.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/get_stop_frequency.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/get_stop_times_patterns.html</loc></url>

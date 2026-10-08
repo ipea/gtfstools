@@ -62,6 +62,10 @@ Please read **gtfstools** vignettes for more on the package usage:
   [`vignette("validating", package = "gtfstools")`](https://ipea.github.io/gtfstools/dev/articles/validating.md)
   or check it on the website ([Validating GTFS
   feeds](https://ipea.github.io/gtfstools/articles/validating.html)).
+- Checking the calendar overlap of GTFS feeds. Run
+  [`vignette("calendar_overlap", package = "gtfstools")`](https://ipea.github.io/gtfstools/dev/articles/calendar_overlap.md)
+  or check it on the website ([Checking the calendar overlap of GTFS
+  feeds](https://ipea.github.io/gtfstools/articles/calendar_overlap.html)).
 
 ## Related packages
 
@@ -85,6 +89,8 @@ Economic Research (Ipea), Brazil.
 
 ## Query information from GTFS feeds
 
+- [`get_calendar_overlap()`](https://ipea.github.io/gtfstools/dev/reference/get_calendar_overlap.md)
+  : Get calendar overlap
 - [`get_children_stops()`](https://ipea.github.io/gtfstools/dev/reference/get_children_stops.md)
   : Get children stops recursively
 - [`get_parent_station()`](https://ipea.github.io/gtfstools/dev/reference/get_parent_station.md)
@@ -219,6 +225,8 @@ Economic Research (Ipea), Brazil.
 
 ### All vignettes
 
+- [Checking the calendar overlap of GTFS
+  feeds](https://ipea.github.io/gtfstools/dev/articles/calendar_overlap.md):
 - [Filtering GTFS
   feeds](https://ipea.github.io/gtfstools/dev/articles/filtering.md):
 - [Introduction to

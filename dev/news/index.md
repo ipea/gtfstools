@@ -366,6 +366,18 @@
   [`remove_unused_ids()`](https://ipea.github.io/gtfstools/dev/reference/remove_unused_ids.md),
   which removes unused ids from all files
   ([\#55](https://github.com/ipea/gtfstools/issues/55)).
+- New function
+  [`get_calendar_overlap()`](https://ipea.github.io/gtfstools/dev/reference/get_calendar_overlap.md),
+  which returns the periods in which all the given GTFS feeds have
+  service, helping to pick a date on which several feeds can be analysed
+  together (e.g. in routing and accessibility analyses). Feeds may be
+  given as paths or as a list of GTFS objects, and `output = "plot"`
+  returns a timeline of each feed’s service days (requires
+  [ggplot2](https://ggplot2.tidyverse.org)). See the new “Checking the
+  calendar overlap of GTFS feeds” vignette
+  ([\#85](https://github.com/ipea/gtfstools/issues/85)). Thanks
+  [@higgicd](https://github.com/higgicd) for the suggestion and the
+  original `check_gtfs_overlap()` code.
 - [`frequencies_to_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/frequencies_to_stop_times.md)
   gains a `strategy` argument, which controls the departure times of the
   trips created from frequency-based `frequencies` entries (those whose

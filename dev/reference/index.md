@@ -9,6 +9,8 @@
 
 ## Query information from GTFS feeds
 
+- [`get_calendar_overlap()`](https://ipea.github.io/gtfstools/dev/reference/get_calendar_overlap.md)
+  : Get calendar overlap
 - [`get_children_stops()`](https://ipea.github.io/gtfstools/dev/reference/get_children_stops.md)
   : Get children stops recursively
 - [`get_parent_station()`](https://ipea.github.io/gtfstools/dev/reference/get_parent_station.md)
