@@ -116,19 +116,35 @@ get_stop_times_patterns <- function(gtfs,
     patterns <- data.table::setorderv(patterns, c("trip_id", "stop_sequence"))
   }
 
-  # each trip's sequence of stops is described by integer codes instead of the
-  # stop_ids themselves, because ids may contain the characters used to
-  # separate them (e.g. the sequences "a;b" -> "c" and "a" -> "b;c" would both
-  # be described as "a;b;c")
+  # each trip's sequence of stops is described by integer codes, which are
+  # compared by cpp_sequence_pattern_id()
 
   stop_codes <- data.table::chmatch(patterns$stop_id, unique(patterns$stop_id))
 
+  # the rows of each trip must be contiguous and the trips ordered as keyby
+  # would order them. when sort_sequence is TRUE, setorderv() above already did
+  # that. otherwise, data.table's ordering is used instead of order(method =
+  # "radix"), which sorts strings by their bytes and would separate the rows of
+  # a trip_id written in different encodings. the ordering is stable, so the
+  # rows of each trip keep their order
+
+  tid <- patterns$trip_id
+
+  if (!sort_sequence) {
+    ord <- data.table::setorderv(
+      data.table::data.table(i = seq_along(tid), trip_id = tid),
+      "trip_id",
+      na.last = FALSE
+    )$i
+    tid <- tid[ord]
+    stop_codes <- stop_codes[ord]
+  }
+
+  trip_start <- which(!duplicated(tid))
+  n_stops <- diff(c(trip_start, length(tid) + 1L))
+
   if (type == "spatial") {
-    patterns <- patterns[
-      ,
-      .(data = paste0(stop_codes[.I], collapse = ";")),
-      keyby = trip_id
-    ]
+    columns <- list(stop_codes)
   } else {
     if (
       !gtfsio::check_field_exists(gtfs, "stop_times", "departure_time_secs")
@@ -143,24 +159,41 @@ get_stop_times_patterns <- function(gtfs,
       created_arrival_secs <- TRUE
     }
 
-    patterns <- patterns[
-      ,
-      {
-        first_departure <- if (all(is.na(departure_time_secs))) NA_integer_ else
-          min(departure_time_secs, na.rm = TRUE)
+    dep <- patterns$departure_time_secs
+    arr <- patterns$arrival_time_secs
 
-        .(
-          data = paste(
-            stop_codes[.I],
-            departure_time_secs - first_departure,
-            arrival_time_secs - first_departure,
-            sep = "|",
-            collapse = ";"
-          )
-        )
-      },
-      keyby = trip_id
-    ]
+    if (!sort_sequence) {
+      dep <- dep[ord]
+      arr <- arr[ord]
+    }
+
+    # times are compared relative to the first departure of each trip: its
+    # smallest non-NA departure, found by sorting the departures within each
+    # trip with NAs last. trips without departures keep NA (NaN included, as
+    # it would otherwise be compared as a different value)
+
+    trip_idx <- rep.int(seq_along(trip_start), n_stops)
+    first_departure <- dep[
+      order(trip_idx, dep, na.last = TRUE, method = "radix")
+    ][trip_start]
+    first_departure[is.na(first_departure)] <- NA
+    first_departure <- rep.int(first_departure, n_stops)
+
+    # non-integer offsets (from pre-existing double _secs columns) are turned
+    # into integer codes. they are compared as text, as when the patterns were
+    # identified by pasting the times together
+
+    to_codes <- function(x) {
+      if (is.integer(x)) return(x)
+      x <- as.character(x)
+      return(match(x, unique(x)))
+    }
+
+    columns <- list(
+      stop_codes,
+      to_codes(dep - first_departure),
+      to_codes(arr - first_departure)
+    )
 
     if (
       gtfsio::check_field_exists(gtfs, "stop_times", "departure_time_secs") &&
@@ -177,8 +210,11 @@ get_stop_times_patterns <- function(gtfs,
     }
   }
 
-  patterns[, pattern_id := .GRP, by = data]
-  patterns[, data := NULL]
+  patterns <- data.table::data.table(
+    trip_id = tid[trip_start],
+    pattern_id = cpp_sequence_pattern_id(n_stops, columns)
+  )
+  data.table::setkeyv(patterns, "trip_id")
 
   return(patterns[])
 }

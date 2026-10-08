@@ -62,6 +62,7 @@
 - `frequencies_to_stop_times()` now raises informative errors for invalid `frequencies` entries and for trips without a `departure_time`.
 - Trip lengths are now always calculated on the `{s2}` sphere, regardless of `sf::sf_use_s2()`.
 - `get_trip_geometry()` is slower with the default `method = "shapes"`, as it locates stops along shapes: on a feed with 15,000 trips and 920,000 `stop_times` rows, about 0.8 seconds instead of 0.02 seconds for the entire shapes.
+- `get_stop_times_patterns()` is about 2 times faster on a feed with 1,700 `stop_times` rows, as trips are compared without building text keys from their stops and times. `get_trip_length()` and `get_trip_geometry()` also no longer build such keys when locating stops along shapes.
 - `get_children_stops()` is now much faster on large feeds (about 250x faster with 20,000 stops).
 - Converting date fields when reading and writing feeds (`read_gtfs()`, `write_gtfs()`, `as_dt_gtfs()`) is now much faster (about 200x faster for the date conversion itself), noticeably speeding up `read_gtfs()` on feeds with large `calendar_dates` tables.
 - Converting times between `"HH:MM:SS"` strings and seconds is now faster, as each distinct time is converted only once. This speeds up `convert_time_to_seconds()` (about 20 times faster on a feed with 900,000 `stop_times` rows), `filter_by_time_of_day()` (about 7 times faster on the same feed) and, to a lesser extent, the other functions that convert times.
