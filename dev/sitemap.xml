@@ -66,6 +66,7 @@
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/remove_duplicates.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/remove_unused_ids.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/seconds_to_string.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/set_route_frequency.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/stop_times_to_frequencies.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/string_to_seconds.html</loc></url>

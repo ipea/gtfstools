@@ -114,6 +114,8 @@
   : Remove duplicated entries
 - [`remove_unused_ids()`](https://ipea.github.io/gtfstools/dev/reference/remove_unused_ids.md)
   : Remove unused ids
+- [`set_route_frequency()`](https://ipea.github.io/gtfstools/dev/reference/set_route_frequency.md)
+  : Set route frequency
 - [`set_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.md)
   : Set trip average speed
 - [`stop_times_to_frequencies()`](https://ipea.github.io/gtfstools/dev/reference/stop_times_to_frequencies.md)

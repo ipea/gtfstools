@@ -87,6 +87,13 @@
   `stop_times`, assuming a constant speed between stops with known
   times.
 - New function
+  [`set_route_frequency()`](https://ipea.github.io/gtfstools/dev/reference/set_route_frequency.md),
+  the editing counterpart of
+  [`get_route_frequency()`](https://ipea.github.io/gtfstools/dev/reference/get_route_frequency.md),
+  which sets the headway of routes within a time of day by replacing
+  their trips in it with a frequency-based template trip. Departures
+  outside the time of day don’t change.
+- New function
   [`get_shape_length()`](https://ipea.github.io/gtfstools/dev/reference/get_shape_length.md),
   which returns the length of each shape.
 - New function
@@ -232,6 +239,15 @@
   along shapes: on a feed with 15,000 trips and 920,000 `stop_times`
   rows, about 0.8 seconds instead of 0.02 seconds for the entire shapes.
 
+- [`get_stop_times_patterns()`](https://ipea.github.io/gtfstools/dev/reference/get_stop_times_patterns.md)
+  is about 2 times faster on a feed with 1,700 `stop_times` rows, as
+  trips are compared without building text keys from their stops and
+  times.
+  [`get_trip_length()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_length.md)
+  and
+  [`get_trip_geometry()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_geometry.md)
+  also no longer build such keys when locating stops along shapes.
+
 - [`get_children_stops()`](https://ipea.github.io/gtfstools/dev/reference/get_children_stops.md)
   is now much faster on large feeds (about 250x faster with 20,000
   stops).
@@ -292,22 +308,24 @@
   [`get_trip_duration()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_duration.md)
   and
   [`get_trip_segment_duration()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_segment_duration.md)
-  used `unit = "min"`, and
+  used `unit = "min"`,
   [`filter_by_spatial_extent()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_spatial_extent.md)
-  used the western half of each feed’s extent. The poa feed has no
-  `frequencies` table. Differences under about 1.2 times are within
-  measurement noise.
+  used the western half of each feed’s extent, and
+  [`filter_by_time_of_day()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_time_of_day.md)
+  kept the period from 07:00 to 09:00. The poa feed has no `frequencies`
+  table. Differences under about 1.2 times are within measurement noise.
 
   | function | n times faster on poa | n times faster on spo |
   |----|----|----|
-  | [`convert_sf_to_shapes()`](https://ipea.github.io/gtfstools/dev/reference/convert_sf_to_shapes.md) | 11.3 | 33.7 |
-  | [`convert_time_to_seconds()`](https://ipea.github.io/gtfstools/dev/reference/convert_time_to_seconds.md) | 5.8 | 1.3 |
-  | [`filter_by_spatial_extent()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_spatial_extent.md) | 2.9 | 1.9 |
-  | [`filter_by_time_of_day()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_time_of_day.md) | 2.9 | 1.2 |
-  | [`frequencies_to_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/frequencies_to_stop_times.md) | – | 12.7 |
-  | [`get_trip_duration()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_duration.md) | 4.0 | 1.5 |
-  | [`get_trip_segment_duration()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_segment_duration.md) | 50.1 | 2.8 |
-  | [`write_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/write_gtfs.md) | 1.5 | 0.9 |
+  | [`convert_sf_to_shapes()`](https://ipea.github.io/gtfstools/dev/reference/convert_sf_to_shapes.md) | 7.8 | 20.8 |
+  | [`convert_time_to_seconds()`](https://ipea.github.io/gtfstools/dev/reference/convert_time_to_seconds.md) | 4.3 | 1.1 |
+  | [`filter_by_spatial_extent()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_spatial_extent.md) | 5.9 | 2.3 |
+  | [`filter_by_time_of_day()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_time_of_day.md) | 2.6 | 1.0 |
+  | [`frequencies_to_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/frequencies_to_stop_times.md) | – | 7.6 |
+  | [`get_stop_times_patterns()`](https://ipea.github.io/gtfstools/dev/reference/get_stop_times_patterns.md) | 2.1 | 2.1 |
+  | [`get_trip_duration()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_duration.md) | 3.6 | 1.1 |
+  | [`get_trip_segment_duration()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_segment_duration.md) | 21.7 | 2.1 |
+  | [`write_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/write_gtfs.md) | 1.5 | 1.6 |
 
 - The package documentation website moved to
   <https://ipea.github.io/gtfstools/> and the GitHub repository to
