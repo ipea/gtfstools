@@ -146,6 +146,13 @@ utils::globalVariables(
     "group",
     "i.group",
     "i.pattern_id",
-    "n"
+    "n",
+    "dwell_time",
+    "selected",
+    "arr",
+    "dep",
+    "dep_shift",
+    "arr_shift",
+    "new_dep"
   )
 )
