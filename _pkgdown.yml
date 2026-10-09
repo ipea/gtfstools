@@ -27,6 +27,7 @@ reference:
     - filter_by_spatial_extent
   - title: "Editing GTFS feeds"
   - contents:
+    - convert_stops_to_shapes
     - convert_time_to_seconds
     - frequencies_to_stop_times
     - interpolate_stop_times
