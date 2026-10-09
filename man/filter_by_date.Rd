@@ -10,7 +10,8 @@ filter_by_date(gtfs, date, keep = TRUE)
 \item{gtfs}{A GTFS object, as created by \code{\link[=read_gtfs]{read_gtfs()}}.}
 
 \item{date}{A \code{Date} vector (including \code{IDate}) or a character vector of
-dates in the \code{"YYYY-MM-DD"} format. The dates used to filter the data.}
+dates in the \code{"YYYYMMDD"} or \code{"YYYY-MM-DD"} formats. The dates used to
+filter the data.}
 
 \item{keep}{A logical. Whether the entries related to the services that run
 on the specified dates should be kept or dropped (defaults to \code{TRUE},

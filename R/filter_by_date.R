@@ -5,7 +5,8 @@
 #'
 #' @template gtfs
 #' @param date A `Date` vector (including `IDate`) or a character vector of
-#'   dates in the `"YYYY-MM-DD"` format. The dates used to filter the data.
+#'   dates in the `"YYYYMMDD"` or `"YYYY-MM-DD"` formats. The dates used to
+#'   filter the data.
 #' @param keep A logical. Whether the entries related to the services that run
 #'   on the specified dates should be kept or dropped (defaults to `TRUE`,
 #'   which keeps the entries).
@@ -50,34 +51,8 @@
 #' @export
 filter_by_date <- function(gtfs, date, keep = TRUE) {
   gtfs <- assert_and_assign_gtfs_object(gtfs)
-  checkmate::assert(
-    checkmate::check_date(date, any.missing = FALSE, min.len = 1),
-    checkmate::check_character(date, any.missing = FALSE, min.len = 1),
-    .var.name = "date"
-  )
+  date <- parse_dates(date)
   checkmate::assert_logical(keep, len = 1, any.missing = FALSE)
-
-  # as.Date() alone accepts trailing text (e.g. "2021-01-01x"), so strings
-  # must also be formatted back to themselves
-
-  if (is.character(date)) {
-    parsed_date <- as.Date(date, format = "%Y-%m-%d")
-    is_bad <- is.na(parsed_date) | format(parsed_date) != date
-    is_bad[is.na(is_bad)] <- TRUE
-
-    if (any(is_bad)) {
-      bad_dates <- date[is_bad]
-      cli::cli_abort(
-        c(
-          "{.arg date} must be in the {.val YYYY-MM-DD} format.",
-          "x" = "Invalid date{?s}: {.val {bad_dates}}."
-        ),
-        class = "gtfstools_bad_date_error"
-      )
-    }
-
-    date <- parsed_date
-  }
 
   if (
     !gtfsio::check_file_exists(gtfs, "calendar") &&
@@ -94,7 +69,8 @@ filter_by_date <- function(gtfs, date, keep = TRUE) {
     return(gtfs)
   }
 
-  relevant_services <- get_services_on_days(gtfs, unique(as.integer(date)))
+  services_on_days <- get_services_on_days(gtfs, unique(as.integer(date)))
+  relevant_services <- unique(services_on_days$service_id)
   gtfs <- filter_by_service_id(gtfs, relevant_services, keep)
 
   return(gtfs)
@@ -102,17 +78,70 @@ filter_by_date <- function(gtfs, date, keep = TRUE) {
 
 
 
+#' Parse dates given as `Date`s or strings
+#'
+#' Validates a `date` argument given either as a `Date` vector or as a
+#' character vector of dates in the `"YYYYMMDD"` or `"YYYY-MM-DD"` formats
+#' (which may be mixed), and converts it to a `Date` vector.
+#'
+#' @param date The `date` argument to be parsed.
+#' @param call The environment of the function whose `date` argument is
+#'   parsed, in which errors are reported.
+#'
+#' @return A `Date` vector.
+#'
+#' @keywords internal
+parse_dates <- function(date, call = parent.frame()) {
+  checkmate::assert(
+    checkmate::check_date(date, any.missing = FALSE, min.len = 1),
+    checkmate::check_character(date, any.missing = FALSE, min.len = 1),
+    .var.name = "date"
+  )
+
+  if (is.character(date)) {
+
+    # the format of each string is chosen by its shape, and as.Date() alone
+    # accepts trailing text (e.g. "2021-01-01x"), so strings must also be
+    # formatted back to themselves
+
+    date_format <- ifelse(grepl("^[0-9]{8}$", date), "%Y%m%d", "%Y-%m-%d")
+    parsed_date <- as.Date(date, format = date_format)
+    is_bad <- is.na(parsed_date) | format(parsed_date, date_format) != date
+    is_bad[is.na(is_bad)] <- TRUE
+
+    if (any(is_bad)) {
+      bad_dates <- date[is_bad]
+      cli::cli_abort(
+        c(
+          "{.arg date} must be in the {.val YYYYMMDD} or {.val YYYY-MM-DD}
+           formats.",
+          "x" = "Invalid date{?s}: {.val {bad_dates}}."
+        ),
+        class = "gtfstools_bad_date_error",
+        call = call
+      )
+    }
+
+    date <- parsed_date
+  }
+
+  return(date)
+}
+
+
+
 #' Get the services that run on the given days
 #'
-#' Returns the services that run on at least one of the given days, according
-#' to the `calendar` and `calendar_dates` tables (either may be missing).
+#' Returns the services that run on each of the given days, according to the
+#' `calendar` and `calendar_dates` tables (either may be missing).
 #'
 #' @template gtfs
 #' @param days An integer vector of unique days, as the number of days since
 #'   1970-01-01.
 #'
-#' @return A character vector of unique `service_id`s, empty if no service
-#'   runs on the given days.
+#' @return A `data.table` with the columns `service_id` and `day` (as an
+#'   integer), with one row for each service running on each day (rows may be
+#'   duplicated). Services with a missing `service_id` are not included.
 #'
 #' @keywords internal
 get_services_on_days <- function(gtfs, days) {
@@ -204,8 +233,8 @@ get_services_on_days <- function(gtfs, days) {
     )
   }
 
-  relevant_services <- unique(services_on_days$service_id)
-  relevant_services <- relevant_services[!is.na(relevant_services)]
+  has_service_id <- !is.na(services_on_days$service_id)
+  if (!all(has_service_id)) services_on_days <- services_on_days[has_service_id]
 
-  return(relevant_services)
+  return(services_on_days)
 }
