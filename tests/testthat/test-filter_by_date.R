@@ -33,6 +33,9 @@ test_that("raises error due to incorrect input types", {
     class = "gtfstools_bad_date_error"
   )
 
+  # dates may also be given in the "YYYYMMDD" format
+  expect_identical(tester(date = "20060703"), tester(date = "2006-07-03"))
+
   # IDate objects are dates too
   expect_identical(
     tester(date = data.table::as.IDate("2006-07-03")),

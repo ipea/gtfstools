@@ -13,11 +13,12 @@ get_services_on_days(gtfs, days)
 1970-01-01.}
 }
 \value{
-A character vector of unique \code{service_id}s, empty if no service
-runs on the given days.
+A \code{data.table} with the columns \code{service_id} and \code{day} (as an
+integer), with one row for each service running on each day (rows may be
+duplicated). Services with a missing \code{service_id} are not included.
 }
 \description{
-Returns the services that run on at least one of the given days, according
-to the \code{calendar} and \code{calendar_dates} tables (either may be missing).
+Returns the services that run on each of the given days, according to the
+\code{calendar} and \code{calendar_dates} tables (either may be missing).
 }
 \keyword{internal}
