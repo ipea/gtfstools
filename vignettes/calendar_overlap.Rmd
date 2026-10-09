@@ -79,7 +79,7 @@ daily_trips <- get_calendar_overlap(c(spo_path, poa_path))
 head(daily_trips[daily_trips$overlap, ])
 ```
 
-Trips listed in `frequencies` count once per departure. The São Paulo sample feed, for instance, describes all its service this way. With `plot = TRUE`, the daily trips of each feed are plotted in a panel of their own, which makes weekly patterns and holidays easy to spot. In Porto Alegre, there are far fewer trips on weekends:
+Trips listed in `frequencies` count once per departure. The São Paulo sample feed, for instance, describes all its service this way. With `plot = TRUE`, the density of each feed's trips over time is plotted in a panel of its own, weighting each day by its number of trips, which shows when each feed's service is concentrated:
 
 ```{r, eval = requireNamespace("ggplot2", quietly = TRUE), fig.width = 7, fig.height = 4, dpi = 96}
 get_calendar_overlap(c(spo_path, poa_path), plot = TRUE) +

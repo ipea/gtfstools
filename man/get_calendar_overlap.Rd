@@ -31,8 +31,9 @@ service on the day).
 
 If \code{plot = TRUE}, a \code{ggplot} object. With \code{resolution = "periods"}, it
 shows one bar per feed (top to bottom in the given order) spanning its
-service days. With \code{resolution = "daily"}, it shows the number of trips
-per day, one panel per feed. In both, the overlap periods are shaded.
+service days. With \code{resolution = "daily"}, it shows the density of each
+feed's trips over time (weighted by the number of trips per day), one
+panel per feed. In both, the overlap periods are shaded.
 }
 \description{
 Returns the periods in which all the given GTFS feeds have service, or the
@@ -64,7 +65,7 @@ which keeps only their unique departures. A trip with an invalid
 service day, so departures after midnight (with times later than
 \code{"24:00:00"}) count on the previous day. If the feed
 has no \code{trips} table with a \code{service_id} field, \code{n_trips} is \code{NA}, and the
-daily plot shows its service days as a rug along the bottom of its panel.
+daily plot shows the density of its service days instead.
 
 Feeds are named after their file names (without the extension) or after the
 list names. Unnamed feeds are named after their position (\code{"feed_1"},

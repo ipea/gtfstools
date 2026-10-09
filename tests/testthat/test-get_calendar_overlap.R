@@ -582,7 +582,8 @@ test_that("returns a timeline plot", {
 test_that("returns a plot of the trips per day", {
   skip_if_not_installed("ggplot2")
 
-  # feeds without trip counts are drawn as a rug, without warnings
+  # feeds without trip counts are drawn by their service days, without
+  # warnings
 
   daily_plot <- tester(
     list(ggl_gtfs, ggl_no_trips),
@@ -595,8 +596,10 @@ test_that("returns a plot of the trips per day", {
     0
   )
   expect_identical(nrow(ggplot2::layer_data(daily_plot, 1)), 10L)
-  expect_identical(nrow(ggplot2::layer_data(daily_plot, 2)), 12L)
-  expect_identical(nrow(ggplot2::layer_data(daily_plot, 3)), 31L)
+
+  densities <- ggplot2::layer_data(daily_plot, 2)
+  expect_identical(sort(unique(as.integer(densities$PANEL))), 1:2)
+  expect_true(all(densities$density >= 0))
 
   # builds without overlap
 

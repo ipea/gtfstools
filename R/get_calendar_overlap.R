@@ -27,8 +27,9 @@
 #'
 #'   If `plot = TRUE`, a `ggplot` object. With `resolution = "periods"`, it
 #'   shows one bar per feed (top to bottom in the given order) spanning its
-#'   service days. With `resolution = "daily"`, it shows the number of trips
-#'   per day, one panel per feed. In both, the overlap periods are shaded.
+#'   service days. With `resolution = "daily"`, it shows the density of each
+#'   feed's trips over time (weighted by the number of trips per day), one
+#'   panel per feed. In both, the overlap periods are shaded.
 #'
 #' @section Details:
 #' A feed has service on a day if at least one of its services runs on it. A
@@ -52,7 +53,7 @@
 #' service day, so departures after midnight (with times later than
 #' `"24:00:00"`) count on the previous day. If the feed
 #' has no `trips` table with a `service_id` field, `n_trips` is `NA`, and the
-#' daily plot shows its service days as a rug along the bottom of its panel.
+#' daily plot shows the density of its service days instead.
 #'
 #' Feeds are named after their file names (without the extension) or after the
 #' list names. Unnamed feeds are named after their position (`"feed_1"`,
@@ -179,10 +180,16 @@ get_calendar_overlap <- function(gtfs, resolution = "daily", plot = FALSE) {
       ggplot2::scale_y_discrete(limits = rev(feed_names)) +
       ggplot2::labs(x = "Date", y = NULL)
   } else {
-    # each day is a bar centred on its date. feeds without trip counts show
-    # their service days as a rug instead
+    # each feed's density weighs its days by their number of trips. days of
+    # feeds without trip counts weigh 1
 
-    daily_trips[, feed := factor(feed, levels = feed_names)]
+    daily_trips[
+      ,
+      `:=`(
+        feed = factor(feed, levels = feed_names),
+        density_weight = data.table::fifelse(is.na(n_trips), 1, n_trips)
+      )
+    ]
 
     overlap_plot <- ggplot2::ggplot() +
       ggplot2::geom_rect(
@@ -193,18 +200,12 @@ get_calendar_overlap <- function(gtfs, resolution = "daily", plot = FALSE) {
         fill = "#E69F00",
         alpha = 0.4
       ) +
-      ggplot2::geom_col(
-        data = daily_trips[!is.na(n_trips)],
-        ggplot2::aes(x = date, y = n_trips),
-        position = "identity",
-        width = 1,
-        fill = "#0072B2"
-      ) +
-      ggplot2::geom_rug(
-        data = daily_trips[is.na(n_trips)],
-        ggplot2::aes(x = date),
+      ggplot2::geom_density(
+        data = daily_trips,
+        ggplot2::aes(x = date, weight = density_weight),
         colour = "#0072B2",
-        sides = "b"
+        fill = "#0072B2",
+        alpha = 0.6
       ) +
       ggplot2::facet_wrap(
         ggplot2::vars(feed),
@@ -212,7 +213,7 @@ get_calendar_overlap <- function(gtfs, resolution = "daily", plot = FALSE) {
         scales = "free_y",
         drop = FALSE
       ) +
-      ggplot2::labs(x = "Date", y = "Trips per day")
+      ggplot2::labs(x = "Date", y = "Density of trips")
   }
 
   overlap_plot <- overlap_plot +
