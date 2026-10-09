@@ -136,13 +136,8 @@ utils::globalVariables(
     "runs",
     "first_day",
     "last_day",
-    "period",
-    "n_running",
-    "n_removed",
-    "i.date",
     "day",
     "change",
-    "x.n_running",
     "group",
     "i.group",
     "i.pattern_id",
@@ -155,6 +150,17 @@ utils::globalVariables(
     "arr_shift",
     "new_dep",
     "x.service_id",
-    "i.day"
+    "i.day",
+    "sid",
+    "weight",
+    "next_day",
+    "is_added",
+    "is_removed",
+    "is_covered",
+    "start_secs",
+    "end_secs",
+    "is_invalid",
+    "n_departures",
+    "density_weight"
   )
 )

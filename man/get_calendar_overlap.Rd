@@ -4,30 +4,43 @@
 \alias{get_calendar_overlap}
 \title{Get calendar overlap}
 \usage{
-get_calendar_overlap(gtfs, output = "df")
+get_calendar_overlap(gtfs, resolution = "daily", plot = FALSE)
 }
 \arguments{
 \item{gtfs}{Either a character vector with the paths to GTFS \code{.zip} files
 or a list of GTFS objects, as created by \code{\link[=read_gtfs]{read_gtfs()}} (a single GTFS
 object must be wrapped in a list).}
 
-\item{output}{A string. \code{"df"} (the default) returns the overlap periods as
-a \code{data.table}, and \code{"plot"} a timeline of each feed's service days
-(requires the \code{{ggplot2}} package).}
+\item{resolution}{A string. \code{"daily"} (the default) returns the number of
+trips of each feed on each of its service days, and \code{"periods"} the
+periods in which all feeds have service.}
+
+\item{plot}{A logical. Whether to return a plot of the result instead of
+the result itself (requires the \code{{ggplot2}} package). Defaults to \code{FALSE}.}
 }
 \value{
-If \code{output = "df"}, a \code{data.table} with one row per period of
-consecutive days on which all feeds have service, and the columns
-\code{start_date}, \code{end_date} (both included in the period) and \code{n_days}. It
-has no rows if there is no such day. If \code{output = "plot"}, a \code{ggplot}
-object with one bar per feed (top to bottom in the given order) spanning
-its service days, and the overlap periods shaded in the background.
+If \code{plot = FALSE} and \code{resolution = "periods"}, a \code{data.table} with
+one row per period of consecutive days on which all feeds have service,
+and the columns \code{start_date}, \code{end_date} (both included in the period) and
+\code{n_days}. It has no rows if there is no such day.
+
+If \code{plot = FALSE} and \code{resolution = "daily"}, a \code{data.table} with one row
+per feed and service day, and the columns \code{feed}, \code{date}, \code{n_trips} (the
+number of trips that run on the day) and \code{overlap} (whether all feeds have
+service on the day).
+
+If \code{plot = TRUE}, a \code{ggplot} object. With \code{resolution = "periods"}, it
+shows one bar per feed (top to bottom in the given order) spanning its
+service days. With \code{resolution = "daily"}, it shows the density of each
+feed's trips over time (weighted by the number of trips per day), one
+panel per feed. In both, the overlap periods are shaded.
 }
 \description{
-Returns the periods in which all the given GTFS feeds have service, or a
-timeline plot of each feed's service days with these periods highlighted.
-Useful to pick a date on which several feeds can be analysed together (e.g.
-when routing on the networks of different agencies).
+Returns the periods in which all the given GTFS feeds have service, or the
+number of trips each feed runs on each of its service days. Either result
+can also be plotted. Useful to pick a date on which several feeds can be
+analysed together (e.g. when routing on the networks of different
+agencies).
 }
 \section{Details}{
 
@@ -35,14 +48,29 @@ A feed has service on a day if at least one of its services runs on it. A
 service runs on the days between the \code{start_date} and \code{end_date} of its
 \code{calendar} entry whose weekday is flagged, minus the days removed from it
 in \code{calendar_dates} (\code{exception_type} 2), plus the days added to it
-(\code{exception_type} 1). Either table may be missing. If the feed has a \code{trips}
+(\code{exception_type} 1). If a service is both added and removed on a day, the
+addition wins. Either table may be missing. If the feed has a \code{trips}
 table with a \code{service_id} field, services not used by any trip are ignored.
 \code{feed_info} dates are not used. A warning is raised for feeds without any
 service day.
 
+The number of trips on a day is the number of trips of the services that
+run on it. A trip listed in \code{frequencies} counts once per departure, every
+\code{headway_secs} from \code{start_time} until (but not including) \code{end_time} (an
+entry whose \code{start_time} and \code{end_time} are equal departs once), and
+the departures of overlapping entries of the same trip are added up
+(identical entries count once), unlike in \code{\link[=frequencies_to_stop_times]{frequencies_to_stop_times()}},
+which keeps only their unique departures. A trip with an invalid
+\code{frequencies} entry counts once, with a warning. Trips count on their
+service day, so departures after midnight (with times later than
+\code{"24:00:00"}) count on the previous day. If the feed
+has no \code{trips} table with a \code{service_id} field, \code{n_trips} is \code{NA}, and the
+daily plot shows the density of its service days instead.
+
 Feeds are named after their file names (without the extension) or after the
 list names. Unnamed feeds are named after their position (\code{"feed_1"},
-\code{"feed_2"}, etc.), and duplicated names are made unique.
+\code{"feed_2"}, etc.), and duplicated names are made unique. Plots of feeds
+spanning long periods can be zoomed in with \code{\link[ggplot2:coord_cartesian]{ggplot2::coord_cartesian()}}.
 }
 
 \examples{
@@ -54,14 +82,15 @@ spo_path <- system.file("extdata/spo_gtfs.zip", package = "gtfstools")
 poa_path <- system.file("extdata/poa_gtfs.zip", package = "gtfstools")
 
 # feeds may be given as paths to their .zip files
-get_calendar_overlap(c(spo_path, poa_path))
+daily_trips <- get_calendar_overlap(c(spo_path, poa_path))
+head(daily_trips)
 
 # or as a list of GTFS objects, whose names are used as feed names
 feeds <- list(spo = read_gtfs(spo_path), poa = read_gtfs(poa_path))
-get_calendar_overlap(feeds)
+get_calendar_overlap(feeds, resolution = "periods")
 
 if (requireNamespace("ggplot2", quietly = TRUE)) {
-  get_calendar_overlap(feeds, output = "plot")
+  get_calendar_overlap(feeds, plot = TRUE)
 }
 
 }
