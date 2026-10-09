@@ -18,6 +18,7 @@
 - New function `get_dates()`, which returns the dates on which a feed has service, as `Date`s or as `"YYYYMMDD"` strings.
 - New function `get_active_services()`, which returns the services active on the given dates.
 - New function `get_start_and_end_times()`, which returns the earliest departure time and the latest arrival time in `stop_times`, optionally restricted to the given trips and dates.
+- New functions `get_stop_timetable()` and `get_route_timetable()`, which return the timetables of the given stops and routes on the given dates: the stop times of the trips that run on each date, with the trip information.
 - New function `get_calendar_overlap()`, which returns the periods in which all the given feeds have service, to help pick a date on which they can be analysed together. See the new "Checking the calendar overlap of GTFS feeds" vignette (#85). Thanks @higgicd for the suggestion and the original code.
 - New functions `get_route_frequency()` and `get_stop_frequency()`, which return the number of departures and the mean headway of each route and at each stop within a time of day (#53).
 - New function `stop_times_to_frequencies()`, the counterpart of `frequencies_to_stop_times()`, which approximates scheduled trips by frequency-based ones (#69).
