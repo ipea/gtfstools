@@ -45,6 +45,7 @@ Imports:
     zip
 Suggests: 
     covr,
+    dplyr,
     ggplot2,
     jsonlite,
     knitr,
