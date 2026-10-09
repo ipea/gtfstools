@@ -23,6 +23,8 @@
   : Get parent stations recursively
 - [`get_route_frequency()`](https://ipea.github.io/gtfstools/dev/reference/get_route_frequency.md)
   : Get route frequency
+- [`get_route_timetable()`](https://ipea.github.io/gtfstools/dev/reference/get_route_timetable.md)
+  : Get route timetable
 - [`get_shape_length()`](https://ipea.github.io/gtfstools/dev/reference/get_shape_length.md)
   : Get shape length
 - [`get_start_and_end_times()`](https://ipea.github.io/gtfstools/dev/reference/get_start_and_end_times.md)
@@ -31,6 +33,8 @@
   : Get stop frequency
 - [`get_stop_times_patterns()`](https://ipea.github.io/gtfstools/dev/reference/get_stop_times_patterns.md)
   : Get stop times patterns
+- [`get_stop_timetable()`](https://ipea.github.io/gtfstools/dev/reference/get_stop_timetable.md)
+  : Get stop timetable
 - [`get_stops()`](https://ipea.github.io/gtfstools/dev/reference/get_stops.md)
   : Get stops
 - [`get_trip_duration()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_duration.md)

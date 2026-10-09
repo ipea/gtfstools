@@ -82,14 +82,27 @@
   [`get_start_and_end_times()`](https://ipea.github.io/gtfstools/dev/reference/get_start_and_end_times.md),
   which returns the earliest departure time and the latest arrival time
   in `stop_times`, optionally restricted to the given trips and dates.
+- New functions
+  [`get_stop_timetable()`](https://ipea.github.io/gtfstools/dev/reference/get_stop_timetable.md)
+  and
+  [`get_route_timetable()`](https://ipea.github.io/gtfstools/dev/reference/get_route_timetable.md),
+  which return the timetables of the given stops and routes on the given
+  dates: the stop times of the trips that run on each date, with the
+  trip information.
 - New function
   [`get_calendar_overlap()`](https://ipea.github.io/gtfstools/dev/reference/get_calendar_overlap.md),
-  which returns the periods in which all the given feeds have service,
-  to help pick a date on which they can be analysed together. See the
-  new “Checking the calendar overlap of GTFS feeds” vignette
+  which returns the number of trips each GTFS feed runs on each of its
+  service days (counting the departures listed in `frequencies`) and
+  whether all feeds have service on that day, helping to pick a date on
+  which several feeds can be analysed together (e.g. in routing and
+  accessibility analyses). With `resolution = "periods"`, it returns the
+  periods in which all feeds have service, and `plot = TRUE` plots
+  either result (requires [ggplot2](https://ggplot2.tidyverse.org)).
+  Feeds may be given as paths or as a list of GTFS objects. See the new
+  “Checking the calendar overlap of GTFS feeds” vignette
   ([\#85](https://github.com/ipea/gtfstools/issues/85)). Thanks
   [@higgicd](https://github.com/higgicd) for the suggestion and the
-  original code.
+  original `check_gtfs_overlap()` code.
 - New functions
   [`get_route_frequency()`](https://ipea.github.io/gtfstools/dev/reference/get_route_frequency.md)
   and
