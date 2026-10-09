@@ -153,6 +153,8 @@ utils::globalVariables(
     "dep",
     "dep_shift",
     "arr_shift",
-    "new_dep"
+    "new_dep",
+    "x.service_id",
+    "i.day"
   )
 )
