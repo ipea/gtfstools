@@ -25,7 +25,7 @@ reference:
     - convert_shapes_to_sf
     - convert_stops_to_sf
     - filter_by_spatial_extent
-  - title: "Manipulation"
+  - title: "Editing GTFS feeds"
   - contents:
     - convert_time_to_seconds
     - frequencies_to_stop_times

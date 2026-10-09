@@ -30,6 +30,7 @@ GTFS feeds are often used to describe very large and complex public transport ne
 - `filter_by_trip_id()`
 - `filter_by_route_type()`
 - `filter_by_weekday()`
+- `filter_by_date()`
 - `filter_by_time_of_day()`
 - `filter_by_spatial_extent()`
 
@@ -86,7 +87,7 @@ The same logic demonstrated with `filter_by_trip_id()` applies to the functions 
 
 # Filtering by day of the week or time of the day:
 
-Frequently enough one wants to analyze service levels on certain days of the week or during different times of the day. The functions `filter_by_weekday()` and `filter_by_time_of_day()` can be used to this purpose.
+Frequently enough one wants to analyze service levels on certain days of the week or during different times of the day. The functions `filter_by_weekday()` and `filter_by_time_of_day()` can be used to this purpose. To filter by specific calendar dates instead, use `filter_by_date()`, which keeps (or drops) the services that run on the given dates.
 
 The first one takes the days of the week you want to keep/drop and also includes a `combine` argument that controls how multi-day filters work. Let's see how that works with a few examples:
 

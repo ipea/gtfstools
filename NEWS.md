@@ -12,6 +12,8 @@
 
 ## New features
 
+- New function `filter_by_date()`, which filters a feed by the services that run on the given dates.
+- New function `get_stops()`, which returns the stops visited by the given trips and/or routes.
 - New function `get_calendar_overlap()`, which returns the periods in which all the given feeds have service, to help pick a date on which they can be analysed together. See the new "Checking the calendar overlap of GTFS feeds" vignette (#85). Thanks @higgicd for the suggestion and the original code.
 - New functions `get_route_frequency()` and `get_stop_frequency()`, which return the number of departures and the mean headway of each route and at each stop within a time of day (#53).
 - New function `stop_times_to_frequencies()`, the counterpart of `frequencies_to_stop_times()`, which approximates scheduled trips by frequency-based ones (#69).
