@@ -33,7 +33,7 @@ Imports:
     cli,
     curl,
     data.table,
-    gtfsio (>= 1.0.0),
+    gtfsio (>= 1.2.2),
     httr2,
     parallelly,
     processx,
