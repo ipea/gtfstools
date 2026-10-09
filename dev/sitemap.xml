@@ -26,6 +26,7 @@
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/download_validator.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/empty_trip_length.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/filter_by_agency_id.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/filter_by_date.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/filter_by_route_id.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/filter_by_route_type.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/filter_by_service_id.html</loc></url>
@@ -44,9 +45,11 @@
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/get_parent_station.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/get_route_frequency.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/get_service_period.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/get_services_on_days.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/get_shape_length.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/get_stop_frequency.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/get_stop_times_patterns.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/get_stops.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/get_trip_departures.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/get_trip_duration.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/get_trip_geometry.html</loc></url>

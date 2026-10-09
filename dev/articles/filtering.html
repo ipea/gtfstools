@@ -92,6 +92,7 @@ filtering functions currently available are:</p>
 <li><code><a href="../reference/filter_by_trip_id.html">filter_by_trip_id()</a></code></li>
 <li><code><a href="../reference/filter_by_route_type.html">filter_by_route_type()</a></code></li>
 <li><code><a href="../reference/filter_by_weekday.html">filter_by_weekday()</a></code></li>
+<li><code><a href="../reference/filter_by_date.html">filter_by_date()</a></code></li>
 <li><code><a href="../reference/filter_by_time_of_day.html">filter_by_time_of_day()</a></code></li>
 <li><code><a href="../reference/filter_by_spatial_extent.html">filter_by_spatial_extent()</a></code></li>
 </ul>
@@ -188,7 +189,10 @@ applies to the functions that filter feeds by <code>agency_id</code>,
 <p>Frequently enough one wants to analyze service levels on certain days
 of the week or during different times of the day. The functions
 <code><a href="../reference/filter_by_weekday.html">filter_by_weekday()</a></code> and
-<code><a href="../reference/filter_by_time_of_day.html">filter_by_time_of_day()</a></code> can be used to this purpose.</p>
+<code><a href="../reference/filter_by_time_of_day.html">filter_by_time_of_day()</a></code> can be used to this purpose. To
+filter by specific calendar dates instead, use
+<code><a href="../reference/filter_by_date.html">filter_by_date()</a></code>, which keeps (or drops) the services that
+run on the given dates.</p>
 <p>The first one takes the days of the week you want to keep/drop and
 also includes a <code>combine</code> argument that controls how
 multi-day filters work. Let’s see how that works with a few

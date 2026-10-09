@@ -61,6 +61,12 @@
 ### New features
 
 - New function
+  [`filter_by_date()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_date.md),
+  which filters a feed by the services that run on the given dates.
+- New function
+  [`get_stops()`](https://ipea.github.io/gtfstools/dev/reference/get_stops.md),
+  which returns the stops visited by the given trips and/or routes.
+- New function
   [`get_calendar_overlap()`](https://ipea.github.io/gtfstools/dev/reference/get_calendar_overlap.md),
   which returns the periods in which all the given feeds have service,
   to help pick a date on which they can be analysed together. See the

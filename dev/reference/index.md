@@ -25,6 +25,8 @@
   : Get stop frequency
 - [`get_stop_times_patterns()`](https://ipea.github.io/gtfstools/dev/reference/get_stop_times_patterns.md)
   : Get stop times patterns
+- [`get_stops()`](https://ipea.github.io/gtfstools/dev/reference/get_stops.md)
+  : Get stops
 - [`get_trip_duration()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_duration.md)
   : Get trip duration
 - [`get_trip_geometry()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_geometry.md)
@@ -42,6 +44,9 @@
   :
 
   Filter GTFS object by `agency_id`
+
+- [`filter_by_date()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_date.md)
+  : Filter GTFS object by date
 
 - [`filter_by_route_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_route_id.md)
   :
@@ -102,7 +107,7 @@
 - [`filter_by_spatial_extent()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_spatial_extent.md)
   : Filter a GTFS object using a spatial extent
 
-## Manipulation
+## Editing GTFS feeds
 
 - [`convert_time_to_seconds()`](https://ipea.github.io/gtfstools/dev/reference/convert_time_to_seconds.md)
   : Convert time fields to seconds after midnight

@@ -236,6 +236,7 @@ including some examples (not available for all types):
 
 Other filtering functions:
 [`filter_by_agency_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_agency_id.md),
+[`filter_by_date()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_date.md),
 [`filter_by_route_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_route_id.md),
 [`filter_by_service_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_service_id.md),
 [`filter_by_shape_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_shape_id.md),

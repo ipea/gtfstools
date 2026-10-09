@@ -17,6 +17,7 @@ functions currently available are:
 - [`filter_by_trip_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_trip_id.md)
 - [`filter_by_route_type()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_route_type.md)
 - [`filter_by_weekday()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_weekday.md)
+- [`filter_by_date()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_date.md)
 - [`filter_by_time_of_day()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_time_of_day.md)
 - [`filter_by_spatial_extent()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_spatial_extent.md)
 
@@ -125,7 +126,10 @@ the week or during different times of the day. The functions
 [`filter_by_weekday()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_weekday.md)
 and
 [`filter_by_time_of_day()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_time_of_day.md)
-can be used to this purpose.
+can be used to this purpose. To filter by specific calendar dates
+instead, use
+[`filter_by_date()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_date.md),
+which keeps (or drops) the services that run on the given dates.
 
 The first one takes the days of the week you want to keep/drop and also
 includes a `combine` argument that controls how multi-day filters work.

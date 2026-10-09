@@ -137,6 +137,7 @@ are used as-is, not recalculated from the time strings.
 
 Other filtering functions:
 [`filter_by_agency_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_agency_id.md),
+[`filter_by_date()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_date.md),
 [`filter_by_route_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_route_id.md),
 [`filter_by_route_type()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_route_type.md),
 [`filter_by_service_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_service_id.md),
