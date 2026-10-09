@@ -14,6 +14,7 @@
 
 - New function `filter_by_date()`, which filters a feed by the services that run on the given dates.
 - New function `get_stops()`, which returns the stops visited by the given trips and/or routes.
+- New function `get_stop_distances()`, which returns the great-circle distances between each pair of stops visited by the given trips and/or routes.
 - New function `convert_stops_to_shapes()`, which creates shapes that link the consecutive stops of trips along straight lines, for trips not linked to a usable shape (or for the given trips), and assigns them to the trips.
 - New function `get_dates()`, which returns the dates on which a feed has service, as `Date`s or as `"YYYYMMDD"` strings.
 - New function `get_active_services()`, which returns the services active on the given dates.

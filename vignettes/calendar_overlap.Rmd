@@ -20,15 +20,17 @@ library(gtfstools)
 
 Routing and accessibility analyses often combine several GTFS feeds, such as those of the different transit agencies of a metropolitan region. Routing engines such as `{r5r}` and OpenTripPlanner work on a given departure date, which must have service in every feed: otherwise, one of the networks silently drops out of the analysis. Feeds are published at different times and cover different periods, so such a date is not always easy to find.
 
-`get_calendar_overlap()` compares the calendars of several feeds. It is based on the `check_gtfs_overlap()` function shared by [@higgicd](https://github.com/higgicd) in [issue #85](https://github.com/ipea/gtfstools/issues/85). Its `resolution` argument controls what the result captures:
+`get_calendar_overlap()` compares the calendars of several feeds. It only hsa two arguments. Its `resolution` argument controls what the result captures:
 
 - `resolution = "daily"` (the default) captures the **intensity** of transit services: the number of trips each feed runs on each of its service days, and whether all feeds have service on that day.
 - `resolution = "periods"` captures whether there is **any** service: the periods of consecutive days on which every feed runs at least one trip, however few.
 
 A day may thus belong to an overlap period even if one of the feeds runs only a handful of trips on it, which the daily trips reveal. With `plot = TRUE`, either result is plotted with `{ggplot2}`.
 
-```{r, message = FALSE, eval = requireNamespace("ggplot2", quietly = TRUE)}
+```{r, message = FALSE, warning = FALSE,  eval = requireNamespace("ggplot2", quietly = TRUE)}
+library(gtfstools)
 library(ggplot2)
+library(dplyr)
 ```
 
 # Trips per day
@@ -40,10 +42,13 @@ spo_path <- system.file("extdata/spo_gtfs.zip", package = "gtfstools")
 poa_path <- system.file("extdata/poa_gtfs.zip", package = "gtfstools")
 
 daily_trips <- get_calendar_overlap(c(spo_path, poa_path))
-head(daily_trips[daily_trips$overlap, ])
+
+daily_trips |> 
+  dplyr::filter( overlap == TRUE) |> 
+  head()
 ```
 
-`n_trips` is the number of trips that run on the day, and `overlap` tells whether all feeds have service on it. Trips listed in `frequencies` count once per departure, so feeds that describe their service with frequencies, such as the São Paulo sample feed, are comparable with feeds that list every trip.
+`n_trips` is the number of trips that run on the day, and `overlap` tells whether all feeds have service on it. Trips listed in `frequencies` count once per departure, so feeds that describe their service with frequencies are comparable with feeds that list every trip.
 
 A feed has service on a day when at least one of its services runs on it, according to the weekdays and dates in `calendar` and the exceptions in `calendar_dates`. Services not used by any trip are ignored. Feeds already read with `read_gtfs()` (and possibly edited afterwards) can also be given as a list, whose names are used as feed names, e.g. `get_calendar_overlap(list(spo = spo_gtfs, poa = poa_gtfs))`.
 
