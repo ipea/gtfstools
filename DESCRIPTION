@@ -27,7 +27,7 @@ URL: https://ipea.github.io/gtfstools/,
     https://github.com/ipea/gtfstools
 BugReports: https://github.com/ipea/gtfstools/issues
 Depends: 
-    R (>= 2.10)
+    R (>= 4.1.0)
 Imports:
     checkmate,
     cli,

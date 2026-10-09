@@ -1,6 +1,6 @@
 #' Get distances between stops
 #'
-#' Returns the distance between each pair of stops visited by the given trips
+#' Returns the Euclidean distance between each pair of stops visited by the given trips
 #' and/or routes.
 #'
 #' @template gtfs
@@ -132,7 +132,6 @@ get_stop_distances <- function(gtfs, trip_id = NULL, route_id = NULL) {
 
   return(distances)
 }
-
 
 
 #' Maximum number of stop pairs without a warning
