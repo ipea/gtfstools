@@ -9,10 +9,14 @@
 
 ## Query information from GTFS feeds
 
+- [`get_active_services()`](https://ipea.github.io/gtfstools/dev/reference/get_active_services.md)
+  : Get active services
 - [`get_calendar_overlap()`](https://ipea.github.io/gtfstools/dev/reference/get_calendar_overlap.md)
   : Get calendar overlap
 - [`get_children_stops()`](https://ipea.github.io/gtfstools/dev/reference/get_children_stops.md)
   : Get children stops recursively
+- [`get_dates()`](https://ipea.github.io/gtfstools/dev/reference/get_dates.md)
+  : Get service dates
 - [`get_dwell_time()`](https://ipea.github.io/gtfstools/dev/reference/get_dwell_time.md)
   : Get dwell time
 - [`get_parent_station()`](https://ipea.github.io/gtfstools/dev/reference/get_parent_station.md)
@@ -21,6 +25,8 @@
   : Get route frequency
 - [`get_shape_length()`](https://ipea.github.io/gtfstools/dev/reference/get_shape_length.md)
   : Get shape length
+- [`get_start_and_end_times()`](https://ipea.github.io/gtfstools/dev/reference/get_start_and_end_times.md)
+  : Get start and end times
 - [`get_stop_frequency()`](https://ipea.github.io/gtfstools/dev/reference/get_stop_frequency.md)
   : Get stop frequency
 - [`get_stop_times_patterns()`](https://ipea.github.io/gtfstools/dev/reference/get_stop_times_patterns.md)
@@ -109,6 +115,8 @@
 
 ## Editing GTFS feeds
 
+- [`convert_stops_to_shapes()`](https://ipea.github.io/gtfstools/dev/reference/convert_stops_to_shapes.md)
+  : Convert stops into shapes
 - [`convert_time_to_seconds()`](https://ipea.github.io/gtfstools/dev/reference/convert_time_to_seconds.md)
   : Convert time fields to seconds after midnight
 - [`frequencies_to_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/frequencies_to_stop_times.md)

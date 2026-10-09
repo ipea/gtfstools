@@ -19,7 +19,8 @@ filter_by_date(gtfs, date, keep = TRUE)
 - date:
 
   A `Date` vector (including `IDate`) or a character vector of dates in
-  the `"YYYY-MM-DD"` format. The dates used to filter the data.
+  the `"YYYYMMDD"` or `"YYYY-MM-DD"` formats. The dates used to filter
+  the data.
 
 - keep:
 

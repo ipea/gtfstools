@@ -67,6 +67,22 @@
   [`get_stops()`](https://ipea.github.io/gtfstools/dev/reference/get_stops.md),
   which returns the stops visited by the given trips and/or routes.
 - New function
+  [`convert_stops_to_shapes()`](https://ipea.github.io/gtfstools/dev/reference/convert_stops_to_shapes.md),
+  which creates shapes that link the consecutive stops of trips along
+  straight lines, for trips not linked to a usable shape (or for the
+  given trips), and assigns them to the trips.
+- New function
+  [`get_dates()`](https://ipea.github.io/gtfstools/dev/reference/get_dates.md),
+  which returns the dates on which a feed has service, as `Date`s or as
+  `"YYYYMMDD"` strings.
+- New function
+  [`get_active_services()`](https://ipea.github.io/gtfstools/dev/reference/get_active_services.md),
+  which returns the services active on the given dates.
+- New function
+  [`get_start_and_end_times()`](https://ipea.github.io/gtfstools/dev/reference/get_start_and_end_times.md),
+  which returns the earliest departure time and the latest arrival time
+  in `stop_times`, optionally restricted to the given trips and dates.
+- New function
   [`get_calendar_overlap()`](https://ipea.github.io/gtfstools/dev/reference/get_calendar_overlap.md),
   which returns the periods in which all the given feeds have service,
   to help pick a date on which they can be analysed together. See the
