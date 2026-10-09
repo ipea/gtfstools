@@ -55,6 +55,7 @@
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/get_services_on_days.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/get_shape_length.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/get_start_and_end_times.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/get_stop_distances.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/get_stop_frequency.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/get_stop_times_patterns.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/get_stop_timetable.html</loc></url>
@@ -74,6 +75,7 @@
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/list_validator_versions.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/locate_stops_along_shapes.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/map_deprecated_file.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/max_stop_pairs_without_warning.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/merge_gtfs.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/merge_service_intervals.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/parse_dates.html</loc></url>

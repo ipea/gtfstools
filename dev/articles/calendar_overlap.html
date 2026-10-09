@@ -83,82 +83,44 @@ work on a given departure date, which must have service in every feed:
 otherwise, one of the networks silently drops out of the analysis. Feeds
 are published at different times and cover different periods, so such a
 date is not always easy to find.</p>
-<p><code><a href="../reference/get_calendar_overlap.html">get_calendar_overlap()</a></code> returns the periods in which all
-the given feeds have service, and how many trips each feed runs on each
-day. It is based on the <code>check_gtfs_overlap()</code> function
-shared by <a href="https://github.com/higgicd" class="external-link"><span class="citation">@higgicd</span></a> in <a href="https://github.com/ipea/gtfstools/issues/85" class="external-link">issue #85</a>.</p>
+<p><code><a href="../reference/get_calendar_overlap.html">get_calendar_overlap()</a></code> compares the calendars of several
+feeds. It only hsa two arguments. Its <code>resolution</code> argument
+controls what the result captures:</p>
+<ul>
+<li>
+<code>resolution = "daily"</code> (the default) captures the
+<strong>intensity</strong> of transit services: the number of trips each
+feed runs on each of its service days, and whether all feeds have
+service on that day.</li>
+<li>
+<code>resolution = "periods"</code> captures whether there is
+<strong>any</strong> service: the periods of consecutive days on which
+every feed runs at least one trip, however few.</li>
+</ul>
+<p>A day may thus belong to an overlap period even if one of the feeds
+runs only a handful of trips on it, which the daily trips reveal. With
+<code>plot = TRUE</code>, either result is plotted with
+<a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ipea.github.io/gtfstools/">gtfstools</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
-<h2 id="finding-a-date-with-service-in-all-feeds">Finding a date with service in all feeds<a class="anchor" aria-label="anchor" href="#finding-a-date-with-service-in-all-feeds"></a>
+<h2 id="trips-per-day">Trips per day<a class="anchor" aria-label="anchor" href="#trips-per-day"></a>
 </h2>
 <p>Feeds can be given as paths to their <code>.zip</code> files. In this
 case, the large <code>shapes</code> and <code>stop_times</code> tables
-are not read. With <code>resolution = "periods"</code>, the function
-returns the periods in which all feeds have service:</p>
+are not read. By default, the function returns one row per feed and
+service day:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">spo_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/spo_gtfs.zip"</span>, package <span class="op">=</span> <span class="st">"gtfstools"</span><span class="op">)</span></span>
 <span><span class="va">poa_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/poa_gtfs.zip"</span>, package <span class="op">=</span> <span class="st">"gtfstools"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">overlap</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_calendar_overlap.html">get_calendar_overlap</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">spo_path</span>, <span class="va">poa_path</span><span class="op">)</span>, resolution <span class="op">=</span> <span class="st">"periods"</span><span class="op">)</span></span>
-<span><span class="va">overlap</span></span>
-<span><span class="co">#&gt;    start_date   end_date n_days</span></span>
-<span><span class="co">#&gt;        &lt;Date&gt;     &lt;Date&gt;  &lt;int&gt;</span></span>
-<span><span class="co">#&gt; 1: 2019-01-18 2019-04-18     91</span></span></code></pre></div>
-<p>Each row is a period of consecutive days on which all feeds have
-service, with its first and last days (both included) and its length.
-The São Paulo and Porto Alegre feeds overlap for 91 days, from January
-18 to April 18, 2019. Any of these days can be used, but a regular
-weekday away from holidays is usually the safest choice, e.g. the first
-Wednesday of the period (<code>format(x, "%u")</code> numbers weekdays
-from 1, Monday, regardless of the locale):</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">period_days</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="va">overlap</span><span class="op">$</span><span class="va">start_date</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="va">overlap</span><span class="op">$</span><span class="va">end_date</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, by <span class="op">=</span> <span class="st">"day"</span><span class="op">)</span></span>
-<span><span class="va">departure_date</span> <span class="op">&lt;-</span> <span class="va">period_days</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/format.html" class="external-link">format</a></span><span class="op">(</span><span class="va">period_days</span>, <span class="st">"%u"</span><span class="op">)</span> <span class="op">==</span> <span class="st">"3"</span><span class="op">]</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
-<span><span class="va">departure_date</span></span>
-<span><span class="co">#&gt; [1] "2019-01-23"</span></span></code></pre></div>
-<p>Feeds already read with <code><a href="../reference/read_gtfs.html">read_gtfs()</a></code> (and possibly edited
-afterwards) can be given as a list, whose names are used as feed names:
-<code>get_calendar_overlap(list(spo = spo_gtfs, poa = poa_gtfs), resolution = "periods")</code>.</p>
-<p>A feed has service on a day when at least one of its services runs on
-it, according to the weekdays and dates in <code>calendar</code> and the
-exceptions in <code>calendar_dates</code>. Services not used by any trip
-are ignored.</p>
-</div>
-<div class="section level2">
-<h2 id="visualising-service-periods">Visualising service periods<a class="anchor" aria-label="anchor" href="#visualising-service-periods"></a>
-</h2>
-<p>When the feeds don’t overlap, the result has no rows:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">ber_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/ber_gtfs.zip"</span>, package <span class="op">=</span> <span class="st">"gtfstools"</span><span class="op">)</span></span>
-<span><span class="va">feeds</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">spo_path</span>, <span class="va">poa_path</span>, <span class="va">ber_path</span><span class="op">)</span></span>
+<span><span class="va">daily_trips</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_calendar_overlap.html">get_calendar_overlap</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">spo_path</span>, <span class="va">poa_path</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/get_calendar_overlap.html">get_calendar_overlap</a></span><span class="op">(</span><span class="va">feeds</span>, resolution <span class="op">=</span> <span class="st">"periods"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Empty data.table (0 rows and 3 cols): start_date,end_date,n_days</span></span></code></pre></div>
-<p><code>plot = TRUE</code> shows why. It returns a
-<a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a> timeline with one bar per feed, spanning its
-service days, and the periods in which all feeds have service shaded in
-the background. The result is a regular <code>ggplot</code> object, so
-it can be customised with <a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a> functions, e.g. to zoom
-in on a period, since the São Paulo feed spans more than 12 years:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/get_calendar_overlap.html">get_calendar_overlap</a></span><span class="op">(</span><span class="va">feeds</span>, resolution <span class="op">=</span> <span class="st">"periods"</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2018-12-01"</span>, <span class="st">"2021-07-01"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="calendar_overlap_files/figure-html/unnamed-chunk-6-1.png" class="r-plt" alt="" width="672"></p>
-<p>The Berlin feed starts in November 2020, after the São Paulo feed
-ends, so no date has service in all three feeds.</p>
-</div>
-<div class="section level2">
-<h2 id="comparing-service-levels">Comparing service levels<a class="anchor" aria-label="anchor" href="#comparing-service-levels"></a>
-</h2>
-<p>The overlap does not guarantee a similar level of service in every
-feed: on some days, a feed may run only a few of its trips. The default,
-<code>resolution = "daily"</code>, returns the number of trips each feed
-runs on each of its service days, and whether all feeds have service on
-that day:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">daily_trips</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_calendar_overlap.html">get_calendar_overlap</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">spo_path</span>, <span class="va">poa_path</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">daily_trips</span><span class="op">[</span><span class="va">daily_trips</span><span class="op">$</span><span class="va">overlap</span>, <span class="op">]</span><span class="op">)</span></span>
+<span><span class="va">daily_trips</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span> <span class="va">overlap</span> <span class="op">==</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt;        feed       date n_trips overlap</span></span>
 <span><span class="co">#&gt;      &lt;char&gt;     &lt;Date&gt;   &lt;int&gt;  &lt;lgcl&gt;</span></span>
 <span><span class="co">#&gt; 1: spo_gtfs 2019-01-18    7948    TRUE</span></span>
@@ -167,18 +129,74 @@ that day:</p>
 <span><span class="co">#&gt; 4: spo_gtfs 2019-01-21    7948    TRUE</span></span>
 <span><span class="co">#&gt; 5: spo_gtfs 2019-01-22    7948    TRUE</span></span>
 <span><span class="co">#&gt; 6: spo_gtfs 2019-01-23    7948    TRUE</span></span></code></pre></div>
-<p>Trips listed in <code>frequencies</code> count once per departure.
-The São Paulo sample feed, for instance, describes all its service this
-way. With <code>plot = TRUE</code>, the density of each feed’s trips
-over time is plotted in a panel of its own, weighting each day by its
-number of trips, which shows when each feed’s service is
-concentrated:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<p><code>n_trips</code> is the number of trips that run on the day, and
+<code>overlap</code> tells whether all feeds have service on it. Trips
+listed in <code>frequencies</code> count once per departure, so feeds
+that describe their service with frequencies are comparable with feeds
+that list every trip.</p>
+<p>A feed has service on a day when at least one of its services runs on
+it, according to the weekdays and dates in <code>calendar</code> and the
+exceptions in <code>calendar_dates</code>. Services not used by any trip
+are ignored. Feeds already read with <code><a href="../reference/read_gtfs.html">read_gtfs()</a></code> (and
+possibly edited afterwards) can also be given as a list, whose names are
+used as feed names,
+e.g. <code>get_calendar_overlap(list(spo = spo_gtfs, poa = poa_gtfs))</code>.</p>
+<p>With <code>plot = TRUE</code>, the density of each feed’s trips over
+time is plotted in a panel of its own, weighting each day by its number
+of trips. The days on which all feeds have service are shaded:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_calendar_overlap.html">get_calendar_overlap</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">spo_path</span>, <span class="va">poa_path</span><span class="op">)</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2019-01-01"</span>, <span class="st">"2019-05-01"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="calendar_overlap_files/figure-html/unnamed-chunk-4-1.png" class="r-plt" alt="" width="672"></p>
+<p>The result is a regular <code>ggplot</code> object, so it can be
+customised with <a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a> functions, e.g. to zoom in on a
+period, as above.</p>
+<p>The daily trips help pick a departure date on which every feed runs
+its usual level of service, such as a regular weekday away from
+holidays. For example, the trips each feed runs on the first Wednesday
+on which both have service (<code>format(x, "%u")</code> numbers
+weekdays from 1, Monday, regardless of the locale):</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">overlap_days</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">daily_trips</span><span class="op">$</span><span class="va">date</span><span class="op">[</span><span class="va">daily_trips</span><span class="op">$</span><span class="va">overlap</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="va">departure_date</span> <span class="op">&lt;-</span> <span class="va">overlap_days</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/format.html" class="external-link">format</a></span><span class="op">(</span><span class="va">overlap_days</span>, <span class="st">"%u"</span><span class="op">)</span> <span class="op">==</span> <span class="st">"3"</span><span class="op">]</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
+<span></span>
+<span><span class="va">daily_trips</span><span class="op">[</span><span class="va">daily_trips</span><span class="op">$</span><span class="va">date</span> <span class="op">==</span> <span class="va">departure_date</span>, <span class="op">]</span></span>
+<span><span class="co">#&gt;        feed       date n_trips overlap</span></span>
+<span><span class="co">#&gt;      &lt;char&gt;     &lt;Date&gt;   &lt;int&gt;  &lt;lgcl&gt;</span></span>
+<span><span class="co">#&gt; 1: spo_gtfs 2019-01-23    7948    TRUE</span></span>
+<span><span class="co">#&gt; 2: poa_gtfs 2019-01-23     194    TRUE</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="overlap-periods">Overlap periods<a class="anchor" aria-label="anchor" href="#overlap-periods"></a>
+</h2>
+<p>When only the dates matter, <code>resolution = "periods"</code>
+summarises the days on which all feeds have service into periods of
+consecutive days, with their first and last days (both included) and
+their length:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/get_calendar_overlap.html">get_calendar_overlap</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">spo_path</span>, <span class="va">poa_path</span><span class="op">)</span>, resolution <span class="op">=</span> <span class="st">"periods"</span><span class="op">)</span></span>
+<span><span class="co">#&gt;    start_date   end_date n_days</span></span>
+<span><span class="co">#&gt;        &lt;Date&gt;     &lt;Date&gt;  &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1: 2019-01-18 2019-04-18     91</span></span></code></pre></div>
+<p>The São Paulo and Porto Alegre feeds overlap for 91 days, from
+January 18 to April 18, 2019. When the feeds don’t overlap, the result
+has no rows:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">ber_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/ber_gtfs.zip"</span>, package <span class="op">=</span> <span class="st">"gtfstools"</span><span class="op">)</span></span>
+<span><span class="va">feeds</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">spo_path</span>, <span class="va">poa_path</span>, <span class="va">ber_path</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/get_calendar_overlap.html">get_calendar_overlap</a></span><span class="op">(</span><span class="va">feeds</span>, resolution <span class="op">=</span> <span class="st">"periods"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Empty data.table (0 rows and 3 cols): start_date,end_date,n_days</span></span></code></pre></div>
+<p>With <code>plot = TRUE</code>, a timeline shows why. Each feed is a
+bar spanning its service days, and the periods in which all feeds have
+service are shaded in the background. The São Paulo feed spans more than
+12 years, so the plot is zoomed in:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/get_calendar_overlap.html">get_calendar_overlap</a></span><span class="op">(</span><span class="va">feeds</span>, resolution <span class="op">=</span> <span class="st">"periods"</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2018-12-01"</span>, <span class="st">"2021-07-01"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="calendar_overlap_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="" width="672"></p>
-<p>A good departure date is thus a regular weekday on which every feed
-runs its usual number of trips.</p>
+<p>The Berlin feed starts in November 2020, after the São Paulo feed
+ends, so no date has service in all three feeds.</p>
 <p>Once a date is chosen, the feeds can be combined into a single one
 with <code><a href="../reference/merge_gtfs.html">merge_gtfs()</a></code>, or reduced to the services of that date
 with the filtering functions (see the <a href="filtering.html">filtering

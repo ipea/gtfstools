@@ -109,6 +109,8 @@ Economic Research (Ipea), Brazil.
   : Get shape length
 - [`get_start_and_end_times()`](https://ipea.github.io/gtfstools/dev/reference/get_start_and_end_times.md)
   : Get start and end times
+- [`get_stop_distances()`](https://ipea.github.io/gtfstools/dev/reference/get_stop_distances.md)
+  : Get distances between stops
 - [`get_stop_frequency()`](https://ipea.github.io/gtfstools/dev/reference/get_stop_frequency.md)
   : Get stop frequency
 - [`get_stop_times_patterns()`](https://ipea.github.io/gtfstools/dev/reference/get_stop_times_patterns.md)

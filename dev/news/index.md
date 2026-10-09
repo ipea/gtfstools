@@ -67,6 +67,10 @@
   [`get_stops()`](https://ipea.github.io/gtfstools/dev/reference/get_stops.md),
   which returns the stops visited by the given trips and/or routes.
 - New function
+  [`get_stop_distances()`](https://ipea.github.io/gtfstools/dev/reference/get_stop_distances.md),
+  which returns the great-circle distances between each pair of stops
+  visited by the given trips and/or routes.
+- New function
   [`convert_stops_to_shapes()`](https://ipea.github.io/gtfstools/dev/reference/convert_stops_to_shapes.md),
   which creates shapes that link the consecutive stops of trips along
   straight lines, for trips not linked to a usable shape (or for the
