@@ -20,39 +20,60 @@ library(gtfstools)
 
 Routing and accessibility analyses often combine several GTFS feeds, such as those of the different transit agencies of a metropolitan region. Routing engines such as `{r5r}` and OpenTripPlanner work on a given departure date, which must have service in every feed: otherwise, one of the networks silently drops out of the analysis. Feeds are published at different times and cover different periods, so such a date is not always easy to find.
 
-`get_calendar_overlap()` returns the periods in which all the given feeds have service, and how many trips each feed runs on each day. It is based on the `check_gtfs_overlap()` function shared by [@higgicd](https://github.com/higgicd) in [issue #85](https://github.com/ipea/gtfstools/issues/85).
+`get_calendar_overlap()` compares the calendars of several feeds. It is based on the `check_gtfs_overlap()` function shared by [@higgicd](https://github.com/higgicd) in [issue #85](https://github.com/ipea/gtfstools/issues/85). Its `resolution` argument controls what the result captures:
+
+- `resolution = "daily"` (the default) captures the **intensity** of transit services: the number of trips each feed runs on each of its service days, and whether all feeds have service on that day.
+- `resolution = "periods"` captures whether there is **any** service: the periods of consecutive days on which every feed runs at least one trip, however few.
+
+A day may thus belong to an overlap period even if one of the feeds runs only a handful of trips on it, which the daily trips reveal. With `plot = TRUE`, either result is plotted with `{ggplot2}`.
 
 ```{r, message = FALSE, eval = requireNamespace("ggplot2", quietly = TRUE)}
 library(ggplot2)
 ```
 
-# Finding a date with service in all feeds
+# Trips per day
 
-Feeds can be given as paths to their `.zip` files. In this case, the large `shapes` and `stop_times` tables are not read. With `resolution = "periods"`, the function returns the periods in which all feeds have service:
+Feeds can be given as paths to their `.zip` files. In this case, the large `shapes` and `stop_times` tables are not read. By default, the function returns one row per feed and service day:
 
 ```{r}
 spo_path <- system.file("extdata/spo_gtfs.zip", package = "gtfstools")
 poa_path <- system.file("extdata/poa_gtfs.zip", package = "gtfstools")
 
-overlap <- get_calendar_overlap(c(spo_path, poa_path), resolution = "periods")
-overlap
+daily_trips <- get_calendar_overlap(c(spo_path, poa_path))
+head(daily_trips[daily_trips$overlap, ])
 ```
 
-Each row is a period of consecutive days on which all feeds have service, with its first and last days (both included) and its length. The São Paulo and Porto Alegre feeds overlap for 91 days, from January 18 to April 18, 2019. Any of these days can be used, but a regular weekday away from holidays is usually the safest choice, e.g. the first Wednesday of the period (`format(x, "%u")` numbers weekdays from 1, Monday, regardless of the locale):
+`n_trips` is the number of trips that run on the day, and `overlap` tells whether all feeds have service on it. Trips listed in `frequencies` count once per departure, so feeds that describe their service with frequencies, such as the São Paulo sample feed, are comparable with feeds that list every trip.
+
+A feed has service on a day when at least one of its services runs on it, according to the weekdays and dates in `calendar` and the exceptions in `calendar_dates`. Services not used by any trip are ignored. Feeds already read with `read_gtfs()` (and possibly edited afterwards) can also be given as a list, whose names are used as feed names, e.g. `get_calendar_overlap(list(spo = spo_gtfs, poa = poa_gtfs))`.
+
+With `plot = TRUE`, the density of each feed's trips over time is plotted in a panel of its own, weighting each day by its number of trips. The days on which all feeds have service are shaded:
+
+```{r, eval = requireNamespace("ggplot2", quietly = TRUE), fig.width = 7, fig.height = 4, dpi = 96}
+get_calendar_overlap(c(spo_path, poa_path), plot = TRUE) +
+  coord_cartesian(xlim = as.Date(c("2019-01-01", "2019-05-01")))
+```
+
+The result is a regular `ggplot` object, so it can be customised with `{ggplot2}` functions, e.g. to zoom in on a period, as above.
+
+The daily trips help pick a departure date on which every feed runs its usual level of service, such as a regular weekday away from holidays. For example, the trips each feed runs on the first Wednesday on which both have service (`format(x, "%u")` numbers weekdays from 1, Monday, regardless of the locale):
 
 ```{r}
-period_days <- seq(overlap$start_date[1], overlap$end_date[1], by = "day")
-departure_date <- period_days[format(period_days, "%u") == "3"][1]
-departure_date
+overlap_days <- unique(daily_trips$date[daily_trips$overlap])
+departure_date <- overlap_days[format(overlap_days, "%u") == "3"][1]
+
+daily_trips[daily_trips$date == departure_date, ]
 ```
 
-Feeds already read with `read_gtfs()` (and possibly edited afterwards) can be given as a list, whose names are used as feed names: `get_calendar_overlap(list(spo = spo_gtfs, poa = poa_gtfs), resolution = "periods")`.
+# Overlap periods
 
-A feed has service on a day when at least one of its services runs on it, according to the weekdays and dates in `calendar` and the exceptions in `calendar_dates`. Services not used by any trip are ignored.
+When only the dates matter, `resolution = "periods"` summarises the days on which all feeds have service into periods of consecutive days, with their first and last days (both included) and their length:
 
-# Visualising service periods
+```{r}
+get_calendar_overlap(c(spo_path, poa_path), resolution = "periods")
+```
 
-When the feeds don't overlap, the result has no rows:
+The São Paulo and Porto Alegre feeds overlap for 91 days, from January 18 to April 18, 2019. When the feeds don't overlap, the result has no rows:
 
 ```{r}
 ber_path <- system.file("extdata/ber_gtfs.zip", package = "gtfstools")
@@ -61,7 +82,7 @@ feeds <- c(spo_path, poa_path, ber_path)
 get_calendar_overlap(feeds, resolution = "periods")
 ```
 
-`plot = TRUE` shows why. It returns a `{ggplot2}` timeline with one bar per feed, spanning its service days, and the periods in which all feeds have service shaded in the background. The result is a regular `ggplot` object, so it can be customised with `{ggplot2}` functions, e.g. to zoom in on a period, since the São Paulo feed spans more than 12 years:
+With `plot = TRUE`, a timeline shows why. Each feed is a bar spanning its service days, and the periods in which all feeds have service are shaded in the background. The São Paulo feed spans more than 12 years, so the plot is zoomed in:
 
 ```{r, eval = requireNamespace("ggplot2", quietly = TRUE), fig.width = 7, fig.height = 2.5, dpi = 96}
 get_calendar_overlap(feeds, resolution = "periods", plot = TRUE) +
@@ -69,23 +90,5 @@ get_calendar_overlap(feeds, resolution = "periods", plot = TRUE) +
 ```
 
 The Berlin feed starts in November 2020, after the São Paulo feed ends, so no date has service in all three feeds.
-
-# Comparing service levels
-
-The overlap does not guarantee a similar level of service in every feed: on some days, a feed may run only a few of its trips. The default, `resolution = "daily"`, returns the number of trips each feed runs on each of its service days, and whether all feeds have service on that day:
-
-```{r}
-daily_trips <- get_calendar_overlap(c(spo_path, poa_path))
-head(daily_trips[daily_trips$overlap, ])
-```
-
-Trips listed in `frequencies` count once per departure. The São Paulo sample feed, for instance, describes all its service this way. With `plot = TRUE`, the density of each feed's trips over time is plotted in a panel of its own, weighting each day by its number of trips, which shows when each feed's service is concentrated:
-
-```{r, eval = requireNamespace("ggplot2", quietly = TRUE), fig.width = 7, fig.height = 4, dpi = 96}
-get_calendar_overlap(c(spo_path, poa_path), plot = TRUE) +
-  coord_cartesian(xlim = as.Date(c("2019-01-01", "2019-05-01")))
-```
-
-A good departure date is thus a regular weekday on which every feed runs its usual number of trips.
 
 Once a date is chosen, the feeds can be combined into a single one with `merge_gtfs()`, or reduced to the services of that date with the filtering functions (see the [filtering vignette](filtering.html)).
