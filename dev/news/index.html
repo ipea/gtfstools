@@ -136,7 +136,8 @@
 </ul></div>
 <div class="section level3">
 <h3 id="notes-development-version">Notes<a class="anchor" aria-label="anchor" href="#notes-development-version"></a></h3>
-<ul><li><p>gtfstools now requires <a href="https://r-quantities.github.io/units/" class="external-link">units</a> &gt;= 1.0-1, which fixed an out-of-bounds read flagged by CRAN’s sanitizer checks (<a href="https://github.com/ipea/gtfstools/issues/84" class="external-link">#84</a>).</p></li>
+<ul><li><p><code><a href="../reference/get_trip_length.html">get_trip_length()</a></code>, <code><a href="../reference/get_trip_geometry.html">get_trip_geometry()</a></code> and the functions that use them (<code><a href="../reference/get_trip_speed.html">get_trip_speed()</a></code>, <code><a href="../reference/set_trip_speed.html">set_trip_speed()</a></code> and <code><a href="../reference/interpolate_stop_times.html">interpolate_stop_times()</a></code>), as well as <code><a href="../reference/get_shape_length.html">get_shape_length()</a></code> and <code><a href="../reference/get_stop_distances.html">get_stop_distances()</a></code>, now run their C++ code in parallel, using as many threads as <code><a href="https://rdrr.io/pkg/data.table/man/openmp-utils.html" class="external-link">data.table::getDTthreads()</a></code> (change it with <code><a href="https://rdrr.io/pkg/data.table/man/openmp-utils.html" class="external-link">data.table::setDTthreads()</a></code>). On a feed with 900,000 shape points and 2,200 trip patterns, with 6 threads, <code><a href="../reference/get_trip_length.html">get_trip_length()</a></code> and <code><a href="../reference/get_trip_geometry.html">get_trip_geometry()</a></code> are about 2 to 2.5 times faster, and <code><a href="../reference/get_shape_length.html">get_shape_length()</a></code> and <code><a href="../reference/get_stop_distances.html">get_stop_distances()</a></code> about 2 times faster. Stops are also located along all shapes in a single call, which makes <code><a href="../reference/get_trip_length.html">get_trip_length()</a></code> about 15% faster even with a single thread. Results don’t depend on the number of threads. On platforms whose compilers don’t support OpenMP, the code runs on a single thread.</p></li>
+<li><p>gtfstools now requires <a href="https://r-quantities.github.io/units/" class="external-link">units</a> &gt;= 1.0-1, which fixed an out-of-bounds read flagged by CRAN’s sanitizer checks (<a href="https://github.com/ipea/gtfstools/issues/84" class="external-link">#84</a>).</p></li>
 <li><p><code><a href="../reference/download_validator.html">download_validator()</a></code> now automatically detects the latest validator version. PR contribution by <a href="https://github.com/baarthur" class="external-link">@baarthur</a>.</p></li>
 <li><p>Invalid dates (e.g. <code>20240230</code>) are still converted to <code>NA</code> when reading or converting feeds, but now with a warning.</p></li>
 <li><p><code><a href="../reference/frequencies_to_stop_times.html">frequencies_to_stop_times()</a></code> now raises informative errors for invalid <code>frequencies</code> entries and for trips without a <code>departure_time</code>.</p></li>
@@ -151,37 +152,101 @@
 <li><p><code><a href="../reference/filter_by_spatial_extent.html">filter_by_spatial_extent()</a></code> is much faster and uses much less memory (about 25 times faster on a feed with 900,000 <code>stop_times</code> rows), as it filters the feed only once and doesn’t create geometries for trips already selected by their shapes.</p></li>
 <li><p><code><a href="../reference/convert_sf_to_shapes.html">convert_sf_to_shapes()</a></code> is much faster (about 30 times faster with <code>calculate_distance = FALSE</code> and 70 times faster with <code>calculate_distance = TRUE</code> on a feed with 50,000 shape points), as it no longer casts the linestrings to points and calculates <code>shape_dist_traveled</code> with a vectorised haversine formula. Distances are calculated on the same sphere used by <a href="https://r-spatial.github.io/s2/" class="external-link">s2</a>, so they match the previous results (with <code>sf::sf_use_s2(TRUE)</code>, the default) to within a micrometre. With <code>sf::sf_use_s2(FALSE)</code>, the previous version calculated ellipsoidal distances, which differ from the spherical ones by up to about 0.4%; distances are now always spherical.</p></li>
 <li>
-<p>The table below shows how many times faster each function optimised above is, compared with the development version before these optimisations, on the example feeds shipped with the package (each stacked twice with <code><a href="../reference/merge_gtfs.html">merge_gtfs()</a></code>). <code><a href="../reference/get_trip_duration.html">get_trip_duration()</a></code> and <code><a href="../reference/get_trip_segment_duration.html">get_trip_segment_duration()</a></code> used <code>unit = "min"</code>, <code><a href="../reference/filter_by_spatial_extent.html">filter_by_spatial_extent()</a></code> used the western half of each feed’s extent, and <code><a href="../reference/filter_by_time_of_day.html">filter_by_time_of_day()</a></code> kept the period from 07:00 to 09:00. The poa feed has no <code>frequencies</code> table. Differences under about 1.2 times are within measurement noise.</p>
+<p>The table below compares the speed of each exported function with the CRAN release (1.4.0), on the example feeds shipped with the package (each stacked twice with <code><a href="../reference/merge_gtfs.html">merge_gtfs()</a></code>), with the default number of threads. Values are how many times faster each function is: values below 1 mean it is slower, and ~1 means a difference under about 1.2 times, within measurement noise. Functions marked with † now measure trips differently (see “Breaking changes”), so they do different work than before: <code><a href="../reference/get_trip_geometry.html">get_trip_geometry()</a></code>, for instance, is slower because it now cuts the shapes between the trips’ first and last stops. <code><a href="../reference/as_dt_gtfs.html">as_dt_gtfs()</a></code> is slower because it now converts integer dates (a fixed cost of about 1 to 1.5 milliseconds), and <code><a href="../reference/convert_shapes_to_sf.html">convert_shapes_to_sf()</a></code> because it now sorts the shape points by <code>shape_pt_sequence</code> by default (<code>sort_sequence = TRUE</code>). <code><a href="../reference/get_trip_duration.html">get_trip_duration()</a></code> and <code><a href="../reference/get_trip_segment_duration.html">get_trip_segment_duration()</a></code> used <code>unit = "min"</code>, <code><a href="../reference/filter_by_spatial_extent.html">filter_by_spatial_extent()</a></code> used the western half of each feed’s extent, <code><a href="../reference/filter_by_time_of_day.html">filter_by_time_of_day()</a></code> kept the period from 07:00 to 09:00, and the other <code>filter_by_*()</code> functions kept half of the ids. The poa feed has no <code>frequencies</code> table, and neither feed has the <code>parent_station</code> column used by <code><a href="../reference/get_children_stops.html">get_children_stops()</a></code> and <code><a href="../reference/get_parent_station.html">get_parent_station()</a></code>. <code><a href="../reference/validate_gtfs.html">validate_gtfs()</a></code> and <code><a href="../reference/download_validator.html">download_validator()</a></code> were not measured.</p>
 <table class="table"><thead><tr><th>function</th>
 <th>n times faster on poa</th>
 <th>n times faster on spo</th>
-</tr></thead><tbody><tr><td><code><a href="../reference/convert_sf_to_shapes.html">convert_sf_to_shapes()</a></code></td>
-<td>7.8</td>
-<td>20.8</td>
+</tr></thead><tbody><tr><td><code><a href="../reference/as_dt_gtfs.html">as_dt_gtfs()</a></code></td>
+<td>0.4</td>
+<td>0.5</td>
+</tr><tr><td><code><a href="../reference/convert_sf_to_shapes.html">convert_sf_to_shapes()</a></code></td>
+<td>12</td>
+<td>42</td>
+</tr><tr><td><code><a href="../reference/convert_shapes_to_sf.html">convert_shapes_to_sf()</a></code></td>
+<td>0.6</td>
+<td>0.6</td>
+</tr><tr><td><code><a href="../reference/convert_stops_to_sf.html">convert_stops_to_sf()</a></code></td>
+<td>~1</td>
+<td>~1</td>
 </tr><tr><td><code><a href="../reference/convert_time_to_seconds.html">convert_time_to_seconds()</a></code></td>
-<td>4.3</td>
-<td>1.1</td>
+<td>2.4</td>
+<td>~1</td>
+</tr><tr><td><code><a href="../reference/filter_by_agency_id.html">filter_by_agency_id()</a></code></td>
+<td>~1</td>
+<td>~1</td>
+</tr><tr><td><code><a href="../reference/filter_by_route_id.html">filter_by_route_id()</a></code></td>
+<td>~1</td>
+<td>~1</td>
+</tr><tr><td><code><a href="../reference/filter_by_route_type.html">filter_by_route_type()</a></code></td>
+<td>~1</td>
+<td>~1</td>
+</tr><tr><td><code><a href="../reference/filter_by_service_id.html">filter_by_service_id()</a></code></td>
+<td>~1</td>
+<td>~1</td>
+</tr><tr><td><code><a href="../reference/filter_by_shape_id.html">filter_by_shape_id()</a></code></td>
+<td>~1</td>
+<td>~1</td>
 </tr><tr><td><code><a href="../reference/filter_by_spatial_extent.html">filter_by_spatial_extent()</a></code></td>
-<td>5.9</td>
-<td>2.3</td>
+<td>3.3</td>
+<td>2.4</td>
+</tr><tr><td><code><a href="../reference/filter_by_stop_id.html">filter_by_stop_id()</a></code></td>
+<td>5.3</td>
+<td>4.6</td>
 </tr><tr><td><code><a href="../reference/filter_by_time_of_day.html">filter_by_time_of_day()</a></code></td>
-<td>2.6</td>
-<td>1.0</td>
+<td>1.4</td>
+<td>~1</td>
+</tr><tr><td><code><a href="../reference/filter_by_trip_id.html">filter_by_trip_id()</a></code></td>
+<td>~1</td>
+<td>~1</td>
+</tr><tr><td><code><a href="../reference/filter_by_weekday.html">filter_by_weekday()</a></code></td>
+<td>~1</td>
+<td>~1</td>
 </tr><tr><td><code><a href="../reference/frequencies_to_stop_times.html">frequencies_to_stop_times()</a></code></td>
 <td>–</td>
-<td>7.6</td>
+<td>5.2</td>
+</tr><tr><td><code><a href="../reference/get_children_stops.html">get_children_stops()</a></code></td>
+<td>–</td>
+<td>–</td>
+</tr><tr><td><code><a href="../reference/get_parent_station.html">get_parent_station()</a></code></td>
+<td>–</td>
+<td>–</td>
 </tr><tr><td><code><a href="../reference/get_stop_times_patterns.html">get_stop_times_patterns()</a></code></td>
-<td>2.1</td>
-<td>2.1</td>
-</tr><tr><td><code><a href="../reference/get_trip_duration.html">get_trip_duration()</a></code></td>
-<td>3.6</td>
-<td>1.1</td>
-</tr><tr><td><code><a href="../reference/get_trip_segment_duration.html">get_trip_segment_duration()</a></code></td>
-<td>21.7</td>
-<td>2.1</td>
-</tr><tr><td><code><a href="../reference/write_gtfs.html">write_gtfs()</a></code></td>
-<td>1.5</td>
 <td>1.6</td>
+<td>1.5</td>
+</tr><tr><td><code><a href="../reference/get_trip_duration.html">get_trip_duration()</a></code></td>
+<td>2.2</td>
+<td>~1</td>
+</tr><tr><td>
+<code><a href="../reference/get_trip_geometry.html">get_trip_geometry()</a></code>†</td>
+<td>0.6</td>
+<td>0.4</td>
+</tr><tr><td>
+<code><a href="../reference/get_trip_length.html">get_trip_length()</a></code>†</td>
+<td>1.7</td>
+<td>~1</td>
+</tr><tr><td><code><a href="../reference/get_trip_segment_duration.html">get_trip_segment_duration()</a></code></td>
+<td>27</td>
+<td>2.7</td>
+</tr><tr><td>
+<code><a href="../reference/get_trip_speed.html">get_trip_speed()</a></code>†</td>
+<td>1.2</td>
+<td>~1</td>
+</tr><tr><td><code><a href="../reference/merge_gtfs.html">merge_gtfs()</a></code></td>
+<td>~1</td>
+<td>~1</td>
+</tr><tr><td><code><a href="../reference/read_gtfs.html">read_gtfs()</a></code></td>
+<td>1.2</td>
+<td>~1</td>
+</tr><tr><td><code><a href="../reference/remove_duplicates.html">remove_duplicates()</a></code></td>
+<td>~1</td>
+<td>~1</td>
+</tr><tr><td>
+<code><a href="../reference/set_trip_speed.html">set_trip_speed()</a></code>†</td>
+<td>1.2</td>
+<td>0.7</td>
+</tr><tr><td><code><a href="../reference/write_gtfs.html">write_gtfs()</a></code></td>
+<td>1.7</td>
+<td>1.9</td>
 </tr></tbody></table></li>
 <li><p>The package documentation website moved to <a href="https://ipea.github.io/gtfstools/" class="uri">https://ipea.github.io/gtfstools/</a> and the GitHub repository to <a href="https://github.com/ipea/gtfstools" class="external-link uri">https://github.com/ipea/gtfstools</a>. All links were updated.</p></li>
 </ul></div>
