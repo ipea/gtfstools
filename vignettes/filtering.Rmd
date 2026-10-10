@@ -14,6 +14,7 @@ knitr::opts_chunk$set(
 )
 
 Sys.setenv(OMP_THREAD_LIMIT = 2)
+data.table::setDTthreads(2)
 
 library(gtfstools)
 ```

@@ -582,3 +582,19 @@ test_that("geometries along shapes handle repeated points and shape ends", {
     cbind(c(0.02, 0.05, 0.05, 0.05, 0.1), 0)
   )
 })
+
+test_that("results don't depend on the number of threads", {
+  ber_gtfs <- read_gtfs(
+    system.file("extdata/ber_gtfs.zip", package = "gtfstools")
+  )
+
+  old_threads <- data.table::setDTthreads(1)
+  on.exit(data.table::setDTthreads(old_threads), add = TRUE)
+  one_thread <- list(tester(gtfs), tester(ber_gtfs))
+
+  data.table::setDTthreads(2)
+  skip_if(data.table::getDTthreads() < 2, "Can't use more than one thread.")
+  two_threads <- list(tester(gtfs), tester(ber_gtfs))
+
+  expect_identical(two_threads, one_thread)
+})

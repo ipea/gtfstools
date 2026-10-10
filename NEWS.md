@@ -66,6 +66,7 @@
 
 ## Notes
 
+- `get_trip_length()`, `get_trip_geometry()` and the functions that use them (`get_trip_speed()`, `set_trip_speed()` and `interpolate_stop_times()`), as well as `get_shape_length()` and `get_stop_distances()`, now run their C++ code in parallel, using as many threads as `data.table::getDTthreads()` (change it with `data.table::setDTthreads()`). On a feed with 900,000 shape points and 2,200 trip patterns, with 6 threads, `get_trip_length()` and `get_trip_geometry()` are about 2 to 2.5 times faster, and `get_shape_length()` and `get_stop_distances()` about 2 times faster. Stops are also located along all shapes in a single call, which makes `get_trip_length()` about 15% faster even with a single thread. Results don't depend on the number of threads. On platforms whose compilers don't support OpenMP, the code runs on a single thread.
 - gtfstools now requires `{units}` >= 1.0-1, which fixed an out-of-bounds read flagged by CRAN's sanitizer checks (#84).
 - `download_validator()` now automatically detects the latest validator version. PR contribution by @baarthur.
 - Invalid dates (e.g. `20240230`) are still converted to `NA` when reading or converting feeds, but now with a warning.
@@ -80,19 +81,39 @@
 - `frequencies_to_stop_times()` is much faster (about 13 times faster when converting a feed into 300,000 `stop_times` rows), as it creates all new trips at once instead of one at a time. It also no longer adds and then removes auxiliary columns from the tables of the given feed.
 - `filter_by_spatial_extent()` is much faster and uses much less memory (about 25 times faster on a feed with 900,000 `stop_times` rows), as it filters the feed only once and doesn't create geometries for trips already selected by their shapes.
 - `convert_sf_to_shapes()` is much faster (about 30 times faster with `calculate_distance = FALSE` and 70 times faster with `calculate_distance = TRUE` on a feed with 50,000 shape points), as it no longer casts the linestrings to points and calculates `shape_dist_traveled` with a vectorised haversine formula. Distances are calculated on the same sphere used by `{s2}`, so they match the previous results (with `sf::sf_use_s2(TRUE)`, the default) to within a micrometre. With `sf::sf_use_s2(FALSE)`, the previous version calculated ellipsoidal distances, which differ from the spherical ones by up to about 0.4%; distances are now always spherical.
-- The table below shows how many times faster each function optimised above is, compared with the development version before these optimisations, on the example feeds shipped with the package (each stacked twice with `merge_gtfs()`). `get_trip_duration()` and `get_trip_segment_duration()` used `unit = "min"`, `filter_by_spatial_extent()` used the western half of each feed's extent, and `filter_by_time_of_day()` kept the period from 07:00 to 09:00. The poa feed has no `frequencies` table. Differences under about 1.2 times are within measurement noise.
+- The table below compares the speed of each exported function with the CRAN release (1.4.0), on the example feeds shipped with the package (each stacked twice with `merge_gtfs()`), with the default number of threads. Values are how many times faster each function is: values below 1 mean it is slower, and ~1 means a difference under about 1.2 times, within measurement noise. Functions marked with † now measure trips differently (see "Breaking changes"), so they do different work than before: `get_trip_geometry()`, for instance, is slower because it now cuts the shapes between the trips' first and last stops. `as_dt_gtfs()` is slower because it now converts integer dates (a fixed cost of about 1 to 1.5 milliseconds), and `convert_shapes_to_sf()` because it now sorts the shape points by `shape_pt_sequence` by default (`sort_sequence = TRUE`). `get_trip_duration()` and `get_trip_segment_duration()` used `unit = "min"`, `filter_by_spatial_extent()` used the western half of each feed's extent, `filter_by_time_of_day()` kept the period from 07:00 to 09:00, and the other `filter_by_*()` functions kept half of the ids. The poa feed has no `frequencies` table, and neither feed has the `parent_station` column used by `get_children_stops()` and `get_parent_station()`. `validate_gtfs()` and `download_validator()` were not measured.
 
   | function | n times faster on poa | n times faster on spo |
   |---|---|---|
-  | `convert_sf_to_shapes()` | 7.8 | 20.8 |
-  | `convert_time_to_seconds()` | 4.3 | 1.1 |
-  | `filter_by_spatial_extent()` | 5.9 | 2.3 |
-  | `filter_by_time_of_day()` | 2.6 | 1.0 |
-  | `frequencies_to_stop_times()` | – | 7.6 |
-  | `get_stop_times_patterns()` | 2.1 | 2.1 |
-  | `get_trip_duration()` | 3.6 | 1.1 |
-  | `get_trip_segment_duration()` | 21.7 | 2.1 |
-  | `write_gtfs()` | 1.5 | 1.6 |
+  | `as_dt_gtfs()` | 0.4 | 0.5 |
+  | `convert_sf_to_shapes()` | 12 | 42 |
+  | `convert_shapes_to_sf()` | 0.6 | 0.6 |
+  | `convert_stops_to_sf()` | ~1 | ~1 |
+  | `convert_time_to_seconds()` | 2.4 | ~1 |
+  | `filter_by_agency_id()` | ~1 | ~1 |
+  | `filter_by_route_id()` | ~1 | ~1 |
+  | `filter_by_route_type()` | ~1 | ~1 |
+  | `filter_by_service_id()` | ~1 | ~1 |
+  | `filter_by_shape_id()` | ~1 | ~1 |
+  | `filter_by_spatial_extent()` | 3.3 | 2.4 |
+  | `filter_by_stop_id()` | 5.3 | 4.6 |
+  | `filter_by_time_of_day()` | 1.4 | ~1 |
+  | `filter_by_trip_id()` | ~1 | ~1 |
+  | `filter_by_weekday()` | ~1 | ~1 |
+  | `frequencies_to_stop_times()` | – | 5.2 |
+  | `get_children_stops()` | – | – |
+  | `get_parent_station()` | – | – |
+  | `get_stop_times_patterns()` | 1.6 | 1.5 |
+  | `get_trip_duration()` | 2.2 | ~1 |
+  | `get_trip_geometry()`† | 0.6 | 0.4 |
+  | `get_trip_length()`† | 1.7 | ~1 |
+  | `get_trip_segment_duration()` | 27 | 2.7 |
+  | `get_trip_speed()`† | 1.2 | ~1 |
+  | `merge_gtfs()` | ~1 | ~1 |
+  | `read_gtfs()` | 1.2 | ~1 |
+  | `remove_duplicates()` | ~1 | ~1 |
+  | `set_trip_speed()`† | 1.2 | 0.7 |
+  | `write_gtfs()` | 1.7 | 1.9 |
 - The package documentation website moved to <https://ipea.github.io/gtfstools/> and the GitHub repository to <https://github.com/ipea/gtfstools>. All links were updated.
 
 # gtfstools 1.4.0

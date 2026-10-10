@@ -444,3 +444,49 @@ test_that("unit argument converts distances correctly", {
     expect_equal(in_m$length, in_km$length * 1000)
   }
 })
+
+test_that("shape rows of different shapes may be interleaved", {
+  # with sort_sequence = FALSE the points of each shape are used in the order
+  # they appear, even if the rows of different shapes are interleaved
+
+  sorted_gtfs <- read_gtfs(spo_path)
+  data.table::setorderv(sorted_gtfs$shapes, c("shape_id", "shape_pt_sequence"))
+  interleaved_gtfs <- read_gtfs(spo_path)
+  interleaved_gtfs$shapes <- sorted_gtfs$shapes[
+    order(data.table::rowid(shape_id), shape_id)
+  ]
+  expect_true(is.unsorted(interleaved_gtfs$shapes$shape_id))
+
+  # the order of the trips in the result may change, but not their lengths
+
+  interleaved_lengths <- tester(interleaved_gtfs, sort_sequence = FALSE)
+  sorted_lengths <- tester(sorted_gtfs)
+  expect_identical(
+    interleaved_lengths[order(trip_id)],
+    sorted_lengths[order(trip_id)]
+  )
+})
+
+test_that("results don't depend on the number of threads", {
+  ber_gtfs <- read_gtfs(
+    system.file("extdata/ber_gtfs.zip", package = "gtfstools")
+  )
+
+  old_threads <- data.table::setDTthreads(1)
+  on.exit(data.table::setDTthreads(old_threads), add = TRUE)
+  one_thread <- list(
+    tester(),
+    tester(by = "segment"),
+    tester(ber_gtfs)
+  )
+
+  data.table::setDTthreads(2)
+  skip_if(data.table::getDTthreads() < 2, "Can't use more than one thread.")
+  two_threads <- list(
+    tester(),
+    tester(by = "segment"),
+    tester(ber_gtfs)
+  )
+
+  expect_identical(two_threads, one_thread)
+})
