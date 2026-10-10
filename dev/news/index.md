@@ -416,33 +416,17 @@
 
   | function | n times faster on poa | n times faster on spo |
   |----|----|----|
-  | [`as_dt_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/as_dt_gtfs.md) | 0.4 | 0.5 |
   | [`convert_sf_to_shapes()`](https://ipea.github.io/gtfstools/dev/reference/convert_sf_to_shapes.md) | 12 | 42 |
-  | [`convert_shapes_to_sf()`](https://ipea.github.io/gtfstools/dev/reference/convert_shapes_to_sf.md) | 0.6 | 0.6 |
-  | [`convert_stops_to_sf()`](https://ipea.github.io/gtfstools/dev/reference/convert_stops_to_sf.md) | ~1 | ~1 |
   | [`convert_time_to_seconds()`](https://ipea.github.io/gtfstools/dev/reference/convert_time_to_seconds.md) | 2.4 | ~1 |
-  | [`filter_by_agency_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_agency_id.md) | ~1 | ~1 |
-  | [`filter_by_route_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_route_id.md) | ~1 | ~1 |
-  | [`filter_by_route_type()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_route_type.md) | ~1 | ~1 |
-  | [`filter_by_service_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_service_id.md) | ~1 | ~1 |
-  | [`filter_by_shape_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_shape_id.md) | ~1 | ~1 |
   | [`filter_by_spatial_extent()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_spatial_extent.md) | 3.3 | 2.4 |
   | [`filter_by_stop_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_stop_id.md) | 5.3 | 4.6 |
   | [`filter_by_time_of_day()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_time_of_day.md) | 1.4 | ~1 |
-  | [`filter_by_trip_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_trip_id.md) | ~1 | ~1 |
-  | [`filter_by_weekday()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_weekday.md) | ~1 | ~1 |
   | [`frequencies_to_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/frequencies_to_stop_times.md) | – | 5.2 |
-  | [`get_children_stops()`](https://ipea.github.io/gtfstools/dev/reference/get_children_stops.md) | – | – |
-  | [`get_parent_station()`](https://ipea.github.io/gtfstools/dev/reference/get_parent_station.md) | – | – |
   | [`get_stop_times_patterns()`](https://ipea.github.io/gtfstools/dev/reference/get_stop_times_patterns.md) | 1.6 | 1.5 |
   | [`get_trip_duration()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_duration.md) | 2.2 | ~1 |
-  | [`get_trip_geometry()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_geometry.md)† | 0.6 | 0.4 |
   | [`get_trip_length()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_length.md)† | 1.7 | ~1 |
   | [`get_trip_segment_duration()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_segment_duration.md) | 27 | 2.7 |
   | [`get_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_speed.md)† | 1.2 | ~1 |
-  | [`merge_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/merge_gtfs.md) | ~1 | ~1 |
-  | [`read_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/read_gtfs.md) | 1.2 | ~1 |
-  | [`remove_duplicates()`](https://ipea.github.io/gtfstools/dev/reference/remove_duplicates.md) | ~1 | ~1 |
   | [`set_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.md)† | 1.2 | 0.7 |
   | [`write_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/write_gtfs.md) | 1.7 | 1.9 |
 
