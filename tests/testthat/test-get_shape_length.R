@@ -95,3 +95,22 @@ test_that("doesn't change the given gtfs", {
   result <- tester(gtfs, shape_id = "17846")
   expect_identical(original_gtfs, gtfs)
 })
+
+test_that("results don't depend on the number of threads", {
+  # spo's shapes have more than 10,000 points, enough to use several threads
+
+  ber_gtfs <- read_gtfs(
+    system.file("extdata/ber_gtfs.zip", package = "gtfstools")
+  )
+  expect_gt(nrow(spo_gtfs$shapes), 10000)
+
+  old_threads <- data.table::setDTthreads(1)
+  on.exit(data.table::setDTthreads(old_threads), add = TRUE)
+  one_thread <- list(tester(), tester(ber_gtfs))
+
+  data.table::setDTthreads(2)
+  skip_if(data.table::getDTthreads() < 2, "Can't use more than one thread.")
+  two_threads <- list(tester(), tester(ber_gtfs))
+
+  expect_identical(two_threads, one_thread)
+})

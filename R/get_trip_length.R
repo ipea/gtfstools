@@ -401,29 +401,41 @@ locate_stops_along_shapes <- function(gtfs,
   )
   pattern_trip <- which(!duplicated(pattern_id))
 
-  pattern_positions <- lapply(
-    pattern_trip,
-    function(k) {
-      rows <- trip_start[k]:trip_end[k]
-      position <- rep(NA_real_, length(rows))
-      if (!has_usable_shape[k]) return(position)
+  # the stops of each pattern are those of its first trip. a pattern is located
+  # only if its shape is usable and at least two of its stops have
+  # coordinates. the others get NA positions, as do stops without coordinates.
+  # all patterns are located at once, in parallel, in C++
 
-      lat <- stop_lat[rows]
-      lon <- stop_lon[rows]
-      is_valid <- !is.na(lat) & !is.na(lon)
-      if (sum(is_valid) < 2) return(position)
+  pattern_n_stops <- n_stops[pattern_trip]
+  rows <- sequence(pattern_n_stops, from = trip_start[pattern_trip])
+  row_pattern <- rep.int(seq_along(pattern_trip), pattern_n_stops)
 
-      shape_point <- shape_rows[[trip_shape_id[k]]]
-      position[is_valid] <- rcpp_locate_stops_on_shape(
-        shapes$shape_pt_lat[shape_point],
-        shapes$shape_pt_lon[shape_point],
-        lat[is_valid],
-        lon[is_valid]
-      )
+  lat <- stop_lat[rows]
+  lon <- stop_lon[rows]
+  is_valid <- !is.na(lat) & !is.na(lon)
+  n_valid <- tabulate(row_pattern[is_valid], nbins = length(pattern_trip))
+  is_located <- has_usable_shape[pattern_trip] & n_valid >= 2
+  to_locate <- is_valid & is_located[row_pattern]
 
-      return(position)
-    }
-  )
+  position <- rep(NA_real_, length(rows))
+
+  if (any(to_locate)) {
+    located_shape_id <- trip_shape_id[pattern_trip[is_located]]
+    used_shapes <- unique(located_shape_id)
+    shape_point <- unlist(shape_rows[used_shapes], use.names = FALSE)
+
+    position[to_locate] <- cpp_locate_stops_on_shapes(
+      shapes$shape_pt_lat[shape_point],
+      shapes$shape_pt_lon[shape_point],
+      lengths(shape_rows[used_shapes], use.names = FALSE),
+      match(located_shape_id, used_shapes),
+      lat[to_locate],
+      lon[to_locate],
+      n_valid[is_located]
+    )
+  }
+
+  pattern_positions <- split(position, row_pattern)
 
   # the positions of each trip are those of its pattern. since the rows of each
   # trip are contiguous, they can simply be concatenated in trip order

@@ -20,10 +20,10 @@ extern "C" SEXP _gtfstools_rcpp_distance_haversine(SEXP lat_from, SEXP lon_from,
   END_CPP11
 }
 // distance_haversine.cpp
-doubles rcpp_locate_stops_on_shape(const doubles shape_lat, const doubles shape_lon, const doubles stop_lat, const doubles stop_lon);
-extern "C" SEXP _gtfstools_rcpp_locate_stops_on_shape(SEXP shape_lat, SEXP shape_lon, SEXP stop_lat, SEXP stop_lon) {
+doubles cpp_locate_stops_on_shapes(const doubles shape_lat, const doubles shape_lon, const integers shape_size, const integers pattern_shape, const doubles stop_lat, const doubles stop_lon, const integers pattern_size);
+extern "C" SEXP _gtfstools_cpp_locate_stops_on_shapes(SEXP shape_lat, SEXP shape_lon, SEXP shape_size, SEXP pattern_shape, SEXP stop_lat, SEXP stop_lon, SEXP pattern_size) {
   BEGIN_CPP11
-    return cpp11::as_sexp(rcpp_locate_stops_on_shape(cpp11::as_cpp<cpp11::decay_t<const doubles>>(shape_lat), cpp11::as_cpp<cpp11::decay_t<const doubles>>(shape_lon), cpp11::as_cpp<cpp11::decay_t<const doubles>>(stop_lat), cpp11::as_cpp<cpp11::decay_t<const doubles>>(stop_lon)));
+    return cpp11::as_sexp(cpp_locate_stops_on_shapes(cpp11::as_cpp<cpp11::decay_t<const doubles>>(shape_lat), cpp11::as_cpp<cpp11::decay_t<const doubles>>(shape_lon), cpp11::as_cpp<cpp11::decay_t<const integers>>(shape_size), cpp11::as_cpp<cpp11::decay_t<const integers>>(pattern_shape), cpp11::as_cpp<cpp11::decay_t<const doubles>>(stop_lat), cpp11::as_cpp<cpp11::decay_t<const doubles>>(stop_lon), cpp11::as_cpp<cpp11::decay_t<const integers>>(pattern_size)));
   END_CPP11
 }
 // distance_haversine.cpp
@@ -50,12 +50,12 @@ extern "C" SEXP _gtfstools_cpp_sequence_pattern_id(SEXP group_size, SEXP columns
 
 extern "C" {
 static const R_CallMethodDef CallEntries[] = {
+    {"_gtfstools_cpp_locate_stops_on_shapes", (DL_FUNC) &_gtfstools_cpp_locate_stops_on_shapes, 7},
     {"_gtfstools_cpp_seconds_to_string",      (DL_FUNC) &_gtfstools_cpp_seconds_to_string,      1},
     {"_gtfstools_cpp_sequence_pattern_id",    (DL_FUNC) &_gtfstools_cpp_sequence_pattern_id,    2},
     {"_gtfstools_cpp_shape_cut_segments",     (DL_FUNC) &_gtfstools_cpp_shape_cut_segments,     6},
     {"_gtfstools_cpp_time_to_seconds",        (DL_FUNC) &_gtfstools_cpp_time_to_seconds,        1},
     {"_gtfstools_rcpp_distance_haversine",    (DL_FUNC) &_gtfstools_rcpp_distance_haversine,    4},
-    {"_gtfstools_rcpp_locate_stops_on_shape", (DL_FUNC) &_gtfstools_rcpp_locate_stops_on_shape, 4},
     {NULL, NULL, 0}
 };
 }

@@ -7,6 +7,26 @@
 #include <cpp11.hpp>
 using namespace cpp11;
 
+// the kernels below run in parallel with OpenMP, when the package is compiled
+// with it (e.g. not with Apple's clang), using as many threads as
+// data.table::getDTthreads(). data.table is already a dependency and its
+// thread count respects OMP_THREAD_LIMIT and setDTthreads(), so users and CRAN
+// control both packages in the same way.
+//
+// inside parallel regions the R API is never used: inputs are read through
+// raw pointers obtained beforehand (which also materializes ALTREP vectors on
+// the main thread), outputs are allocated beforehand, and errors are raised
+// after the region. each output element depends only on its own element,
+// pattern or shape, without reductions across threads, so the results are the
+// same regardless of the number of threads.
+//
+// called once per kernel call, on the main thread, before any parallel region
+
+static int gtfs_threads() {
+  const int n_threads = as_cpp<int>(package("data.table")["getDTthreads"]());
+  return n_threads < 1 ? 1 : n_threads;
+}
+
 // great-circle distance, in meters, between each pair of points (from[i] and
 // to[i], in degrees), using the haversine formula. the sphere has the same
 // radius used by {s2}, {sf}'s default engine for geographic coordinates, so
@@ -52,13 +72,27 @@ doubles rcpp_distance_haversine(const doubles lat_from,
 
   writable::doubles distance(n);
 
+  const double* lat_from_p = REAL(lat_from);
+  const double* lon_from_p = REAL(lon_from);
+  const double* lat_to_p = REAL(lat_to);
+  const double* lon_to_p = REAL(lon_to);
+  double* distance_p = REAL(distance);
+
+  // small inputs aren't worth the threading overhead
+
+  const int n_threads = n > 10000 ? gtfs_threads() : 1;
+  (void) n_threads;
+
+#ifdef _OPENMP
+#pragma omp parallel for num_threads(n_threads) if(n_threads > 1)
+#endif
   for (R_xlen_t i = 0; i < n; i++) {
-    if (ISNAN(lat_from[i]) || ISNAN(lon_from[i]) ||
-        ISNAN(lat_to[i]) || ISNAN(lon_to[i])) {
-      distance[i] = NA_REAL;
+    if (ISNAN(lat_from_p[i]) || ISNAN(lon_from_p[i]) ||
+        ISNAN(lat_to_p[i]) || ISNAN(lon_to_p[i])) {
+      distance_p[i] = NA_REAL;
     } else {
-      distance[i] = distance_haversine(
-        lat_from[i], lon_from[i], lat_to[i], lon_to[i]
+      distance_p[i] = distance_haversine(
+        lat_from_p[i], lon_from_p[i], lat_to_p[i], lon_to_p[i]
       );
     }
   }
@@ -75,51 +109,18 @@ static double unwrap_longitude(double lon, double reference) {
   return reference + diff;
 }
 
-//' rcpp_locate_stops_on_shape
-//'
-//' Locates a sequence of stops along a shape, returning the distance, in
-//' meters, from the start of the shape to the point of the shape where each
-//' stop is projected. Each stop is projected onto the line segments of the
-//' shape (not only onto its vertices), and the stops are forced to advance
-//' along the shape in the order they are given, so that loops and shapes that
-//' pass by the same place more than once are handled correctly.
-//'
-//' The stops are placed, with dynamic programming, so as to (approximately)
-//' minimize the sum of the squared distances between the stops and their
-//' points on the shape, under the ordering constraint. A stop located before
-//' the previous one on the same segment is placed at the previous stop's
-//' position (the previous stop is never moved back to make room for it).
-//' Squared distances are calculated in a local
-//' equirectangular frame of each shape segment, while the lengths along the
-//' shape are great-circle distances calculated with the haversine formula.
-//'
-//' All coordinates must be non-missing, and the shape must have at least two
-//' points.
-//'
-//' @noRd
-[[cpp11::register]]
-doubles rcpp_locate_stops_on_shape(const doubles shape_lat,
-                                   const doubles shape_lon,
-                                   const doubles stop_lat,
-                                   const doubles stop_lon) {
-  const R_xlen_t n_points = shape_lat.size();
-  const R_xlen_t n_stops = stop_lat.size();
-  if (shape_lon.size() != n_points || stop_lon.size() != n_stops) {
-    stop("Latitude and longitude vectors must have the same length.");
-  }
-  if (n_points < 2) stop("The shape must have at least two points.");
-  if (n_stops == 0) return writable::doubles((R_xlen_t) 0);
+// locates the stops of one pattern along its shape (see
+// cpp_locate_stops_on_shapes() below). doesn't use the R API, so it can run in
+// parallel. may throw std::bad_alloc
 
-  for (R_xlen_t k = 0; k < n_points; k++) {
-    if (ISNAN(shape_lat[k]) || ISNAN(shape_lon[k])) {
-      stop("Shape coordinates must not be missing.");
-    }
-  }
-  for (R_xlen_t i = 0; i < n_stops; i++) {
-    if (ISNAN(stop_lat[i]) || ISNAN(stop_lon[i])) {
-      stop("Stop coordinates must not be missing.");
-    }
-  }
+static void locate_stops_on_shape(const double* shape_lat,
+                                  const double* shape_lon,
+                                  const R_xlen_t n_points,
+                                  const double* stop_lat,
+                                  const double* stop_lon,
+                                  const R_xlen_t n_stops,
+                                  double* position) {
+  if (n_stops == 0) return;
 
   const R_xlen_t n_segments = n_points - 1;
   const double earth_radius = 6371010.0;
@@ -210,8 +211,6 @@ doubles rcpp_locate_stops_on_shape(const doubles shape_lat,
   }
 
   for (R_xlen_t i = 1; i < n_stops; i++) {
-    check_user_interrupt();
-
     // minimum cost (and its segment) among the segments before segment j
     double earlier_min = 0.0;
     int earlier_arg = -1;
@@ -271,7 +270,6 @@ doubles rcpp_locate_stops_on_shape(const doubles shape_lat,
   // previous stop, but before it, is moved to the previous stop's position, so
   // distances between consecutive stops are never negative
 
-  writable::doubles position(n_stops);
   double previous_pos = 0.0;
 
   for (R_xlen_t i = 0; i < n_stops; i++) {
@@ -281,6 +279,155 @@ doubles rcpp_locate_stops_on_shape(const doubles shape_lat,
     if (i > 0 && pos < previous_pos) pos = previous_pos;
     position[i] = pos;
     previous_pos = pos;
+  }
+
+}
+
+//' cpp_locate_stops_on_shapes
+//'
+//' Locates each pattern's sequence of stops along its shape, returning the distance, in
+//' meters, from the start of the shape to the point of the shape where each
+//' stop is projected. Each stop is projected onto the line segments of the
+//' shape (not only onto its vertices), and the stops are forced to advance
+//' along the shape in the order they are given, so that loops and shapes that
+//' pass by the same place more than once are handled correctly.
+//'
+//' The stops are placed, with dynamic programming, so as to (approximately)
+//' minimize the sum of the squared distances between the stops and their
+//' points on the shape, under the ordering constraint. A stop located before
+//' the previous one on the same segment is placed at the previous stop's
+//' position (the previous stop is never moved back to make room for it).
+//' Squared distances are calculated in a local
+//' equirectangular frame of each shape segment, while the lengths along the
+//' shape are great-circle distances calculated with the haversine formula.
+//'
+//' The shapes' points are in 'shape_lat' and 'shape_lon', contiguous and in the
+//' order of 'shape_size'. The stops of each pattern are in 'stop_lat' and
+//' 'stop_lon', contiguous and in the order of 'pattern_size', and the shape of
+//' each pattern is given by 'pattern_shape' (1-based). Returns the positions of
+//' all stops, in the same order. Patterns are processed in parallel.
+//'
+//' All coordinates must be non-missing, and the shapes used must have at least
+//' two points.
+//'
+//' @noRd
+[[cpp11::register]]
+doubles cpp_locate_stops_on_shapes(const doubles shape_lat,
+                                   const doubles shape_lon,
+                                   const integers shape_size,
+                                   const integers pattern_shape,
+                                   const doubles stop_lat,
+                                   const doubles stop_lon,
+                                   const integers pattern_size) {
+  const R_xlen_t n_points = shape_lat.size();
+  const R_xlen_t n_shapes = shape_size.size();
+  const R_xlen_t n_stops = stop_lat.size();
+  const R_xlen_t n_patterns = pattern_shape.size();
+
+  if (shape_lon.size() != n_points || stop_lon.size() != n_stops) {
+    stop("Latitude and longitude vectors must have the same length.");
+  }
+  if (pattern_size.size() != n_patterns) {
+    stop("'pattern_shape' and 'pattern_size' must have the same length.");
+  }
+
+  // serial validation and offsets
+
+  const int* shape_size_p = INTEGER(shape_size);
+  const int* pattern_shape_p = INTEGER(pattern_shape);
+  const int* pattern_size_p = INTEGER(pattern_size);
+
+  std::vector<R_xlen_t> shape_start(n_shapes);
+  R_xlen_t total_points = 0;
+  for (R_xlen_t s = 0; s < n_shapes; s++) {
+    if (shape_size_p[s] == NA_INTEGER || shape_size_p[s] < 0) {
+      stop("'shape_size' must not include negative or NA values.");
+    }
+    shape_start[s] = total_points;
+    total_points += shape_size_p[s];
+  }
+  if (total_points != n_points) {
+    stop("'shape_size' must sum to the number of shape points.");
+  }
+
+  std::vector<R_xlen_t> stop_start(n_patterns);
+  R_xlen_t total_stops = 0;
+  for (R_xlen_t p = 0; p < n_patterns; p++) {
+    const int s = pattern_shape_p[p];
+    if (s == NA_INTEGER || s < 1 || s > n_shapes) {
+      stop("'pattern_shape' must be valid shape indices.");
+    }
+    if (shape_size_p[s - 1] < 2) {
+      stop("The shapes must have at least two points.");
+    }
+    if (pattern_size_p[p] == NA_INTEGER || pattern_size_p[p] < 0) {
+      stop("'pattern_size' must not include negative or NA values.");
+    }
+    stop_start[p] = total_stops;
+    total_stops += pattern_size_p[p];
+  }
+  if (total_stops != n_stops) {
+    stop("'pattern_size' must sum to the number of stops.");
+  }
+
+  const double* shape_lat_p = REAL(shape_lat);
+  const double* shape_lon_p = REAL(shape_lon);
+  const double* stop_lat_p = REAL(stop_lat);
+  const double* stop_lon_p = REAL(stop_lon);
+
+  for (R_xlen_t k = 0; k < n_points; k++) {
+    if (ISNAN(shape_lat_p[k]) || ISNAN(shape_lon_p[k])) {
+      stop("Shape coordinates must not be missing.");
+    }
+  }
+  for (R_xlen_t i = 0; i < n_stops; i++) {
+    if (ISNAN(stop_lat_p[i]) || ISNAN(stop_lon_p[i])) {
+      stop("Stop coordinates must not be missing.");
+    }
+  }
+
+  writable::doubles position(n_stops);
+  double* position_p = REAL(position);
+
+  // patterns are processed in blocks, so that the user can interrupt the
+  // calculation between them. within a block, patterns are spread among the
+  // threads dynamically, since their sizes vary a lot
+
+  const int n_threads = n_patterns > 1 ? gtfs_threads() : 1;
+  (void) n_threads;
+  const R_xlen_t block_size = 256;
+  int failed = 0;
+
+  for (R_xlen_t first = 0; first < n_patterns; first += block_size) {
+    check_user_interrupt();
+    const R_xlen_t last = std::min(first + block_size, n_patterns);
+
+#ifdef _OPENMP
+#pragma omp parallel for schedule(dynamic, 1) num_threads(n_threads)
+#endif
+    for (R_xlen_t p = first; p < last; p++) {
+      try {
+        const R_xlen_t shape = pattern_shape_p[p] - 1;
+        const R_xlen_t offset = shape_start[shape];
+        locate_stops_on_shape(
+          shape_lat_p + offset,
+          shape_lon_p + offset,
+          shape_size_p[shape],
+          stop_lat_p + stop_start[p],
+          stop_lon_p + stop_start[p],
+          pattern_size_p[p],
+          position_p + stop_start[p]
+        );
+      } catch (...) {
+        // exceptions can't leave a parallel region (e.g. std::bad_alloc)
+#ifdef _OPENMP
+#pragma omp atomic write
+#endif
+        failed = 1;
+      }
+    }
+
+    if (failed) stop("Failed to locate the stops along the shapes.");
   }
 
   return position;
@@ -339,23 +486,46 @@ list cpp_shape_cut_segments(const doubles lat,
   // build_shape_cuts() absorbs by clamping the interpolation factors
 
   writable::doubles cum(n_points);
+  double* cum_p = REAL(cum);
+  const double* lat_p = REAL(lat);
+  const double* lon_p = REAL(lon);
+  const int* shape_size_p = INTEGER(shape_size);
 
+  // shapes are processed in parallel. each shape's sum stays within a single
+  // iteration (no reduction across threads), so the results don't depend on
+  // the number of threads
+
+  check_user_interrupt();
+  const int n_threads = n_shapes > 1 ? gtfs_threads() : 1;
+  (void) n_threads;
+  int is_finite = 1;
+
+#ifdef _OPENMP
+#pragma omp parallel for schedule(dynamic, 16) num_threads(n_threads)
+#endif
   for (R_xlen_t s = 0; s < n_shapes; s++) {
     const R_xlen_t start = shape_start[s];
-    const R_xlen_t end = start + shape_size[s];
+    const R_xlen_t end = start + shape_size_p[s];
     long double sum = 0.0L;
 
     for (R_xlen_t k = start; k < end; k++) {
       if (k > start) {
-        sum += distance_haversine(lat[k - 1], lon[k - 1], lat[k], lon[k]);
+        sum += distance_haversine(
+          lat_p[k - 1], lon_p[k - 1], lat_p[k], lon_p[k]
+        );
       }
       const double value = static_cast<double>(sum);
       if (!std::isfinite(value)) {
-        stop("Shape distances must be finite.");
+#ifdef _OPENMP
+#pragma omp atomic write
+#endif
+        is_finite = 0;
       }
-      cum[k] = value;
+      cum_p[k] = value;
     }
   }
+
+  if (!is_finite) stop("Shape distances must be finite.");
 
   // for each part: the number of points of its shape whose cumulative distance
   // is <= from (as findInterval()), <= to, and < to (findInterval() with
@@ -366,7 +536,7 @@ list cpp_shape_cut_segments(const doubles lat,
   writable::integers first_inner(n_cuts);
   writable::integers last_inner(n_cuts);
 
-  const double* cum_begin = REAL(cum);
+  const double* cum_begin = cum_p;
 
   for (R_xlen_t i = 0; i < n_cuts; i++) {
     if (cut_shape[i] == NA_INTEGER || cut_shape[i] < 1 ||

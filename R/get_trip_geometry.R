@@ -254,8 +254,8 @@ get_trip_geometry <- function(gtfs,
 #' @keywords internal
 build_shape_cuts <- function(cuts, shape_points) {
   # the cumulative distance of each point of the relevant shapes is calculated
-  # in C++ with the same distances as rcpp_locate_stops_on_shape(), but summed
-  # in long double, as R's cumsum() does, while rcpp_locate_stops_on_shape()
+  # in C++ with the same distances as cpp_locate_stops_on_shapes(), but summed
+  # in long double, as R's cumsum() does, while cpp_locate_stops_on_shapes()
   # sums in double. so the positions of the last stops may slightly exceed the
   # cumulative distance of the last shape point. hence the interpolation
   # factors are clamped to [0, 1] below
