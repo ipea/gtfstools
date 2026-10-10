@@ -85,35 +85,20 @@
 
   | function | n times faster on poa | n times faster on spo |
   |---|---|---|
-  | `as_dt_gtfs()` | 0.4 | 0.5 |
   | `convert_sf_to_shapes()` | 12 | 42 |
-  | `convert_shapes_to_sf()` | 0.6 | 0.6 |
-  | `convert_stops_to_sf()` | ~1 | ~1 |
   | `convert_time_to_seconds()` | 2.4 | ~1 |
-  | `filter_by_agency_id()` | ~1 | ~1 |
-  | `filter_by_route_id()` | ~1 | ~1 |
-  | `filter_by_route_type()` | ~1 | ~1 |
-  | `filter_by_service_id()` | ~1 | ~1 |
-  | `filter_by_shape_id()` | ~1 | ~1 |
   | `filter_by_spatial_extent()` | 3.3 | 2.4 |
   | `filter_by_stop_id()` | 5.3 | 4.6 |
   | `filter_by_time_of_day()` | 1.4 | ~1 |
-  | `filter_by_trip_id()` | ~1 | ~1 |
-  | `filter_by_weekday()` | ~1 | ~1 |
   | `frequencies_to_stop_times()` | – | 5.2 |
-  | `get_children_stops()` | – | – |
-  | `get_parent_station()` | – | – |
   | `get_stop_times_patterns()` | 1.6 | 1.5 |
   | `get_trip_duration()` | 2.2 | ~1 |
-  | `get_trip_geometry()`† | 0.6 | 0.4 |
   | `get_trip_length()`† | 1.7 | ~1 |
   | `get_trip_segment_duration()` | 27 | 2.7 |
   | `get_trip_speed()`† | 1.2 | ~1 |
-  | `merge_gtfs()` | ~1 | ~1 |
-  | `read_gtfs()` | 1.2 | ~1 |
-  | `remove_duplicates()` | ~1 | ~1 |
   | `set_trip_speed()`† | 1.2 | 0.7 |
   | `write_gtfs()` | 1.7 | 1.9 |
+
 - The package documentation website moved to <https://ipea.github.io/gtfstools/> and the GitHub repository to <https://github.com/ipea/gtfstools>. All links were updated.
 
 # gtfstools 1.4.0
