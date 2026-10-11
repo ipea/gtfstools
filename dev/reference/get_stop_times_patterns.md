@@ -7,12 +7,7 @@ each of these cases.
 ## Usage
 
 ``` r
-get_stop_times_patterns(
-  gtfs,
-  trip_id = NULL,
-  type = "spatial",
-  sort_sequence = TRUE
-)
+get_stop_times_patterns(gtfs, trip_id = NULL, type = "spatial", sort_sequence)
 ```
 
 ## Arguments
@@ -35,12 +30,9 @@ get_stop_times_patterns(
 
 - sort_sequence:
 
-  A logical specifying whether to sort timetables by `stop_sequence`.
-  Defaults to `TRUE`. Sorting an already ordered table is cheap, and
-  pattern identification based on unordered timetables may result in
-  multiple ids identifying what would be the same pattern, had the table
-  been ordered. Set to `FALSE` only if the timetables are known to be
-  ordered.
+  Deprecated; do not supply. Timetables are now always sorted by
+  `stop_sequence`. Passing `TRUE` raises a warning, and passing `FALSE`
+  raises an error.
 
 ## Value
 
@@ -57,13 +49,11 @@ account, and the time that the trip started is ignored (e.g. if two
 trips depart from stop A and follow the same sequence of stops to arrive
 at stop B, taking both 1 hour to do so, their spatiotemporal pattern
 will be considered the same, even if one departed at 6 am and another at
-7 am). Please also note that the `stop_sequence` field is currently
-ignored - which means that two stops are considered to follow the same
-sequence if one is listed right below the other on the `stop_times`
-table (e.g. if trip X lists stops A followed by stop B with
-`stop_sequence`s 1 and 2, and trip Y lists stops A followed by stop B
-with `stop_sequence`s 1 and 3, they are assigned to the same
-`pattern_id`).
+7 am). Please also note that only the order given by `stop_sequence`
+matters, not its values - e.g. if trip X lists stops A followed by stop
+B with `stop_sequence`s 1 and 2, and trip Y lists stops A followed by
+stop B with `stop_sequence`s 1 and 3, they are assigned to the same
+`pattern_id`.
 
 Existing `_secs` columns in `stop_times` (e.g. created with
 [`convert_time_to_seconds()`](https://ipea.github.io/gtfstools/dev/reference/convert_time_to_seconds.md))

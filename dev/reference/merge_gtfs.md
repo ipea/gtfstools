@@ -18,7 +18,9 @@ merge_gtfs(..., files = NULL, prefix = FALSE)
 - files:
 
   A character vector listing the GTFS tables to be merged. If `NULL`
-  (the default), all tables are merged.
+  (the default), all tables are merged. Elements that are not tables,
+  such as the `locations` of GTFS-Flex feeds (read from a geojson file),
+  are not merged and are left out of the result, with a warning.
 
 - prefix:
 

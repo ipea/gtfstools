@@ -83,6 +83,11 @@ created trips to differentiate each one of them (e.g. in this case, the
 new trips, described in the `trips` and `stop_times` tables, would be
 called `"example_trip_1"` and `"example_trip_2"`).
 
+The times of each new trip are those of its template, shifted so that it
+departs from the first stop at the departure time. When the template has
+a dwell time at the first stop, a departure close to midnight may yield
+an arrival before 00:00:00, which is set to 00:00:00 instead.
+
 Existing `_secs` columns in `stop_times` and `frequencies` (e.g. created
 with
 [`convert_time_to_seconds()`](https://ipea.github.io/gtfstools/dev/reference/convert_time_to_seconds.md))

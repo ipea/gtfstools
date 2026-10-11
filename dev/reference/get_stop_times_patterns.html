@@ -26,6 +26,7 @@ these cases.'><meta property="og:image" content="https://ipea.github.io/gtfstool
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/calendar_overlap.html">Checking the calendar overlap of GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/editing.html">Editing GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/filtering.html">Filtering GTFS feeds</a></li>
+    <li><a class="dropdown-item" href="../articles/querying.html">Querying GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/validating.html">Validating GTFS feeds</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -58,12 +59,7 @@ these cases.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_stop_times_patterns</span><span class="op">(</span></span>
-<span>  <span class="va">gtfs</span>,</span>
-<span>  trip_id <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  type <span class="op">=</span> <span class="st">"spatial"</span>,</span>
-<span>  sort_sequence <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_stop_times_patterns</span><span class="op">(</span><span class="va">gtfs</span>, trip_id <span class="op">=</span> <span class="cn">NULL</span>, type <span class="op">=</span> <span class="st">"spatial"</span>, <span class="va">sort_sequence</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -86,12 +82,9 @@ analyses the pattern of every <code>trip_id</code> in the GTFS.</p></dd>
 
 
 <dt id="arg-sort-sequence">sort_sequence<a class="anchor" aria-label="anchor" href="#arg-sort-sequence"></a></dt>
-<dd><p>A logical specifying whether to sort timetables by
-<code>stop_sequence</code>. Defaults to <code>TRUE</code>. Sorting an already ordered table is
-cheap, and pattern identification based on unordered timetables may result
-in multiple ids identifying what would be the same pattern, had the table
-been ordered. Set to <code>FALSE</code> only if the timetables are known to be
-ordered.</p></dd>
+<dd><p>Deprecated; do not supply. Timetables are now always
+sorted by <code>stop_sequence</code>. Passing <code>TRUE</code> raises a warning, and passing
+<code>FALSE</code> raises an error.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -110,13 +103,11 @@ case, only the time between stops is taken into account, and the time that
 the trip started is ignored (e.g. if two trips depart from stop A and follow
 the same sequence of stops to arrive at stop B, taking both 1 hour to do so,
 their spatiotemporal pattern will be considered the same, even if one
-departed at 6 am and another at 7 am). Please also note that the
-<code>stop_sequence</code> field is currently ignored - which means that two stops are
-considered to follow the same sequence if one is listed right below the
-other on the <code>stop_times</code> table (e.g. if trip X lists stops A followed by
-stop B with <code>stop_sequence</code>s 1 and 2, and trip Y lists stops A followed by
-stop B with <code>stop_sequence</code>s 1 and 3, they are assigned to the same
-<code>pattern_id</code>).</p>
+departed at 6 am and another at 7 am). Please also note that only the order
+given by <code>stop_sequence</code> matters, not its values - e.g. if trip X lists stops
+A followed by stop B with <code>stop_sequence</code>s 1 and 2, and trip Y lists stops A
+followed by stop B with <code>stop_sequence</code>s 1 and 3, they are assigned to the
+same <code>pattern_id</code>.</p>
 <p>Existing <code>_secs</code> columns in <code>stop_times</code> (e.g. created with
 <code><a href="convert_time_to_seconds.html">convert_time_to_seconds()</a></code>) are used as-is, not recalculated from the time
 strings.</p>

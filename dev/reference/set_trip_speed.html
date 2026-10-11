@@ -24,6 +24,7 @@ by changing the arrival_time and departure_time columns in stop_times."><meta pr
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/calendar_overlap.html">Checking the calendar overlap of GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/editing.html">Editing GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/filtering.html">Filtering GTFS feeds</a></li>
+    <li><a class="dropdown-item" href="../articles/querying.html">Querying GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/validating.html">Validating GTFS feeds</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -84,7 +85,8 @@ average speed set.</p></dd>
 <dt id="arg-speed">speed<a class="anchor" aria-label="anchor" href="#arg-speed"></a></dt>
 <dd><p>A numeric representing the speed to be set. Its length must
 either equal 1, in which case the value is recycled for all
-<code>trip_id</code>s, or equal <code>trip_id</code>'s length.</p></dd>
+<code>trip_id</code>s, or equal <code>trip_id</code>'s length. Must be positive and finite. A
+<code>trip_id</code> listed more than once must be given the same speed.</p></dd>
 
 
 <dt id="arg-unit">unit<a class="anchor" aria-label="anchor" href="#arg-unit"></a></dt>

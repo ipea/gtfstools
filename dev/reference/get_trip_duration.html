@@ -22,6 +22,7 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/calendar_overlap.html">Checking the calendar overlap of GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/editing.html">Editing GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/filtering.html">Filtering GTFS feeds</a></li>
+    <li><a class="dropdown-item" href="../articles/querying.html">Querying GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/validating.html">Validating GTFS feeds</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -85,7 +86,8 @@ desired. One of <code>"s"</code> (seconds), <code>"min"</code> (minutes, the def
 
 <p>The duration of a trip is defined as the time difference between its last
 arrival time and its first departure time, as specified in the <code>stop_times</code>
-table.</p>
+table. Trips without any arrival time or without any departure time get a
+<code>NA</code> duration, with a warning.</p>
 <p>Existing <code>_secs</code> columns in <code>stop_times</code> (e.g. created with
 <code><a href="convert_time_to_seconds.html">convert_time_to_seconds()</a></code>) are used as-is, not recalculated from the time
 strings.</p>

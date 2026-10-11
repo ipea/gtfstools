@@ -13,11 +13,11 @@ In order to answer these puzzling questions, **gtfstools** includes
 [`validate_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/validate_gtfs.md),
 a function that wraps the [Canonical GTFS
 Validator](https://github.com/MobilityData/gtfs-validator) developed by
-MobilityData. The validator requires Java 11 or higher to run - you can
-check the version you have currently installed with the command
-`java -version` on a terminal session or with the command
-`system("java -version")` from your R session. If need be, you can
-download Java 11 from
+MobilityData. The validator requires Java 11 or higher to run (recent
+versions require Java 17 or higher) - you can check the version you have
+currently installed with the command `java -version` on a terminal
+session or with the command `system("java -version")` from your R
+session. If need be, you can download Java from
 <https://www.oracle.com/java/technologies/downloads>.
 
 Using
@@ -41,7 +41,7 @@ library(gtfstools)
 
 latest_validator <- download_validator(tempdir())
 latest_validator
-#> [1] "/tmp/RtmpE0CgHc/gtfs-validator-v8.0.1.jar"
+#> [1] "/tmp/Rtmp06BBXg/gtfs-validator-v8.0.1.jar"
 ```
 
 The second (and final) step is actually running

@@ -38,6 +38,7 @@
 <li><a class="dropdown-item" href="../articles/calendar_overlap.html">Checking the calendar overlap of GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/editing.html">Editing GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/filtering.html">Filtering GTFS feeds</a></li>
+    <li><a class="dropdown-item" href="../articles/querying.html">Querying GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/validating.html">Validating GTFS feeds</a></li>
   </ul>
 </li>
@@ -429,11 +430,11 @@ want to merge with the <code>files</code> argument:</p>
 <p><code><a href="../reference/set_trip_speed.html">set_trip_speed()</a></code> sets the average speed of specified
 trips by adjusting the <code>arrival_time</code> and
 <code>departure_time</code> columns in the <code>stop_times</code>
-table. Average speed is calculated as the difference between the arrival
-time at the last stop minus the departure time at the first stop,
-divided by the trip’s length. Please note that arrival and departure
-times at intermediate stops are set as <code>""</code>. Some transport
-routing software, such as <a href="https://www.opentripplanner.org/" class="external-link">OpenTripPlanner</a> and <a href="https://github.com/conveyal/r5" class="external-link">R5</a>, support specifying stop
+table. Average speed is calculated as the trip’s length divided by the
+difference between the arrival time at the last stop and the departure
+time at the first stop. Please note that arrival and departure times at
+intermediate stops are set as <code>""</code>. Some transport routing
+software, such as <a href="https://www.opentripplanner.org/" class="external-link">OpenTripPlanner</a> and <a href="https://github.com/conveyal/r5" class="external-link">R5</a>, support specifying stop
 times like so, in which case they interpolate arrival/departure times at
 intermediate stops based on the trip’s average speed and the euclidean
 distance between stops.</p>

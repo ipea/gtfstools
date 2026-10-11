@@ -37,13 +37,10 @@ object is altered).
 
 ## Details
 
-Other gtfstools functions use existing `_secs` columns as-is. Only the
-functions that edit times
-([`set_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.md)
-and
-[`filter_by_time_of_day()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_time_of_day.md))
-keep them in sync, so re-run `convert_time_to_seconds()` after other
-edits.
+Other gtfstools functions use existing `_secs` columns as-is. The
+functions that edit times keep them in sync, but other edits (e.g. made
+directly to the tables) don't, so re-run `convert_time_to_seconds()`
+after them.
 
 ## Examples
 

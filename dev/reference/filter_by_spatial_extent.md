@@ -24,18 +24,22 @@ filter_by_spatial_extent(
 
 - geom:
 
-  An `sf` object. Describes the spatial extent used to filter the data.
+  An `sf`, `sfc` or `bbox` object, in WGS 84 (EPSG 4326). Describes the
+  spatial extent used to filter the data.
 
 - spatial_operation:
 
   A spatial operation function from the set of options listed in
-  [geos_binary_pred](https://r-spatial.github.io/sf/reference/geos_binary_pred.html)
-  (check the [DE-I9M](https://en.wikipedia.org/wiki/DE-9IM) Wikipedia
-  entry for the definition of each function). Defaults to
+  [geos_binary_pred](https://r-spatial.github.io/sf/reference/geos_binary_pred.html).
+  Defaults to
   [`sf::st_intersects`](https://r-spatial.github.io/sf/reference/geos_binary_pred.html),
   which tests if the shapes and trips have ANY intersection with the
   object specified in `geom`. Please note that `geom` is passed as the
   `x` argument of these functions.
+  [`sf::st_equals_exact()`](https://r-spatial.github.io/sf/reference/geos_binary_pred.html)
+  and
+  [`sf::st_is_within_distance()`](https://r-spatial.github.io/sf/reference/geos_binary_pred.html)
+  are not supported, since they require additional arguments.
 
 - keep:
 

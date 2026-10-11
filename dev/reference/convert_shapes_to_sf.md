@@ -5,7 +5,7 @@ Converts the `shapes` table to a `LINESTRING sf` object.
 ## Usage
 
 ``` r
-convert_shapes_to_sf(gtfs, shape_id = NULL, crs = 4326, sort_sequence = TRUE)
+convert_shapes_to_sf(gtfs, shape_id = NULL, crs = 4326, sort_sequence)
 ```
 
 ## Arguments
@@ -27,11 +27,9 @@ convert_shapes_to_sf(gtfs, shape_id = NULL, crs = 4326, sort_sequence = TRUE)
 
 - sort_sequence:
 
-  A logical. Whether to sort shapes by `shape_pt_sequence`. Defaults to
-  `TRUE`. Sorting an already ordered table is cheap, and shapes
-  generated from unordered sequences do not correctly depict the real
-  life trip shapes. Set to `FALSE` only if the shapes are known to be
-  ordered.
+  Deprecated; do not supply. Shapes are now always sorted by
+  `shape_pt_sequence`. Passing `TRUE` raises a warning, and passing
+  `FALSE` raises an error.
 
 ## Value
 

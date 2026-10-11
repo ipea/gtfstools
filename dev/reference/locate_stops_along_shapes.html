@@ -22,6 +22,7 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/calendar_overlap.html">Checking the calendar overlap of GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/editing.html">Editing GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/filtering.html">Filtering GTFS feeds</a></li>
+    <li><a class="dropdown-item" href="../articles/querying.html">Querying GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/validating.html">Validating GTFS feeds</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -52,7 +53,7 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">locate_stops_along_shapes</span><span class="op">(</span><span class="va">gtfs</span>, <span class="va">st</span>, <span class="va">stop_lat</span>, <span class="va">stop_lon</span>, <span class="va">sort_sequence</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">locate_stops_along_shapes</span><span class="op">(</span><span class="va">gtfs</span>, <span class="va">st</span>, <span class="va">stop_lat</span>, <span class="va">stop_lon</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -71,10 +72,6 @@ the rows of each trip are contiguous.</p></dd>
 <dt id="arg-stop-lat-stop-lon">stop_lat, stop_lon<a class="anchor" aria-label="anchor" href="#arg-stop-lat-stop-lon"></a></dt>
 <dd><p>The coordinates of the stops listed in <code>st</code>.</p></dd>
 
-
-<dt id="arg-sort-sequence">sort_sequence<a class="anchor" aria-label="anchor" href="#arg-sort-sequence"></a></dt>
-<dd><p>Whether to sort the shapes by <code>shape_pt_sequence</code>.</p></dd>
-
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -83,7 +80,7 @@ shape, in meters from the start of the shape. Stops whose trip is not
 linked to a usable shape, or that don't have coordinates, get <code>NA</code>. Its
 <code>"shape_points"</code> attribute is a list with the shape points on which the
 positions were measured (<code>shapes</code>, without missing coordinates and
-sorted if <code>sort_sequence</code> is <code>TRUE</code>), the rows of each shape in <code>shapes</code>
+sorted by <code>shape_pt_sequence</code>), the rows of each shape in <code>shapes</code>
 (<code>rows</code>) and the <code>shape_id</code> of each trip (<code>trip_shape_id</code>), in order of
 appearance in <code>st</code>.</p>
     </div>

@@ -12,7 +12,7 @@ get_trip_geometry(
   trip_id = NULL,
   method = "shapes",
   crs = 4326,
-  sort_sequence = TRUE,
+  sort_sequence,
   file = NULL
 )
 ```
@@ -46,11 +46,9 @@ get_trip_geometry(
 
 - sort_sequence:
 
-  A logical specifying whether to sort timetables and shapes by
-  `stop_sequence` and `shape_pt_sequence`, respectively. Defaults to
-  `TRUE`. Set to `FALSE` only if these tables are known to be ordered.
-  Geometries generated from unordered sequences do not correctly depict
-  the trip trajectories.
+  Deprecated; do not supply. Timetables and shapes are now always sorted
+  by `stop_sequence` and `shape_pt_sequence`. Passing `TRUE` raises a
+  warning, and passing `FALSE` raises an error.
 
 - file:
 

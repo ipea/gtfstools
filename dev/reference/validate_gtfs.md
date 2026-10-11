@@ -7,7 +7,8 @@ report (if validator v3.1.0 or higher is used) and in JSON format.
 Please check the complete set of rules used in the validation
 [here](https://github.com/MobilityData/gtfs-validator/blob/master/RULES.md).
 Please note that this function requires a working installation of Java
-11 or higher to work.
+11 or higher to work. Recent versions of the validator require Java 17
+or higher.
 
 ## Usage
 
@@ -65,7 +66,7 @@ validate_gtfs(
 
   An integer between 1 and the number of cores in the running machine.
   Control how many threads are used during the validation. Defaults to
-  using all but one of the available cores.
+  1.
 
 ## Value
 

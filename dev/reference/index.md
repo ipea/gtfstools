@@ -43,8 +43,6 @@
   : Get a summary of a GTFS feed
 - [`get_trip_duration()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_duration.md)
   : Get trip duration
-- [`get_trip_geometry()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_geometry.md)
-  : Get trip geometry
 - [`get_trip_length()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_length.md)
   : Get trip length
 - [`get_trip_segment_duration()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_segment_duration.md)
@@ -121,6 +119,12 @@
 - [`filter_by_spatial_extent()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_spatial_extent.md)
   : Filter a GTFS object using a spatial extent
 
+- [`get_trip_geometry()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_geometry.md)
+  : Get trip geometry
+
+- [`get_route_geometry()`](https://ipea.github.io/gtfstools/dev/reference/get_route_geometry.md)
+  : Get route geometry
+
 ## Editing GTFS feeds
 
 - [`interpolate_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_stop_times.md)
@@ -131,8 +135,12 @@
   : Remove duplicated entries
 - [`remove_unused_ids()`](https://ipea.github.io/gtfstools/dev/reference/remove_unused_ids.md)
   : Remove unused ids
+- [`fix_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/fix_gtfs.md)
+  : Fix common problems in GTFS feeds
 - [`set_dwell_time()`](https://ipea.github.io/gtfstools/dev/reference/set_dwell_time.md)
   : Set dwell time
+- [`set_max_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_max_speed.md)
+  : Set trip maximum speed
 - [`set_route_frequency()`](https://ipea.github.io/gtfstools/dev/reference/set_route_frequency.md)
   : Set route frequency
 - [`set_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.md)

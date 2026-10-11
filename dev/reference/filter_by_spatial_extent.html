@@ -26,6 +26,7 @@ are selected through a specified spatial operation."><meta property="og:image" c
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/calendar_overlap.html">Checking the calendar overlap of GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/editing.html">Editing GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/filtering.html">Filtering GTFS feeds</a></li>
+    <li><a class="dropdown-item" href="../articles/querying.html">Querying GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/validating.html">Validating GTFS feeds</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -75,18 +76,18 @@ are selected through a specified spatial operation.</p>
 
 
 <dt id="arg-geom">geom<a class="anchor" aria-label="anchor" href="#arg-geom"></a></dt>
-<dd><p>An <code>sf</code> object. Describes the spatial extent used to filter the
-data.</p></dd>
+<dd><p>An <code>sf</code>, <code>sfc</code> or <code>bbox</code> object, in WGS 84 (EPSG 4326).
+Describes the spatial extent used to filter the data.</p></dd>
 
 
 <dt id="arg-spatial-operation">spatial_operation<a class="anchor" aria-label="anchor" href="#arg-spatial-operation"></a></dt>
 <dd><p>A spatial operation function from the set of
-options listed in <a href="https://r-spatial.github.io/sf/reference/geos_binary_pred.html" class="external-link">geos_binary_pred</a> (check the
-<a href="https://en.wikipedia.org/wiki/DE-9IM" class="external-link">DE-I9M</a> Wikipedia entry for the
-definition of each function). Defaults to <code><a href="https://r-spatial.github.io/sf/reference/geos_binary_pred.html" class="external-link">sf::st_intersects</a></code>, which
+options listed in <a href="https://r-spatial.github.io/sf/reference/geos_binary_pred.html" class="external-link">geos_binary_pred</a>. Defaults to <code><a href="https://r-spatial.github.io/sf/reference/geos_binary_pred.html" class="external-link">sf::st_intersects</a></code>, which
 tests if the shapes and trips have ANY intersection with the object
 specified in <code>geom</code>. Please note that <code>geom</code> is passed as the <code>x</code> argument
-of these functions.</p></dd>
+of these functions. <code><a href="https://r-spatial.github.io/sf/reference/geos_binary_pred.html" class="external-link">sf::st_equals_exact()</a></code> and
+<code><a href="https://r-spatial.github.io/sf/reference/geos_binary_pred.html" class="external-link">sf::st_is_within_distance()</a></code> are not supported, since they require
+additional arguments.</p></dd>
 
 
 <dt id="arg-keep">keep<a class="anchor" aria-label="anchor" href="#arg-keep"></a></dt>

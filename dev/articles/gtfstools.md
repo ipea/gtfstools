@@ -412,9 +412,9 @@ names(merged_files)
 [`set_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.md)
 sets the average speed of specified trips by adjusting the
 `arrival_time` and `departure_time` columns in the `stop_times` table.
-Average speed is calculated as the difference between the arrival time
-at the last stop minus the departure time at the first stop, divided by
-the trip’s length. Please note that arrival and departure times at
+Average speed is calculated as the trip’s length divided by the
+difference between the arrival time at the last stop and the departure
+time at the first stop. Please note that arrival and departure times at
 intermediate stops are set as `""`. Some transport routing software,
 such as [OpenTripPlanner](https://www.opentripplanner.org/) and
 [R5](https://github.com/conveyal/r5), support specifying stop times like

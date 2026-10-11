@@ -26,6 +26,7 @@ new fields with the _secs suffix."><meta property="og:image" content="https://ip
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/calendar_overlap.html">Checking the calendar overlap of GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/editing.html">Editing GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/filtering.html">Filtering GTFS feeds</a></li>
+    <li><a class="dropdown-item" href="../articles/querying.html">Querying GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/validating.html">Validating GTFS feeds</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -89,9 +90,9 @@ is altered).</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>Other gtfstools functions use existing <code>_secs</code> columns as-is. Only the
-functions that edit times (<code><a href="set_trip_speed.html">set_trip_speed()</a></code> and <code><a href="filter_by_time_of_day.html">filter_by_time_of_day()</a></code>)
-keep them in sync, so re-run <code>convert_time_to_seconds()</code> after other edits.</p>
+    <p>Other gtfstools functions use existing <code>_secs</code> columns as-is. The functions
+that edit times keep them in sync, but other edits (e.g. made directly to
+the tables) don't, so re-run <code>convert_time_to_seconds()</code> after them.</p>
     </div>
 
     <div class="section level2">

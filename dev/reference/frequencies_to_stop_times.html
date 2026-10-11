@@ -24,6 +24,7 @@ frequencies table."><meta property="og:image" content="https://ipea.github.io/gt
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/calendar_overlap.html">Checking the calendar overlap of GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/editing.html">Editing GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/filtering.html">Filtering GTFS feeds</a></li>
+    <li><a class="dropdown-item" href="../articles/querying.html">Querying GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/validating.html">Validating GTFS feeds</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -126,6 +127,10 @@ departing at that time. <code>frequencies_to_stop_times()</code> appends a <code
 suffix to the newly created trips to differentiate each one of them (e.g. in
 this case, the new trips, described in the <code>trips</code> and <code>stop_times</code> tables,
 would be called <code>"example_trip_1"</code> and <code>"example_trip_2"</code>).</p>
+<p>The times of each new trip are those of its template, shifted so that it
+departs from the first stop at the departure time. When the template has a
+dwell time at the first stop, a departure close to midnight may yield an
+arrival before 00:00:00, which is set to 00:00:00 instead.</p>
 <p>Existing <code>_secs</code> columns in <code>stop_times</code> and <code>frequencies</code> (e.g. created
 with <code><a href="convert_time_to_seconds.html">convert_time_to_seconds()</a></code>) are used as-is, not recalculated from the
 time strings.</p>

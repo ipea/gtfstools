@@ -38,6 +38,7 @@
 <li><a class="dropdown-item" href="../articles/calendar_overlap.html">Checking the calendar overlap of GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/editing.html">Editing GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/filtering.html">Filtering GTFS feeds</a></li>
+    <li><a class="dropdown-item" href="../articles/querying.html">Querying GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/validating.html">Validating GTFS feeds</a></li>
   </ul>
 </li>
@@ -88,10 +89,11 @@ of the questions that may arise when dealing with GTFS data.</p>
 <strong>gtfstools</strong> includes <code><a href="../reference/validate_gtfs.html">validate_gtfs()</a></code>, a
 function that wraps the <a href="https://github.com/MobilityData/gtfs-validator" class="external-link">Canonical GTFS
 Validator</a> developed by MobilityData. The validator requires Java 11
-or higher to run - you can check the version you have currently
-installed with the command <code>java -version</code> on a terminal
-session or with the command <code>system("java -version")</code> from
-your R session. If need be, you can download Java 11 from <a href="https://www.oracle.com/java/technologies/downloads" class="external-link uri">https://www.oracle.com/java/technologies/downloads</a>.</p>
+or higher to run (recent versions require Java 17 or higher) - you can
+check the version you have currently installed with the command
+<code>java -version</code> on a terminal session or with the command
+<code>system("java -version")</code> from your R session. If need be,
+you can download Java from <a href="https://www.oracle.com/java/technologies/downloads" class="external-link uri">https://www.oracle.com/java/technologies/downloads</a>.</p>
 <p>Using <code><a href="../reference/validate_gtfs.html">validate_gtfs()</a></code> is very simple and requires no
 more than a few function calls. First we need to download the validator
 command-line tool. We can do it manually from MobilityData releases, or
@@ -108,7 +110,7 @@ the command-line tool version, which controls some of its behavior.</p>
 <span></span>
 <span><span class="va">latest_validator</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/download_validator.html">download_validator</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">latest_validator</span></span>
-<span><span class="co">#&gt; [1] "/tmp/RtmpE0CgHc/gtfs-validator-v8.0.1.jar"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "/tmp/Rtmp06BBXg/gtfs-validator-v8.0.1.jar"</span></span></code></pre></div>
 <p>The second (and final) step is actually running
 <code><a href="../reference/validate_gtfs.html">validate_gtfs()</a></code>. To do that we need some GTFS data, which
 the function accepts in varying formats: it can be a GTFS object, as

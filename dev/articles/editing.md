@@ -20,6 +20,9 @@ functions currently available are:
 - [`interpolate_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_stop_times.md):
   fills blank stop times, assuming a constant speed between stops with
   known times;
+- [`set_max_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_max_speed.md):
+  caps the speed of trips, slowing down only the parts that are faster
+  than a maximum speed;
 - [`set_dwell_time()`](https://ipea.github.io/gtfstools/dev/reference/set_dwell_time.md):
   sets how long vehicles stay at stops;
 - [`frequencies_to_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/frequencies_to_stop_times.md):
@@ -30,7 +33,10 @@ functions currently available are:
   removes duplicated entries from the feed’s tables;
 - [`remove_unused_ids()`](https://ipea.github.io/gtfstools/dev/reference/remove_unused_ids.md):
   removes the ids that the feed doesn’t use, with their entries in every
-  table.
+  table;
+- [`fix_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/fix_gtfs.md):
+  cleans a feed in one call, removing duplicated entries and unused ids,
+  optionally capping the speed of trips and filling blank stop times.
 
 This vignette will introduce you to the first four functions and will
 cover their usage in detail. By default, they return an edited copy of
@@ -42,7 +48,6 @@ into the current **R** session:
 ``` r
 
 library(gtfstools)
-library(dplyr)
 ```
 
 ## Setting route frequencies
@@ -187,13 +192,11 @@ new_speed_gtfs$stop_times[
 ```
 
 The duration of the trip is set to its length, measured along its shape,
-divided by the given speed. The arrival time at the all the stops along
-the trip change accordingly. In this particular feed of São Paulo, the
-arrival and departure times at intermediate stops are set to `""`, so
-the function
+divided by the given speed.
 [`set_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.md)
-only updates the arrival time of the last stop. To fill in the expected
-arrival and departure times of intermediate stops, you use
+updates the arrival time at the last stop accordingly and sets the
+arrival and departure times at intermediate stops to `""`. To fill in
+the expected arrival and departure times of intermediate stops, you use
 [`interpolate_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_stop_times.md),
 as we’ll see in a [later section](#interpolating-stop-times).
 
@@ -203,7 +206,7 @@ function also includes a few other arguments that control which trips
 and parts of trips are changed:
 
 - `unit` sets the unit in which the speed is given, either `"km/h"` (the
-  default) or `"m/s"`;
+  default), `"m/s"` or `"mph"`;
 - `first_stop` and `last_stop` set the speed of only a segment of the
   trips, between two stops. The times at the stops after the segment are
   shifted by the change in its duration;
@@ -294,10 +297,7 @@ only the first and last stops of each trip have times:
 
 trip <- "T2-1@1#520"
 
-gtfs$stop_times |> 
-  filter(trip_id == trip) |> 
-  select(stop_id, arrival_time, departure_time) |> 
-  head()
+head(gtfs$stop_times[trip_id == trip, .(stop_id, arrival_time, departure_time)])
 #>    stop_id arrival_time departure_time
 #>     <char>       <char>         <char>
 #> 1:    3609     05:20:00       05:20:00
@@ -317,10 +317,12 @@ along the trip’s shape:
 
 interpolated_gtfs <- interpolate_stop_times(gtfs, trip_id = trip)
 
-interpolated_gtfs$stop_times |> 
-  filter(trip_id == trip) |> 
-  select(stop_id, arrival_time, departure_time) |> 
-  head()
+head(
+  interpolated_gtfs$stop_times[
+    trip_id == trip,
+    .(stop_id, arrival_time, departure_time)
+  ]
+)
 #>    stop_id arrival_time departure_time
 #>     <char>       <char>         <char>
 #> 1:    3609     05:20:00       05:20:00

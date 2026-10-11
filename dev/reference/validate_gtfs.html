@@ -5,13 +5,13 @@ validator v3.1.0 or higher is used) and in JSON format. Please check the
 complete set of rules used in the validation
 here.
 Please note that this function requires a working installation of Java 11 or
-higher to work."><meta property="og:description" content="Uses MobilityData's GTFS validator to perform a GTFS
+higher to work. Recent versions of the validator require Java 17 or higher."><meta property="og:description" content="Uses MobilityData's GTFS validator to perform a GTFS
 business rule validation. The results are available as an HTML report (if
 validator v3.1.0 or higher is used) and in JSON format. Please check the
 complete set of rules used in the validation
 here.
 Please note that this function requires a working installation of Java 11 or
-higher to work."><meta property="og:image" content="https://ipea.github.io/gtfstools/logo.png"><meta name="robots" content="noindex"></head><body>
+higher to work. Recent versions of the validator require Java 17 or higher."><meta property="og:image" content="https://ipea.github.io/gtfstools/logo.png"><meta name="robots" content="noindex"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -34,6 +34,7 @@ higher to work."><meta property="og:image" content="https://ipea.github.io/gtfst
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/calendar_overlap.html">Checking the calendar overlap of GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/editing.html">Editing GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/filtering.html">Filtering GTFS feeds</a></li>
+    <li><a class="dropdown-item" href="../articles/querying.html">Querying GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/validating.html">Validating GTFS feeds</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -65,7 +66,7 @@ validator v3.1.0 or higher is used) and in JSON format. Please check the
 complete set of rules used in the validation
 <a href="https://github.com/MobilityData/gtfs-validator/blob/master/RULES.md" class="external-link">here</a>.
 Please note that this function requires a working installation of Java 11 or
-higher to work.</p>
+higher to work. Recent versions of the validator require Java 17 or higher.</p>
     </div>
 
     <div class="section level2">
@@ -126,7 +127,7 @@ Defaults to <code>FALSE</code>.</p></dd>
 <dt id="arg-n-threads">n_threads<a class="anchor" aria-label="anchor" href="#arg-n-threads"></a></dt>
 <dd><p>An integer between 1 and the number of cores in the running
 machine. Control how many threads are used during the validation. Defaults
-to using all but one of the available cores.</p></dd>
+to 1.</p></dd>
 
 </dl></div>
     <div class="section level2">

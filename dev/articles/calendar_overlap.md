@@ -9,8 +9,9 @@ of the analysis. Feeds are published at different times and cover
 different periods, so such a date is not always easy to find.
 
 [`get_calendar_overlap()`](https://ipea.github.io/gtfstools/dev/reference/get_calendar_overlap.md)
-compares the calendars of several feeds. It only hsa two arguments. Its
-`resolution` argument controls what the result captures:
+compares the calendars of several feeds. Besides the feeds, it has only
+two arguments. Its `resolution` argument controls what the result
+captures:
 
 - `resolution = "daily"` (the default) captures the **intensity** of
   transit services: the number of trips each feed runs on each of its
@@ -28,7 +29,6 @@ only a handful of trips on it, which the daily trips reveal. With
 
 library(gtfstools)
 library(ggplot2)
-library(dplyr)
 ```
 
 ## Trips per day
@@ -44,9 +44,7 @@ poa_path <- system.file("extdata/poa_gtfs.zip", package = "gtfstools")
 
 daily_trips <- get_calendar_overlap(c(spo_path, poa_path))
 
-daily_trips |> 
-  dplyr::filter( overlap == TRUE) |> 
-  head()
+head(daily_trips[overlap == TRUE])
 #>        feed       date n_trips overlap
 #>      <char>     <Date>   <int>  <lgcl>
 #> 1: spo_gtfs 2019-01-18    7948    TRUE

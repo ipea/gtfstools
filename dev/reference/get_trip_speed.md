@@ -13,7 +13,7 @@ get_trip_speed(
   method = "shapes",
   by = "trip",
   unit = "km/h",
-  sort_sequence = TRUE,
+  sort_sequence,
   file = NULL
 )
 ```
@@ -54,9 +54,9 @@ get_trip_speed(
 
 - sort_sequence:
 
-  A logical specifying whether to sort timetables and shapes by
-  `stop_sequence` and `shape_pt_sequence`, respectively. Defaults to
-  `TRUE`. Set to `FALSE` only if these tables are known to be ordered.
+  Deprecated; do not supply. Timetables and shapes are now always sorted
+  by `stop_sequence` and `shape_pt_sequence`. Passing `TRUE` raises a
+  warning, and passing `FALSE` raises an error.
 
 - file:
 
@@ -80,7 +80,9 @@ divided by the duration calculated by
 [`get_trip_segment_duration()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_segment_duration.md)
 (with `by = "segment"`). Speeds are `NA` when the length is `NA` (e.g.
 trips not linked to a shape) or when the duration is missing (e.g. blank
-times at intermediate stops) or not positive.
+times at intermediate stops) or not positive. With `by = "trip"`, trips
+without any arrival or departure time raise the warning of
+[`get_trip_duration()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_duration.md).
 
 Existing `_secs` columns in `stop_times` (e.g. created with
 [`convert_time_to_seconds()`](https://ipea.github.io/gtfstools/dev/reference/convert_time_to_seconds.md))

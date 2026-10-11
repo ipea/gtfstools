@@ -38,6 +38,7 @@
 <li><a class="dropdown-item" href="../articles/calendar_overlap.html">Checking the calendar overlap of GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/editing.html">Editing GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/filtering.html">Filtering GTFS feeds</a></li>
+    <li><a class="dropdown-item" href="../articles/querying.html">Querying GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/validating.html">Validating GTFS feeds</a></li>
   </ul>
 </li>
@@ -85,8 +86,8 @@ otherwise, one of the networks silently drops out of the analysis. Feeds
 are published at different times and cover different periods, so such a
 date is not always easy to find.</p>
 <p><code><a href="../reference/get_calendar_overlap.html">get_calendar_overlap()</a></code> compares the calendars of several
-feeds. It only hsa two arguments. Its <code>resolution</code> argument
-controls what the result captures:</p>
+feeds. Besides the feeds, it has only two arguments. Its
+<code>resolution</code> argument controls what the result captures:</p>
 <ul>
 <li>
 <code>resolution = "daily"</code> (the default) captures the
@@ -104,8 +105,7 @@ runs only a handful of trips on it, which the daily trips reveal. With
 <a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ipea.github.io/gtfstools/">gtfstools</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span></code></pre></div>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="trips-per-day">Trips per day<a class="anchor" aria-label="anchor" href="#trips-per-day"></a>
 </h2>
@@ -119,9 +119,7 @@ service day:</p>
 <span></span>
 <span><span class="va">daily_trips</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_calendar_overlap.html">get_calendar_overlap</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">spo_path</span>, <span class="va">poa_path</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">daily_trips</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span> <span class="va">overlap</span> <span class="op">==</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">daily_trips</span><span class="op">[</span><span class="va">overlap</span> <span class="op">==</span> <span class="cn">TRUE</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="co">#&gt;        feed       date n_trips overlap</span></span>
 <span><span class="co">#&gt;      &lt;char&gt;     &lt;Date&gt;   &lt;int&gt;  &lt;lgcl&gt;</span></span>
 <span><span class="co">#&gt; 1: spo_gtfs 2019-01-18    7948    TRUE</span></span>

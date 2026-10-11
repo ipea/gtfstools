@@ -36,7 +36,8 @@ set_trip_speed(
 
   A numeric representing the speed to be set. Its length must either
   equal 1, in which case the value is recycled for all `trip_id`s, or
-  equal `trip_id`'s length.
+  equal `trip_id`'s length. Must be positive and finite. A `trip_id`
+  listed more than once must be given the same speed.
 
 - unit:
 

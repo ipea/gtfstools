@@ -6,12 +6,7 @@ Returns the duration of segments between stops of each specified
 ## Usage
 
 ``` r
-get_trip_segment_duration(
-  gtfs,
-  trip_id = NULL,
-  unit = "min",
-  sort_sequence = TRUE
-)
+get_trip_segment_duration(gtfs, trip_id = NULL, unit = "min", sort_sequence)
 ```
 
 ## Arguments
@@ -35,11 +30,9 @@ get_trip_segment_duration(
 
 - sort_sequence:
 
-  A logical specifying whether to sort timetables by `stop_sequence`.
-  Defaults to `TRUE`. Sorting an already ordered table is cheap, and
-  durations calculated from unordered timetables do not correctly depict
-  the real life segment durations. Set to `FALSE` only if the timetables
-  are known to be ordered.
+  Deprecated; do not supply. Timetables are now always sorted by
+  `stop_sequence`. Passing `TRUE` raises a warning, and passing `FALSE`
+  raises an error.
 
 ## Value
 

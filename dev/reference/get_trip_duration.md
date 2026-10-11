@@ -35,7 +35,8 @@ A `data.table` containing the duration of each specified trip.
 
 The duration of a trip is defined as the time difference between its
 last arrival time and its first departure time, as specified in the
-`stop_times` table.
+`stop_times` table. Trips without any arrival time or without any
+departure time get a `NA` duration, with a warning.
 
 Existing `_secs` columns in `stop_times` (e.g. created with
 [`convert_time_to_seconds()`](https://ipea.github.io/gtfstools/dev/reference/convert_time_to_seconds.md))

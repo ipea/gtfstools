@@ -24,6 +24,7 @@ in each file."><meta property="og:image" content="https://ipea.github.io/gtfstoo
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/calendar_overlap.html">Checking the calendar overlap of GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/editing.html">Editing GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/filtering.html">Filtering GTFS feeds</a></li>
+    <li><a class="dropdown-item" href="../articles/querying.html">Querying GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/validating.html">Validating GTFS feeds</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -78,9 +79,11 @@ in each file.</p>
 
 
 <dt id="arg-keep">keep<a class="anchor" aria-label="anchor" href="#arg-keep"></a></dt>
-<dd><p>A logical. Whether the entries related to the <code>trip_id</code>s that
-passes through the specified <code>stop_id</code>s should be kept or dropped (defaults
-to <code>TRUE</code>, which keeps the entries).</p></dd>
+<dd><p>A logical. Whether the <code>stop_times</code> entries at the specified
+<code>stop_id</code>s (and the entries related to them in other tables) should be
+kept or dropped (defaults to <code>TRUE</code>, which keeps the entries). Trips that
+still have entries in <code>stop_times</code> are kept. To keep or drop entire trips,
+pass the <code>trip_id</code>s that serve these stops to <code><a href="filter_by_trip_id.html">filter_by_trip_id()</a></code>.</p></dd>
 
 
 <dt id="arg-include-children">include_children<a class="anchor" aria-label="anchor" href="#arg-include-children"></a></dt>
@@ -135,12 +138,12 @@ process.</p>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/object.size.html" class="external-link">object.size</a></span><span class="op">(</span><span class="va">gtfs</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 811304 bytes</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># keeps entries related to trips that pass through specified stop_ids</span></span></span>
+<span class="r-in"><span><span class="co"># keeps the stop_times entries at the specified stop_ids</span></span></span>
 <span class="r-in"><span><span class="va">smaller_gtfs</span> <span class="op">&lt;-</span> <span class="fu">filter_by_stop_id</span><span class="op">(</span><span class="va">gtfs</span>, <span class="va">stop_ids</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/object.size.html" class="external-link">object.size</a></span><span class="op">(</span><span class="va">smaller_gtfs</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 64272 bytes</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># drops entries related to trips that pass through specified stop_ids</span></span></span>
+<span class="r-in"><span><span class="co"># drops the stop_times entries at the specified stop_ids</span></span></span>
 <span class="r-in"><span><span class="va">smaller_gtfs</span> <span class="op">&lt;-</span> <span class="fu">filter_by_stop_id</span><span class="op">(</span><span class="va">gtfs</span>, <span class="va">stop_ids</span>, keep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/object.size.html" class="external-link">object.size</a></span><span class="op">(</span><span class="va">smaller_gtfs</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 809872 bytes</span>

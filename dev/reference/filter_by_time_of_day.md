@@ -70,12 +70,14 @@ service follows a fixed schedule throughout the day or not. If it's 0
 Instead, the operators try to maintain the listed headways. In such
 cases, if `update_frequencies` is `TRUE` we just update `start_time` and
 `end_time` to the appropriate value of `from` or `to` (which of this
-value is used depends on `keep`). When `keep` is `TRUE`, `end_time` is
-set to one second after `to`: as required by the GTFS specification, no
-trip departs at the `end_time` of an entry, so this keeps a departure
-that happens exactly at `to` (e.g. when converting the filtered feed
-with
+value is used depends on `keep`). The time of day includes both `from`
+and `to`. As required by the GTFS specification, no trip departs at the
+`end_time` of an entry, so when `keep` is `TRUE`, `end_time` is set to
+one second after `to`, which keeps a departure that happens exactly at
+`to` (e.g. when converting the filtered feed with
 [`frequencies_to_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/frequencies_to_stop_times.md)).
+When `keep` is `FALSE`, the entries that cross `to` start one second
+after it. Entries left without any departure are removed.
 
 If `exact_times` is 1, however, operators try to strictly adhere to the
 start times and headway. As a result, when updating the `start_time`
@@ -181,11 +183,11 @@ head(smaller_gtfs$frequencies)
 #>       trip_id start_time end_time headway_secs
 #>        <char>     <char>   <char>        <int>
 #> 1: CPTM L07-0   05:00:00 05:59:00          360
-#> 2: CPTM L07-1   05:00:00 05:59:00          360
-#> 3: CPTM L08-0   05:00:00 05:59:00          480
-#> 4: CPTM L08-1   05:00:00 05:59:00          480
-#> 5: CPTM L09-0   05:00:00 05:59:00          480
-#> 6: CPTM L09-1   05:00:00 05:59:00          480
+#> 2: CPTM L07-0   06:00:00 06:00:01          360
+#> 3: CPTM L07-1   05:00:00 05:59:00          360
+#> 4: CPTM L07-1   06:00:00 06:00:01          360
+#> 5: CPTM L08-0   05:00:00 05:59:00          480
+#> 6: CPTM L08-0   06:00:00 06:00:01          300
 head(smaller_gtfs$stop_times)
 #>       trip_id arrival_time departure_time stop_id stop_sequence
 #>        <char>       <char>         <char>  <char>         <int>
@@ -196,22 +198,23 @@ head(smaller_gtfs$stop_times)
 #> 5: CPTM L07-0     04:32:00       04:32:00   18916             5
 #> 6: CPTM L07-0     04:40:00       04:40:00   18965             6
 
-# frequencies entries can be adjusted using update_frequencies = TRUE
+# frequencies entries are adjusted by default. use update_frequencies =
+# FALSE to keep their original times
 smaller_gtfs <- filter_by_time_of_day(
   gtfs,
   "05:30:00",
   "06:00:00",
-  update_frequencies = TRUE
+  update_frequencies = FALSE
 )
 head(smaller_gtfs$frequencies)
 #>       trip_id start_time end_time headway_secs
 #>        <char>     <char>   <char>        <int>
-#> 1: CPTM L07-0   05:30:00 05:59:00          360
-#> 2: CPTM L07-1   05:30:00 05:59:00          360
-#> 3: CPTM L08-0   05:30:00 05:59:00          480
-#> 4: CPTM L08-1   05:30:00 05:59:00          480
-#> 5: CPTM L09-0   05:30:00 05:59:00          480
-#> 6: CPTM L09-1   05:30:00 05:59:00          480
+#> 1: CPTM L07-0   05:00:00 05:59:00          360
+#> 2: CPTM L07-0   06:00:00 06:59:00          360
+#> 3: CPTM L07-1   05:00:00 05:59:00          360
+#> 4: CPTM L07-1   06:00:00 06:59:00          360
+#> 5: CPTM L08-0   05:00:00 05:59:00          480
+#> 6: CPTM L08-0   06:00:00 06:59:00          300
 
 # when keep = FALSE, the behaviour of the function in general, and of
 # update_frequencies in particular, is a bit different
@@ -227,7 +230,7 @@ head(smaller_gtfs$frequencies)
 #>        <char>     <char>   <char>        <int>
 #> 1: CPTM L07-0   04:00:00 04:59:00          720
 #> 2: CPTM L07-0   05:00:00 05:30:00          360
-#> 3: CPTM L07-0   06:00:00 06:59:00          360
+#> 3: CPTM L07-0   06:00:01 06:59:00          360
 #> 4: CPTM L07-0   07:00:00 07:59:00          360
 #> 5: CPTM L07-0   08:00:00 08:59:00          360
 #> 6: CPTM L07-0   09:00:00 09:59:00          480

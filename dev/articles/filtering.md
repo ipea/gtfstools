@@ -35,7 +35,7 @@ library(ggplot2)
 
 ## Filtering by `agency_id`, `route_id`, `service_id`, `shape_id`, `stop_id`, `trip_id` or `route_type`:
 
-The first six work in a very similar fashion. You specify a vector of
+The first seven work in a very similar fashion. You specify a vector of
 identifiers, and the function keeps (or drops, as we’ll see soon) all
 the entries that are in any way related to this id. Let’s see how that
 works using
@@ -117,7 +117,12 @@ than the original, is much larger than in the first case.
 The same logic demonstrated with
 [`filter_by_trip_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_trip_id.md)
 applies to the functions that filter feeds by `agency_id`, `route_id`,
-`service_id`, `shape_id`, `stop_id` and `route_type`.
+`service_id`, `shape_id` and `route_type`.
+[`filter_by_stop_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_stop_id.md)
+is slightly different: it keeps (or drops) the `stop_times` entries at
+the given stops, rather than entire trips. To keep or drop the entire
+trips that serve some stops, pass their `trip_id`s to
+[`filter_by_trip_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_trip_id.md).
 
 ## Filtering by day of the week or time of the day:
 
@@ -226,11 +231,11 @@ head(smaller_gtfs$frequencies)
 #>       trip_id start_time end_time headway_secs
 #>        <char>     <char>   <char>        <int>
 #> 1: CPTM L07-0   05:00:00 05:59:00          360
-#> 2: CPTM L07-1   05:00:00 05:59:00          360
-#> 3: CPTM L08-0   05:00:00 05:59:00          480
-#> 4: CPTM L08-1   05:00:00 05:59:00          480
-#> 5: CPTM L09-0   05:00:00 05:59:00          480
-#> 6: CPTM L09-1   05:00:00 05:59:00          480
+#> 2: CPTM L07-0   06:00:00 06:00:01          360
+#> 3: CPTM L07-1   05:00:00 05:59:00          360
+#> 4: CPTM L07-1   06:00:00 06:00:01          360
+#> 5: CPTM L08-0   05:00:00 05:59:00          480
+#> 6: CPTM L08-0   06:00:00 06:00:01          300
 
 # stop_times entries are preserved because they should be interpreted as
 # "templates"

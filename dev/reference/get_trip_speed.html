@@ -24,6 +24,7 @@ to the last stop of the trip or between each pair of consecutive stops."><meta p
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/calendar_overlap.html">Checking the calendar overlap of GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/editing.html">Editing GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/filtering.html">Filtering GTFS feeds</a></li>
+    <li><a class="dropdown-item" href="../articles/querying.html">Querying GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/validating.html">Validating GTFS feeds</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -61,7 +62,7 @@ to the last stop of the trip or between each pair of consecutive stops.</p>
 <span>  method <span class="op">=</span> <span class="st">"shapes"</span>,</span>
 <span>  by <span class="op">=</span> <span class="st">"trip"</span>,</span>
 <span>  unit <span class="op">=</span> <span class="st">"km/h"</span>,</span>
-<span>  sort_sequence <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  <span class="va">sort_sequence</span>,</span>
 <span>  file <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -102,9 +103,9 @@ One of <code>"km/h"</code> (the default), <code>"m/s"</code> or <code>"mph"</cod
 
 
 <dt id="arg-sort-sequence">sort_sequence<a class="anchor" aria-label="anchor" href="#arg-sort-sequence"></a></dt>
-<dd><p>A logical specifying whether to sort timetables and
-shapes by <code>stop_sequence</code> and <code>shape_pt_sequence</code>, respectively. Defaults
-to <code>TRUE</code>. Set to <code>FALSE</code> only if these tables are known to be ordered.</p></dd>
+<dd><p>Deprecated; do not supply. Timetables and shapes are
+now always sorted by <code>stop_sequence</code> and <code>shape_pt_sequence</code>. Passing
+<code>TRUE</code> raises a warning, and passing <code>FALSE</code> raises an error.</p></dd>
 
 
 <dt id="arg-file">file<a class="anchor" aria-label="anchor" href="#arg-file"></a></dt>
@@ -127,7 +128,9 @@ that delimit the segment and its average <code>speed</code>.</p>
 duration calculated by <code><a href="get_trip_duration.html">get_trip_duration()</a></code> (with <code>by = "trip"</code>) or by
 <code><a href="get_trip_segment_duration.html">get_trip_segment_duration()</a></code> (with <code>by = "segment"</code>). Speeds are <code>NA</code> when
 the length is <code>NA</code> (e.g. trips not linked to a shape) or when the duration
-is missing (e.g. blank times at intermediate stops) or not positive.</p>
+is missing (e.g. blank times at intermediate stops) or not positive. With
+<code>by = "trip"</code>, trips without any arrival or departure time raise the warning
+of <code><a href="get_trip_duration.html">get_trip_duration()</a></code>.</p>
 <p>Existing <code>_secs</code> columns in <code>stop_times</code> (e.g. created with
 <code><a href="convert_time_to_seconds.html">convert_time_to_seconds()</a></code>) are used as-is, not recalculated from the time
 strings.</p>
