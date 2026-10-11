@@ -20,6 +20,7 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/calendar_overlap.html">Checking the calendar overlap of GTFS feeds</a></li>
+    <li><a class="dropdown-item" href="../articles/editing.html">Editing GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/filtering.html">Filtering GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/validating.html">Validating GTFS feeds</a></li>
   </ul></li>
@@ -63,7 +64,8 @@
 </ul></div>
 <div class="section level3">
 <h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
-<ul><li>New function <code><a href="../reference/filter_by_date.html">filter_by_date()</a></code>, which filters a feed by the services that run on the given dates.</li>
+<ul><li>New function <code><a href="../reference/get_summary.html">get_summary()</a></code>, which summarises a feed (its files, agencies, service calendar, totals and the distributions of trip speeds, trip lengths and route headways), optionally restricted to some dates, routes, modes, agencies and a time of day. It returns a list of <code>data.table</code>s and writes an HTML report with tables and figures (requires <a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a>, <a href="https://yihui.org/knitr/" class="external-link">knitr</a>, <a href="https://github.com/rstudio/rmarkdown" class="external-link">rmarkdown</a> and Pandoc).</li>
+<li>New function <code><a href="../reference/filter_by_date.html">filter_by_date()</a></code>, which filters a feed by the services that run on the given dates.</li>
 <li>New function <code><a href="../reference/get_stops.html">get_stops()</a></code>, which returns the stops visited by the given trips and/or routes.</li>
 <li>New function <code><a href="../reference/get_stop_distances.html">get_stop_distances()</a></code>, which returns the great-circle distances between each pair of stops visited by the given trips and/or routes.</li>
 <li>New function <code><a href="../reference/convert_stops_to_shapes.html">convert_stops_to_shapes()</a></code>, which creates shapes that link the consecutive stops of trips along straight lines, for trips not linked to a usable shape (or for the given trips), and assigns them to the trips.</li>
@@ -85,13 +87,18 @@
 <li>
 <code><a href="../reference/set_trip_speed.html">set_trip_speed()</a></code> gains the <code>first_stop</code>, <code>last_stop</code>, <code>from</code> and <code>to</code> arguments, to change speeds only between two stops and only for trips departing within a time of day (<a href="https://github.com/ipea/gtfstools/issues/89" class="external-link">#89</a>).</li>
 <li>
+<code><a href="../reference/get_trip_speed.html">get_trip_speed()</a></code> and <code><a href="../reference/set_trip_speed.html">set_trip_speed()</a></code> now accept <code>unit = "mph"</code>, for speeds in miles per hour.</li>
+<li>
 <code><a href="../reference/frequencies_to_stop_times.html">frequencies_to_stop_times()</a></code> gains the <code>strategy</code> argument, to shift the departures of frequency-based trips by half the headway or by a random offset (<a href="https://github.com/ipea/gtfstools/issues/56" class="external-link">#56</a>).</li>
 <li>
 <code><a href="../reference/write_gtfs.html">write_gtfs()</a></code> gains the <code>compression_level</code> argument. Its default, 6 (previously always 9), makes writing about 2 to 3 times faster for files of very similar size.</li>
+<li>New vignette “Editing GTFS feeds”, which lists the functions that edit feeds and demonstrates <code><a href="../reference/set_route_frequency.html">set_route_frequency()</a></code>, <code><a href="../reference/set_trip_speed.html">set_trip_speed()</a></code>, <code><a href="../reference/stop_times_to_frequencies.html">stop_times_to_frequencies()</a></code> and <code><a href="../reference/interpolate_stop_times.html">interpolate_stop_times()</a></code>.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
-<ul><li>The <code>filter_by_*()</code> functions no longer drop:
+<ul><li>
+<code><a href="../reference/get_trip_duration.html">get_trip_duration()</a></code> no longer adds temporary columns to the <code>stop_times</code> table of the given GTFS object, which could be left behind if an error happened during the calculation.</li>
+<li>The <code>filter_by_*()</code> functions no longer drop:
 <ul><li>rows whose blank keys mean “applies to all”: zone <code>fare_rules</code> without <code>route_id</code>, <code>transfers</code> without <code>from_stop_id</code>/<code>to_stop_id</code> and <code>attributions</code> without <code>agency_id</code>;</li>
 <li>the <code>agency</code> of single-agency feeds whose <code>routes.agency_id</code> is blank or absent;</li>
 <li>the station entrances, generic nodes and boarding areas of kept stations and platforms, with their pathways and levels.</li>

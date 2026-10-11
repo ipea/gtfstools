@@ -40,14 +40,18 @@ pattern, as identified by
 [`get_stop_times_patterns()`](https://ipea.github.io/gtfstools/dev/reference/get_stop_times_patterns.md)).
 Each group is then split into one-hour slots of the clock, from
 `HH:00:00` (included) to the next `HH:00:00` (not included), according
-to the first departure time of each trip. Slots after midnight are kept
-as such (e.g. from `"25:00:00"` to `"26:00:00"`).
+to the earliest `departure_time` of each trip in `stop_times`,
+regardless of `stop_sequence`. This is the departure from the trip's
+first stop in valid feeds, but not when later times are written
+incorrectly (e.g. times after midnight written as `"00:30:00"` instead
+of `"24:30:00"`). Slots after midnight are kept as such (e.g. from
+`"25:00:00"` to `"26:00:00"`).
 
 In each slot with `n` trips:
 
-- the trip that departs first (ties broken by `trip_id`) becomes the
-  template. It keeps its `trip_id`, its `trips` entry and its
-  `stop_times` entries, so travel times may differ from one hour to
+- the trip with the earliest departure (ties broken by `trip_id`)
+  becomes the template. It keeps its `trip_id`, its `trips` entry and
+  its `stop_times` entries, so travel times may differ from one hour to
   another. As in any frequency-based trip, only its times relative to
   its first departure matter;
 

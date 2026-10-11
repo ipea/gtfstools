@@ -39,6 +39,8 @@
   : Get stop timetable
 - [`get_stops()`](https://ipea.github.io/gtfstools/dev/reference/get_stops.md)
   : Get stops
+- [`get_summary()`](https://ipea.github.io/gtfstools/dev/reference/get_summary.md)
+  : Get a summary of a GTFS feed
 - [`get_trip_duration()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_duration.md)
   : Get trip duration
 - [`get_trip_geometry()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_geometry.md)
@@ -121,12 +123,6 @@
 
 ## Editing GTFS feeds
 
-- [`convert_stops_to_shapes()`](https://ipea.github.io/gtfstools/dev/reference/convert_stops_to_shapes.md)
-  : Convert stops into shapes
-- [`convert_time_to_seconds()`](https://ipea.github.io/gtfstools/dev/reference/convert_time_to_seconds.md)
-  : Convert time fields to seconds after midnight
-- [`frequencies_to_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/frequencies_to_stop_times.md)
-  : Convert frequencies to stop times
 - [`interpolate_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_stop_times.md)
   : Interpolate missing stop times
 - [`merge_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/merge_gtfs.md)
@@ -143,6 +139,8 @@
   : Set trip average speed
 - [`stop_times_to_frequencies()`](https://ipea.github.io/gtfstools/dev/reference/stop_times_to_frequencies.md)
   : Convert stop times to frequencies
+- [`frequencies_to_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/frequencies_to_stop_times.md)
+  : Convert frequencies to stop times
 
 ## Validate GTFS feeds
 
@@ -152,6 +150,13 @@
   : List MobilityData's GTFS validator versions
 - [`validate_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/validate_gtfs.md)
   : Validate GTFS feed
+
+## Support functions
+
+- [`convert_stops_to_shapes()`](https://ipea.github.io/gtfstools/dev/reference/convert_stops_to_shapes.md)
+  : Convert stops into shapes
+- [`convert_time_to_seconds()`](https://ipea.github.io/gtfstools/dev/reference/convert_time_to_seconds.md)
+  : Convert time fields to seconds after midnight
 
 ## Interoperability between GTFS packages
 

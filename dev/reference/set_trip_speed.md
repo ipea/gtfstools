@@ -41,7 +41,7 @@ set_trip_speed(
 - unit:
 
   A string representing the unit in which the speed is given. One of
-  `"km/h"` (the default) or `"m/s"`.
+  `"km/h"` (the default), `"m/s"` or `"mph"` (miles per hour).
 
 - first_stop:
 

@@ -58,6 +58,10 @@ Please read **gtfstools** vignettes for more on the package usage:
   [`vignette("filtering", package = "gtfstools")`](https://ipea.github.io/gtfstools/dev/articles/filtering.md)
   or check it on the website ([Filtering GTFS
   feeds](https://ipea.github.io/gtfstools/articles/filtering.html)).
+- Editing GTFS feeds. Run
+  [`vignette("editing", package = "gtfstools")`](https://ipea.github.io/gtfstools/dev/articles/editing.md)
+  or check it on the website ([Editing GTFS
+  feeds](https://ipea.github.io/gtfstools/articles/editing.html)).
 - Validating GTFS feeds. Run
   [`vignette("validating", package = "gtfstools")`](https://ipea.github.io/gtfstools/dev/articles/validating.md)
   or check it on the website ([Validating GTFS

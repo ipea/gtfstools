@@ -2,6 +2,7 @@
 <url><loc>https://ipea.github.io/gtfstools/dev/CLAUDE.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/LICENSE-text.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/articles/calendar_overlap.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/articles/editing.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/articles/filtering.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/articles/gtfstools.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/articles/index.html</loc></url>
@@ -60,6 +61,7 @@
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/get_stop_times_patterns.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/get_stop_timetable.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/get_stops.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/get_summary.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/get_trip_departures.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/get_trip_duration.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/get_trip_geometry.html</loc></url>
@@ -83,15 +85,21 @@
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/read_gtfs.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/remove_duplicates.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/remove_unused_ids.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/report_deps_available.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/seconds_to_string.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/set_dwell_time.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/set_route_frequency.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/stop_times_to_frequencies.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/string_to_seconds.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/sum_or_na.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/summarise_distribution.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/summarise_route_frequency.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/summarise_services.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/validate_gtfs.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/warn_missing_ids.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/warn_times_not_interpolated.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/write_gtfs.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/write_summary_report.html</loc></url>
 </urlset>
 

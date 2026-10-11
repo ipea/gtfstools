@@ -44,9 +44,6 @@ install.packages("gtfstools")
 
 ``` r
 
-install.packages("gtfstools", repos = "https://dhersz.r-universe.dev")
-
-# or
 # install.packages("remotes")
 remotes::install_github("ipea/gtfstools")
 ```
@@ -56,6 +53,31 @@ Then attach it to the current R session:
 ``` r
 
 library(gtfstools)
+```
+
+Some functions of the package run part of their computations in
+parallel, such as
+[`get_trip_length()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_length.md),
+[`get_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_speed.md),
+[`get_trip_geometry()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_geometry.md),
+[`set_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.md),
+[`interpolate_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_stop_times.md),
+[`get_shape_length()`](https://ipea.github.io/gtfstools/dev/reference/get_shape_length.md)
+and
+[`get_stop_distances()`](https://ipea.github.io/gtfstools/dev/reference/get_stop_distances.md).
+Since **gtfstools** is built on top of
+[data.table](https://r-datatable.com), these functions follow its
+configuration and, by default, use 50% of the available logical CPU
+cores. Users can change the number of threads used by the package with
+[`data.table::setDTthreads()`](https://rdrr.io/pkg/data.table/man/openmp-utils.html):
+
+``` r
+
+# checks the number of threads currently used
+data.table::getDTthreads()
+
+# uses 4 threads
+data.table::setDTthreads(4)
 ```
 
 A few sample files are included in the package:
@@ -145,7 +167,7 @@ trip_geom <- get_trip_geometry(spo_gtfs)
 plot(trip_geom$geometry)
 ```
 
-![](gtfstools_files/figure-html/unnamed-chunk-7-1.png)
+![](gtfstools_files/figure-html/unnamed-chunk-8-1.png)
 
 ``` r
 
@@ -163,7 +185,7 @@ plot(shape_geom$geometry)
 plot(straight_geom$geometry, add = TRUE, col = "red")
 ```
 
-![](gtfstools_files/figure-html/unnamed-chunk-7-2.png)
+![](gtfstools_files/figure-html/unnamed-chunk-8-2.png)
 
 [`get_trip_duration()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_duration.md)
 returns the duration of each trip in a GTFS object, as specified in the
@@ -391,7 +413,7 @@ names(merged_files)
 sets the average speed of specified trips by adjusting the
 `arrival_time` and `departure_time` columns in the `stop_times` table.
 Average speed is calculated as the difference between the arrival time
-at the last stop minus the departure time at the first top, divided by
+at the last stop minus the departure time at the first stop, divided by
 the trip’s length. Please note that arrival and departure times at
 intermediate stops are set as `""`. Some transport routing software,
 such as [OpenTripPlanner](https://www.opentripplanner.org/) and

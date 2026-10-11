@@ -49,8 +49,8 @@ get_trip_speed(
 
 - unit:
 
-  A string representing the unit in which the speeds are desired. Either
-  `"km/h"` (the default) or `"m/s"`.
+  A string representing the unit in which the speeds are desired. One of
+  `"km/h"` (the default), `"m/s"` or `"mph"` (miles per hour).
 
 - sort_sequence:
 

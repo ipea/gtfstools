@@ -58,6 +58,10 @@ Please read **gtfstools** vignettes for more on the package usage:
   [`vignette("filtering", package = "gtfstools")`](https://ipea.github.io/gtfstools/dev/articles/filtering.md)
   or check it on the website ([Filtering GTFS
   feeds](https://ipea.github.io/gtfstools/articles/filtering.html)).
+- Editing GTFS feeds. Run
+  [`vignette("editing", package = "gtfstools")`](https://ipea.github.io/gtfstools/dev/articles/editing.md)
+  or check it on the website ([Editing GTFS
+  feeds](https://ipea.github.io/gtfstools/articles/editing.html)).
 - Validating GTFS feeds. Run
   [`vignette("validating", package = "gtfstools")`](https://ipea.github.io/gtfstools/dev/articles/validating.md)
   or check it on the website ([Validating GTFS
@@ -119,6 +123,8 @@ Economic Research (Ipea), Brazil.
   : Get stop timetable
 - [`get_stops()`](https://ipea.github.io/gtfstools/dev/reference/get_stops.md)
   : Get stops
+- [`get_summary()`](https://ipea.github.io/gtfstools/dev/reference/get_summary.md)
+  : Get a summary of a GTFS feed
 - [`get_trip_duration()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_duration.md)
   : Get trip duration
 - [`get_trip_geometry()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_geometry.md)
@@ -201,12 +207,6 @@ Economic Research (Ipea), Brazil.
 
 ## Editing GTFS feeds
 
-- [`convert_stops_to_shapes()`](https://ipea.github.io/gtfstools/dev/reference/convert_stops_to_shapes.md)
-  : Convert stops into shapes
-- [`convert_time_to_seconds()`](https://ipea.github.io/gtfstools/dev/reference/convert_time_to_seconds.md)
-  : Convert time fields to seconds after midnight
-- [`frequencies_to_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/frequencies_to_stop_times.md)
-  : Convert frequencies to stop times
 - [`interpolate_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_stop_times.md)
   : Interpolate missing stop times
 - [`merge_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/merge_gtfs.md)
@@ -223,6 +223,8 @@ Economic Research (Ipea), Brazil.
   : Set trip average speed
 - [`stop_times_to_frequencies()`](https://ipea.github.io/gtfstools/dev/reference/stop_times_to_frequencies.md)
   : Convert stop times to frequencies
+- [`frequencies_to_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/frequencies_to_stop_times.md)
+  : Convert frequencies to stop times
 
 ## Validate GTFS feeds
 
@@ -232,6 +234,13 @@ Economic Research (Ipea), Brazil.
   : List MobilityData's GTFS validator versions
 - [`validate_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/validate_gtfs.md)
   : Validate GTFS feed
+
+## Support functions
+
+- [`convert_stops_to_shapes()`](https://ipea.github.io/gtfstools/dev/reference/convert_stops_to_shapes.md)
+  : Convert stops into shapes
+- [`convert_time_to_seconds()`](https://ipea.github.io/gtfstools/dev/reference/convert_time_to_seconds.md)
+  : Convert time fields to seconds after midnight
 
 ## Interoperability between GTFS packages
 
@@ -252,6 +261,8 @@ Economic Research (Ipea), Brazil.
 
 - [Checking the calendar overlap of GTFS
   feeds](https://ipea.github.io/gtfstools/dev/articles/calendar_overlap.md):
+- [Editing GTFS
+  feeds](https://ipea.github.io/gtfstools/dev/articles/editing.md):
 - [Filtering GTFS
   feeds](https://ipea.github.io/gtfstools/dev/articles/filtering.md):
 - [Introduction to

@@ -28,6 +28,7 @@ lossy approximation of the original schedule."><meta property="og:image" content
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/calendar_overlap.html">Checking the calendar overlap of GTFS feeds</a></li>
+    <li><a class="dropdown-item" href="../articles/editing.html">Editing GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/filtering.html">Filtering GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/validating.html">Validating GTFS feeds</a></li>
   </ul></li>
@@ -95,10 +96,13 @@ tables (and <code>transfers</code>, when present). If the given GTFS object has 
 present in <code>trips</code>) and the same sequence of stops (their spatial pattern,
 as identified by <code><a href="get_stop_times_patterns.html">get_stop_times_patterns()</a></code>). Each group is then split into
 one-hour slots of the clock, from <code>HH:00:00</code> (included) to the next
-<code>HH:00:00</code> (not included), according to the first departure time of each
-trip. Slots after midnight are kept as such (e.g. from <code>"25:00:00"</code> to
-<code>"26:00:00"</code>).</p>
-<p>In each slot with <code>n</code> trips:</p><ul><li><p>the trip that departs first (ties broken by <code>trip_id</code>) becomes the
+<code>HH:00:00</code> (not included), according to the earliest <code>departure_time</code> of
+each trip in <code>stop_times</code>, regardless of <code>stop_sequence</code>. This is the
+departure from the trip's first stop in valid feeds, but not when later
+times are written incorrectly (e.g. times after midnight written as
+<code>"00:30:00"</code> instead of <code>"24:30:00"</code>). Slots after midnight are kept as such
+(e.g. from <code>"25:00:00"</code> to <code>"26:00:00"</code>).</p>
+<p>In each slot with <code>n</code> trips:</p><ul><li><p>the trip with the earliest departure (ties broken by <code>trip_id</code>) becomes the
 template. It keeps its <code>trip_id</code>, its <code>trips</code> entry and its <code>stop_times</code>
 entries, so travel times may differ from one hour to another. As in any
 frequency-based trip, only its times relative to its first departure
