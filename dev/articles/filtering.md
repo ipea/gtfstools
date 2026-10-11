@@ -33,6 +33,11 @@ library(gtfstools)
 library(ggplot2)
 ```
 
+``` r
+
+library(dplyr)
+```
+
 ## Filtering by `agency_id`, `route_id`, `service_id`, `shape_id`, `stop_id`, `trip_id` or `route_type`:
 
 The first seven work in a very similar fashion. You specify a vector of
@@ -48,7 +53,9 @@ gtfs <- read_gtfs(path)
 utils::object.size(gtfs)
 #> 811304 bytes
 
-head(gtfs$trips[, .(trip_id, trip_headsign, shape_id)])
+gtfs$trips |>
+  select(trip_id, trip_headsign, shape_id) |>
+  head()
 #>       trip_id trip_headsign shape_id
 #>        <char>        <char>   <char>
 #> 1: CPTM L07-0       JUNDIAI    17846
@@ -63,7 +70,9 @@ smaller_gtfs <- filter_by_trip_id(gtfs, c("CPTM L07-0", "CPTM L07-1"))
 utils::object.size(smaller_gtfs)
 #> 71592 bytes
 
-head(smaller_gtfs$trips[, .(trip_id, trip_headsign, shape_id)])
+smaller_gtfs$trips |>
+  select(trip_id, trip_headsign, shape_id) |>
+  head()
 #>       trip_id trip_headsign shape_id
 #>        <char>        <char>   <char>
 #> 1: CPTM L07-0       JUNDIAI    17846
@@ -95,7 +104,9 @@ smaller_gtfs <- filter_by_trip_id(
 utils::object.size(smaller_gtfs)
 #> 762576 bytes
 
-head(smaller_gtfs$trips[, .(trip_id, trip_headsign, shape_id)])
+smaller_gtfs$trips |>
+  select(trip_id, trip_headsign, shape_id) |>
+  head()
 #>       trip_id       trip_headsign shape_id
 #>        <char>              <char>   <char>
 #> 1: CPTM L08-0        AMADOR BUENO    17848
@@ -148,7 +159,8 @@ smaller_gtfs <- filter_by_weekday(
   weekday = c("saturday", "sunday"),
   combine = "and"
 )
-smaller_gtfs$calendar[, c("service_id", "sunday", "saturday")]
+smaller_gtfs$calendar |>
+  select(service_id, sunday, saturday)
 #>    service_id sunday saturday
 #>        <char>  <int>    <int>
 #> 1:        USD      1        1
@@ -162,7 +174,8 @@ smaller_gtfs <- filter_by_weekday(
   weekday = c("sunday", "saturday"),
   combine = "or"
 )
-smaller_gtfs$calendar[, c("service_id", "sunday", "saturday")]
+smaller_gtfs$calendar |>
+  select(service_id, sunday, saturday)
 #>     service_id sunday saturday
 #>         <char>  <int>    <int>
 #>  1:        USD      1        1
@@ -183,7 +196,8 @@ smaller_gtfs <- filter_by_weekday(
   combine = "and",
   keep = FALSE
 )
-smaller_gtfs$calendar[, c("service_id", "sunday", "saturday")]
+smaller_gtfs$calendar |>
+  select(service_id, sunday, saturday)
 #>    service_id sunday saturday
 #>        <char>  <int>    <int>
 #> 1:        U__      0        0
@@ -203,7 +217,8 @@ smaller_gtfs <- filter_by_weekday(
   combine = "or",
   keep = FALSE
 )
-smaller_gtfs$calendar[, c("service_id", "sunday", "saturday")]
+smaller_gtfs$calendar |>
+  select(service_id, sunday, saturday)
 #>    service_id sunday saturday
 #>        <char>  <int>    <int>
 #> 1:        U__      0        0
@@ -239,7 +254,9 @@ head(smaller_gtfs$frequencies)
 
 # stop_times entries are preserved because they should be interpreted as
 # "templates"
-head(smaller_gtfs$stop_times[, c("trip_id", "departure_time", "arrival_time")])
+smaller_gtfs$stop_times |>
+  select(trip_id, departure_time, arrival_time) |>
+  head()
 #>       trip_id departure_time arrival_time
 #>        <char>         <char>       <char>
 #> 1: CPTM L07-0       04:00:00     04:00:00
@@ -255,7 +272,9 @@ frequencies <- gtfs$frequencies
 gtfs$frequencies <- NULL
 smaller_gtfs <- filter_by_time_of_day(gtfs, from = "05:00:00", to = "06:00:00")
 
-head(smaller_gtfs$stop_times[, c("trip_id", "departure_time", "arrival_time")])
+smaller_gtfs$stop_times |>
+  select(trip_id, departure_time, arrival_time) |>
+  head()
 #>       trip_id departure_time arrival_time
 #>        <char>         <char>       <char>
 #> 1: CPTM L07-0       05:04:00     05:04:00
@@ -281,7 +300,9 @@ smaller_gtfs <- filter_by_time_of_day(
 )
 
 # CPTM L07-0 trip is kept intact because it crosses the time block
-head(smaller_gtfs$stop_times[, c("trip_id", "departure_time", "arrival_time")])
+smaller_gtfs$stop_times |>
+  select(trip_id, departure_time, arrival_time) |>
+  head()
 #>       trip_id departure_time arrival_time
 #>        <char>         <char>       <char>
 #> 1: CPTM L07-0       04:00:00     04:00:00
@@ -301,7 +322,9 @@ smaller_gtfs <- filter_by_time_of_day(
 )
 
 # CPTM L07-0 trip is gone
-head(smaller_gtfs$stop_times[, c("trip_id", "departure_time", "arrival_time")])
+smaller_gtfs$stop_times |>
+  select(trip_id, departure_time, arrival_time) |>
+  head()
 #>       trip_id departure_time arrival_time
 #>        <char>         <char>       <char>
 #> 1: CPTM L09-0       04:00:00     04:00:00
@@ -381,7 +404,7 @@ bbox <- sf::st_bbox(convert_shapes_to_sf(gtfs, shape_id = "68962"))
 plotter(gtfs, bbox, do_filter = FALSE)
 ```
 
-![](filtering_files/figure-html/unnamed-chunk-9-1.png)
+![](filtering_files/figure-html/unnamed-chunk-10-1.png)
 
 By default
 [`filter_by_spatial_extent()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_spatial_extent.md)
@@ -393,7 +416,7 @@ and shapes that intersect the given geometry. Here’s how it looks like:
 plotter(gtfs, bbox)
 ```
 
-![](filtering_files/figure-html/unnamed-chunk-10-1.png)
+![](filtering_files/figure-html/unnamed-chunk-11-1.png)
 
 Alternatively you can also *drop* such data:
 
@@ -402,7 +425,7 @@ Alternatively you can also *drop* such data:
 plotter(gtfs, bbox, keep = FALSE)
 ```
 
-![](filtering_files/figure-html/unnamed-chunk-11-1.png)
+![](filtering_files/figure-html/unnamed-chunk-12-1.png)
 
 You can also control which spatial operation you want to use to filter
 the data. This is how you’d keep the data that is contained inside the
@@ -413,7 +436,7 @@ given geometry:
 plotter(gtfs, bbox, spatial_operation = sf::st_contains)
 ```
 
-![](filtering_files/figure-html/unnamed-chunk-12-1.png)
+![](filtering_files/figure-html/unnamed-chunk-13-1.png)
 
 And, simultaneously using `spatial_operation` and `keep`, this is how
 you’d drop the data contained inside the geometry:
@@ -423,7 +446,7 @@ you’d drop the data contained inside the geometry:
 plotter(gtfs, bbox, spatial_operation = sf::st_contains, keep = FALSE)
 ```
 
-![](filtering_files/figure-html/unnamed-chunk-13-1.png)
+![](filtering_files/figure-html/unnamed-chunk-14-1.png)
 
 All filtering functions return a GTFS object readily available to be
 manipulated and analyzed using the rest of **gtfstools**’ toolkit. For

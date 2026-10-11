@@ -31,6 +31,11 @@ library(gtfstools)
 library(ggplot2)
 ```
 
+``` r
+
+library(dplyr)
+```
+
 ## Trips per day
 
 Feeds can be given as paths to their `.zip` files. In this case, the
@@ -44,7 +49,9 @@ poa_path <- system.file("extdata/poa_gtfs.zip", package = "gtfstools")
 
 daily_trips <- get_calendar_overlap(c(spo_path, poa_path))
 
-head(daily_trips[overlap == TRUE])
+daily_trips |> 
+  dplyr::filter( overlap == TRUE) |> 
+  head()
 #>        feed       date n_trips overlap
 #>      <char>     <Date>   <int>  <lgcl>
 #> 1: spo_gtfs 2019-01-18    7948    TRUE
@@ -79,7 +86,7 @@ get_calendar_overlap(c(spo_path, poa_path), plot = TRUE) +
   coord_cartesian(xlim = as.Date(c("2019-01-01", "2019-05-01")))
 ```
 
-![](calendar_overlap_files/figure-html/unnamed-chunk-4-1.png)
+![](calendar_overlap_files/figure-html/unnamed-chunk-5-1.png)
 
 The result is a regular `ggplot` object, so it can be customised with
 [ggplot2](https://ggplot2.tidyverse.org) functions, e.g. to zoom in on a
@@ -96,7 +103,8 @@ regardless of the locale):
 overlap_days <- unique(daily_trips$date[daily_trips$overlap])
 departure_date <- overlap_days[format(overlap_days, "%u") == "3"][1]
 
-daily_trips[daily_trips$date == departure_date, ]
+daily_trips |>
+  filter(date == departure_date)
 #>        feed       date n_trips overlap
 #>      <char>     <Date>   <int>  <lgcl>
 #> 1: spo_gtfs 2019-01-23    7948    TRUE
@@ -141,7 +149,7 @@ get_calendar_overlap(feeds, resolution = "periods", plot = TRUE) +
   coord_cartesian(xlim = as.Date(c("2018-12-01", "2021-07-01")))
 ```
 
-![](calendar_overlap_files/figure-html/unnamed-chunk-8-1.png)
+![](calendar_overlap_files/figure-html/unnamed-chunk-9-1.png)
 
 The Berlin feed starts in November 2020, after the São Paulo feed ends,
 so no date has service in all three feeds.

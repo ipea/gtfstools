@@ -146,6 +146,8 @@ are updated to match.
 ## Examples
 
 ``` r
+library(dplyr)
+
 data_path <- system.file("extdata/spo_gtfs.zip", package = "gtfstools")
 gtfs <- read_gtfs(data_path)
 
@@ -157,7 +159,9 @@ new_gtfs <- set_dwell_time(
   stop_id = "18920",
   dwell_time = 30
 )
-head(new_gtfs$stop_times[trip_id == "CPTM L07-0"])
+new_gtfs$stop_times |>
+  filter(trip_id == "CPTM L07-0") |>
+  head()
 #>       trip_id arrival_time departure_time stop_id stop_sequence
 #>        <char>       <char>         <char>  <char>         <int>
 #> 1: CPTM L07-0     04:00:00       04:00:00   18940             1
@@ -230,7 +234,9 @@ set_dwell_time(
   dwell_time = 30,
   by_reference = TRUE
 )
-head(gtfs$stop_times[trip_id == "CPTM L07-0"])
+gtfs$stop_times |>
+  filter(trip_id == "CPTM L07-0") |>
+  head()
 #>       trip_id arrival_time departure_time stop_id stop_sequence
 #>        <char>       <char>         <char>  <char>         <int>
 #> 1: CPTM L07-0     04:00:00       04:00:00   18940             1

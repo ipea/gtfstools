@@ -73,6 +73,8 @@ Other filtering functions:
 ## Examples
 
 ``` r
+library(dplyr)
+
 # read gtfs
 data_path <- system.file("extdata/spo_gtfs.zip", package = "gtfstools")
 gtfs <- read_gtfs(data_path)
@@ -82,7 +84,8 @@ object.size(gtfs)
 
 # keeps entries related to services than run EITHER on monday OR on sunday
 smaller_gtfs <- filter_by_weekday(gtfs, weekday = c("monday", "sunday"))
-smaller_gtfs$calendar[, c("service_id", "monday", "sunday")]
+smaller_gtfs$calendar |>
+  select(service_id, monday, sunday)
 #>     service_id monday sunday
 #>         <char>  <int>  <int>
 #>  1:        USD      1      1
@@ -104,7 +107,8 @@ smaller_gtfs <- filter_by_weekday(
   weekday = c("monday", "sunday"),
   combine = "and"
 )
-smaller_gtfs$calendar[, c("service_id", "monday", "sunday")]
+smaller_gtfs$calendar |>
+  select(service_id, monday, sunday)
 #>    service_id monday sunday
 #>        <char>  <int>  <int>
 #> 1:        USD      1      1
@@ -119,7 +123,8 @@ smaller_gtfs <- filter_by_weekday(
   weekday = c("monday", "sunday"),
   keep = FALSE
 )
-smaller_gtfs$calendar[, c("service_id", "monday", "sunday")]
+smaller_gtfs$calendar |>
+  select(service_id, monday, sunday)
 #>    service_id monday sunday
 #>        <char>  <int>  <int>
 #> 1:        _S_      0      0
@@ -136,7 +141,8 @@ smaller_gtfs <- filter_by_weekday(
   combine = "and",
   keep = FALSE
 )
-smaller_gtfs$calendar[, c("service_id", "monday", "sunday")]
+smaller_gtfs$calendar |>
+  select(service_id, monday, sunday)
 #>     service_id monday sunday
 #>         <char>  <int>  <int>
 #>  1:        U__      1      0

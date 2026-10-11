@@ -156,12 +156,16 @@ departures. Trips whose departure there is blank are left unchanged.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">data_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/spo_gtfs.zip"</span>, package <span class="op">=</span> <span class="st">"gtfstools"</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">data_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/spo_gtfs.zip"</span>, package <span class="op">=</span> <span class="st">"gtfstools"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">gtfs</span> <span class="op">&lt;-</span> <span class="fu"><a href="read_gtfs.html">read_gtfs</a></span><span class="op">(</span><span class="va">data_path</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">gtfs_new_speed</span> <span class="op">&lt;-</span> <span class="fu">set_trip_speed</span><span class="op">(</span><span class="va">gtfs</span>, trip_id <span class="op">=</span> <span class="st">"CPTM L07-0"</span>, <span class="fl">50</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">gtfs_new_speed</span><span class="op">$</span><span class="va">stop_times</span><span class="op">[</span><span class="va">trip_id</span> <span class="op">==</span> <span class="st">"CPTM L07-0"</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="va">gtfs_new_speed</span><span class="op">$</span><span class="va">stop_times</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">trip_id</span> <span class="op">==</span> <span class="st">"CPTM L07-0"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Index: &lt;trip_id&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        trip_id arrival_time departure_time stop_id stop_sequence</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         &lt;char&gt;       &lt;char&gt;         &lt;char&gt;  &lt;char&gt;         &lt;int&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  1: CPTM L07-0     04:00:00       04:00:00   18940             1</span>
@@ -190,7 +194,9 @@ departures. Trips whose departure there is blank are left unchanged.</p>
 <span class="r-in"><span>  speed <span class="op">=</span> <span class="fl">15</span>,</span></span>
 <span class="r-in"><span>  unit <span class="op">=</span> <span class="st">"m/s"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">gtfs_new_speed</span><span class="op">$</span><span class="va">stop_times</span><span class="op">[</span><span class="va">trip_id</span> <span class="op">==</span> <span class="st">"CPTM L07-0"</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="va">gtfs_new_speed</span><span class="op">$</span><span class="va">stop_times</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">trip_id</span> <span class="op">==</span> <span class="st">"CPTM L07-0"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Index: &lt;trip_id&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        trip_id arrival_time departure_time stop_id stop_sequence</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         &lt;char&gt;       &lt;char&gt;         &lt;char&gt;  &lt;char&gt;         &lt;int&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  1: CPTM L07-0     04:00:00       04:00:00   18940             1</span>
@@ -220,7 +226,9 @@ departures. Trips whose departure there is blank are left unchanged.</p>
 <span class="r-in"><span>  first_stop <span class="op">=</span> <span class="st">"18917"</span>,</span></span>
 <span class="r-in"><span>  last_stop <span class="op">=</span> <span class="st">"18922"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">gtfs_new_speed</span><span class="op">$</span><span class="va">stop_times</span><span class="op">[</span><span class="va">trip_id</span> <span class="op">==</span> <span class="st">"CPTM L07-0"</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="va">gtfs_new_speed</span><span class="op">$</span><span class="va">stop_times</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">trip_id</span> <span class="op">==</span> <span class="st">"CPTM L07-0"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Index: &lt;trip_id&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        trip_id arrival_time departure_time stop_id stop_sequence</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         &lt;char&gt;       &lt;char&gt;         &lt;char&gt;  &lt;char&gt;         &lt;int&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  1: CPTM L07-0     04:00:00       04:00:00   18940             1</span>
@@ -253,18 +261,26 @@ departures. Trips whose departure there is blank are left unchanged.</p>
 <span class="r-in"><span>  from <span class="op">=</span> <span class="st">"07:00:00"</span>,</span></span>
 <span class="r-in"><span>  to <span class="op">=</span> <span class="st">"09:00:00"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># the arrival at the last stop of a trip that departs at 07:02 changes</span></span></span>
-<span class="r-in"><span><span class="va">poa_gtfs</span><span class="op">$</span><span class="va">stop_times</span><span class="op">[</span><span class="va">trip_id</span> <span class="op">==</span> <span class="st">"T2-1@1#702"</span><span class="op">]</span><span class="op">[</span><span class="va">.N</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="va">poa_gtfs</span><span class="op">$</span><span class="va">stop_times</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">trip_id</span> <span class="op">==</span> <span class="st">"T2-1@1#702"</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_tail</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       trip_id arrival_time departure_time stop_id stop_sequence</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;char&gt;       &lt;char&gt;         &lt;char&gt;  &lt;char&gt;         &lt;int&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1: T2-1@1#702     08:03:00       08:03:00    1456            62</span>
-<span class="r-in"><span><span class="va">poa_new_speed</span><span class="op">$</span><span class="va">stop_times</span><span class="op">[</span><span class="va">trip_id</span> <span class="op">==</span> <span class="st">"T2-1@1#702"</span><span class="op">]</span><span class="op">[</span><span class="va">.N</span><span class="op">]</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">poa_new_speed</span><span class="op">$</span><span class="va">stop_times</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">trip_id</span> <span class="op">==</span> <span class="st">"T2-1@1#702"</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_tail</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Index: &lt;trip_id&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       trip_id arrival_time departure_time stop_id stop_sequence</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;char&gt;       &lt;char&gt;         &lt;char&gt;  &lt;char&gt;         &lt;int&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1: T2-1@1#702     07:41:39       07:41:39    1456            62</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># original gtfs remains unchanged</span></span></span>
-<span class="r-in"><span><span class="va">gtfs</span><span class="op">$</span><span class="va">stop_times</span><span class="op">[</span><span class="va">trip_id</span> <span class="op">==</span> <span class="st">"CPTM L07-0"</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="va">gtfs</span><span class="op">$</span><span class="va">stop_times</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">trip_id</span> <span class="op">==</span> <span class="st">"CPTM L07-0"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        trip_id arrival_time departure_time stop_id stop_sequence</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         &lt;char&gt;       &lt;char&gt;         &lt;char&gt;  &lt;char&gt;         &lt;int&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  1: CPTM L07-0     04:00:00       04:00:00   18940             1</span>
@@ -288,7 +304,10 @@ departures. Trips whose departure there is blank are left unchanged.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># when doing by reference, original gtfs is changed</span></span></span>
 <span class="r-in"><span><span class="fu">set_trip_speed</span><span class="op">(</span><span class="va">gtfs</span>, trip_id <span class="op">=</span> <span class="st">"CPTM L07-0"</span>, <span class="fl">50</span>, by_reference <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">gtfs</span><span class="op">$</span><span class="va">stop_times</span><span class="op">[</span><span class="va">trip_id</span> <span class="op">==</span> <span class="st">"CPTM L07-0"</span><span class="op">]</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">gtfs</span><span class="op">$</span><span class="va">stop_times</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">trip_id</span> <span class="op">==</span> <span class="st">"CPTM L07-0"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Index: &lt;trip_id&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        trip_id arrival_time departure_time stop_id stop_sequence</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         &lt;char&gt;       &lt;char&gt;         &lt;char&gt;  &lt;char&gt;         &lt;int&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  1: CPTM L07-0     04:00:00       04:00:00   18940             1</span>
@@ -309,7 +328,6 @@ departures. Trips whose departure there is blank are left unchanged.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 16: CPTM L07-0                               18973            16</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 17: CPTM L07-0                               18974            17</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 18: CPTM L07-0     05:12:42       05:12:42   18975            18</span>
-<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

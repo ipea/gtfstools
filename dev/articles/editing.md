@@ -48,6 +48,7 @@ into the current **R** session:
 ``` r
 
 library(gtfstools)
+library(dplyr)
 ```
 
 ## Setting route frequencies
@@ -165,10 +166,10 @@ get_trip_speed(new_speed_gtfs, trip_id = "CPTM L07-0")
 #>        <char>    <num>
 #> 1: CPTM L07-0 50.00388
 
-new_speed_gtfs$stop_times[
-  trip_id == "CPTM L07-0",
-  .(stop_id, stop_sequence, arrival_time, departure_time)
-]
+new_speed_gtfs$stop_times |>
+  filter(trip_id == "CPTM L07-0") |>
+  select(stop_id, stop_sequence, arrival_time, departure_time)
+#> Index: <trip_id>
 #>     stop_id stop_sequence arrival_time departure_time
 #>      <char>         <int>       <char>         <char>
 #>  1:   18940             1     04:00:00       04:00:00
@@ -237,11 +238,12 @@ nrow(converted_gtfs$trips)
 #> [1] 157
 
 # frequencies of route T2 on weekdays, from 6 to 10 am
-converted_gtfs$frequencies[
-  startsWith(trip_id, "T2-1@1#") &
-    start_time >= "06:00:00" &
+converted_gtfs$frequencies |>
+  filter(
+    startsWith(trip_id, "T2-1@1#"),
+    start_time >= "06:00:00",
     start_time < "10:00:00"
-]
+  )
 #>       trip_id start_time end_time headway_secs exact_times
 #>        <char>     <char>   <char>        <int>       <int>
 #> 1: T2-1@1#610   06:00:00 07:00:00          515           0
@@ -297,7 +299,10 @@ only the first and last stops of each trip have times:
 
 trip <- "T2-1@1#520"
 
-head(gtfs$stop_times[trip_id == trip, .(stop_id, arrival_time, departure_time)])
+gtfs$stop_times |> 
+  filter(trip_id == trip) |> 
+  select(stop_id, arrival_time, departure_time) |> 
+  head()
 #>    stop_id arrival_time departure_time
 #>     <char>       <char>         <char>
 #> 1:    3609     05:20:00       05:20:00
@@ -317,12 +322,10 @@ along the trip’s shape:
 
 interpolated_gtfs <- interpolate_stop_times(gtfs, trip_id = trip)
 
-head(
-  interpolated_gtfs$stop_times[
-    trip_id == trip,
-    .(stop_id, arrival_time, departure_time)
-  ]
-)
+interpolated_gtfs$stop_times |> 
+  filter(trip_id == trip) |> 
+  select(stop_id, arrival_time, departure_time) |> 
+  head()
 #>    stop_id arrival_time departure_time
 #>     <char>       <char>         <char>
 #> 1:    3609     05:20:00       05:20:00

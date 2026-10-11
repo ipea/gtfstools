@@ -138,7 +138,9 @@ time strings.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">data_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/spo_gtfs.zip"</span>, package <span class="op">=</span> <span class="st">"gtfstools"</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">data_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/spo_gtfs.zip"</span>, package <span class="op">=</span> <span class="st">"gtfstools"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">gtfs</span> <span class="op">&lt;-</span> <span class="fu"><a href="read_gtfs.html">read_gtfs</a></span><span class="op">(</span><span class="va">data_path</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">trip</span> <span class="op">&lt;-</span> <span class="st">"CPTM L07-0"</span></span></span>
 <span class="r-in"><span></span></span>
@@ -149,7 +151,9 @@ time strings.</p>
 <span class="r-in"><span><span class="va">converted_gtfs</span> <span class="op">&lt;-</span> <span class="fu">frequencies_to_stop_times</span><span class="op">(</span><span class="va">gtfs</span>, <span class="va">trip</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># how the specified trip_id was described in the frequencies table</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">gtfs</span><span class="op">$</span><span class="va">frequencies</span><span class="op">[</span><span class="va">trip_id</span> <span class="op">==</span> <span class="va">trip</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">gtfs</span><span class="op">$</span><span class="va">frequencies</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">trip_id</span> <span class="op">==</span> <span class="va">trip</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       trip_id start_time end_time headway_secs</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;char&gt;     &lt;char&gt;   &lt;char&gt;        &lt;int&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1: CPTM L07-0   04:00:00 04:59:00          720</span>
@@ -160,8 +164,9 @@ time strings.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6: CPTM L07-0   09:00:00 09:59:00          480</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># the first row of each equivalent stop_times entry in the converted gtfs</span></span></span>
-<span class="r-in"><span><span class="va">equivalent_stop_times</span> <span class="op">&lt;-</span> <span class="va">converted_gtfs</span><span class="op">$</span><span class="va">stop_times</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="va">trip</span>, <span class="va">trip_id</span><span class="op">)</span><span class="op">]</span></span></span>
-<span class="r-in"><span><span class="va">equivalent_stop_times</span><span class="op">[</span><span class="va">equivalent_stop_times</span><span class="op">[</span>, <span class="va">.I</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, by <span class="op">=</span> <span class="va">trip_id</span><span class="op">]</span><span class="op">$</span><span class="va">V1</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="va">converted_gtfs</span><span class="op">$</span><span class="va">stop_times</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="va">trip</span>, <span class="va">trip_id</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct</a></span><span class="op">(</span><span class="va">trip_id</span>, .keep_all <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>             trip_id arrival_time departure_time stop_id stop_sequence</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>              &lt;char&gt;       &lt;char&gt;         &lt;char&gt;  &lt;char&gt;         &lt;int&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   1:   CPTM L07-0_1     04:00:00       04:00:00   18940             1</span>
@@ -175,7 +180,6 @@ time strings.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 159: CPTM L07-0_159     23:24:00       23:24:00   18940             1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 160: CPTM L07-0_160     23:36:00       23:36:00   18940             1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 161: CPTM L07-0_161     23:48:00       23:48:00   18940             1</span>
-<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

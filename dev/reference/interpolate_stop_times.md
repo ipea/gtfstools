@@ -92,12 +92,16 @@ as well as the `shapes` table and the `shape_id` column in `trips` with
 ## Examples
 
 ``` r
+library(dplyr)
+
 data_path <- system.file("extdata/poa_gtfs.zip", package = "gtfstools")
 gtfs <- read_gtfs(data_path)
 trip <- "T2-1@1#520"
 
 # only the first and last stops of each trip have times
-head(gtfs$stop_times[trip_id == trip])
+gtfs$stop_times |>
+  filter(trip_id == trip) |>
+  head()
 #>       trip_id arrival_time departure_time stop_id stop_sequence
 #>        <char>       <char>         <char>  <char>         <int>
 #> 1: T2-1@1#520     05:20:00       05:20:00    3609             1
@@ -110,7 +114,9 @@ head(gtfs$stop_times[trip_id == trip])
 # distances measured along the trips' shapes. some trips of this feed have
 # times past midnight written as "00:xx:xx", so they are left blank
 interpolated_gtfs <- suppressWarnings(interpolate_stop_times(gtfs))
-head(interpolated_gtfs$stop_times[trip_id == trip])
+interpolated_gtfs$stop_times |>
+  filter(trip_id == trip) |>
+  head()
 #>       trip_id arrival_time departure_time stop_id stop_sequence
 #>        <char>       <char>         <char>  <char>         <int>
 #> 1: T2-1@1#520     05:20:00       05:20:00    3609             1
@@ -137,7 +143,9 @@ interpolated_gtfs <- interpolate_stop_times(
   trip_id = trip,
   method = "euclidean"
 )
-head(interpolated_gtfs$stop_times[trip_id == trip])
+interpolated_gtfs$stop_times |>
+  filter(trip_id == trip) |>
+  head()
 #>       trip_id arrival_time departure_time stop_id stop_sequence
 #>        <char>       <char>         <char>  <char>         <int>
 #> 1: T2-1@1#520     05:20:00       05:20:00    3609             1

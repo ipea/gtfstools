@@ -96,6 +96,8 @@ are used as-is, not recalculated from the time strings.
 ## Examples
 
 ``` r
+library(dplyr)
+
 data_path <- system.file("extdata/spo_gtfs.zip", package = "gtfstools")
 gtfs <- read_gtfs(data_path)
 trip <- "CPTM L07-0"
@@ -107,7 +109,9 @@ converted_gtfs <- frequencies_to_stop_times(gtfs)
 converted_gtfs <- frequencies_to_stop_times(gtfs, trip)
 
 # how the specified trip_id was described in the frequencies table
-head(gtfs$frequencies[trip_id == trip])
+gtfs$frequencies |>
+  filter(trip_id == trip) |>
+  head()
 #>       trip_id start_time end_time headway_secs
 #>        <char>     <char>   <char>        <int>
 #> 1: CPTM L07-0   04:00:00 04:59:00          720
@@ -118,8 +122,9 @@ head(gtfs$frequencies[trip_id == trip])
 #> 6: CPTM L07-0   09:00:00 09:59:00          480
 
 # the first row of each equivalent stop_times entry in the converted gtfs
-equivalent_stop_times <- converted_gtfs$stop_times[grepl(trip, trip_id)]
-equivalent_stop_times[equivalent_stop_times[, .I[1], by = trip_id]$V1]
+converted_gtfs$stop_times |>
+  filter(grepl(trip, trip_id)) |>
+  distinct(trip_id, .keep_all = TRUE)
 #>             trip_id arrival_time departure_time stop_id stop_sequence
 #>              <char>       <char>         <char>  <char>         <int>
 #>   1:   CPTM L07-0_1     04:00:00       04:00:00   18940             1

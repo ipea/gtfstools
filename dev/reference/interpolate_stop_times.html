@@ -133,12 +133,16 @@ well as the <code>shapes</code> table and the <code>shape_id</code> column in <c
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">data_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/poa_gtfs.zip"</span>, package <span class="op">=</span> <span class="st">"gtfstools"</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">data_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/poa_gtfs.zip"</span>, package <span class="op">=</span> <span class="st">"gtfstools"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">gtfs</span> <span class="op">&lt;-</span> <span class="fu"><a href="read_gtfs.html">read_gtfs</a></span><span class="op">(</span><span class="va">data_path</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">trip</span> <span class="op">&lt;-</span> <span class="st">"T2-1@1#520"</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># only the first and last stops of each trip have times</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">gtfs</span><span class="op">$</span><span class="va">stop_times</span><span class="op">[</span><span class="va">trip_id</span> <span class="op">==</span> <span class="va">trip</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">gtfs</span><span class="op">$</span><span class="va">stop_times</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">trip_id</span> <span class="op">==</span> <span class="va">trip</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       trip_id arrival_time departure_time stop_id stop_sequence</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;char&gt;       &lt;char&gt;         &lt;char&gt;  &lt;char&gt;         &lt;int&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1: T2-1@1#520     05:20:00       05:20:00    3609             1</span>
@@ -151,7 +155,9 @@ well as the <code>shapes</code> table and the <code>shape_id</code> column in <c
 <span class="r-in"><span><span class="co"># distances measured along the trips' shapes. some trips of this feed have</span></span></span>
 <span class="r-in"><span><span class="co"># times past midnight written as "00:xx:xx", so they are left blank</span></span></span>
 <span class="r-in"><span><span class="va">interpolated_gtfs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="fu">interpolate_stop_times</span><span class="op">(</span><span class="va">gtfs</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">interpolated_gtfs</span><span class="op">$</span><span class="va">stop_times</span><span class="op">[</span><span class="va">trip_id</span> <span class="op">==</span> <span class="va">trip</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">interpolated_gtfs</span><span class="op">$</span><span class="va">stop_times</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">trip_id</span> <span class="op">==</span> <span class="va">trip</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       trip_id arrival_time departure_time stop_id stop_sequence</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;char&gt;       &lt;char&gt;         &lt;char&gt;  &lt;char&gt;         &lt;int&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1: T2-1@1#520     05:20:00       05:20:00    3609             1</span>
@@ -178,7 +184,9 @@ well as the <code>shapes</code> table and the <code>shape_id</code> column in <c
 <span class="r-in"><span>  trip_id <span class="op">=</span> <span class="va">trip</span>,</span></span>
 <span class="r-in"><span>  method <span class="op">=</span> <span class="st">"euclidean"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">interpolated_gtfs</span><span class="op">$</span><span class="va">stop_times</span><span class="op">[</span><span class="va">trip_id</span> <span class="op">==</span> <span class="va">trip</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">interpolated_gtfs</span><span class="op">$</span><span class="va">stop_times</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">trip_id</span> <span class="op">==</span> <span class="va">trip</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       trip_id arrival_time departure_time stop_id stop_sequence</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;char&gt;       &lt;char&gt;         &lt;char&gt;  &lt;char&gt;         &lt;int&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1: T2-1@1#520     05:20:00       05:20:00    3609             1</span>
@@ -187,7 +195,6 @@ well as the <code>shapes</code> table and the <code>shape_id</code> column in <c
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4: T2-1@1#520     05:23:27       05:23:27    6336             4</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5: T2-1@1#520     05:25:21       05:25:21    3633             5</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6: T2-1@1#520     05:26:01       05:26:01    5544             6</span>
-<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

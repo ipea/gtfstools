@@ -72,6 +72,8 @@ those of the functions above, so some warnings (e.g. about a missing
 ## Examples
 
 ``` r
+library(dplyr)
+
 data_path <- system.file("extdata/spo_gtfs.zip", package = "gtfstools")
 
 gtfs <- read_gtfs(data_path)
@@ -96,11 +98,16 @@ fixed_gtfs$agency
 #>               <char>      <char>
 #> 1: America/Sao_Paulo          pt
 
-gtfs$stop_times[trip_id == "CPTM L07-0"][.N]
+gtfs$stop_times |>
+  filter(trip_id == "CPTM L07-0") |>
+  slice_tail(n = 1)
 #>       trip_id arrival_time departure_time stop_id stop_sequence
 #>        <char>       <char>         <char>  <char>         <int>
 #> 1: CPTM L07-0     06:16:00       06:16:00   18975            18
-fixed_gtfs$stop_times[trip_id == "CPTM L07-0"][.N]
+
+fixed_gtfs$stop_times |>
+  filter(trip_id == "CPTM L07-0") |>
+  slice_tail(n = 1)
 #>       trip_id arrival_time departure_time stop_id stop_sequence
 #>        <char>       <char>         <char>  <char>         <int>
 #> 1: CPTM L07-0     06:19:33       06:19:33   18975            18

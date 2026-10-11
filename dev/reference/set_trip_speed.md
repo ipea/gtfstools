@@ -110,12 +110,16 @@ whose departure there is blank are left unchanged.
 ## Examples
 
 ``` r
+library(dplyr)
+
 data_path <- system.file("extdata/spo_gtfs.zip", package = "gtfstools")
 
 gtfs <- read_gtfs(data_path)
 
 gtfs_new_speed <- set_trip_speed(gtfs, trip_id = "CPTM L07-0", 50)
-gtfs_new_speed$stop_times[trip_id == "CPTM L07-0"]
+gtfs_new_speed$stop_times |>
+  filter(trip_id == "CPTM L07-0")
+#> Index: <trip_id>
 #>        trip_id arrival_time departure_time stop_id stop_sequence
 #>         <char>       <char>         <char>  <char>         <int>
 #>  1: CPTM L07-0     04:00:00       04:00:00   18940             1
@@ -144,7 +148,9 @@ gtfs_new_speed <- set_trip_speed(
   speed = 15,
   unit = "m/s"
 )
-gtfs_new_speed$stop_times[trip_id == "CPTM L07-0"]
+gtfs_new_speed$stop_times |>
+  filter(trip_id == "CPTM L07-0")
+#> Index: <trip_id>
 #>        trip_id arrival_time departure_time stop_id stop_sequence
 #>         <char>       <char>         <char>  <char>         <int>
 #>  1: CPTM L07-0     04:00:00       04:00:00   18940             1
@@ -174,7 +180,9 @@ gtfs_new_speed <- set_trip_speed(
   first_stop = "18917",
   last_stop = "18922"
 )
-gtfs_new_speed$stop_times[trip_id == "CPTM L07-0"]
+gtfs_new_speed$stop_times |>
+  filter(trip_id == "CPTM L07-0")
+#> Index: <trip_id>
 #>        trip_id arrival_time departure_time stop_id stop_sequence
 #>         <char>       <char>         <char>  <char>         <int>
 #>  1: CPTM L07-0     04:00:00       04:00:00   18940             1
@@ -207,18 +215,26 @@ poa_new_speed <- set_trip_speed(
   from = "07:00:00",
   to = "09:00:00"
 )
+
 # the arrival at the last stop of a trip that departs at 07:02 changes
-poa_gtfs$stop_times[trip_id == "T2-1@1#702"][.N]
+poa_gtfs$stop_times |>
+  filter(trip_id == "T2-1@1#702") |>
+  slice_tail(n = 1)
 #>       trip_id arrival_time departure_time stop_id stop_sequence
 #>        <char>       <char>         <char>  <char>         <int>
 #> 1: T2-1@1#702     08:03:00       08:03:00    1456            62
-poa_new_speed$stop_times[trip_id == "T2-1@1#702"][.N]
+
+poa_new_speed$stop_times |>
+  filter(trip_id == "T2-1@1#702") |>
+  slice_tail(n = 1)
+#> Index: <trip_id>
 #>       trip_id arrival_time departure_time stop_id stop_sequence
 #>        <char>       <char>         <char>  <char>         <int>
 #> 1: T2-1@1#702     07:41:39       07:41:39    1456            62
 
 # original gtfs remains unchanged
-gtfs$stop_times[trip_id == "CPTM L07-0"]
+gtfs$stop_times |>
+  filter(trip_id == "CPTM L07-0")
 #>        trip_id arrival_time departure_time stop_id stop_sequence
 #>         <char>       <char>         <char>  <char>         <int>
 #>  1: CPTM L07-0     04:00:00       04:00:00   18940             1
@@ -242,7 +258,10 @@ gtfs$stop_times[trip_id == "CPTM L07-0"]
 
 # when doing by reference, original gtfs is changed
 set_trip_speed(gtfs, trip_id = "CPTM L07-0", 50, by_reference = TRUE)
-gtfs$stop_times[trip_id == "CPTM L07-0"]
+
+gtfs$stop_times |>
+  filter(trip_id == "CPTM L07-0")
+#> Index: <trip_id>
 #>        trip_id arrival_time departure_time stop_id stop_sequence
 #>         <char>       <char>         <char>  <char>         <int>
 #>  1: CPTM L07-0     04:00:00       04:00:00   18940             1

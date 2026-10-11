@@ -95,6 +95,8 @@ in for the new `frequencies` entries.
 ## Examples
 
 ``` r
+library(dplyr)
+
 data_path <- system.file("extdata/ber_gtfs.zip", package = "gtfstools")
 gtfs <- read_gtfs(data_path)
 
@@ -115,7 +117,9 @@ head(converted_gtfs$frequencies)
 #> 6: 143765723   17:00:00 18:00:00         3600           0
 
 # converts only the trips of one route
-route_trips <- gtfs$trips[route_id == gtfs$trips$route_id[1]]$trip_id
+route_trips <- gtfs$trips |>
+  filter(route_id == gtfs$trips$route_id[1]) |>
+  pull(trip_id)
 converted_gtfs <- stop_times_to_frequencies(gtfs, route_trips)
 
 # converting back yields evenly spaced scheduled trips

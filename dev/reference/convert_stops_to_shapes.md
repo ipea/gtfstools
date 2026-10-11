@@ -68,6 +68,16 @@ current `shape_id`, with a warning.
 ## Examples
 
 ``` r
+library(dplyr)
+#> 
+#> Attaching package: ‘dplyr’
+#> The following objects are masked from ‘package:stats’:
+#> 
+#>     filter, lag
+#> The following objects are masked from ‘package:base’:
+#> 
+#>     intersect, setdiff, setequal, union
+
 data_path <- system.file("extdata/spo_gtfs.zip", package = "gtfstools")
 gtfs <- read_gtfs(data_path)
 
@@ -83,7 +93,9 @@ head(new_gtfs$shapes)
 #> 4: stops_shape_1    -23.54485    -46.63383                 4
 #> 5: stops_shape_1    -23.54657    -46.63639                 5
 #> 6: stops_shape_1    -23.54557    -46.63838                 6
-head(new_gtfs$trips[, c("trip_id", "shape_id")])
+new_gtfs$trips |>
+  select(trip_id, shape_id) |>
+  head()
 #>       trip_id       shape_id
 #>        <char>         <char>
 #> 1: CPTM L07-0 stops_shape_11

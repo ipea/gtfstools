@@ -129,7 +129,8 @@ the feed and leave the given GTFS object unchanged.</p>
 <p>We will start by loading the packages required by this demonstration
 into the current <strong>R</strong> session:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ipea.github.io/gtfstools/">gtfstools</a></span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ipea.github.io/gtfstools/">gtfstools</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="setting-route-frequencies">Setting route frequencies<a class="anchor" aria-label="anchor" href="#setting-route-frequencies"></a>
 </h2>
@@ -237,10 +238,10 @@ relative to each of its departures.</p>
 <span><span class="co">#&gt;        &lt;char&gt;    &lt;num&gt;</span></span>
 <span><span class="co">#&gt; 1: CPTM L07-0 50.00388</span></span>
 <span></span>
-<span><span class="va">new_speed_gtfs</span><span class="op">$</span><span class="va">stop_times</span><span class="op">[</span></span>
-<span>  <span class="va">trip_id</span> <span class="op">==</span> <span class="st">"CPTM L07-0"</span>,</span>
-<span>  <span class="fu">.</span><span class="op">(</span><span class="va">stop_id</span>, <span class="va">stop_sequence</span>, <span class="va">arrival_time</span>, <span class="va">departure_time</span><span class="op">)</span></span>
-<span><span class="op">]</span></span>
+<span><span class="va">new_speed_gtfs</span><span class="op">$</span><span class="va">stop_times</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">trip_id</span> <span class="op">==</span> <span class="st">"CPTM L07-0"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">stop_id</span>, <span class="va">stop_sequence</span>, <span class="va">arrival_time</span>, <span class="va">departure_time</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Index: &lt;trip_id&gt;</span></span>
 <span><span class="co">#&gt;     stop_id stop_sequence arrival_time departure_time</span></span>
 <span><span class="co">#&gt;      &lt;char&gt;         &lt;int&gt;       &lt;char&gt;         &lt;char&gt;</span></span>
 <span><span class="co">#&gt;  1:   18940             1     04:00:00       04:00:00</span></span>
@@ -307,11 +308,12 @@ Porto Alegre’s feed:</p>
 <span><span class="co">#&gt; [1] 157</span></span>
 <span></span>
 <span><span class="co"># frequencies of route T2 on weekdays, from 6 to 10 am</span></span>
-<span><span class="va">converted_gtfs</span><span class="op">$</span><span class="va">frequencies</span><span class="op">[</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/startsWith.html" class="external-link">startsWith</a></span><span class="op">(</span><span class="va">trip_id</span>, <span class="st">"T2-1@1#"</span><span class="op">)</span> <span class="op">&amp;</span></span>
-<span>    <span class="va">start_time</span> <span class="op">&gt;=</span> <span class="st">"06:00:00"</span> <span class="op">&amp;</span></span>
+<span><span class="va">converted_gtfs</span><span class="op">$</span><span class="va">frequencies</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/startsWith.html" class="external-link">startsWith</a></span><span class="op">(</span><span class="va">trip_id</span>, <span class="st">"T2-1@1#"</span><span class="op">)</span>,</span>
+<span>    <span class="va">start_time</span> <span class="op">&gt;=</span> <span class="st">"06:00:00"</span>,</span>
 <span>    <span class="va">start_time</span> <span class="op">&lt;</span> <span class="st">"10:00:00"</span></span>
-<span><span class="op">]</span></span>
+<span>  <span class="op">)</span></span>
 <span><span class="co">#&gt;       trip_id start_time end_time headway_secs exact_times</span></span>
 <span><span class="co">#&gt;        &lt;char&gt;     &lt;char&gt;   &lt;char&gt;        &lt;int&gt;       &lt;int&gt;</span></span>
 <span><span class="co">#&gt; 1: T2-1@1#610   06:00:00 07:00:00          515           0</span></span>
@@ -363,7 +365,10 @@ only the first and last stops of each trip have times:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">trip</span> <span class="op">&lt;-</span> <span class="st">"T2-1@1#520"</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">gtfs</span><span class="op">$</span><span class="va">stop_times</span><span class="op">[</span><span class="va">trip_id</span> <span class="op">==</span> <span class="va">trip</span>, <span class="fu">.</span><span class="op">(</span><span class="va">stop_id</span>, <span class="va">arrival_time</span>, <span class="va">departure_time</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="va">gtfs</span><span class="op">$</span><span class="va">stop_times</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">trip_id</span> <span class="op">==</span> <span class="va">trip</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">stop_id</span>, <span class="va">arrival_time</span>, <span class="va">departure_time</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    stop_id arrival_time departure_time</span></span>
 <span><span class="co">#&gt;     &lt;char&gt;       &lt;char&gt;         &lt;char&gt;</span></span>
 <span><span class="co">#&gt; 1:    3609     05:20:00       05:20:00</span></span>
@@ -378,12 +383,10 @@ a constant speed, with distances measured along the trip’s shape:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">interpolated_gtfs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/interpolate_stop_times.html">interpolate_stop_times</a></span><span class="op">(</span><span class="va">gtfs</span>, trip_id <span class="op">=</span> <span class="va">trip</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span></span>
-<span>  <span class="va">interpolated_gtfs</span><span class="op">$</span><span class="va">stop_times</span><span class="op">[</span></span>
-<span>    <span class="va">trip_id</span> <span class="op">==</span> <span class="va">trip</span>,</span>
-<span>    <span class="fu">.</span><span class="op">(</span><span class="va">stop_id</span>, <span class="va">arrival_time</span>, <span class="va">departure_time</span><span class="op">)</span></span>
-<span>  <span class="op">]</span></span>
-<span><span class="op">)</span></span>
+<span><span class="va">interpolated_gtfs</span><span class="op">$</span><span class="va">stop_times</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">trip_id</span> <span class="op">==</span> <span class="va">trip</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">stop_id</span>, <span class="va">arrival_time</span>, <span class="va">departure_time</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    stop_id arrival_time departure_time</span></span>
 <span><span class="co">#&gt;     &lt;char&gt;       &lt;char&gt;         &lt;char&gt;</span></span>
 <span><span class="co">#&gt; 1:    3609     05:20:00       05:20:00</span></span>
