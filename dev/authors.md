@@ -17,6 +17,10 @@
 
 - **Christopher Higgins**. Contributor.
 
+- **Gonçalo F. Matos**. Contributor.
+
+- **Yigit Han Eroglu**. Contributor.
+
 - **Arthur Bazolli**. Contributor.
 
 - **Marcus Saraiva**. Contributor.
