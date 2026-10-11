@@ -10,6 +10,8 @@
   feeds](https://ipea.github.io/gtfstools/dev/articles/filtering.md):
 - [Introduction to
   gtfstools](https://ipea.github.io/gtfstools/dev/articles/gtfstools.md):
+- [Mapping GTFS
+  feeds](https://ipea.github.io/gtfstools/dev/articles/mapping.md):
 - [Querying GTFS
   feeds](https://ipea.github.io/gtfstools/dev/articles/querying.md):
 - [Validating GTFS

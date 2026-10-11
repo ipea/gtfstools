@@ -22,6 +22,7 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/calendar_overlap.html">Checking the calendar overlap of GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/editing.html">Editing GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/filtering.html">Filtering GTFS feeds</a></li>
+    <li><a class="dropdown-item" href="../articles/mapping.html">Mapping GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/querying.html">Querying GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/validating.html">Validating GTFS feeds</a></li>
   </ul></li>
@@ -98,6 +99,7 @@
 <code><a href="../reference/write_gtfs.html">write_gtfs()</a></code> gains the <code>compression_level</code> argument. Its default, 6 (previously always 9), makes writing about 2 to 3 times faster for files of very similar size.</li>
 <li>New vignette “Editing GTFS feeds”, which lists the functions that edit feeds and demonstrates <code><a href="../reference/set_route_frequency.html">set_route_frequency()</a></code>, <code><a href="../reference/set_trip_speed.html">set_trip_speed()</a></code>, <code><a href="../reference/stop_times_to_frequencies.html">stop_times_to_frequencies()</a></code> and <code><a href="../reference/interpolate_stop_times.html">interpolate_stop_times()</a></code>.</li>
 <li>New vignette “Querying GTFS feeds”, which demonstrates <code><a href="../reference/get_route_frequency.html">get_route_frequency()</a></code>, <code><a href="../reference/get_stop_frequency.html">get_stop_frequency()</a></code>, <code><a href="../reference/get_stop_timetable.html">get_stop_timetable()</a></code>, <code><a href="../reference/get_trip_length.html">get_trip_length()</a></code>, <code><a href="../reference/get_trip_duration.html">get_trip_duration()</a></code>, <code><a href="../reference/get_trip_speed.html">get_trip_speed()</a></code> and <code><a href="../reference/get_summary.html">get_summary()</a></code>.</li>
+<li>New vignette “Mapping GTFS feeds”, which maps the transit network, routes by speed and stops by frequency with <code><a href="../reference/convert_shapes_to_sf.html">convert_shapes_to_sf()</a></code>, <code><a href="../reference/get_route_geometry.html">get_route_geometry()</a></code> and <code><a href="../reference/convert_stops_to_sf.html">convert_stops_to_sf()</a></code>.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>

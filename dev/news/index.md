@@ -221,6 +221,12 @@
   [`get_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_speed.md)
   and
   [`get_summary()`](https://ipea.github.io/gtfstools/dev/reference/get_summary.md).
+- New vignette “Mapping GTFS feeds”, which maps the transit network,
+  routes by speed and stops by frequency with
+  [`convert_shapes_to_sf()`](https://ipea.github.io/gtfstools/dev/reference/convert_shapes_to_sf.md),
+  [`get_route_geometry()`](https://ipea.github.io/gtfstools/dev/reference/get_route_geometry.md)
+  and
+  [`convert_stops_to_sf()`](https://ipea.github.io/gtfstools/dev/reference/convert_stops_to_sf.md).
 
 ### Bug fixes
 
