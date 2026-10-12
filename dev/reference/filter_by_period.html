@@ -57,7 +57,7 @@ period, keeping (or dropping) the relevant entries in each file.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">filter_by_period</span><span class="op">(</span><span class="va">gtfs</span>, <span class="va">start_date</span>, <span class="va">end_date</span>, keep <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">filter_by_period</span><span class="op">(</span><span class="va">gtfs</span>, <span class="va">start_date</span>, <span class="va">end_date</span>, keep <span class="op">=</span> <span class="cn">TRUE</span>, trim <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -79,6 +79,12 @@ period, both included. <code>end_date</code> must not be earlier than <code>star
 in the specified period should be kept or dropped (defaults to <code>TRUE</code>,
 which keeps the entries).</p></dd>
 
+
+<dt id="arg-trim">trim<a class="anchor" aria-label="anchor" href="#arg-trim"></a></dt>
+<dd><p>A logical. Whether the calendars of the kept services should be
+cut to the period (defaults to <code>TRUE</code>), so that the GTFS object has no
+service outside it. Ignored when <code>keep</code> is <code>FALSE</code>.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -89,10 +95,16 @@ process.</p>
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
 
 
-<p>Filtering by a period is the same as filtering by each of its days with
+<p>The services are selected as when filtering by each day of the period with
 <code><a href="filter_by_date.html">filter_by_date()</a></code>, whose details also apply here: the services that run
-on at least one day of the period are kept (or dropped) as a whole, so they
-may still run on days outside it.</p>
+on at least one day of the period are kept (or dropped).</p>
+<p>With <code>trim = TRUE</code>, the kept services are then cut to the period: the
+<code>start_date</code> and <code>end_date</code> of their <code>calendar</code> entries are clipped to it
+(entries left without any day are removed), and the <code>calendar_dates</code>
+entries outside it are removed. Each service then runs on exactly the same
+days within the period as before, and on no day outside it. The
+<code>feed_info</code> table is not changed. With <code>trim = FALSE</code>, the services are
+kept as a whole, so they may still run on days outside the period.</p>
 <p>The period is first clipped to the dates covered by the <code>calendar</code> and
 <code>calendar_dates</code> tables, on which the services can run, so the days of the
 period outside them add no work. The memory used still grows with the
@@ -137,8 +149,26 @@ number of days the period shares with each service's calendar.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3:         WD 2006-07-04              2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4:         WE 2006-07-04              1</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># keeps the services that run in the first week of july 2006</span></span></span>
+<span class="r-in"><span><span class="co"># keeps the services that run in the first week of july 2006, with their</span></span></span>
+<span class="r-in"><span><span class="co"># calendars cut to that week</span></span></span>
 <span class="r-in"><span><span class="va">smaller_gtfs</span> <span class="op">&lt;-</span> <span class="fu">filter_by_period</span><span class="op">(</span><span class="va">gtfs</span>, <span class="st">"2006-07-01"</span>, <span class="st">"2006-07-07"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">smaller_gtfs</span><span class="op">$</span><span class="va">calendar</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    service_id monday tuesday wednesday thursday friday saturday sunday</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;char&gt;  &lt;int&gt;   &lt;int&gt;     &lt;int&gt;    &lt;int&gt;  &lt;int&gt;    &lt;int&gt;  &lt;int&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:         WE      0       0         0        0      0        1      1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:         WD      1       1         1        1      1        0      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    start_date   end_date</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;Date&gt;     &lt;Date&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1: 2006-07-01 2006-07-07</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2: 2006-07-01 2006-07-07</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># keeps the same services, with their whole calendars</span></span></span>
+<span class="r-in"><span><span class="va">smaller_gtfs</span> <span class="op">&lt;-</span> <span class="fu">filter_by_period</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">gtfs</span>,</span></span>
+<span class="r-in"><span>  <span class="st">"2006-07-01"</span>,</span></span>
+<span class="r-in"><span>  <span class="st">"2006-07-07"</span>,</span></span>
+<span class="r-in"><span>  trim <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">smaller_gtfs</span><span class="op">$</span><span class="va">calendar</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    service_id monday tuesday wednesday thursday friday saturday sunday</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;char&gt;  &lt;int&gt;   &lt;int&gt;     &lt;int&gt;    &lt;int&gt;  &lt;int&gt;    &lt;int&gt;  &lt;int&gt;</span>

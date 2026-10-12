@@ -76,7 +76,9 @@
 - New function
   [`filter_by_period()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_period.md),
   which filters a feed by the services that run on at least one day of a
-  period, given by its first and last dates.
+  period, given by its first and last dates. By default (`trim = TRUE`),
+  the calendars of the kept services are cut to the period, so the feed
+  has no service outside it.
 - New function
   [`get_stops()`](https://ipea.github.io/gtfstools/dev/reference/get_stops.md),
   which returns the stops visited by the given trips and/or routes.

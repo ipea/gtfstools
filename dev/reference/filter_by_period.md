@@ -6,7 +6,7 @@ period, keeping (or dropping) the relevant entries in each file.
 ## Usage
 
 ``` r
-filter_by_period(gtfs, start_date, end_date, keep = TRUE)
+filter_by_period(gtfs, start_date, end_date, keep = TRUE, trim = TRUE)
 ```
 
 ## Arguments
@@ -28,6 +28,12 @@ filter_by_period(gtfs, start_date, end_date, keep = TRUE)
   specified period should be kept or dropped (defaults to `TRUE`, which
   keeps the entries).
 
+- trim:
+
+  A logical. Whether the calendars of the kept services should be cut to
+  the period (defaults to `TRUE`), so that the GTFS object has no
+  service outside it. Ignored when `keep` is `FALSE`.
+
 ## Value
 
 The GTFS object passed to the `gtfs` parameter, after the filtering
@@ -35,11 +41,19 @@ process.
 
 ## Details
 
-Filtering by a period is the same as filtering by each of its days with
+The services are selected as when filtering by each day of the period
+with
 [`filter_by_date()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_date.md),
 whose details also apply here: the services that run on at least one day
-of the period are kept (or dropped) as a whole, so they may still run on
-days outside it.
+of the period are kept (or dropped).
+
+With `trim = TRUE`, the kept services are then cut to the period: the
+`start_date` and `end_date` of their `calendar` entries are clipped to
+it (entries left without any day are removed), and the `calendar_dates`
+entries outside it are removed. Each service then runs on exactly the
+same days within the period as before, and on no day outside it. The
+`feed_info` table is not changed. With `trim = FALSE`, the services are
+kept as a whole, so they may still run on days outside the period.
 
 The period is first clipped to the dates covered by the `calendar` and
 `calendar_dates` tables, on which the services can run, so the days of
@@ -88,8 +102,26 @@ gtfs$calendar_dates
 #> 3:         WD 2006-07-04              2
 #> 4:         WE 2006-07-04              1
 
-# keeps the services that run in the first week of july 2006
+# keeps the services that run in the first week of july 2006, with their
+# calendars cut to that week
 smaller_gtfs <- filter_by_period(gtfs, "2006-07-01", "2006-07-07")
+smaller_gtfs$calendar
+#>    service_id monday tuesday wednesday thursday friday saturday sunday
+#>        <char>  <int>   <int>     <int>    <int>  <int>    <int>  <int>
+#> 1:         WE      0       0         0        0      0        1      1
+#> 2:         WD      1       1         1        1      1        0      0
+#>    start_date   end_date
+#>        <Date>     <Date>
+#> 1: 2006-07-01 2006-07-07
+#> 2: 2006-07-01 2006-07-07
+
+# keeps the same services, with their whole calendars
+smaller_gtfs <- filter_by_period(
+  gtfs,
+  "2006-07-01",
+  "2006-07-07",
+  trim = FALSE
+)
 smaller_gtfs$calendar
 #>    service_id monday tuesday wednesday thursday friday saturday sunday
 #>        <char>  <int>   <int>     <int>    <int>  <int>    <int>  <int>
