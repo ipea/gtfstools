@@ -7,7 +7,7 @@ character vector of dates in the `"YYYYMMDD"` or `"YYYY-MM-DD"` formats
 ## Usage
 
 ``` r
-parse_dates(date, call = parent.frame())
+parse_dates(date, call = parent.frame(), arg = "date")
 ```
 
 ## Arguments
@@ -20,6 +20,10 @@ parse_dates(date, call = parent.frame())
 
   The environment of the function whose `date` argument is parsed, in
   which errors are reported.
+
+- arg:
+
+  A string. The name of the argument, used in error messages.
 
 ## Value
 

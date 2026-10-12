@@ -20,6 +20,9 @@ functions currently available are:
 - [`interpolate_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_stop_times.md):
   fills blank stop times, assuming a constant speed between stops with
   known times;
+- [`set_route_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_route_speed.md):
+  sets the average speed of the trips of routes, or of a segment of
+  them;
 - [`set_max_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_max_speed.md):
   caps the speed of trips, slowing down only the parts that are faster
   than a maximum speed;

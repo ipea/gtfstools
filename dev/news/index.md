@@ -74,6 +74,10 @@
   [`filter_by_date()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_date.md),
   which filters a feed by the services that run on the given dates.
 - New function
+  [`filter_by_period()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_period.md),
+  which filters a feed by the services that run on at least one day of a
+  period, given by its first and last dates.
+- New function
   [`get_stops()`](https://ipea.github.io/gtfstools/dev/reference/get_stops.md),
   which returns the stops visited by the given trips and/or routes.
 - New function
@@ -142,6 +146,13 @@
   which sets the headway of routes within a time of day by replacing
   their trips in it with a frequency-based template trip. Departures
   outside the time of day don’t change.
+- New function
+  [`set_route_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_route_speed.md),
+  the route counterpart of
+  [`set_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.md),
+  which sets the average speed of all trips of the given routes
+  (optionally only of a segment between two stops, and only of trips
+  departing within a time of day).
 - New functions
   [`get_dwell_time()`](https://ipea.github.io/gtfstools/dev/reference/get_dwell_time.md)
   and

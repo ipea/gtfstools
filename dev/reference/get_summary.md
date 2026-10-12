@@ -101,9 +101,11 @@ the browser):
   and `feed_end_date` (from `feed_info`, `NA` if absent);
 
 - `totals`: the columns `indicator`, `value` and `unit`, with the number
-  of agencies, routes, trips and stops, the total length of the shapes
-  and of the trips (in km), the total duration of the trips (in hours),
-  the mean trip speed (in km/h) and the mean route headway (in minutes);
+  of agencies, routes, trips and stops, the total and mean length of the
+  shapes and of the trips (in km), the total duration of the trips (in
+  hours), the mean duration of the trips (in minutes), the mean trip
+  speed (in km/h) and the mean route headway (in minutes). The means are
+  taken over the shapes and trips whose value is known;
 
 - `speed`, `distance` and `frequency`: summary statistics (`n`, `min`,
   `q25`, `median`, `mean`, `q75`, `max` and `unit`) of the trip speeds
@@ -127,14 +129,17 @@ it (see
 with `full_trips = TRUE`), so the trip speeds and lengths refer to whole
 trips.
 
-Trip lengths and speeds are calculated with
-[`get_trip_length()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_length.md)
+Trip lengths, durations and speeds are calculated with
+[`get_trip_length()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_length.md),
+[`get_trip_duration()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_duration.md)
 and
 [`get_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_speed.md).
 Each trip is counted once, however many days it runs on and however many
-departures the `frequencies` table lists for it. The total shape length
-counts each shape used by the selected trips once, and the number of
-stops counts the stops visited by the selected trips.
+departures the `frequencies` table lists for it. Trips with a zero or
+negative duration count in the total and mean durations, but have no
+speed. The total and mean shape lengths count each shape used by the
+selected trips once, and the number of stops counts the stops visited by
+the selected trips.
 
 The `services` summary and the calendar chart in the report describe the
 whole calendar of the selected services: when `date` is given, the

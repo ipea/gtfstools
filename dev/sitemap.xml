@@ -33,6 +33,7 @@
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/empty_trip_length.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/filter_by_agency_id.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/filter_by_date.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/filter_by_period.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/filter_by_route_id.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/filter_by_route_type.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/filter_by_service_id.html</loc></url>
@@ -95,6 +96,7 @@
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/set_dwell_time.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/set_max_speed.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/set_route_frequency.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/set_route_speed.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/stop_times_to_frequencies.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/string_to_seconds.html</loc></url>

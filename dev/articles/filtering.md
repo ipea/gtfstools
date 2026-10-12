@@ -18,6 +18,7 @@ functions currently available are:
 - [`filter_by_route_type()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_route_type.md)
 - [`filter_by_weekday()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_weekday.md)
 - [`filter_by_date()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_date.md)
+- [`filter_by_period()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_period.md)
 - [`filter_by_time_of_day()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_time_of_day.md)
 - [`filter_by_spatial_extent()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_spatial_extent.md)
 

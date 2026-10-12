@@ -232,17 +232,20 @@ sessions:</p>
 <code class="sourceCode R"><span><span class="va">feed_summary</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_summary.html">get_summary</a></span><span class="op">(</span><span class="va">spo_path</span>, open_browser <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">feed_summary</span><span class="op">$</span><span class="va">totals</span></span>
-<span><span class="co">#&gt;              indicator     value   unit</span></span>
-<span><span class="co">#&gt;                 &lt;char&gt;     &lt;num&gt; &lt;char&gt;</span></span>
-<span><span class="co">#&gt; 1:          n_agencies   1.00000   &lt;NA&gt;</span></span>
-<span><span class="co">#&gt; 2:            n_routes  19.00000   &lt;NA&gt;</span></span>
-<span><span class="co">#&gt; 3:             n_trips  36.00000   &lt;NA&gt;</span></span>
-<span><span class="co">#&gt; 4:             n_stops 654.00000   &lt;NA&gt;</span></span>
-<span><span class="co">#&gt; 5:  total_shape_length 895.92810     km</span></span>
-<span><span class="co">#&gt; 6:   total_trip_length 891.57769     km</span></span>
-<span><span class="co">#&gt; 7: total_trip_duration  42.74667      h</span></span>
-<span><span class="co">#&gt; 8:     mean_trip_speed  23.46380   km/h</span></span>
-<span><span class="co">#&gt; 9:  mean_route_headway  24.43757    min</span></span></code></pre></div>
+<span><span class="co">#&gt;               indicator     value   unit</span></span>
+<span><span class="co">#&gt;                  &lt;char&gt;     &lt;num&gt; &lt;char&gt;</span></span>
+<span><span class="co">#&gt;  1:          n_agencies   1.00000   &lt;NA&gt;</span></span>
+<span><span class="co">#&gt;  2:            n_routes  19.00000   &lt;NA&gt;</span></span>
+<span><span class="co">#&gt;  3:             n_trips  36.00000   &lt;NA&gt;</span></span>
+<span><span class="co">#&gt;  4:             n_stops 654.00000   &lt;NA&gt;</span></span>
+<span><span class="co">#&gt;  5:  total_shape_length 895.92810     km</span></span>
+<span><span class="co">#&gt;  6:   mean_shape_length  24.88689     km</span></span>
+<span><span class="co">#&gt;  7:   total_trip_length 891.57769     km</span></span>
+<span><span class="co">#&gt;  8:    mean_trip_length  24.76605     km</span></span>
+<span><span class="co">#&gt;  9: total_trip_duration  42.74667      h</span></span>
+<span><span class="co">#&gt; 10:  mean_trip_duration  71.24444    min</span></span>
+<span><span class="co">#&gt; 11:     mean_trip_speed  23.46380   km/h</span></span>
+<span><span class="co">#&gt; 12:  mean_route_headway  24.43757    min</span></span></code></pre></div>
 <p><strong>Note:</strong></p>
 <p>The results of these functions are readily available to be further
 analyzed, or to be combined with the rest of <strong>gtfstools</strong>’

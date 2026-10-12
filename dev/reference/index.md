@@ -60,6 +60,9 @@
 - [`filter_by_date()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_date.md)
   : Filter GTFS object by date
 
+- [`filter_by_period()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_period.md)
+  : Filter GTFS object by period
+
 - [`filter_by_route_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_route_id.md)
   :
 
@@ -143,6 +146,8 @@
   : Set trip maximum speed
 - [`set_route_frequency()`](https://ipea.github.io/gtfstools/dev/reference/set_route_frequency.md)
   : Set route frequency
+- [`set_route_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_route_speed.md)
+  : Set route average speed
 - [`set_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.md)
   : Set trip average speed
 - [`stop_times_to_frequencies()`](https://ipea.github.io/gtfstools/dev/reference/stop_times_to_frequencies.md)

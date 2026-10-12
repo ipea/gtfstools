@@ -154,9 +154,11 @@ the days with service), <code>busiest_date</code> and <code>max_trips_per_day</c
 with the most trips and its number of trips) and <code>feed_start_date</code> and
 <code>feed_end_date</code> (from <code>feed_info</code>, <code>NA</code> if absent);</p></li>
 <li><p><code>totals</code>: the columns <code>indicator</code>, <code>value</code> and <code>unit</code>, with the number
-of agencies, routes, trips and stops, the total length of the shapes
-and of the trips (in km), the total duration of the trips (in hours),
-the mean trip speed (in km/h) and the mean route headway (in minutes);</p></li>
+of agencies, routes, trips and stops, the total and mean length of the
+shapes and of the trips (in km), the total duration of the trips (in
+hours), the mean duration of the trips (in minutes), the mean trip
+speed (in km/h) and the mean route headway (in minutes). The means are
+taken over the shapes and trips whose value is known;</p></li>
 <li><p><code>speed</code>, <code>distance</code> and <code>frequency</code>: summary statistics (<code>n</code>, <code>min</code>,
 <code>q25</code>, <code>median</code>, <code>mean</code>, <code>q75</code>, <code>max</code> and <code>unit</code>) of the trip speeds
 (in km/h), of the trip lengths (in km) and of the route headways (in
@@ -175,11 +177,13 @@ and <a href="https://pandoc.org/" class="external-link">Pandoc</a>, which is shi
 order. The time-of-day filter keeps the whole trips that run within it
 (see <code><a href="filter_by_time_of_day.html">filter_by_time_of_day()</a></code> with <code>full_trips = TRUE</code>), so the trip
 speeds and lengths refer to whole trips.</p>
-<p>Trip lengths and speeds are calculated with <code><a href="get_trip_length.html">get_trip_length()</a></code> and
-<code><a href="get_trip_speed.html">get_trip_speed()</a></code>. Each trip is counted once, however many days it runs on
-and however many departures the <code>frequencies</code> table lists for it. The total
-shape length counts each shape used by the selected trips once, and the
-number of stops counts the stops visited by the selected trips.</p>
+<p>Trip lengths, durations and speeds are calculated with <code><a href="get_trip_length.html">get_trip_length()</a></code>,
+<code><a href="get_trip_duration.html">get_trip_duration()</a></code> and <code><a href="get_trip_speed.html">get_trip_speed()</a></code>. Each trip is counted once,
+however many days it runs on and however many departures the <code>frequencies</code>
+table lists for it. Trips with a zero or negative duration count in the
+total and mean durations, but have no speed. The total and mean shape lengths
+count each shape used by the selected trips once, and the number of stops
+counts the stops visited by the selected trips.</p>
 <p>The <code>services</code> summary and the calendar chart in the report describe the
 whole calendar of the selected services: when <code>date</code> is given, the
 services that run on these dates are kept as a whole (see
