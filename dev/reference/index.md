@@ -148,10 +148,10 @@
   : Set trip maximum speed
 - [`set_route_frequency()`](https://ipea.github.io/gtfstools/dev/reference/set_route_frequency.md)
   : Set route frequency
-- [`set_route_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_route_speed.md)
-  : Set route average speed
 - [`set_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.md)
   : Set trip average speed
+- [`set_route_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_route_speed.md)
+  : Set route average speed
 - [`stop_times_to_frequencies()`](https://ipea.github.io/gtfstools/dev/reference/stop_times_to_frequencies.md)
   : Convert stop times to frequencies
 - [`frequencies_to_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/frequencies_to_stop_times.md)

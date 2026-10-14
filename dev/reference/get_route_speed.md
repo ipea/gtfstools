@@ -60,7 +60,9 @@ are not returned.
 
 ## See also
 
-[`get_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_speed.md)
+[`get_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_speed.md),
+[`set_route_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_route_speed.md),
+[`set_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.md)
 
 ## Examples
 

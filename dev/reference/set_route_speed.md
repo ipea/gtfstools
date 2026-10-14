@@ -92,7 +92,8 @@ ignored.
 ## See also
 
 [`set_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.md),
-[`get_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_speed.md)
+[`get_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_speed.md),
+[`get_route_speed()`](https://ipea.github.io/gtfstools/dev/reference/get_route_speed.md)
 
 ## Examples
 

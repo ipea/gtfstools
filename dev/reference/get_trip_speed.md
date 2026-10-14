@@ -95,6 +95,9 @@ are used as-is, not recalculated from the time strings.
 
 ## See also
 
+[`get_route_speed()`](https://ipea.github.io/gtfstools/dev/reference/get_route_speed.md),
+[`set_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.md),
+[`set_route_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_route_speed.md),
 [`get_trip_length()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_length.md),
 [`get_trip_duration()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_duration.md),
 [`get_trip_segment_duration()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_segment_duration.md)

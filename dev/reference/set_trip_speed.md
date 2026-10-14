@@ -107,6 +107,12 @@ at `first_stop` as written in `stop_times`, so use times past
 `frequencies`, these are template times, not actual departures. Trips
 whose departure there is blank are left unchanged.
 
+## See also
+
+[`set_route_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_route_speed.md),
+[`get_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_speed.md),
+[`get_route_speed()`](https://ipea.github.io/gtfstools/dev/reference/get_route_speed.md)
+
 ## Examples
 
 ``` r
