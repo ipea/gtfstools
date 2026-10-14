@@ -366,7 +366,7 @@ plotter <- function(gtfs,
     gtfs <- filter_by_spatial_extent(gtfs, geom, spatial_operation, keep)
   }
 
-  shapes <- convert_shapes_to_sf(gtfs)
+  shapes <- get_shapes_geometry(gtfs)
   trips <- get_trip_geometry(gtfs, method = "euclidean")
   geom <- sf::st_as_sfc(geom)
 
@@ -400,7 +400,7 @@ bounding box placed on top of it.
 
 ``` r
 
-bbox <- sf::st_bbox(convert_shapes_to_sf(gtfs, shape_id = "68962"))
+bbox <- sf::st_bbox(get_shapes_geometry(gtfs, shape_id = "68962"))
 
 plotter(gtfs, bbox, do_filter = FALSE)
 ```

@@ -128,14 +128,14 @@ interpolated_gtfs$stop_times |>
 
 # the speed is now known between every pair of consecutive stops
 head(get_trip_speed(interpolated_gtfs, trip, by = "segment"))
-#>       trip_id segment from_stop_id to_stop_id    speed
-#>        <char>   <int>       <char>     <char>    <num>
-#> 1: T2-1@1#520       1         3609       3608 18.97450
-#> 2: T2-1@1#520       2         3608       3564 19.07504
-#> 3: T2-1@1#520       3         3564       6336 19.04637
-#> 4: T2-1@1#520       4         6336       3633 19.05867
-#> 5: T2-1@1#520       5         3633       5544 19.32197
-#> 6: T2-1@1#520       6         5544       3644 18.78885
+#>    route_id    trip_id segment from_stop_id to_stop_id    speed
+#>      <char>     <char>   <int>       <char>     <char>    <num>
+#> 1:       T2 T2-1@1#520       1         3609       3608 18.97450
+#> 2:       T2 T2-1@1#520       2         3608       3564 19.07504
+#> 3:       T2 T2-1@1#520       3         3564       6336 19.04637
+#> 4:       T2 T2-1@1#520       4         6336       3633 19.05867
+#> 5:       T2 T2-1@1#520       5         3633       5544 19.32197
+#> 6:       T2 T2-1@1#520       6         5544       3644 18.78885
 
 # straight-line distances between stops, for a single trip
 interpolated_gtfs <- interpolate_stop_times(

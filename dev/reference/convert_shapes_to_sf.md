@@ -1,6 +1,9 @@
-# Convert `shapes` table to simple feature object
+# Convert `shapes` table to simple feature object (deprecated)
 
-Converts the `shapes` table to a `LINESTRING sf` object.
+This function is deprecated: calling it raises a warning. Please use
+[`get_shapes_geometry()`](https://ipea.github.io/gtfstools/dev/reference/get_shapes_geometry.md)
+instead, which takes the same arguments (except `sort_sequence`) and
+returns the same result.
 
 ## Usage
 
@@ -35,35 +38,7 @@ convert_shapes_to_sf(gtfs, shape_id = NULL, crs = 4326, sort_sequence)
 
 A `LINESTRING sf` object.
 
-## Examples
+## See also
 
-``` r
-# read gtfs
-data_path <- system.file("extdata/spo_gtfs.zip", package = "gtfstools")
-gtfs <- read_gtfs(data_path)
-
-shapes_sf <- convert_shapes_to_sf(gtfs)
-head(shapes_sf)
-#> Simple feature collection with 6 features and 1 field
-#> Geometry type: LINESTRING
-#> Dimension:     XY
-#> Bounding box:  xmin: -46.69114 ymin: -23.64631 xmax: -46.47121 ymax: -23.48005
-#> Geodetic CRS:  WGS 84
-#>   shape_id                       geometry
-#> 1    17838 LINESTRING (-46.64105 -23.6...
-#> 2    17839 LINESTRING (-46.60321 -23.4...
-#> 3    17840 LINESTRING (-46.58193 -23.5...
-#> 4    17841 LINESTRING (-46.69114 -23.5...
-#> 5    17842 LINESTRING (-46.66696 -23.5...
-#> 6    17843 LINESTRING (-46.47127 -23.5...
-
-shapes_sf <- convert_shapes_to_sf(gtfs, shape_id = "17846")
-shapes_sf
-#> Simple feature collection with 1 feature and 1 field
-#> Geometry type: LINESTRING
-#> Dimension:     XY
-#> Bounding box:  xmin: -46.87255 ymin: -23.53517 xmax: -46.63535 ymax: -23.19474
-#> Geodetic CRS:  WGS 84
-#>   shape_id                       geometry
-#> 1    17846 LINESTRING (-46.63535 -23.5...
-```
+[`get_shapes_geometry()`](https://ipea.github.io/gtfstools/dev/reference/get_shapes_geometry.md),
+which replaces this function.

@@ -156,18 +156,18 @@ spo_gtfs <- read_gtfs(path)
 
 get_trip_speed(spo_gtfs, trip_id = "CPTM L07-0")
 #> Key: <trip_id>
-#>       trip_id    speed
-#>        <char>    <num>
-#> 1: CPTM L07-0 26.73002
+#>    route_id    trip_id    speed
+#>      <char>     <char>    <num>
+#> 1: CPTM L07 CPTM L07-0 26.73002
 
 # 'unit' argument defaults to "km/h"
 new_speed_gtfs <- set_trip_speed(spo_gtfs, trip_id = "CPTM L07-0", speed = 50)
 
 get_trip_speed(new_speed_gtfs, trip_id = "CPTM L07-0")
 #> Key: <trip_id>
-#>       trip_id    speed
-#>        <char>    <num>
-#> 1: CPTM L07-0 50.00388
+#>    route_id    trip_id    speed
+#>      <char>     <char>    <num>
+#> 1: CPTM L07 CPTM L07-0 50.00388
 
 new_speed_gtfs$stop_times |>
   filter(trip_id == "CPTM L07-0") |>

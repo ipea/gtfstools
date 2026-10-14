@@ -79,47 +79,47 @@ gtfs <- read_gtfs(data_path)
 
 # the trip is faster than 30 km/h between some of its stops
 get_trip_speed(gtfs, "CPTM L07-0", by = "segment")
-#>        trip_id segment from_stop_id to_stop_id    speed
-#>         <char>   <int>       <char>     <char>    <num>
-#>  1: CPTM L07-0       1        18940      18920 26.60738
-#>  2: CPTM L07-0       2        18920      18919 18.18377
-#>  3: CPTM L07-0       3        18919      18917 11.93590
-#>  4: CPTM L07-0       4        18917      18916 15.07881
-#>  5: CPTM L07-0       5        18916      18965 16.28882
-#>  6: CPTM L07-0       6        18965      18923 21.31043
-#>  7: CPTM L07-0       7        18923      18922 15.08821
-#>  8: CPTM L07-0       8        18922    4114459 17.68714
-#>  9: CPTM L07-0       9      4114459      18921 31.53864
-#> 10: CPTM L07-0      10        18921      18924 32.98105
-#> 11: CPTM L07-0      11        18924      18925 36.47943
-#> 12: CPTM L07-0      12        18925      18926 20.48514
-#> 13: CPTM L07-0      13        18926      18971 26.54381
-#> 14: CPTM L07-0      14        18971      18972 52.84955
-#> 15: CPTM L07-0      15        18972      18973 28.27469
-#> 16: CPTM L07-0      16        18973      18974 44.78676
-#> 17: CPTM L07-0      17        18974      18975 38.29072
+#>     route_id    trip_id segment from_stop_id to_stop_id    speed
+#>       <char>     <char>   <int>       <char>     <char>    <num>
+#>  1: CPTM L07 CPTM L07-0       1        18940      18920 26.60738
+#>  2: CPTM L07 CPTM L07-0       2        18920      18919 18.18377
+#>  3: CPTM L07 CPTM L07-0       3        18919      18917 11.93590
+#>  4: CPTM L07 CPTM L07-0       4        18917      18916 15.07881
+#>  5: CPTM L07 CPTM L07-0       5        18916      18965 16.28882
+#>  6: CPTM L07 CPTM L07-0       6        18965      18923 21.31043
+#>  7: CPTM L07 CPTM L07-0       7        18923      18922 15.08821
+#>  8: CPTM L07 CPTM L07-0       8        18922    4114459 17.68714
+#>  9: CPTM L07 CPTM L07-0       9      4114459      18921 31.53864
+#> 10: CPTM L07 CPTM L07-0      10        18921      18924 32.98105
+#> 11: CPTM L07 CPTM L07-0      11        18924      18925 36.47943
+#> 12: CPTM L07 CPTM L07-0      12        18925      18926 20.48514
+#> 13: CPTM L07 CPTM L07-0      13        18926      18971 26.54381
+#> 14: CPTM L07 CPTM L07-0      14        18971      18972 52.84955
+#> 15: CPTM L07 CPTM L07-0      15        18972      18973 28.27469
+#> 16: CPTM L07 CPTM L07-0      16        18973      18974 44.78676
+#> 17: CPTM L07 CPTM L07-0      17        18974      18975 38.29072
 
 gtfs_capped <- set_max_speed(gtfs, max_speed = 30, trip_id = "CPTM L07-0")
 get_trip_speed(gtfs_capped, "CPTM L07-0", by = "segment")
-#>        trip_id segment from_stop_id to_stop_id    speed
-#>         <char>   <int>       <char>     <char>    <num>
-#>  1: CPTM L07-0       1        18940      18920 26.60738
-#>  2: CPTM L07-0       2        18920      18919 18.18377
-#>  3: CPTM L07-0       3        18919      18917 11.93590
-#>  4: CPTM L07-0       4        18917      18916 15.07881
-#>  5: CPTM L07-0       5        18916      18965 16.28882
-#>  6: CPTM L07-0       6        18965      18923 21.31043
-#>  7: CPTM L07-0       7        18923      18922 15.08821
-#>  8: CPTM L07-0       8        18922    4114459 17.68714
-#>  9: CPTM L07-0       9      4114459      18921 29.97732
-#> 10: CPTM L07-0      10        18921      18924 29.98277
-#> 11: CPTM L07-0      11        18924      18925 29.98309
-#> 12: CPTM L07-0      12        18925      18926 20.48514
-#> 13: CPTM L07-0      13        18926      18971 26.54381
-#> 14: CPTM L07-0      14        18971      18972 29.98556
-#> 15: CPTM L07-0      15        18972      18973 28.27469
-#> 16: CPTM L07-0      16        18973      18974 29.98277
-#> 17: CPTM L07-0      17        18974      18975 29.98295
+#>     route_id    trip_id segment from_stop_id to_stop_id    speed
+#>       <char>     <char>   <int>       <char>     <char>    <num>
+#>  1: CPTM L07 CPTM L07-0       1        18940      18920 26.60738
+#>  2: CPTM L07 CPTM L07-0       2        18920      18919 18.18377
+#>  3: CPTM L07 CPTM L07-0       3        18919      18917 11.93590
+#>  4: CPTM L07 CPTM L07-0       4        18917      18916 15.07881
+#>  5: CPTM L07 CPTM L07-0       5        18916      18965 16.28882
+#>  6: CPTM L07 CPTM L07-0       6        18965      18923 21.31043
+#>  7: CPTM L07 CPTM L07-0       7        18923      18922 15.08821
+#>  8: CPTM L07 CPTM L07-0       8        18922    4114459 17.68714
+#>  9: CPTM L07 CPTM L07-0       9      4114459      18921 29.97732
+#> 10: CPTM L07 CPTM L07-0      10        18921      18924 29.98277
+#> 11: CPTM L07 CPTM L07-0      11        18924      18925 29.98309
+#> 12: CPTM L07 CPTM L07-0      12        18925      18926 20.48514
+#> 13: CPTM L07 CPTM L07-0      13        18926      18971 26.54381
+#> 14: CPTM L07 CPTM L07-0      14        18971      18972 29.98556
+#> 15: CPTM L07 CPTM L07-0      15        18972      18973 28.27469
+#> 16: CPTM L07 CPTM L07-0      16        18973      18974 29.98277
+#> 17: CPTM L07 CPTM L07-0      17        18974      18975 29.98295
 
 # the later stops are shifted, so the trip ends later
  get_start_and_end_times(gtfs, trip_id = "CPTM L07-0")

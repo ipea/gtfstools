@@ -115,6 +115,8 @@ Economic Research (Ipea), Brazil.
   : Get parent stations recursively
 - [`get_route_frequency()`](https://ipea.github.io/gtfstools/dev/reference/get_route_frequency.md)
   : Get route frequency
+- [`get_route_speed()`](https://ipea.github.io/gtfstools/dev/reference/get_route_speed.md)
+  : Get route speed
 - [`get_route_timetable()`](https://ipea.github.io/gtfstools/dev/reference/get_route_timetable.md)
   : Get route timetable
 - [`get_shape_length()`](https://ipea.github.io/gtfstools/dev/reference/get_shape_length.md)
@@ -201,16 +203,6 @@ Economic Research (Ipea), Brazil.
 
   Convert a simple feature object into a `shapes` table
 
-- [`convert_shapes_to_sf()`](https://ipea.github.io/gtfstools/dev/reference/convert_shapes_to_sf.md)
-  :
-
-  Convert `shapes` table to simple feature object
-
-- [`convert_stops_to_sf()`](https://ipea.github.io/gtfstools/dev/reference/convert_stops_to_sf.md)
-  :
-
-  Convert `stops` table to simple feature object
-
 - [`filter_by_spatial_extent()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_spatial_extent.md)
   : Filter a GTFS object using a spatial extent
 
@@ -219,6 +211,16 @@ Economic Research (Ipea), Brazil.
 
 - [`get_route_geometry()`](https://ipea.github.io/gtfstools/dev/reference/get_route_geometry.md)
   : Get route geometry
+
+- [`get_shapes_geometry()`](https://ipea.github.io/gtfstools/dev/reference/get_shapes_geometry.md)
+  :
+
+  Get the `shapes` table with spatial geometry
+
+- [`get_stops_geometry()`](https://ipea.github.io/gtfstools/dev/reference/get_stops_geometry.md)
+  :
+
+  Get the `stops` table with spatial geometry
 
 ## Editing GTFS feeds
 
@@ -269,7 +271,17 @@ Economic Research (Ipea), Brazil.
   : Coerce lists and GTFS objects from other packages into
   gtfstools-compatible GTFS objects
 
-## Defunct
+## Deprecated and defunct
+
+- [`convert_shapes_to_sf()`](https://ipea.github.io/gtfstools/dev/reference/convert_shapes_to_sf.md)
+  :
+
+  Convert `shapes` table to simple feature object (deprecated)
+
+- [`convert_stops_to_sf()`](https://ipea.github.io/gtfstools/dev/reference/convert_stops_to_sf.md)
+  :
+
+  Convert `stops` table to simple feature object (deprecated)
 
 - [`filter_by_sf()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_sf.md)
   :

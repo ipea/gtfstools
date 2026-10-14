@@ -91,7 +91,7 @@ enabled. Defaults to <code>TRUE</code>.</p></dd>
 <span class="r-in"><span><span class="va">gtfs</span> <span class="op">&lt;-</span> <span class="fu"><a href="read_gtfs.html">read_gtfs</a></span><span class="op">(</span><span class="va">data_path</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># first converting existing shapes table into a sf object</span></span></span>
-<span class="r-in"><span><span class="va">shapes_sf</span> <span class="op">&lt;-</span> <span class="fu"><a href="convert_shapes_to_sf.html">convert_shapes_to_sf</a></span><span class="op">(</span><span class="va">gtfs</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">shapes_sf</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_shapes_geometry.html">get_shapes_geometry</a></span><span class="op">(</span><span class="va">gtfs</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">shapes_sf</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Simple feature collection with 6 features and 1 field</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Geometry type: LINESTRING</span>

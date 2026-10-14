@@ -87,13 +87,13 @@ easily mapped with <a href="https://ggplot2.tidyverse.org" class="external-link"
 how to map a feed using the following functions:</p>
 <ul>
 <li>
-<code><a href="../reference/convert_shapes_to_sf.html">convert_shapes_to_sf()</a></code>: converts the
-<code>shapes</code> table into <code>LINESTRING</code>s;</li>
+<code><a href="../reference/get_shapes_geometry.html">get_shapes_geometry()</a></code>: converts the <code>shapes</code>
+table into <code>LINESTRING</code>s;</li>
 <li>
 <code><a href="../reference/get_route_geometry.html">get_route_geometry()</a></code>: returns the distinct trip
 geometries of each route;</li>
 <li>
-<code><a href="../reference/convert_stops_to_sf.html">convert_stops_to_sf()</a></code>: converts the <code>stops</code>
+<code><a href="../reference/get_stops_geometry.html">get_stops_geometry()</a></code>: converts the <code>stops</code>
 table into <code>POINT</code>s.</li>
 </ul>
 <p>We will start by loading the packages required by this demonstration
@@ -105,7 +105,7 @@ into the current <strong>R</strong> session:</p>
 <div class="section level2">
 <h2 id="mapping-the-transit-network">Mapping the transit network<a class="anchor" aria-label="anchor" href="#mapping-the-transit-network"></a>
 </h2>
-<p><code><a href="../reference/convert_shapes_to_sf.html">convert_shapes_to_sf()</a></code> converts the <code>shapes</code>
+<p><code><a href="../reference/get_shapes_geometry.html">get_shapes_geometry()</a></code> converts the <code>shapes</code>
 table into an <code>sf</code> object with the geometry of each shape.
 Mapping them gives an overview of the whole network described in the
 feed. Let’s see how that works using São Paulo’s feed:</p>
@@ -113,7 +113,7 @@ feed. Let’s see how that works using São Paulo’s feed:</p>
 <code class="sourceCode R"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/spo_gtfs.zip"</span>, package <span class="op">=</span> <span class="st">"gtfstools"</span><span class="op">)</span></span>
 <span><span class="va">gtfs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_gtfs.html">read_gtfs</a></span><span class="op">(</span><span class="va">path</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">shapes</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/convert_shapes_to_sf.html">convert_shapes_to_sf</a></span><span class="op">(</span><span class="va">gtfs</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">shapes</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_shapes_geometry.html">get_shapes_geometry</a></span><span class="op">(</span><span class="va">gtfs</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html" class="external-link">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">shapes</span><span class="op">)</span> <span class="op">+</span></span>
@@ -131,12 +131,6 @@ the trips of each route (frequency-based trips count once, regardless of
 their headway):</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">trip_speed</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_trip_speed.html">get_trip_speed</a></span><span class="op">(</span><span class="va">gtfs</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">trip_speed</span> <span class="op">&lt;-</span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span></span>
-<span>  x <span class="op">=</span> <span class="va">trip_speed</span>,</span>
-<span>  y <span class="op">=</span>  <span class="va">gtfs</span><span class="op">$</span><span class="va">trips</span> <span class="op">|&gt;</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">trip_id</span>, <span class="va">route_id</span><span class="op">)</span>,</span>
-<span>  by <span class="op">=</span> <span class="st">"trip_id"</span></span>
-<span>  <span class="op">)</span></span>
 <span></span>
 <span><span class="va">route_speed</span> <span class="op">&lt;-</span> <span class="va">trip_speed</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">route_id</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -193,11 +187,11 @@ stop:</p>
 <span>    departures <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">departures</span><span class="op">)</span>, </span>
 <span>    .groups <span class="op">=</span> <span class="st">"drop"</span></span>
 <span>    <span class="op">)</span></span></code></pre></div>
-<p><code><a href="../reference/convert_stops_to_sf.html">convert_stops_to_sf()</a></code> converts the stops into points, to
+<p><code><a href="../reference/get_stops_geometry.html">get_stops_geometry()</a></code> converts the stops into points, to
 which we join the number of departures. The size and the color of each
 stop vary with its number of departures:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">stops</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/convert_stops_to_sf.html">convert_stops_to_sf</a></span><span class="op">(</span><span class="va">gtfs</span>, stop_id <span class="op">=</span> <span class="va">stop_frequency</span><span class="op">$</span><span class="va">stop_id</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">stops</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_stops_geometry.html">get_stops_geometry</a></span><span class="op">(</span><span class="va">gtfs</span>, stop_id <span class="op">=</span> <span class="va">stop_frequency</span><span class="op">$</span><span class="va">stop_id</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">stops</span> <span class="op">&lt;-</span> <span class="va">stops</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">inner_join</a></span><span class="op">(</span><span class="va">stop_frequency</span>, by <span class="op">=</span> <span class="st">"stop_id"</span><span class="op">)</span></span>

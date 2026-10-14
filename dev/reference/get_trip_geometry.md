@@ -71,7 +71,7 @@ matches the length returned by
 (when this length is not `NA`, see below), and the limitations described
 there apply. Trips whose stops are all located at the same point of the
 shape get a zero-length geometry. Use
-[`convert_shapes_to_sf()`](https://ipea.github.io/gtfstools/dev/reference/convert_shapes_to_sf.md)
+[`get_shapes_geometry()`](https://ipea.github.io/gtfstools/dev/reference/get_shapes_geometry.md)
 for the geometry of entire shapes.
 
 With `method = "euclidean"`, the geometry links the consecutive stops of
@@ -92,7 +92,7 @@ that cross the antimeridian are not handled correctly.
 ## See also
 
 [`get_trip_length()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_length.md),
-[`convert_shapes_to_sf()`](https://ipea.github.io/gtfstools/dev/reference/convert_shapes_to_sf.md)
+[`get_shapes_geometry()`](https://ipea.github.io/gtfstools/dev/reference/get_shapes_geometry.md)
 
 ## Examples
 

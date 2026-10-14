@@ -331,33 +331,33 @@ segment:</p>
 <code class="sourceCode R"><span><span class="va">trip_speed</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_trip_speed.html">get_trip_speed</a></span><span class="op">(</span><span class="va">spo_gtfs</span>, unit <span class="op">=</span> <span class="st">"m/s"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">trip_speed</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Key: &lt;trip_id&gt;</span></span>
-<span><span class="co">#&gt;      trip_id    speed</span></span>
-<span><span class="co">#&gt;       &lt;char&gt;    &lt;num&gt;</span></span>
-<span><span class="co">#&gt; 1: 2002-10-0 2.322455</span></span>
-<span><span class="co">#&gt; 2: 2105-10-0 2.847512</span></span>
-<span><span class="co">#&gt; 3: 2105-10-1 2.680871</span></span>
-<span><span class="co">#&gt; 4: 2161-10-0 3.103457</span></span>
-<span><span class="co">#&gt; 5: 2161-10-1 3.229289</span></span>
-<span><span class="co">#&gt; 6: 4491-10-0 3.336661</span></span>
+<span><span class="co">#&gt;    route_id   trip_id    speed</span></span>
+<span><span class="co">#&gt;      &lt;char&gt;    &lt;char&gt;    &lt;num&gt;</span></span>
+<span><span class="co">#&gt; 1:  2002-10 2002-10-0 2.322455</span></span>
+<span><span class="co">#&gt; 2:  2105-10 2105-10-0 2.847512</span></span>
+<span><span class="co">#&gt; 3:  2105-10 2105-10-1 2.680871</span></span>
+<span><span class="co">#&gt; 4:  2161-10 2161-10-0 3.103457</span></span>
+<span><span class="co">#&gt; 5:  2161-10 2161-10-1 3.229289</span></span>
+<span><span class="co">#&gt; 6:  4491-10 4491-10-0 3.336661</span></span>
 <span></span>
 <span><span class="co"># 'unit' argument defaults to "km/h"</span></span>
 <span><span class="va">single_trip_speed</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_trip_speed.html">get_trip_speed</a></span><span class="op">(</span><span class="va">spo_gtfs</span>, trip_id <span class="op">=</span> <span class="va">single_trip</span><span class="op">)</span></span>
 <span><span class="va">single_trip_speed</span></span>
 <span><span class="co">#&gt; Key: &lt;trip_id&gt;</span></span>
-<span><span class="co">#&gt;       trip_id    speed</span></span>
-<span><span class="co">#&gt;        &lt;char&gt;    &lt;num&gt;</span></span>
-<span><span class="co">#&gt; 1: CPTM L07-0 26.73002</span></span>
+<span><span class="co">#&gt;    route_id    trip_id    speed</span></span>
+<span><span class="co">#&gt;      &lt;char&gt;     &lt;char&gt;    &lt;num&gt;</span></span>
+<span><span class="co">#&gt; 1: CPTM L07 CPTM L07-0 26.73002</span></span>
 <span></span>
 <span><span class="va">segment_speed</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_trip_speed.html">get_trip_speed</a></span><span class="op">(</span><span class="va">spo_gtfs</span>, <span class="va">single_trip</span>, by <span class="op">=</span> <span class="st">"segment"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">segment_speed</span><span class="op">)</span></span>
-<span><span class="co">#&gt;       trip_id segment from_stop_id to_stop_id    speed</span></span>
-<span><span class="co">#&gt;        &lt;char&gt;   &lt;int&gt;       &lt;char&gt;     &lt;char&gt;    &lt;num&gt;</span></span>
-<span><span class="co">#&gt; 1: CPTM L07-0       1        18940      18920 26.60738</span></span>
-<span><span class="co">#&gt; 2: CPTM L07-0       2        18920      18919 18.18377</span></span>
-<span><span class="co">#&gt; 3: CPTM L07-0       3        18919      18917 11.93590</span></span>
-<span><span class="co">#&gt; 4: CPTM L07-0       4        18917      18916 15.07881</span></span>
-<span><span class="co">#&gt; 5: CPTM L07-0       5        18916      18965 16.28882</span></span>
-<span><span class="co">#&gt; 6: CPTM L07-0       6        18965      18923 21.31043</span></span></code></pre></div>
+<span><span class="co">#&gt;    route_id    trip_id segment from_stop_id to_stop_id    speed</span></span>
+<span><span class="co">#&gt;      &lt;char&gt;     &lt;char&gt;   &lt;int&gt;       &lt;char&gt;     &lt;char&gt;    &lt;num&gt;</span></span>
+<span><span class="co">#&gt; 1: CPTM L07 CPTM L07-0       1        18940      18920 26.60738</span></span>
+<span><span class="co">#&gt; 2: CPTM L07 CPTM L07-0       2        18920      18919 18.18377</span></span>
+<span><span class="co">#&gt; 3: CPTM L07 CPTM L07-0       3        18919      18917 11.93590</span></span>
+<span><span class="co">#&gt; 4: CPTM L07 CPTM L07-0       4        18917      18916 15.07881</span></span>
+<span><span class="co">#&gt; 5: CPTM L07 CPTM L07-0       5        18916      18965 16.28882</span></span>
+<span><span class="co">#&gt; 6: CPTM L07 CPTM L07-0       6        18965      18923 21.31043</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="manipulate-feeds">Manipulate feeds<a class="anchor" aria-label="anchor" href="#manipulate-feeds"></a>
@@ -444,28 +444,28 @@ distance between stops.</p>
 <span></span>
 <span><span class="fu"><a href="../reference/get_trip_speed.html">get_trip_speed</a></span><span class="op">(</span><span class="va">spo_gtfs</span>, <span class="va">selected_trips</span>, unit <span class="op">=</span> <span class="st">"km/h"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Key: &lt;trip_id&gt;</span></span>
-<span><span class="co">#&gt;       trip_id     speed</span></span>
-<span><span class="co">#&gt;        &lt;char&gt;     &lt;num&gt;</span></span>
-<span><span class="co">#&gt; 1:  2002-10-0  8.360838</span></span>
-<span><span class="co">#&gt; 2: CPTM L07-0 26.730015</span></span>
+<span><span class="co">#&gt;    route_id    trip_id     speed</span></span>
+<span><span class="co">#&gt;      &lt;char&gt;     &lt;char&gt;     &lt;num&gt;</span></span>
+<span><span class="co">#&gt; 1:  2002-10  2002-10-0  8.360838</span></span>
+<span><span class="co">#&gt; 2: CPTM L07 CPTM L07-0 26.730015</span></span>
 <span></span>
 <span><span class="co"># 'speed' is recycled to all trips if only a single value is given</span></span>
 <span><span class="va">new_speed_gtfs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/set_trip_speed.html">set_trip_speed</a></span><span class="op">(</span><span class="va">spo_gtfs</span>, <span class="va">selected_trips</span>, <span class="fl">50</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/get_trip_speed.html">get_trip_speed</a></span><span class="op">(</span><span class="va">new_speed_gtfs</span>, <span class="va">selected_trips</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Key: &lt;trip_id&gt;</span></span>
-<span><span class="co">#&gt;       trip_id    speed</span></span>
-<span><span class="co">#&gt;        &lt;char&gt;    &lt;num&gt;</span></span>
-<span><span class="co">#&gt; 1:  2002-10-0 50.06073</span></span>
-<span><span class="co">#&gt; 2: CPTM L07-0 50.00388</span></span>
+<span><span class="co">#&gt;    route_id    trip_id    speed</span></span>
+<span><span class="co">#&gt;      &lt;char&gt;     &lt;char&gt;    &lt;num&gt;</span></span>
+<span><span class="co">#&gt; 1:  2002-10  2002-10-0 50.06073</span></span>
+<span><span class="co">#&gt; 2: CPTM L07 CPTM L07-0 50.00388</span></span>
 <span></span>
 <span><span class="co"># but you can also specify different speeds for each trip</span></span>
 <span><span class="va">new_speed_gtfs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/set_trip_speed.html">set_trip_speed</a></span><span class="op">(</span><span class="va">spo_gtfs</span>, <span class="va">selected_trips</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">30</span>, <span class="fl">40</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/get_trip_speed.html">get_trip_speed</a></span><span class="op">(</span><span class="va">new_speed_gtfs</span>, <span class="va">selected_trips</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Key: &lt;trip_id&gt;</span></span>
-<span><span class="co">#&gt;       trip_id    speed</span></span>
-<span><span class="co">#&gt;        &lt;char&gt;    &lt;num&gt;</span></span>
-<span><span class="co">#&gt; 1:  2002-10-0 30.02396</span></span>
-<span><span class="co">#&gt; 2: CPTM L07-0 40.00677</span></span></code></pre></div>
+<span><span class="co">#&gt;    route_id    trip_id    speed</span></span>
+<span><span class="co">#&gt;      &lt;char&gt;     &lt;char&gt;    &lt;num&gt;</span></span>
+<span><span class="co">#&gt; 1:  2002-10  2002-10-0 30.02396</span></span>
+<span><span class="co">#&gt; 2: CPTM L07 CPTM L07-0 40.00677</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="write-feeds">

@@ -74,7 +74,7 @@ data_path <- system.file("extdata/spo_gtfs.zip", package = "gtfstools")
 gtfs <- read_gtfs(data_path)
 
 shape_id <- "68962"
-shape_sf <- convert_shapes_to_sf(gtfs, shape_id)
+shape_sf <- get_shapes_geometry(gtfs, shape_id)
 bbox <- sf::st_bbox(shape_sf)
 object.size(gtfs)
 #> 860808 bytes

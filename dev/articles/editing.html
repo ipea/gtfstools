@@ -229,18 +229,18 @@ relative to each of its departures.</p>
 <span></span>
 <span><span class="fu"><a href="../reference/get_trip_speed.html">get_trip_speed</a></span><span class="op">(</span><span class="va">spo_gtfs</span>, trip_id <span class="op">=</span> <span class="st">"CPTM L07-0"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Key: &lt;trip_id&gt;</span></span>
-<span><span class="co">#&gt;       trip_id    speed</span></span>
-<span><span class="co">#&gt;        &lt;char&gt;    &lt;num&gt;</span></span>
-<span><span class="co">#&gt; 1: CPTM L07-0 26.73002</span></span>
+<span><span class="co">#&gt;    route_id    trip_id    speed</span></span>
+<span><span class="co">#&gt;      &lt;char&gt;     &lt;char&gt;    &lt;num&gt;</span></span>
+<span><span class="co">#&gt; 1: CPTM L07 CPTM L07-0 26.73002</span></span>
 <span></span>
 <span><span class="co"># 'unit' argument defaults to "km/h"</span></span>
 <span><span class="va">new_speed_gtfs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/set_trip_speed.html">set_trip_speed</a></span><span class="op">(</span><span class="va">spo_gtfs</span>, trip_id <span class="op">=</span> <span class="st">"CPTM L07-0"</span>, speed <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/get_trip_speed.html">get_trip_speed</a></span><span class="op">(</span><span class="va">new_speed_gtfs</span>, trip_id <span class="op">=</span> <span class="st">"CPTM L07-0"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Key: &lt;trip_id&gt;</span></span>
-<span><span class="co">#&gt;       trip_id    speed</span></span>
-<span><span class="co">#&gt;        &lt;char&gt;    &lt;num&gt;</span></span>
-<span><span class="co">#&gt; 1: CPTM L07-0 50.00388</span></span>
+<span><span class="co">#&gt;    route_id    trip_id    speed</span></span>
+<span><span class="co">#&gt;      &lt;char&gt;     &lt;char&gt;    &lt;num&gt;</span></span>
+<span><span class="co">#&gt; 1: CPTM L07 CPTM L07-0 50.00388</span></span>
 <span></span>
 <span><span class="va">new_speed_gtfs</span><span class="op">$</span><span class="va">stop_times</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">trip_id</span> <span class="op">==</span> <span class="st">"CPTM L07-0"</span><span class="op">)</span> <span class="op">|&gt;</span></span>

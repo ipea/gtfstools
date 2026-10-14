@@ -107,18 +107,18 @@ route_trips <- gtfs$trips |>
   pull(trip_id)
 get_trip_speed(gtfs, route_trips)
 #> Key: <trip_id>
-#>       trip_id    speed
-#>        <char>    <num>
-#> 1: CPTM L07-0 26.73002
-#> 2: CPTM L07-1 26.73002
+#>    route_id    trip_id    speed
+#>      <char>     <char>    <num>
+#> 1: CPTM L07 CPTM L07-0 26.73002
+#> 2: CPTM L07 CPTM L07-1 26.73002
 
 new_speed_gtfs <- set_route_speed(gtfs, route_id = "CPTM L07", speed = 50)
 get_trip_speed(new_speed_gtfs, route_trips)
 #> Key: <trip_id>
-#>       trip_id    speed
-#>        <char>    <num>
-#> 1: CPTM L07-0 50.00388
-#> 2: CPTM L07-1 50.00388
+#>    route_id    trip_id    speed
+#>      <char>     <char>    <num>
+#> 1: CPTM L07 CPTM L07-0 50.00388
+#> 2: CPTM L07 CPTM L07-1 50.00388
 
 # set the speed only of the trips that depart within a time of day
 poa_path <- system.file("extdata/poa_gtfs.zip", package = "gtfstools")

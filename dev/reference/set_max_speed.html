@@ -134,47 +134,47 @@ modified.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># the trip is faster than 30 km/h between some of its stops</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="get_trip_speed.html">get_trip_speed</a></span><span class="op">(</span><span class="va">gtfs</span>, <span class="st">"CPTM L07-0"</span>, by <span class="op">=</span> <span class="st">"segment"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        trip_id segment from_stop_id to_stop_id    speed</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         &lt;char&gt;   &lt;int&gt;       &lt;char&gt;     &lt;char&gt;    &lt;num&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  1: CPTM L07-0       1        18940      18920 26.60738</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  2: CPTM L07-0       2        18920      18919 18.18377</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  3: CPTM L07-0       3        18919      18917 11.93590</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  4: CPTM L07-0       4        18917      18916 15.07881</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  5: CPTM L07-0       5        18916      18965 16.28882</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  6: CPTM L07-0       6        18965      18923 21.31043</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  7: CPTM L07-0       7        18923      18922 15.08821</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  8: CPTM L07-0       8        18922    4114459 17.68714</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  9: CPTM L07-0       9      4114459      18921 31.53864</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10: CPTM L07-0      10        18921      18924 32.98105</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11: CPTM L07-0      11        18924      18925 36.47943</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12: CPTM L07-0      12        18925      18926 20.48514</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13: CPTM L07-0      13        18926      18971 26.54381</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 14: CPTM L07-0      14        18971      18972 52.84955</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 15: CPTM L07-0      15        18972      18973 28.27469</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 16: CPTM L07-0      16        18973      18974 44.78676</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 17: CPTM L07-0      17        18974      18975 38.29072</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     route_id    trip_id segment from_stop_id to_stop_id    speed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       &lt;char&gt;     &lt;char&gt;   &lt;int&gt;       &lt;char&gt;     &lt;char&gt;    &lt;num&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1: CPTM L07 CPTM L07-0       1        18940      18920 26.60738</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  2: CPTM L07 CPTM L07-0       2        18920      18919 18.18377</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  3: CPTM L07 CPTM L07-0       3        18919      18917 11.93590</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  4: CPTM L07 CPTM L07-0       4        18917      18916 15.07881</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  5: CPTM L07 CPTM L07-0       5        18916      18965 16.28882</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  6: CPTM L07 CPTM L07-0       6        18965      18923 21.31043</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  7: CPTM L07 CPTM L07-0       7        18923      18922 15.08821</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  8: CPTM L07 CPTM L07-0       8        18922    4114459 17.68714</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  9: CPTM L07 CPTM L07-0       9      4114459      18921 31.53864</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10: CPTM L07 CPTM L07-0      10        18921      18924 32.98105</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11: CPTM L07 CPTM L07-0      11        18924      18925 36.47943</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12: CPTM L07 CPTM L07-0      12        18925      18926 20.48514</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13: CPTM L07 CPTM L07-0      13        18926      18971 26.54381</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14: CPTM L07 CPTM L07-0      14        18971      18972 52.84955</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15: CPTM L07 CPTM L07-0      15        18972      18973 28.27469</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16: CPTM L07 CPTM L07-0      16        18973      18974 44.78676</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17: CPTM L07 CPTM L07-0      17        18974      18975 38.29072</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">gtfs_capped</span> <span class="op">&lt;-</span> <span class="fu">set_max_speed</span><span class="op">(</span><span class="va">gtfs</span>, max_speed <span class="op">=</span> <span class="fl">30</span>, trip_id <span class="op">=</span> <span class="st">"CPTM L07-0"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="get_trip_speed.html">get_trip_speed</a></span><span class="op">(</span><span class="va">gtfs_capped</span>, <span class="st">"CPTM L07-0"</span>, by <span class="op">=</span> <span class="st">"segment"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        trip_id segment from_stop_id to_stop_id    speed</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         &lt;char&gt;   &lt;int&gt;       &lt;char&gt;     &lt;char&gt;    &lt;num&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  1: CPTM L07-0       1        18940      18920 26.60738</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  2: CPTM L07-0       2        18920      18919 18.18377</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  3: CPTM L07-0       3        18919      18917 11.93590</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  4: CPTM L07-0       4        18917      18916 15.07881</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  5: CPTM L07-0       5        18916      18965 16.28882</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  6: CPTM L07-0       6        18965      18923 21.31043</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  7: CPTM L07-0       7        18923      18922 15.08821</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  8: CPTM L07-0       8        18922    4114459 17.68714</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  9: CPTM L07-0       9      4114459      18921 29.97732</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10: CPTM L07-0      10        18921      18924 29.98277</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11: CPTM L07-0      11        18924      18925 29.98309</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12: CPTM L07-0      12        18925      18926 20.48514</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13: CPTM L07-0      13        18926      18971 26.54381</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 14: CPTM L07-0      14        18971      18972 29.98556</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 15: CPTM L07-0      15        18972      18973 28.27469</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 16: CPTM L07-0      16        18973      18974 29.98277</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 17: CPTM L07-0      17        18974      18975 29.98295</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     route_id    trip_id segment from_stop_id to_stop_id    speed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       &lt;char&gt;     &lt;char&gt;   &lt;int&gt;       &lt;char&gt;     &lt;char&gt;    &lt;num&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1: CPTM L07 CPTM L07-0       1        18940      18920 26.60738</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  2: CPTM L07 CPTM L07-0       2        18920      18919 18.18377</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  3: CPTM L07 CPTM L07-0       3        18919      18917 11.93590</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  4: CPTM L07 CPTM L07-0       4        18917      18916 15.07881</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  5: CPTM L07 CPTM L07-0       5        18916      18965 16.28882</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  6: CPTM L07 CPTM L07-0       6        18965      18923 21.31043</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  7: CPTM L07 CPTM L07-0       7        18923      18922 15.08821</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  8: CPTM L07 CPTM L07-0       8        18922    4114459 17.68714</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  9: CPTM L07 CPTM L07-0       9      4114459      18921 29.97732</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10: CPTM L07 CPTM L07-0      10        18921      18924 29.98277</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11: CPTM L07 CPTM L07-0      11        18924      18925 29.98309</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12: CPTM L07 CPTM L07-0      12        18925      18926 20.48514</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13: CPTM L07 CPTM L07-0      13        18926      18971 26.54381</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14: CPTM L07 CPTM L07-0      14        18971      18972 29.98556</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15: CPTM L07 CPTM L07-0      15        18972      18973 28.27469</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16: CPTM L07 CPTM L07-0      16        18973      18974 29.98277</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17: CPTM L07 CPTM L07-0      17        18974      18975 29.98295</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># the later stops are shifted, so the trip ends later</span></span></span>
 <span class="r-in"><span> <span class="fu"><a href="get_start_and_end_times.html">get_start_and_end_times</a></span><span class="op">(</span><span class="va">gtfs</span>, trip_id <span class="op">=</span> <span class="st">"CPTM L07-0"</span><span class="op">)</span></span></span>

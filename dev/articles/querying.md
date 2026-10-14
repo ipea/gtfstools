@@ -163,10 +163,10 @@ divides the length of each trip by its duration:
 # 'unit' argument defaults to "km/h"
 get_trip_speed(gtfs, trip_ids)
 #> Key: <trip_id>
-#>       trip_id     speed
-#>        <char>     <num>
-#> 1:  2002-10-0  8.360838
-#> 2: CPTM L07-0 26.730015
+#>    route_id    trip_id     speed
+#>      <char>     <char>     <num>
+#> 1:  2002-10  2002-10-0  8.360838
+#> 2: CPTM L07 CPTM L07-0 26.730015
 ```
 
 ## Summarising a feed

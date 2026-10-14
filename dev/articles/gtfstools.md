@@ -301,33 +301,33 @@ segment:
 trip_speed <- get_trip_speed(spo_gtfs, unit = "m/s")
 head(trip_speed)
 #> Key: <trip_id>
-#>      trip_id    speed
-#>       <char>    <num>
-#> 1: 2002-10-0 2.322455
-#> 2: 2105-10-0 2.847512
-#> 3: 2105-10-1 2.680871
-#> 4: 2161-10-0 3.103457
-#> 5: 2161-10-1 3.229289
-#> 6: 4491-10-0 3.336661
+#>    route_id   trip_id    speed
+#>      <char>    <char>    <num>
+#> 1:  2002-10 2002-10-0 2.322455
+#> 2:  2105-10 2105-10-0 2.847512
+#> 3:  2105-10 2105-10-1 2.680871
+#> 4:  2161-10 2161-10-0 3.103457
+#> 5:  2161-10 2161-10-1 3.229289
+#> 6:  4491-10 4491-10-0 3.336661
 
 # 'unit' argument defaults to "km/h"
 single_trip_speed <- get_trip_speed(spo_gtfs, trip_id = single_trip)
 single_trip_speed
 #> Key: <trip_id>
-#>       trip_id    speed
-#>        <char>    <num>
-#> 1: CPTM L07-0 26.73002
+#>    route_id    trip_id    speed
+#>      <char>     <char>    <num>
+#> 1: CPTM L07 CPTM L07-0 26.73002
 
 segment_speed <- get_trip_speed(spo_gtfs, single_trip, by = "segment")
 head(segment_speed)
-#>       trip_id segment from_stop_id to_stop_id    speed
-#>        <char>   <int>       <char>     <char>    <num>
-#> 1: CPTM L07-0       1        18940      18920 26.60738
-#> 2: CPTM L07-0       2        18920      18919 18.18377
-#> 3: CPTM L07-0       3        18919      18917 11.93590
-#> 4: CPTM L07-0       4        18917      18916 15.07881
-#> 5: CPTM L07-0       5        18916      18965 16.28882
-#> 6: CPTM L07-0       6        18965      18923 21.31043
+#>    route_id    trip_id segment from_stop_id to_stop_id    speed
+#>      <char>     <char>   <int>       <char>     <char>    <num>
+#> 1: CPTM L07 CPTM L07-0       1        18940      18920 26.60738
+#> 2: CPTM L07 CPTM L07-0       2        18920      18919 18.18377
+#> 3: CPTM L07 CPTM L07-0       3        18919      18917 11.93590
+#> 4: CPTM L07 CPTM L07-0       4        18917      18916 15.07881
+#> 5: CPTM L07 CPTM L07-0       5        18916      18965 16.28882
+#> 6: CPTM L07 CPTM L07-0       6        18965      18923 21.31043
 ```
 
 ### Manipulate feeds
@@ -428,28 +428,28 @@ selected_trips <- c("2002-10-0", "CPTM L07-0")
 
 get_trip_speed(spo_gtfs, selected_trips, unit = "km/h")
 #> Key: <trip_id>
-#>       trip_id     speed
-#>        <char>     <num>
-#> 1:  2002-10-0  8.360838
-#> 2: CPTM L07-0 26.730015
+#>    route_id    trip_id     speed
+#>      <char>     <char>     <num>
+#> 1:  2002-10  2002-10-0  8.360838
+#> 2: CPTM L07 CPTM L07-0 26.730015
 
 # 'speed' is recycled to all trips if only a single value is given
 new_speed_gtfs <- set_trip_speed(spo_gtfs, selected_trips, 50)
 get_trip_speed(new_speed_gtfs, selected_trips)
 #> Key: <trip_id>
-#>       trip_id    speed
-#>        <char>    <num>
-#> 1:  2002-10-0 50.06073
-#> 2: CPTM L07-0 50.00388
+#>    route_id    trip_id    speed
+#>      <char>     <char>    <num>
+#> 1:  2002-10  2002-10-0 50.06073
+#> 2: CPTM L07 CPTM L07-0 50.00388
 
 # but you can also specify different speeds for each trip
 new_speed_gtfs <- set_trip_speed(spo_gtfs, selected_trips, c(30, 40))
 get_trip_speed(new_speed_gtfs, selected_trips)
 #> Key: <trip_id>
-#>       trip_id    speed
-#>        <char>    <num>
-#> 1:  2002-10-0 30.02396
-#> 2: CPTM L07-0 40.00677
+#>    route_id    trip_id    speed
+#>      <char>     <char>    <num>
+#> 1:  2002-10  2002-10-0 30.02396
+#> 2: CPTM L07 CPTM L07-0 40.00677
 ```
 
 ###  Write feeds

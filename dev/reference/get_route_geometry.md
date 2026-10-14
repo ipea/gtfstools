@@ -2,7 +2,8 @@
 
 Returns the distinct geometries of the trips of each specified
 `route_id` (its "variants", e.g. each direction and each short-turn
-service), with the number of trips that follow each of them.
+service), with the `trip_id` that identifies each of them and the number
+of trips that follow them.
 
 ## Usage
 
@@ -41,9 +42,11 @@ get_route_geometry(gtfs, route_id = NULL, method = "shapes", crs = 4326)
 ## Value
 
 A `LINESTRING sf` with one row per route and distinct trip geometry,
-with the columns `route_id`, `n_trips` (the number of trips of the route
-with that geometry) and `geometry`. Rows are ordered by `route_id` (with
-`NA` last) and, within each route, by decreasing `n_trips`.
+with the columns `route_id`, `trip_pattern` (the first `trip_id`, in
+alphabetical order, of the route's trips with that geometry, which
+identifies it), `n_trips` (the number of trips of the route with that
+geometry) and `geometry`. Rows are ordered by `route_id` (with `NA`
+last) and, within each route, by decreasing `n_trips`.
 
 ## Details
 
@@ -69,7 +72,7 @@ and these trips are counted in an empty-geometry row of their route.
 ## See also
 
 [`get_trip_geometry()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_geometry.md),
-[`convert_shapes_to_sf()`](https://ipea.github.io/gtfstools/dev/reference/convert_shapes_to_sf.md)
+[`get_shapes_geometry()`](https://ipea.github.io/gtfstools/dev/reference/get_shapes_geometry.md)
 
 ## Examples
 
@@ -80,29 +83,29 @@ gtfs <- read_gtfs(data_path)
 
 route_geometry <- get_route_geometry(gtfs)
 head(route_geometry)
-#> Simple feature collection with 6 features and 2 fields
+#> Simple feature collection with 6 features and 3 fields
 #> Geometry type: LINESTRING
 #> Dimension:     XY
 #> Bounding box:  xmin: -46.64446 ymin: -23.65102 xmax: -46.56817 ymax: -23.43291
 #> Geodetic CRS:  WGS 84
-#>   route_id n_trips                       geometry
-#> 1  2002-10       1 LINESTRING (-46.62959 -23.5...
-#> 2  2105-10       1 LINESTRING (-46.58098 -23.4...
-#> 3  2105-10       1 LINESTRING (-46.61683 -23.5...
-#> 4  2161-10       1 LINESTRING (-46.56992 -23.4...
-#> 5  2161-10       1 LINESTRING (-46.63553 -23.5...
-#> 6  4491-10       1 LINESTRING (-46.62075 -23.6...
+#>   route_id trip_pattern n_trips                       geometry
+#> 1  2002-10    2002-10-0       1 LINESTRING (-46.62959 -23.5...
+#> 2  2105-10    2105-10-0       1 LINESTRING (-46.58098 -23.4...
+#> 3  2105-10    2105-10-1       1 LINESTRING (-46.61683 -23.5...
+#> 4  2161-10    2161-10-0       1 LINESTRING (-46.56992 -23.4...
+#> 5  2161-10    2161-10-1       1 LINESTRING (-46.63553 -23.5...
+#> 6  4491-10    4491-10-0       1 LINESTRING (-46.62075 -23.6...
 
 route_geometry <- get_route_geometry(gtfs, route_id = "CPTM L07")
 route_geometry
-#> Simple feature collection with 2 features and 2 fields
+#> Simple feature collection with 2 features and 3 fields
 #> Geometry type: LINESTRING
 #> Dimension:     XY
 #> Bounding box:  xmin: -46.87192 ymin: -23.53514 xmax: -46.63545 ymax: -23.19565
 #> Geodetic CRS:  WGS 84
-#>   route_id n_trips                       geometry
-#> 1 CPTM L07       1 LINESTRING (-46.63545 -23.5...
-#> 2 CPTM L07       1 LINESTRING (-46.87192 -23.1...
+#>   route_id trip_pattern n_trips                       geometry
+#> 1 CPTM L07   CPTM L07-0       1 LINESTRING (-46.63545 -23.5...
+#> 2 CPTM L07   CPTM L07-1       1 LINESTRING (-46.87192 -23.1...
 plot(route_geometry["n_trips"])
 
 ```

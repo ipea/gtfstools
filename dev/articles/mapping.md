@@ -7,11 +7,11 @@ feed into spatial `sf` objects, which can be easily mapped with
 [ggplot2](https://ggplot2.tidyverse.org). This vignette will show you
 how to map a feed using the following functions:
 
-- [`convert_shapes_to_sf()`](https://ipea.github.io/gtfstools/dev/reference/convert_shapes_to_sf.md):
+- [`get_shapes_geometry()`](https://ipea.github.io/gtfstools/dev/reference/get_shapes_geometry.md):
   converts the `shapes` table into `LINESTRING`s;
 - [`get_route_geometry()`](https://ipea.github.io/gtfstools/dev/reference/get_route_geometry.md):
   returns the distinct trip geometries of each route;
-- [`convert_stops_to_sf()`](https://ipea.github.io/gtfstools/dev/reference/convert_stops_to_sf.md):
+- [`get_stops_geometry()`](https://ipea.github.io/gtfstools/dev/reference/get_stops_geometry.md):
   converts the `stops` table into `POINT`s.
 
 We will start by loading the packages required by this demonstration
@@ -26,7 +26,7 @@ library(dplyr)
 
 ## Mapping the transit network
 
-[`convert_shapes_to_sf()`](https://ipea.github.io/gtfstools/dev/reference/convert_shapes_to_sf.md)
+[`get_shapes_geometry()`](https://ipea.github.io/gtfstools/dev/reference/get_shapes_geometry.md)
 converts the `shapes` table into an `sf` object with the geometry of
 each shape. Mapping them gives an overview of the whole network
 described in the feed. Let’s see how that works using São Paulo’s feed:
@@ -39,7 +39,7 @@ gtfs <- read_gtfs(path)
 
 ``` r
 
-shapes <- convert_shapes_to_sf(gtfs)
+shapes <- get_shapes_geometry(gtfs)
 
 ggplot() +
   geom_sf(data = shapes) +
@@ -60,12 +60,6 @@ and take the simple mean of the speeds of the trips of each route
 ``` r
 
 trip_speed <- get_trip_speed(gtfs)
-
-trip_speed <-  dplyr::left_join(
-  x = trip_speed,
-  y =  gtfs$trips |> dplyr::select(trip_id, route_id),
-  by = "trip_id"
-  )
 
 route_speed <- trip_speed |>
   dplyr::group_by(route_id) |>
@@ -133,14 +127,14 @@ stop_frequency <- stop_frequency |>
     )
 ```
 
-[`convert_stops_to_sf()`](https://ipea.github.io/gtfstools/dev/reference/convert_stops_to_sf.md)
+[`get_stops_geometry()`](https://ipea.github.io/gtfstools/dev/reference/get_stops_geometry.md)
 converts the stops into points, to which we join the number of
 departures. The size and the color of each stop vary with its number of
 departures:
 
 ``` r
 
-stops <- convert_stops_to_sf(gtfs, stop_id = stop_frequency$stop_id)
+stops <- get_stops_geometry(gtfs, stop_id = stop_frequency$stop_id)
 
 stops <- stops |>
   dplyr::inner_join(stop_frequency, by = "stop_id")

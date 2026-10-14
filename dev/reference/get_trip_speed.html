@@ -116,10 +116,11 @@ corresponds to <code>method = "euclidean"</code>).</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>With <code>by = "trip"</code>, a <code>data.table</code> with the <code>trip_id</code> and the
-average <code>speed</code> of each trip. With <code>by = "segment"</code>, a <code>data.table</code> with
-the <code>trip_id</code>, the <code>segment</code> number, the <code>from_stop_id</code> and <code>to_stop_id</code>
-that delimit the segment and its average <code>speed</code>.</p>
+    <p>With <code>by = "trip"</code>, a <code>data.table</code> with the <code>route_id</code>, the
+<code>trip_id</code> and the average <code>speed</code> of each trip. With <code>by = "segment"</code>, a
+<code>data.table</code> with the <code>route_id</code>, the <code>trip_id</code>, the <code>segment</code> number, the
+<code>from_stop_id</code> and <code>to_stop_id</code> that delimit the segment and its average
+<code>speed</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -132,6 +133,9 @@ the length is <code>NA</code> (e.g. trips not linked to a shape) or when the dur
 is missing (e.g. blank times at intermediate stops) or not positive. With
 <code>by = "trip"</code>, trips without any arrival or departure time raise the warning
 of <code><a href="get_trip_duration.html">get_trip_duration()</a></code>.</p>
+<p>The <code>route_id</code> of each trip comes from the <code>trips</code> table, which is required
+(also with <code>method = "euclidean"</code>). Trips not listed in <code>trips</code> have an <code>NA</code>
+<code>route_id</code>.</p>
 <p>Existing <code>_secs</code> columns in <code>stop_times</code> (e.g. created with
 <code><a href="convert_time_to_seconds.html">convert_time_to_seconds()</a></code>) are used as-is, not recalculated from the time
 strings.</p>
@@ -151,50 +155,50 @@ strings.</p>
 <span class="r-in"><span><span class="va">trip_speed</span> <span class="op">&lt;-</span> <span class="fu">get_trip_speed</span><span class="op">(</span><span class="va">gtfs</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">trip_speed</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Key: &lt;trip_id&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      trip_id     speed</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       &lt;char&gt;     &lt;num&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1: 2002-10-0  8.360838</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2: 2105-10-0 10.251044</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3: 2105-10-1  9.651135</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4: 2161-10-0 11.172445</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5: 2161-10-1 11.625440</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6: 4491-10-0 12.011979</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    route_id   trip_id     speed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      &lt;char&gt;    &lt;char&gt;     &lt;num&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:  2002-10 2002-10-0  8.360838</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:  2105-10 2105-10-0 10.251044</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:  2105-10 2105-10-1  9.651135</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:  2161-10 2161-10-0 11.172445</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5:  2161-10 2161-10-1 11.625440</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6:  4491-10 4491-10-0 12.011979</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">trip_ids</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CPTM L07-0"</span>, <span class="st">"2002-10-0"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">trip_speed</span> <span class="op">&lt;-</span> <span class="fu">get_trip_speed</span><span class="op">(</span><span class="va">gtfs</span>, <span class="va">trip_ids</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">trip_speed</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Key: &lt;trip_id&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       trip_id     speed</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;char&gt;     &lt;num&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:  2002-10-0  8.360838</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2: CPTM L07-0 26.730015</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    route_id    trip_id     speed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      &lt;char&gt;     &lt;char&gt;     &lt;num&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:  2002-10  2002-10-0  8.360838</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2: CPTM L07 CPTM L07-0 26.730015</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">trip_speed</span> <span class="op">&lt;-</span> <span class="fu">get_trip_speed</span><span class="op">(</span><span class="va">gtfs</span>, <span class="va">trip_ids</span>, method <span class="op">=</span> <span class="st">"euclidean"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">trip_speed</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Key: &lt;trip_id&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       trip_id     speed</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;char&gt;     &lt;num&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:  2002-10-0  6.559614</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2: CPTM L07-0 24.342591</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    route_id    trip_id     speed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      &lt;char&gt;     &lt;char&gt;     &lt;num&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:  2002-10  2002-10-0  6.559614</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2: CPTM L07 CPTM L07-0 24.342591</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">trip_speed</span> <span class="op">&lt;-</span> <span class="fu">get_trip_speed</span><span class="op">(</span><span class="va">gtfs</span>, <span class="va">trip_ids</span>, unit <span class="op">=</span> <span class="st">"m/s"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">trip_speed</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Key: &lt;trip_id&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       trip_id    speed</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;char&gt;    &lt;num&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:  2002-10-0 2.322455</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2: CPTM L07-0 7.425004</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    route_id    trip_id    speed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      &lt;char&gt;     &lt;char&gt;    &lt;num&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:  2002-10  2002-10-0 2.322455</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2: CPTM L07 CPTM L07-0 7.425004</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">segment_speed</span> <span class="op">&lt;-</span> <span class="fu">get_trip_speed</span><span class="op">(</span><span class="va">gtfs</span>, <span class="st">"CPTM L07-0"</span>, by <span class="op">=</span> <span class="st">"segment"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">segment_speed</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       trip_id segment from_stop_id to_stop_id    speed</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;char&gt;   &lt;int&gt;       &lt;char&gt;     &lt;char&gt;    &lt;num&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1: CPTM L07-0       1        18940      18920 26.60738</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2: CPTM L07-0       2        18920      18919 18.18377</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3: CPTM L07-0       3        18919      18917 11.93590</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4: CPTM L07-0       4        18917      18916 15.07881</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5: CPTM L07-0       5        18916      18965 16.28882</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6: CPTM L07-0       6        18965      18923 21.31043</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    route_id    trip_id segment from_stop_id to_stop_id    speed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      &lt;char&gt;     &lt;char&gt;   &lt;int&gt;       &lt;char&gt;     &lt;char&gt;    &lt;num&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1: CPTM L07 CPTM L07-0       1        18940      18920 26.60738</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2: CPTM L07 CPTM L07-0       2        18920      18919 18.18377</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3: CPTM L07 CPTM L07-0       3        18919      18917 11.93590</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4: CPTM L07 CPTM L07-0       4        18917      18916 15.07881</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5: CPTM L07 CPTM L07-0       5        18916      18965 16.28882</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6: CPTM L07 CPTM L07-0       6        18965      18923 21.31043</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

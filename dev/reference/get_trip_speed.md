@@ -65,10 +65,11 @@ get_trip_speed(
 
 ## Value
 
-With `by = "trip"`, a `data.table` with the `trip_id` and the average
-`speed` of each trip. With `by = "segment"`, a `data.table` with the
-`trip_id`, the `segment` number, the `from_stop_id` and `to_stop_id`
-that delimit the segment and its average `speed`.
+With `by = "trip"`, a `data.table` with the `route_id`, the `trip_id`
+and the average `speed` of each trip. With `by = "segment"`, a
+`data.table` with the `route_id`, the `trip_id`, the `segment` number,
+the `from_stop_id` and `to_stop_id` that delimit the segment and its
+average `speed`.
 
 ## Details
 
@@ -83,6 +84,10 @@ trips not linked to a shape) or when the duration is missing (e.g. blank
 times at intermediate stops) or not positive. With `by = "trip"`, trips
 without any arrival or departure time raise the warning of
 [`get_trip_duration()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_duration.md).
+
+The `route_id` of each trip comes from the `trips` table, which is
+required (also with `method = "euclidean"`). Trips not listed in `trips`
+have an `NA` `route_id`.
 
 Existing `_secs` columns in `stop_times` (e.g. created with
 [`convert_time_to_seconds()`](https://ipea.github.io/gtfstools/dev/reference/convert_time_to_seconds.md))
@@ -104,48 +109,48 @@ gtfs <- read_gtfs(data_path)
 trip_speed <- get_trip_speed(gtfs)
 head(trip_speed)
 #> Key: <trip_id>
-#>      trip_id     speed
-#>       <char>     <num>
-#> 1: 2002-10-0  8.360838
-#> 2: 2105-10-0 10.251044
-#> 3: 2105-10-1  9.651135
-#> 4: 2161-10-0 11.172445
-#> 5: 2161-10-1 11.625440
-#> 6: 4491-10-0 12.011979
+#>    route_id   trip_id     speed
+#>      <char>    <char>     <num>
+#> 1:  2002-10 2002-10-0  8.360838
+#> 2:  2105-10 2105-10-0 10.251044
+#> 3:  2105-10 2105-10-1  9.651135
+#> 4:  2161-10 2161-10-0 11.172445
+#> 5:  2161-10 2161-10-1 11.625440
+#> 6:  4491-10 4491-10-0 12.011979
 
 trip_ids <- c("CPTM L07-0", "2002-10-0")
 trip_speed <- get_trip_speed(gtfs, trip_ids)
 trip_speed
 #> Key: <trip_id>
-#>       trip_id     speed
-#>        <char>     <num>
-#> 1:  2002-10-0  8.360838
-#> 2: CPTM L07-0 26.730015
+#>    route_id    trip_id     speed
+#>      <char>     <char>     <num>
+#> 1:  2002-10  2002-10-0  8.360838
+#> 2: CPTM L07 CPTM L07-0 26.730015
 
 trip_speed <- get_trip_speed(gtfs, trip_ids, method = "euclidean")
 trip_speed
 #> Key: <trip_id>
-#>       trip_id     speed
-#>        <char>     <num>
-#> 1:  2002-10-0  6.559614
-#> 2: CPTM L07-0 24.342591
+#>    route_id    trip_id     speed
+#>      <char>     <char>     <num>
+#> 1:  2002-10  2002-10-0  6.559614
+#> 2: CPTM L07 CPTM L07-0 24.342591
 
 trip_speed <- get_trip_speed(gtfs, trip_ids, unit = "m/s")
 trip_speed
 #> Key: <trip_id>
-#>       trip_id    speed
-#>        <char>    <num>
-#> 1:  2002-10-0 2.322455
-#> 2: CPTM L07-0 7.425004
+#>    route_id    trip_id    speed
+#>      <char>     <char>    <num>
+#> 1:  2002-10  2002-10-0 2.322455
+#> 2: CPTM L07 CPTM L07-0 7.425004
 
 segment_speed <- get_trip_speed(gtfs, "CPTM L07-0", by = "segment")
 head(segment_speed)
-#>       trip_id segment from_stop_id to_stop_id    speed
-#>        <char>   <int>       <char>     <char>    <num>
-#> 1: CPTM L07-0       1        18940      18920 26.60738
-#> 2: CPTM L07-0       2        18920      18919 18.18377
-#> 3: CPTM L07-0       3        18919      18917 11.93590
-#> 4: CPTM L07-0       4        18917      18916 15.07881
-#> 5: CPTM L07-0       5        18916      18965 16.28882
-#> 6: CPTM L07-0       6        18965      18923 21.31043
+#>    route_id    trip_id segment from_stop_id to_stop_id    speed
+#>      <char>     <char>   <int>       <char>     <char>    <num>
+#> 1: CPTM L07 CPTM L07-0       1        18940      18920 26.60738
+#> 2: CPTM L07 CPTM L07-0       2        18920      18919 18.18377
+#> 3: CPTM L07 CPTM L07-0       3        18919      18917 11.93590
+#> 4: CPTM L07 CPTM L07-0       4        18917      18916 15.07881
+#> 5: CPTM L07 CPTM L07-0       5        18916      18965 16.28882
+#> 6: CPTM L07 CPTM L07-0       6        18965      18923 21.31043
 ```
