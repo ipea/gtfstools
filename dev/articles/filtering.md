@@ -2,8 +2,8 @@
 
 GTFS feeds are often used to describe very large and complex public
 transport networks. These large files can become quite cumbersome to
-use, manipulate and move around, and it’s not unfrequent that one wants
-to analyze a specific subset of the data.
+use, manipulate and move around, and it’s not uncommon that one wants to
+analyze a specific subset of the data.
 
 **gtfstools** includes a few functions to filter GTFS feeds, thus
 allowing for faster and more convenient data processing. The filtering

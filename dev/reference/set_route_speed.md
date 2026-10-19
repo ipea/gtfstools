@@ -30,13 +30,13 @@ set_route_speed(
 - route_id:
 
   A character vector including the `route_id`s to have the average speed
-  of their trips set.
+  of their trips set. `route_id`s not listed in `trips` are ignored,
+  with a warning.
 
 - speed:
 
-  A numeric representing the speed to be set. Its length must either
-  equal 1, in which case the value is recycled for all `route_id`s, or
-  equal `route_id`'s length. Must be positive and finite.
+  A number representing the speed to be set for the trips of all
+  `route_id`s. Must be positive and finite.
 
 - unit:
 
@@ -78,8 +78,8 @@ invisibly (note that in this case the original GTFS object is altered).
 
 ## Details
 
-Every trip of each route, as listed in `trips`, gets the route's speed,
-as in
+Every trip of each route, as listed in `trips`, gets the given speed, as
+in
 [`set_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.md),
 whose details also apply here: the duration of each trip's segment (by
 default, the whole trip) is set to its length divided by `speed`, the
@@ -103,23 +103,16 @@ library(dplyr)
 data_path <- system.file("extdata/spo_gtfs.zip", package = "gtfstools")
 gtfs <- read_gtfs(data_path)
 
-route_trips <- gtfs$trips |>
-  filter(route_id == "CPTM L07") |>
-  pull(trip_id)
-get_trip_speed(gtfs, route_trips)
-#> Key: <trip_id>
-#>    route_id    trip_id    speed
-#>      <char>     <char>    <num>
-#> 1: CPTM L07 CPTM L07-0 26.73002
-#> 2: CPTM L07 CPTM L07-1 26.73002
+get_route_speed(gtfs, route_id = "CPTM L07")
+#>    route_id min_speed mean_speed median_speed max_speed     sd_speed
+#>      <char>     <num>      <num>        <num>     <num>        <num>
+#> 1: CPTM L07  26.73002   26.73002     26.73002  26.73002 7.944109e-15
 
 new_speed_gtfs <- set_route_speed(gtfs, route_id = "CPTM L07", speed = 50)
-get_trip_speed(new_speed_gtfs, route_trips)
-#> Key: <trip_id>
-#>    route_id    trip_id    speed
-#>      <char>     <char>    <num>
-#> 1: CPTM L07 CPTM L07-0 50.00388
-#> 2: CPTM L07 CPTM L07-1 50.00388
+get_route_speed(new_speed_gtfs, route_id = "CPTM L07")
+#>    route_id min_speed mean_speed median_speed max_speed     sd_speed
+#>      <char>     <num>      <num>        <num>     <num>        <num>
+#> 1: CPTM L07  50.00388   50.00388     50.00388  50.00388 1.588822e-14
 
 # set the speed only of the trips that depart within a time of day
 poa_path <- system.file("extdata/poa_gtfs.zip", package = "gtfstools")

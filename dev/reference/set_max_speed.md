@@ -26,7 +26,8 @@ set_max_speed(gtfs, max_speed, route_id = NULL, trip_id = NULL, unit = "km/h")
 
   A character vector including the `route_id`s whose trips have their
   speeds capped. If both `route_id` and `trip_id` are `NULL` (the
-  default), the speeds of every trip in the GTFS are capped.
+  default), the speeds of every trip in the GTFS are capped. `route_id`s
+  not listed in `trips` are ignored, with a warning.
 
 - trip_id:
 

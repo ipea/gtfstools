@@ -52,32 +52,25 @@ ggplot() +
 
 Spatial objects become more interesting when combined with other
 information about the feed. Let’s map the routes by their average speed.
-First, we calculate the speed of each trip with
-[`get_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_speed.md),
-and take the simple mean of the speeds of the trips of each route
-(frequency-based trips count once, regardless of their headway):
+First, we calculate summary statistics of the speeds of the trips of
+each route with
+[`get_route_speed()`](https://ipea.github.io/gtfstools/dev/reference/get_route_speed.md).
+We use `mean_speed`, the simple mean of the speeds of the trips of each
+route (frequency-based trips count once, regardless of their headway):
 
 ``` r
 
-trip_speed <- get_trip_speed(gtfs)
-
-route_speed <- trip_speed |>
-  dplyr::group_by(route_id) |>
-  dplyr::summarise(
-    speed = mean(speed, na.rm = TRUE), 
-    .groups = "drop"
-    )
+route_speed <- get_route_speed(gtfs)
 
 head(route_speed)
-#> # A tibble: 6 × 2
-#>   route_id speed
-#>   <chr>    <dbl>
-#> 1 2002-10   8.36
-#> 2 2105-10   9.95
-#> 3 2161-10  11.4 
-#> 4 4491-10  13.6 
-#> 5 5290-10   9.87
-#> 6 6450-51  11.5
+#>    route_id min_speed mean_speed median_speed max_speed  sd_speed
+#>      <char>     <num>      <num>        <num>     <num>     <num>
+#> 1:  2002-10  8.360838   8.360838     8.360838  8.360838        NA
+#> 2:  2105-10  9.651135   9.951090     9.951090 10.251044 0.4241997
+#> 3:  2161-10 11.172445  11.398943    11.398943 11.625440 0.3203161
+#> 4:  4491-10 12.011979  13.585046    13.585046 15.158114 2.2246538
+#> 5:  5290-10  9.103782   9.870054     9.870054 10.636326 1.0836719
+#> 6:  6450-51 11.450417  11.450417    11.450417 11.450417        NA
 ```
 
 Then, we join these speeds to the geometries returned by
@@ -92,7 +85,7 @@ routes <- get_route_geometry(gtfs) |>
   dplyr::inner_join(route_speed, by = "route_id")
 
 ggplot() +
-  geom_sf(data = routes, aes(color = speed)) +
+  geom_sf(data = routes, aes(color = mean_speed)) +
   scale_color_viridis_c(name = "Speed (km/h)") +
   theme_void()
 ```

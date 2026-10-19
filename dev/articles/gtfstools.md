@@ -419,8 +419,12 @@ intermediate stops are set as `""`. Some transport routing software,
 such as [OpenTripPlanner](https://www.opentripplanner.org/) and
 [R5](https://github.com/conveyal/r5), support specifying stop times like
 so, in which case they interpolate arrival/departure times at
-intermediate stops based on the trip’s average speed and the euclidean
-distance between stops.
+intermediate stops based on the trip’s average speed and the distances
+between stops. The [Editing GTFS
+feeds](https://ipea.github.io/gtfstools/dev/articles/editing.md)
+vignette presents other editing functions, such as
+[`set_route_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_route_speed.md),
+which sets the speed of all trips of the given routes.
 
 ``` r
 

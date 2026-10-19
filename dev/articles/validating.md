@@ -41,7 +41,7 @@ library(gtfstools)
 
 latest_validator <- download_validator(tempdir())
 latest_validator
-#> [1] "/tmp/RtmpdYhVOu/gtfs-validator-v8.0.1.jar"
+#> [1] "/tmp/Rtmplg7r5W/gtfs-validator-v8.0.1.jar"
 ```
 
 The second (and final) step is actually running
@@ -75,7 +75,7 @@ As we can see, the validation generates a few output files:
   or higher);
 - `report.json` summarizes the exact same information, but in JSON
   format, which can be used to easily parse and process the results;
-- `system_errors.json` summarizes eventual system erros that may have
+- `system_errors.json` summarizes eventual system errors that may have
   happened during the validation and may compromise the results;
 - `validation_stderr.txt` lists the informative messages sent by the
   command-line tool to the standard error output stream, which includes

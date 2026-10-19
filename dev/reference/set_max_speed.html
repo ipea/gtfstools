@@ -82,7 +82,8 @@ trips that are already slower are left unchanged.</p>
 <dt id="arg-route-id">route_id<a class="anchor" aria-label="anchor" href="#arg-route-id"></a></dt>
 <dd><p>A character vector including the <code>route_id</code>s whose trips
 have their speeds capped. If both <code>route_id</code> and <code>trip_id</code> are <code>NULL</code>
-(the default), the speeds of every trip in the GTFS are capped.</p></dd>
+(the default), the speeds of every trip in the GTFS are capped.
+<code>route_id</code>s not listed in <code>trips</code> are ignored, with a warning.</p></dd>
 
 
 <dt id="arg-trip-id">trip_id<a class="anchor" aria-label="anchor" href="#arg-trip-id"></a></dt>

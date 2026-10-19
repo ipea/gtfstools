@@ -21,7 +21,8 @@ get_route_frequency(gtfs, route_id = NULL, from, to)
 
   A character vector including the `route_id`s to have their frequencies
   calculated. If `NULL` (the default), the function calculates the
-  frequency of every `route_id` in the GTFS.
+  frequency of every `route_id` in the GTFS. `route_id`s not listed in
+  `trips` are ignored, with a warning.
 
 - from:
 

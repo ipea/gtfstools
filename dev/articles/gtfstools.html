@@ -437,8 +437,11 @@ time at the first stop. Please note that arrival and departure times at
 intermediate stops are set as <code>""</code>. Some transport routing
 software, such as <a href="https://www.opentripplanner.org/" class="external-link">OpenTripPlanner</a> and <a href="https://github.com/conveyal/r5" class="external-link">R5</a>, support specifying stop
 times like so, in which case they interpolate arrival/departure times at
-intermediate stops based on the trip’s average speed and the euclidean
-distance between stops.</p>
+intermediate stops based on the trip’s average speed and the distances
+between stops. The <a href="editing.html">Editing GTFS feeds</a>
+vignette presents other editing functions, such as
+<code><a href="../reference/set_route_speed.html">set_route_speed()</a></code>, which sets the speed of all trips of the
+given routes.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">selected_trips</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2002-10-0"</span>, <span class="st">"CPTM L07-0"</span><span class="op">)</span></span>
 <span></span>

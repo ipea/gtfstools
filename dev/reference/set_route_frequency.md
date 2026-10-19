@@ -20,7 +20,7 @@ set_route_frequency(gtfs, route_id, headway, from, to)
 - route_id:
 
   A character vector including the `route_id`s to have their frequency
-  set.
+  set. `route_id`s not listed in `trips` are ignored, with a warning.
 
 - headway:
 

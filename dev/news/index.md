@@ -72,6 +72,13 @@
   [`get_stops_geometry()`](https://ipea.github.io/gtfstools/dev/reference/get_stops_geometry.md),
   which take the same arguments (except the deprecated `sort_sequence`)
   and return the same results. Calling them raises a warning.
+- The `file` argument of
+  [`get_trip_geometry()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_geometry.md),
+  [`get_trip_length()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_length.md)
+  and
+  [`get_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_speed.md)
+  is deprecated in favour of `method` (`file = "stop_times"` corresponds
+  to `method = "euclidean"`).
 
 ### New features
 
@@ -262,13 +269,15 @@
   [`get_stop_timetable()`](https://ipea.github.io/gtfstools/dev/reference/get_stop_timetable.md),
   [`get_trip_length()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_length.md),
   [`get_trip_duration()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_duration.md),
-  [`get_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_speed.md)
+  [`get_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_speed.md),
+  [`get_route_speed()`](https://ipea.github.io/gtfstools/dev/reference/get_route_speed.md)
   and
   [`get_summary()`](https://ipea.github.io/gtfstools/dev/reference/get_summary.md).
 - New vignette “Mapping GTFS feeds”, which maps the transit network,
   routes by speed and stops by frequency with
   [`get_shapes_geometry()`](https://ipea.github.io/gtfstools/dev/reference/get_shapes_geometry.md),
-  [`get_route_geometry()`](https://ipea.github.io/gtfstools/dev/reference/get_route_geometry.md)
+  [`get_route_geometry()`](https://ipea.github.io/gtfstools/dev/reference/get_route_geometry.md),
+  [`get_route_speed()`](https://ipea.github.io/gtfstools/dev/reference/get_route_speed.md)
   and
   [`get_stops_geometry()`](https://ipea.github.io/gtfstools/dev/reference/get_stops_geometry.md).
 
@@ -412,16 +421,6 @@
   [`filter_by_stop_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_stop_id.md)
   now correctly describes that it keeps (or drops) the `stop_times`
   entries at the given stops, not entire trips.
-
-### Feature deprecation
-
-- The `file` argument of
-  [`get_trip_geometry()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_geometry.md),
-  [`get_trip_length()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_length.md)
-  and
-  [`get_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_speed.md)
-  is deprecated in favour of `method` (`file = "stop_times"` corresponds
-  to `method = "euclidean"`).
 
 ### Notes
 
@@ -690,7 +689,7 @@ CRAN release: 2024-10-07
   [`filter_by_spatial_extent()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_spatial_extent.md).
   For backwards compatibility reasons, usage of
   [`filter_by_sf()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_sf.md)
-  is still allowed as of the curent version, but the function will be
+  is still allowed as of the current version, but the function will be
   removed from the package in version 2.0.0.
 
 ### Notes

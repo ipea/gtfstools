@@ -21,6 +21,8 @@ vignette will introduce you to some of them:
   the duration of trips;
 - [`get_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_speed.md):
   the average speed of trips;
+- [`get_route_speed()`](https://ipea.github.io/gtfstools/dev/reference/get_route_speed.md):
+  summary statistics of the speeds of the trips of routes;
 - [`get_summary()`](https://ipea.github.io/gtfstools/dev/reference/get_summary.md):
   a summary of the whole feed.
 
@@ -167,6 +169,21 @@ get_trip_speed(gtfs, trip_ids)
 #>      <char>     <char>     <num>
 #> 1:  2002-10  2002-10-0  8.360838
 #> 2: CPTM L07 CPTM L07-0 26.730015
+```
+
+[`get_route_speed()`](https://ipea.github.io/gtfstools/dev/reference/get_route_speed.md)
+summarises the speeds of the trips of each route, as calculated by
+[`get_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_speed.md)
+(the standard deviation is `NA` for routes with a single trip, such as
+2002-10):
+
+``` r
+
+get_route_speed(gtfs, route_id = c("CPTM L07", "2002-10"))
+#>    route_id min_speed mean_speed median_speed max_speed     sd_speed
+#>      <char>     <num>      <num>        <num>     <num>        <num>
+#> 1:  2002-10  8.360838   8.360838     8.360838  8.360838           NA
+#> 2: CPTM L07 26.730015  26.730015    26.730015 26.730015 7.944109e-15
 ```
 
 ## Summarising a feed

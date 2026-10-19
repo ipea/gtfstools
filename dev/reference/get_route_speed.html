@@ -71,7 +71,8 @@ specified <code>route_id</code>.</p>
 <dt id="arg-route-id">route_id<a class="anchor" aria-label="anchor" href="#arg-route-id"></a></dt>
 <dd><p>A character vector including the <code>route_id</code>s to have their
 speeds summarised. If <code>NULL</code> (the default), the function summarises the
-speeds of every <code>route_id</code> in the GTFS.</p></dd>
+speeds of every <code>route_id</code> in the GTFS. <code>route_id</code>s not listed in <code>trips</code>
+are ignored, with a warning.</p></dd>
 
 
 <dt id="arg-method">method<a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>

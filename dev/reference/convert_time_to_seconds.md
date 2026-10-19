@@ -1,7 +1,7 @@
 # Convert time fields to seconds after midnight
 
 Converts `stop_times`' and `frequencies`' fields in the "HH:MM:SS"
-format to seconds after midnight. Instead of overwritting the existing
+format to seconds after midnight. Instead of overwriting the existing
 fields, creates new fields with the `_secs` suffix.
 
 ## Usage
