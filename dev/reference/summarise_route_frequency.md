@@ -31,7 +31,8 @@ summarise_route_frequency(feed, service_days, date, from, to)
 ## Value
 
 A list with the elements `headways` (the headway of each route and
-direction, in minutes), `stats` (their summary, as created by
+direction, in minutes, named by `route_id`), `stats` (their summary, as
+created by
 [`summarise_distribution()`](https://ipea.github.io/gtfstools/dev/reference/summarise_distribution.md)),
 `date`, `from` and `to` (the day and time of day in which the headways
 were measured, `NA` if there is none).

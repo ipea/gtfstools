@@ -18,9 +18,11 @@ write_summary_report(result, values, selection, output_dir)
 - values:
 
   A named list with the numeric vectors to be plotted (`speed`,
-  `distance` and `frequency`) and the calendar chart created by
+  `distance` and `frequency`), the calendar chart created by
   [`get_calendar_overlap()`](https://ipea.github.io/gtfstools/dev/reference/get_calendar_overlap.md)
-  (`calendar`, `NULL` if there is none).
+  (`calendar`, `NULL` if there is none) and a named list with the mode
+  of each plotted value, as factors (`modes`, empty if the values are
+  not grouped by mode).
 
 - selection:
 

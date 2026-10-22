@@ -20,7 +20,8 @@ get_summary(
   from = NULL,
   to = NULL,
   output_dir = NULL,
-  open_browser = TRUE
+  open_browser = TRUE,
+  by_route_type = FALSE
 )
 ```
 
@@ -78,6 +79,12 @@ get_summary(
   A logical. Whether to open the HTML report in the browser, in
   interactive sessions (defaults to `TRUE`).
 
+- by_route_type:
+
+  A logical. Whether to break down the totals, speeds, distances and
+  frequencies by transport mode (`route_type`), in addition to the whole
+  selection (defaults to `FALSE`).
+
 ## Value
 
 A named list of `data.table`s (invisibly, if the report was opened in
@@ -105,13 +112,18 @@ the browser):
   shapes and of the trips (in km), the total duration of the trips (in
   hours), the mean duration of the trips (in minutes), the mean trip
   speed (in km/h) and the mean route headway (in minutes). The means are
-  taken over the shapes and trips whose value is known;
+  taken over the shapes and trips whose value is known. If
+  `by_route_type = TRUE`, `value` is replaced by one column per mode
+  followed by the column `all` (codes of extended `route_type`s, such as
+  `"700"`, are non-syntactic names, so they need backticks);
 
 - `speed`, `distance` and `frequency`: summary statistics (`n`, `min`,
   `q25`, `median`, `mean`, `q75`, `max` and `unit`) of the trip speeds
   (in km/h), of the trip lengths (in km) and of the route headways (in
   minutes). `frequency` also has the columns `date`, `from` and `to`,
   with the day and the time of day in which the headways were measured.
+  If `by_route_type = TRUE`, these tables start with a `mode` column and
+  have one row per mode followed by the row `all`.
 
 The report is saved as `gtfs_summary.md` and `gtfs_summary.html`
 (together with its figures) in `output_dir`.
@@ -161,6 +173,18 @@ day, rounded out to whole hours. Trips that start on the previous day
 and run after midnight are not counted, and times are in the local time
 of each agency.
 
+With `by_route_type = TRUE`, modes are named as in the `mode` argument,
+extended `route_type`s by their code, and trips whose `route_type` is
+unknown are grouped as `"unknown"`. Modes are ordered by `route_type`,
+with `"unknown"` last. Each mode is described as if it were selected
+alone (except that the headways of all modes are measured on the same
+day and time of day), so stops, shapes and agencies shared by several
+modes count in each of them. Only the numbers of routes and trips and
+the total trip lengths and durations add up to the `all` column. Modes
+whose routes have blank `agency_id`s count all the agencies of the
+selection, and trips listed in `stop_times` but not in `trips` only
+count in `all`. In the report, the histograms of the modes are overlaid.
+
 ## Examples
 
 ``` r
@@ -189,12 +213,28 @@ if (
     open_browser = FALSE
   )
   feed_summary$frequency
+
+  feed_summary <- get_summary(
+    data_path,
+    output_dir = tempdir(),
+    open_browser = FALSE,
+    by_route_type = TRUE
+  )
+  feed_summary$totals
   # }
 }
-#>        n   min      q25   median     mean      q75   max   unit       date
-#>    <int> <num>    <num>    <num>    <num>    <num> <num> <char>     <Date>
-#> 1:    10     6 11.18182 13.33333 23.62351 17.14286   120    min 2008-01-01
-#>        from       to
-#>      <char>   <char>
-#> 1: 07:00:00 09:00:00
+#>               indicator     subway      rail       bus       all   unit
+#>                  <char>      <num>     <num>     <num>     <num> <char>
+#>  1:          n_agencies   1.000000   1.00000   1.00000   1.00000   <NA>
+#>  2:            n_routes   6.000000   7.00000   6.00000  19.00000   <NA>
+#>  3:             n_trips  12.000000  14.00000  10.00000  36.00000   <NA>
+#>  4:             n_stops  88.000000 100.00000 466.00000 654.00000   <NA>
+#>  5:  total_shape_length 196.966795 525.64661 173.31469 895.92810     km
+#>  6:   mean_shape_length  16.413900  37.54619  17.33147  24.88689     km
+#>  7:   total_trip_length 195.942016 524.74754 170.88814 891.57769     km
+#>  8:    mean_trip_length  16.328501  37.48197  17.08881  24.76605     km
+#>  9: total_trip_duration   7.263333  19.66667  15.81667  42.74667      h
+#> 10:  mean_trip_duration  36.316667  84.28571  94.90000  71.24444    min
+#> 11:     mean_trip_speed  27.364010  29.06481  10.94215  23.46380   km/h
+#> 12:  mean_route_headway   6.283301  10.96129  65.08947  24.43757    min
 ```

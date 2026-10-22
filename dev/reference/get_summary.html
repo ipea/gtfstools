@@ -78,7 +78,8 @@ issues in the GTFS feed. To do that, use <code><a href="validate_gtfs.html">vali
 <span>  from <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  to <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  output_dir <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  open_browser <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  open_browser <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  by_route_type <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -135,6 +136,12 @@ overwritten.</p></dd>
 <dd><p>A logical. Whether to open the HTML report in the
 browser, in interactive sessions (defaults to <code>TRUE</code>).</p></dd>
 
+
+<dt id="arg-by-route-type">by_route_type<a class="anchor" aria-label="anchor" href="#arg-by-route-type"></a></dt>
+<dd><p>A logical. Whether to break down the totals, speeds,
+distances and frequencies by transport mode (<code>route_type</code>), in addition
+to the whole selection (defaults to <code>FALSE</code>).</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -158,12 +165,17 @@ of agencies, routes, trips and stops, the total and mean length of the
 shapes and of the trips (in km), the total duration of the trips (in
 hours), the mean duration of the trips (in minutes), the mean trip
 speed (in km/h) and the mean route headway (in minutes). The means are
-taken over the shapes and trips whose value is known;</p></li>
+taken over the shapes and trips whose value is known. If
+<code>by_route_type = TRUE</code>, <code>value</code> is replaced by one column per mode
+followed by the column <code>all</code> (codes of extended <code>route_type</code>s, such as
+<code>"700"</code>, are non-syntactic names, so they need backticks);</p></li>
 <li><p><code>speed</code>, <code>distance</code> and <code>frequency</code>: summary statistics (<code>n</code>, <code>min</code>,
 <code>q25</code>, <code>median</code>, <code>mean</code>, <code>q75</code>, <code>max</code> and <code>unit</code>) of the trip speeds
 (in km/h), of the trip lengths (in km) and of the route headways (in
 minutes). <code>frequency</code> also has the columns <code>date</code>, <code>from</code> and <code>to</code>, with
-the day and the time of day in which the headways were measured.</p></li>
+the day and the time of day in which the headways were measured. If
+<code>by_route_type = TRUE</code>, these tables start with a <code>mode</code> column and
+have one row per mode followed by the row <code>all</code>.</p></li>
 </ul><p>The report is saved as <code>gtfs_summary.md</code> and <code>gtfs_summary.html</code>
 (together with its figures) in <code>output_dir</code>.</p>
     </div>
@@ -198,6 +210,17 @@ are measured within the given time of day or, if <code>from</code> and <code>to<
 <code>NULL</code>, from the first to the last departure of that day, rounded out to
 whole hours. Trips that start on the previous day and run after midnight
 are not counted, and times are in the local time of each agency.</p>
+<p>With <code>by_route_type = TRUE</code>, modes are named as in the <code>mode</code> argument,
+extended <code>route_type</code>s by their code, and trips whose <code>route_type</code> is
+unknown are grouped as <code>"unknown"</code>. Modes are ordered by <code>route_type</code>, with
+<code>"unknown"</code> last. Each mode is described as if it were selected alone
+(except that the headways of all modes are measured on the same day and
+time of day), so stops, shapes and agencies shared by several modes count
+in each of them. Only the numbers of routes and trips and the total trip
+lengths and durations add up to the <code>all</code> column. Modes whose routes have
+blank <code>agency_id</code>s count all the agencies of the selection, and trips
+listed in <code>stop_times</code> but not in <code>trips</code> only count in <code>all</code>. In the
+report, the histograms of the modes are overlaid.</p>
     </div>
 
     <div class="section level2">
@@ -227,14 +250,30 @@ are not counted, and times are in the local time of each agency.</p>
 <span class="r-in"><span>    open_browser <span class="op">=</span> <span class="cn">FALSE</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">feed_summary</span><span class="op">$</span><span class="va">frequency</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="va">feed_summary</span> <span class="op">&lt;-</span> <span class="fu">get_summary</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="va">data_path</span>,</span></span>
+<span class="r-in"><span>    output_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    open_browser <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
+<span class="r-in"><span>    by_route_type <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">feed_summary</span><span class="op">$</span><span class="va">totals</span></span></span>
 <span class="r-in"><span>  <span class="co"># }</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        n   min      q25   median     mean      q75   max   unit       date</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    &lt;int&gt; &lt;num&gt;    &lt;num&gt;    &lt;num&gt;    &lt;num&gt;    &lt;num&gt; &lt;num&gt; &lt;char&gt;     &lt;Date&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:    10     6 11.18182 13.33333 23.62351 17.14286   120    min 2008-01-01</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        from       to</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      &lt;char&gt;   &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1: 07:00:00 09:00:00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>               indicator     subway      rail       bus       all   unit</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                  &lt;char&gt;      &lt;num&gt;     &lt;num&gt;     &lt;num&gt;     &lt;num&gt; &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1:          n_agencies   1.000000   1.00000   1.00000   1.00000   &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  2:            n_routes   6.000000   7.00000   6.00000  19.00000   &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  3:             n_trips  12.000000  14.00000  10.00000  36.00000   &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  4:             n_stops  88.000000 100.00000 466.00000 654.00000   &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  5:  total_shape_length 196.966795 525.64661 173.31469 895.92810     km</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  6:   mean_shape_length  16.413900  37.54619  17.33147  24.88689     km</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  7:   total_trip_length 195.942016 524.74754 170.88814 891.57769     km</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  8:    mean_trip_length  16.328501  37.48197  17.08881  24.76605     km</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  9: total_trip_duration   7.263333  19.66667  15.81667  42.74667      h</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10:  mean_trip_duration  36.316667  84.28571  94.90000  71.24444    min</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11:     mean_trip_speed  27.364010  29.06481  10.94215  23.46380   km/h</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12:  mean_route_headway   6.283301  10.96129  65.08947  24.43757    min</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

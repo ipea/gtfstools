@@ -91,7 +91,10 @@
   writes an HTML report with tables and figures (requires
   [ggplot2](https://ggplot2.tidyverse.org),
   [knitr](https://yihui.org/knitr/),
-  [rmarkdown](https://github.com/rstudio/rmarkdown) and Pandoc).
+  [rmarkdown](https://github.com/rstudio/rmarkdown) and Pandoc). With
+  `by_route_type = TRUE`, the totals, speeds, lengths and headways are
+  also broken down by transport mode
+  ([\#127](https://github.com/ipea/gtfstools/issues/127)).
 - New function
   [`get_route_speed()`](https://ipea.github.io/gtfstools/dev/reference/get_route_speed.md),
   which returns the minimum, mean, median, maximum and standard
