@@ -1,8 +1,8 @@
 # Interpolate the distances travelled along shapes
 
-Fills the `shape_dist_traveled` columns of `stop_times` and `shapes`
-with the distance, in meters, from the start of each shape to each stop
-and to each shape point.
+Calculates the distance, in meters, from the start of each shape to each
+stop and to each shape point, and writes it to the `shape_dist_traveled`
+columns of `stop_times` and `shapes`, replacing any existing values.
 
 ## Usage
 

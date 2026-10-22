@@ -197,9 +197,10 @@
   times.
 - New function
   [`interpolate_shape_dist_traveled()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_shape_dist_traveled.md),
-  which fills the `shape_dist_traveled` columns of `stop_times` and
-  `shapes` with the distance, in meters, from the start of each shape to
-  each stop and shape point. Stops are located along the shapes as in
+  which calculates the distance, in meters, from the start of each shape
+  to each stop and shape point, and writes it to the
+  `shape_dist_traveled` columns of `stop_times` and `shapes`, replacing
+  any existing values. Stops are located along the shapes as in
   [`get_trip_length()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_length.md).
 - New function
   [`convert_seconds_to_time()`](https://ipea.github.io/gtfstools/dev/reference/convert_seconds_to_time.md),
@@ -249,9 +250,10 @@
   [`set_max_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_max_speed.md),
   fills blank stop times with
   [`interpolate_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_stop_times.md)
-  and, in feeds with shapes, fills the distances travelled along shapes
-  with
-  [`interpolate_shape_dist_traveled()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_shape_dist_traveled.md).
+  and, in feeds with shapes, recalculates the distances travelled along
+  shapes with
+  [`interpolate_shape_dist_traveled()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_shape_dist_traveled.md),
+  replacing any existing `shape_dist_traveled` values.
 - New function
   [`get_shape_length()`](https://ipea.github.io/gtfstools/dev/reference/get_shape_length.md),
   which returns the length of each shape.

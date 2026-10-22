@@ -2,7 +2,8 @@
 
 Cleans a GTFS feed in one call, by removing duplicated entries and
 unused ids, optionally capping the speed of trips, filling blank stop
-times and filling the distances travelled along shapes.
+times and recalculating the distances travelled along shapes (replacing
+any existing ones).
 
 ## Usage
 
@@ -65,10 +66,10 @@ The feed goes through the following steps, in this order:
     that can't be located along their trip's shape get `NA`.
 
 The `trips` and `stop_times` tables are always required, and `stops` is
-required to cap speeds, to fill blank times and to fill the distances
-travelled along shapes. The warnings raised are those of the functions
-above, so some warnings (e.g. about a missing `shapes` table) may be
-raised twice.
+required to cap speeds, to fill blank times and to calculate the
+distances travelled along shapes. The warnings raised are those of the
+functions above, so some warnings (e.g. about trips not linked to a
+shape) may be raised more than once.
 
 ## See also
 
