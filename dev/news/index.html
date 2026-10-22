@@ -147,6 +147,7 @@
 </ul></li>
 <li>
 <code><a href="../reference/filter_by_spatial_extent.html">filter_by_spatial_extent()</a></code> no longer errors when stops have missing coordinates, and with <code>keep = FALSE</code> drops every selected trip. It now filters the feed only once, so shapes not used by any trip are no longer kept and duplicated rows are no longer removed.</li>
+<li>Fixed a bug in <code><a href="../reference/filter_by_spatial_extent.html">filter_by_spatial_extent()</a></code> in which a <code>bbox</code> passed to <code>geom</code> was converted to a slightly larger polygon with curved edges, so shapes and trips near its edges could be wrongly kept or dropped. A <code>bbox</code> is now treated as a rectangle in longitude and latitude.</li>
 <li>
 <code><a href="../reference/filter_by_stop_id.html">filter_by_stop_id()</a></code> no longer adds a <code>.flagged</code> column to the <code>fare_rules</code> table of the given feed.</li>
 <li>

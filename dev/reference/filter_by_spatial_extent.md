@@ -25,7 +25,9 @@ filter_by_spatial_extent(
 - geom:
 
   An `sf`, `sfc` or `bbox` object, in WGS 84 (EPSG 4326). Describes the
-  spatial extent used to filter the data.
+  spatial extent used to filter the data. A `bbox` is treated as a
+  rectangle in longitude and latitude (unlike `sf::st_as_sfc(bbox)`,
+  whose edges are geodesics when `{s2}` is used).
 
 - spatial_operation:
 

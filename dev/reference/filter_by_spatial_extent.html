@@ -78,7 +78,9 @@ are selected through a specified spatial operation.</p>
 
 <dt id="arg-geom">geom<a class="anchor" aria-label="anchor" href="#arg-geom"></a></dt>
 <dd><p>An <code>sf</code>, <code>sfc</code> or <code>bbox</code> object, in WGS 84 (EPSG 4326).
-Describes the spatial extent used to filter the data.</p></dd>
+Describes the spatial extent used to filter the data. A <code>bbox</code> is treated
+as a rectangle in longitude and latitude (unlike <code>sf::st_as_sfc(bbox)</code>,
+whose edges are geodesics when <code>{s2}</code> is used).</p></dd>
 
 
 <dt id="arg-spatial-operation">spatial_operation<a class="anchor" aria-label="anchor" href="#arg-spatial-operation"></a></dt>

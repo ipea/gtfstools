@@ -387,6 +387,12 @@
   `keep = FALSE` drops every selected trip. It now filters the feed only
   once, so shapes not used by any trip are no longer kept and duplicated
   rows are no longer removed.
+- Fixed a bug in
+  [`filter_by_spatial_extent()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_spatial_extent.md)
+  in which a `bbox` passed to `geom` was converted to a slightly larger
+  polygon with curved edges, so shapes and trips near its edges could be
+  wrongly kept or dropped. A `bbox` is now treated as a rectangle in
+  longitude and latitude.
 - [`filter_by_stop_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_stop_id.md)
   no longer adds a `.flagged` column to the `fare_rules` table of the
   given feed.
