@@ -102,6 +102,10 @@ trips by frequency-based ones;</li>
 <code><a href="../reference/interpolate_stop_times.html">interpolate_stop_times()</a></code>: fills blank stop times,
 assuming a constant speed between stops with known times;</li>
 <li>
+<code><a href="../reference/interpolate_shape_dist_traveled.html">interpolate_shape_dist_traveled()</a></code>: fills the distances,
+in meters, travelled along the shapes up to each stop and shape
+point;</li>
+<li>
 <code><a href="../reference/set_route_speed.html">set_route_speed()</a></code>: sets the average speed of the trips
 of routes, or of a segment of them;</li>
 <li>
@@ -124,8 +128,9 @@ the feed’s tables;</li>
 doesn’t use, with their entries in every table;</li>
 <li>
 <code><a href="../reference/fix_gtfs.html">fix_gtfs()</a></code>: cleans a feed in one call, removing
-duplicated entries and unused ids, optionally capping the speed of trips
-and filling blank stop times.</li>
+duplicated entries and unused ids, optionally capping the speed of
+trips, filling blank stop times and filling the distances travelled
+along shapes.</li>
 </ul>
 <p>This vignette will introduce you to the first four functions and will
 cover their usage in detail. By default, they return an edited copy of

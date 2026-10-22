@@ -83,6 +83,19 @@
 ### New features
 
 - New function
+  [`crop_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/crop_gtfs.md),
+  which crops a feed to a spatial extent: it keeps the stops inside it
+  (and their parent stations) and the parts of the trips that serve
+  them, and, by default, trims the trips’ shapes to their first and last
+  remaining stops. Unlike
+  [`filter_by_spatial_extent()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_spatial_extent.md),
+  which keeps entire trips, trips that leave the spatial extent are cut.
+  Blank times at the new ends of cropped trips are interpolated, and the
+  `frequencies` of trips whose first stop is dropped are shifted
+  accordingly ([\#44](https://github.com/ipea/gtfstools/issues/44)).
+  Thanks to [@luukvdmeer](https://github.com/luukvdmeer) for the
+  proposal and discussion.
+- New function
   [`get_summary()`](https://ipea.github.io/gtfstools/dev/reference/get_summary.md),
   which summarises a feed (its files, agencies, service calendar, totals
   and the distributions of trip speeds, trip lengths and route
@@ -183,6 +196,18 @@
   `stop_times`, assuming a constant speed between stops with known
   times.
 - New function
+  [`interpolate_shape_dist_traveled()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_shape_dist_traveled.md),
+  which fills the `shape_dist_traveled` columns of `stop_times` and
+  `shapes` with the distance, in meters, from the start of each shape to
+  each stop and shape point. Stops are located along the shapes as in
+  [`get_trip_length()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_length.md).
+- New function
+  [`convert_seconds_to_time()`](https://ipea.github.io/gtfstools/dev/reference/convert_seconds_to_time.md),
+  the counterpart of
+  [`convert_time_to_seconds()`](https://ipea.github.io/gtfstools/dev/reference/convert_time_to_seconds.md),
+  which converts seconds after midnight to strings in the “HH:MM:SS”
+  format.
+- New function
   [`set_route_frequency()`](https://ipea.github.io/gtfstools/dev/reference/set_route_frequency.md),
   the editing counterpart of
   [`get_route_frequency()`](https://ipea.github.io/gtfstools/dev/reference/get_route_frequency.md),
@@ -222,8 +247,11 @@
   a wrapper that cleans a feed in one call: it removes duplicated
   entries and unused ids, optionally caps the speed of trips with
   [`set_max_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_max_speed.md),
-  and fills blank stop times with
-  [`interpolate_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_stop_times.md).
+  fills blank stop times with
+  [`interpolate_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_stop_times.md)
+  and, in feeds with shapes, fills the distances travelled along shapes
+  with
+  [`interpolate_shape_dist_traveled()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_shape_dist_traveled.md).
 - New function
   [`get_shape_length()`](https://ipea.github.io/gtfstools/dev/reference/get_shape_length.md),
   which returns the length of each shape.

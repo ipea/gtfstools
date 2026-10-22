@@ -18,6 +18,7 @@
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/build_timetable.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/check_deprecated_sort_sequence.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/convert_from_standard.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/convert_seconds_to_time.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/convert_sf_to_shapes.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/convert_shapes_to_sf.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/convert_stops_to_sf.html</loc></url>
@@ -27,6 +28,7 @@
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/copy_gtfs_diff_field_class.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/copy_gtfs_without_field.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/copy_gtfs_without_file.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/crop_gtfs.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/date_to_integer.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/dates_to_periods.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/download_validator.html</loc></url>
@@ -82,10 +84,15 @@
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/has_shapes.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/index.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/integer_to_date.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/interpolate_cropped_trips.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/interpolate_shape_dist_traveled.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/interpolate_stop_times.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/is_blank_time.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/list_validator_versions.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/locate_cropped_trip_cuts.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/locate_stops_along_shapes.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/map_deprecated_file.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/match_stop_times_rows.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/max_stop_pairs_without_warning.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/merge_gtfs.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/merge_service_intervals.html</loc></url>
@@ -94,6 +101,7 @@
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/read_gtfs.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/remove_duplicates.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/remove_unused_ids.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/replace_cropped_shapes.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/report_deps_available.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/route_type_ids.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/seconds_to_string.html</loc></url>
@@ -102,6 +110,7 @@
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/set_route_frequency.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/set_route_speed.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/shift_cropped_frequencies.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/stop_times_to_frequencies.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/string_to_seconds.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/sum_or_na.html</loc></url>

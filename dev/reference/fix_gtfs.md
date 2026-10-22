@@ -1,8 +1,8 @@
 # Fix common problems in GTFS feeds
 
 Cleans a GTFS feed in one call, by removing duplicated entries and
-unused ids, optionally capping the speed of trips, and filling blank
-stop times.
+unused ids, optionally capping the speed of trips, filling blank stop
+times and filling the distances travelled along shapes.
 
 ## Usage
 
@@ -55,19 +55,28 @@ The feed goes through the following steps, in this order:
     Speeds are capped before interpolating, so the filled times follow
     the capped times. Interpolated times are rounded to the second.
     Stops whose times can't be interpolated are left blank, with a
-    warning.
+    warning;
+
+5.  [`interpolate_shape_dist_traveled()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_shape_dist_traveled.md),
+    only if the feed has a `shapes` table and `trips` has a `shape_id`
+    column, replaces the `shape_dist_traveled` columns of `stop_times`
+    and `shapes` with the distances, in meters, from the start of each
+    shape. Existing values, whatever their unit, are replaced, and stops
+    that can't be located along their trip's shape get `NA`.
 
 The `trips` and `stop_times` tables are always required, and `stops` is
-required to cap speeds and to fill blank times. The warnings raised are
-those of the functions above, so some warnings (e.g. about a missing
-`shapes` table) may be raised twice.
+required to cap speeds, to fill blank times and to fill the distances
+travelled along shapes. The warnings raised are those of the functions
+above, so some warnings (e.g. about a missing `shapes` table) may be
+raised twice.
 
 ## See also
 
 [`remove_duplicates()`](https://ipea.github.io/gtfstools/dev/reference/remove_duplicates.md),
 [`remove_unused_ids()`](https://ipea.github.io/gtfstools/dev/reference/remove_unused_ids.md),
 [`set_max_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_max_speed.md),
-[`interpolate_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_stop_times.md)
+[`interpolate_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_stop_times.md),
+[`interpolate_shape_dist_traveled()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_shape_dist_traveled.md)
 
 ## Examples
 
@@ -111,4 +120,7 @@ fixed_gtfs$stop_times |>
 #>       trip_id arrival_time departure_time stop_id stop_sequence
 #>        <char>       <char>         <char>  <char>         <int>
 #> 1: CPTM L07-0     06:19:33       06:19:33   18975            18
+#>    shape_dist_traveled
+#>                  <num>
+#> 1:            60598.61
 ```

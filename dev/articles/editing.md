@@ -20,6 +20,9 @@ functions currently available are:
 - [`interpolate_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_stop_times.md):
   fills blank stop times, assuming a constant speed between stops with
   known times;
+- [`interpolate_shape_dist_traveled()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_shape_dist_traveled.md):
+  fills the distances, in meters, travelled along the shapes up to each
+  stop and shape point;
 - [`set_route_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_route_speed.md):
   sets the average speed of the trips of routes, or of a segment of
   them;
@@ -39,7 +42,8 @@ functions currently available are:
   table;
 - [`fix_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/fix_gtfs.md):
   cleans a feed in one call, removing duplicated entries and unused ids,
-  optionally capping the speed of trips and filling blank stop times.
+  optionally capping the speed of trips, filling blank stop times and
+  filling the distances travelled along shapes.
 
 This vignette will introduce you to the first four functions and will
 cover their usage in detail. By default, they return an edited copy of

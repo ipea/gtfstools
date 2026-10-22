@@ -111,6 +111,9 @@
 
   Convert a simple feature object into a `shapes` table
 
+- [`crop_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/crop_gtfs.md)
+  : Crop a GTFS object to a spatial extent
+
 - [`filter_by_spatial_extent()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_spatial_extent.md)
   : Filter a GTFS object using a spatial extent
 
@@ -134,6 +137,8 @@
 
 - [`interpolate_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_stop_times.md)
   : Interpolate missing stop times
+- [`interpolate_shape_dist_traveled()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_shape_dist_traveled.md)
+  : Interpolate the distances travelled along shapes
 - [`merge_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/merge_gtfs.md)
   : Merge GTFS files
 - [`remove_duplicates()`](https://ipea.github.io/gtfstools/dev/reference/remove_duplicates.md)
@@ -172,6 +177,8 @@
   : Convert stops into shapes
 - [`convert_time_to_seconds()`](https://ipea.github.io/gtfstools/dev/reference/convert_time_to_seconds.md)
   : Convert time fields to seconds after midnight
+- [`convert_seconds_to_time()`](https://ipea.github.io/gtfstools/dev/reference/convert_seconds_to_time.md)
+  : Convert seconds after midnight to time strings
 
 ## Interoperability between GTFS packages
 
