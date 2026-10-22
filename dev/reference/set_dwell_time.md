@@ -16,6 +16,7 @@ set_dwell_time(
   unit = "s",
   from = NULL,
   to = NULL,
+  route_type = NULL,
   by_reference = FALSE
 )
 ```
@@ -31,7 +32,7 @@ set_dwell_time(
 
   A character vector including the `trip_id`s to have their dwell times
   set. If `NULL` (the default), the dwell times of every `trip_id` in
-  the GTFS are set.
+  the GTFS (or of every trip of the given `route_type`s) are set.
 
 - stop_id:
 
@@ -62,6 +63,15 @@ set_dwell_time(
   A string, in the "HH:MM:SS" format. Only visits whose arrival time is
   at or before `to` are changed. If `NULL` (the default), there is no
   upper limit.
+
+- route_type:
+
+  An integer vector of `route_type`s (see
+  [`filter_by_route_type()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_route_type.md)).
+  If given, only trips of routes of these types are changed; together
+  with the other selection arguments, it restricts their selection.
+  `route_type`s not listed in `routes` are ignored. If `NULL` (the
+  default), trips of any type are changed.
 
 - by_reference:
 

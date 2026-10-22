@@ -54,7 +54,7 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">prepare_trip_stops</span><span class="op">(</span><span class="va">gtfs</span>, <span class="va">trip_id</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">prepare_trip_stops</span><span class="op">(</span><span class="va">gtfs</span>, <span class="va">trip_id</span>, with_departure <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -69,11 +69,16 @@
 <dd><p>The <code>trip_id</code>s whose stop_times should be selected, or <code>NULL</code>
 to select every trip.</p></dd>
 
+
+<dt id="arg-with-departure">with_departure<a class="anchor" aria-label="anchor" href="#arg-with-departure"></a></dt>
+<dd><p>Whether to also select the <code>departure_time</code>.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A new <code>data.table</code> with the <code>trip_id</code>, <code>stop_id</code> and
-<code>stop_sequence</code> of the selected stop_times, sorted by <code>trip_id</code> and
+<code>stop_sequence</code> (and, if <code>with_departure</code> is <code>TRUE</code>, the
+<code>departure_time</code>) of the selected stop_times, sorted by <code>trip_id</code> and
 <code>stop_sequence</code>, plus the <code>stop_lat</code> and <code>stop_lon</code> of each stop.</p>
     </div>
 

@@ -152,10 +152,12 @@
   whether all feeds have service on that day, helping to pick a date on
   which several feeds can be analysed together (e.g. in routing and
   accessibility analyses). With `resolution = "periods"`, it returns the
-  periods in which all feeds have service, and `plot = TRUE` plots
-  either result (requires [ggplot2](https://ggplot2.tidyverse.org)).
-  Feeds may be given as paths or as a list of GTFS objects. See the new
-  “Checking the calendar overlap of GTFS feeds” vignette
+  periods in which all feeds have service. `plot = TRUE` plots either
+  result (requires [ggplot2](https://ggplot2.tidyverse.org)): a box plot
+  of when each feed’s trips run, or a timeline of its service periods. A
+  message is printed when the feeds have no day with service in all of
+  them. Feeds may be given as paths or as a list of GTFS objects. See
+  the new “Checking the calendar overlap of GTFS feeds” vignette
   ([\#85](https://github.com/ipea/gtfstools/issues/85)). Thanks
   [@higgicd](https://github.com/higgicd) for the suggestion and the
   original `check_gtfs_overlap()` code.
@@ -183,14 +185,17 @@
   [`get_route_frequency()`](https://ipea.github.io/gtfstools/dev/reference/get_route_frequency.md),
   which sets the headway of routes within a time of day by replacing
   their trips in it with a frequency-based template trip. Departures
-  outside the time of day don’t change.
+  outside the time of day don’t change. With `route_type`, it changes
+  only the routes of the given transport modes (all of them if
+  `route_id` is not given).
 - New function
   [`set_route_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_route_speed.md),
   the route counterpart of
   [`set_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.md),
   which sets the average speed of all trips of the given routes
-  (optionally only of a segment between two stops, and only of trips
-  departing within a time of day).
+  (optionally only of a segment between two stops, only of trips
+  departing within a time of day, and only of the given transport modes,
+  with `route_type`).
 - New functions
   [`get_dwell_time()`](https://ipea.github.io/gtfstools/dev/reference/get_dwell_time.md)
   and
@@ -198,12 +203,17 @@
   which return and set how long vehicles stay at stops, optionally
   within a time of day.
   [`set_dwell_time()`](https://ipea.github.io/gtfstools/dev/reference/set_dwell_time.md)
-  shifts the later times of each trip accordingly.
+  shifts the later times of each trip accordingly, and can be restricted
+  to the trips of the given transport modes (`route_type`).
 - New function
   [`set_max_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_max_speed.md),
   which caps the speed of the given trips and/or routes. Each part of a
   trip faster than the maximum speed is slowed down to it, and the later
-  times of the trip are shifted accordingly.
+  times of the trip are shifted accordingly. Like
+  [`set_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.md),
+  it can cap speeds only between two stops (`first_stop`, `last_stop`),
+  for trips departing within a time of day (`from`, `to`), and for trips
+  of the given transport modes (`route_type`).
 - New function
   [`fix_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/fix_gtfs.md),
   a wrapper that cleans a feed in one call: it removes duplicated
@@ -244,10 +254,26 @@
   change speeds only between two stops and only for trips departing
   within a time of day
   ([\#89](https://github.com/ipea/gtfstools/issues/89)).
+- [`set_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.md)
+  gains the `route_type` argument, to change only the trips of the given
+  transport modes. It restricts the trips given in `trip_id`, or, on its
+  own, sets the speed of all the trips of these modes, so `trip_id` is
+  now optional.
 - [`get_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_speed.md)
   and
   [`set_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.md)
   now accept `unit = "mph"`, for speeds in miles per hour.
+- [`get_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_speed.md),
+  [`get_route_speed()`](https://ipea.github.io/gtfstools/dev/reference/get_route_speed.md),
+  [`get_trip_duration()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_duration.md),
+  [`get_trip_length()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_length.md)
+  and
+  [`get_trip_segment_duration()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_segment_duration.md)
+  gain the `from` and `to` arguments, as in
+  [`get_dwell_time()`](https://ipea.github.io/gtfstools/dev/reference/get_dwell_time.md),
+  to include only the trips that depart from their first stop within a
+  time of day (or, for segment results, only the segments that depart
+  within it).
 - [`frequencies_to_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/frequencies_to_stop_times.md)
   gains the `strategy` argument, to shift the departures of
   frequency-based trips by half the headway or by a random offset

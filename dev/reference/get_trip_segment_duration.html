@@ -54,7 +54,14 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_trip_segment_duration</span><span class="op">(</span><span class="va">gtfs</span>, trip_id <span class="op">=</span> <span class="cn">NULL</span>, unit <span class="op">=</span> <span class="st">"min"</span>, <span class="va">sort_sequence</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_trip_segment_duration</span><span class="op">(</span></span>
+<span>  <span class="va">gtfs</span>,</span>
+<span>  trip_id <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  unit <span class="op">=</span> <span class="st">"min"</span>,</span>
+<span>  <span class="va">sort_sequence</span>,</span>
+<span>  from <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  to <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -82,6 +89,18 @@ desired. One of <code>"s"</code> (seconds), <code>"min"</code> (minutes, the def
 sorted by <code>stop_sequence</code>. Passing <code>TRUE</code> raises a warning, and passing
 <code>FALSE</code> raises an error.</p></dd>
 
+
+<dt id="arg-from">from<a class="anchor" aria-label="anchor" href="#arg-from"></a></dt>
+<dd><p>A string, in the "HH:MM:SS" format. Only segments that depart
+from their first stop at or after <code>from</code> are included. If <code>NULL</code> (the
+default), there is no lower limit.</p></dd>
+
+
+<dt id="arg-to">to<a class="anchor" aria-label="anchor" href="#arg-to"></a></dt>
+<dd><p>A string, in the "HH:MM:SS" format. Only segments that depart from
+their first stop at or before <code>to</code> are included. If <code>NULL</code> (the default),
+there is no upper limit.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -99,6 +118,12 @@ between its arrival time and its departure time, as specified in the
 <p>Existing <code>_secs</code> columns in <code>stop_times</code> (e.g. created with
 <code><a href="convert_time_to_seconds.html">convert_time_to_seconds()</a></code>) are used as-is, not recalculated from the time
 strings.</p>
+<p><code>from</code> and <code>to</code> are compared with the departure time of the first stop of
+each segment, read as the durations are (from <code>departure_time_secs</code>, if
+present), so use times past <code>"24:00:00"</code> for departures after midnight.
+For trips listed in <code>frequencies</code>, these are template times, not the times
+of each departure. Segments whose departure is blank are never included
+when <code>from</code> or <code>to</code> is given.</p>
     </div>
 
     <div class="section level2">
@@ -163,6 +188,23 @@ strings.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 15: CPTM L07-0      15      480</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 16: CPTM L07-0      16      480</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 17: CPTM L07-0      17      480</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># use the from and to arguments to keep only the segments that depart</span></span></span>
+<span class="r-in"><span><span class="co"># within a time of day</span></span></span>
+<span class="r-in"><span><span class="va">trip_segment_dur</span> <span class="op">&lt;-</span> <span class="fu">get_trip_segment_duration</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">gtfs</span>,</span></span>
+<span class="r-in"><span>  from <span class="op">=</span> <span class="st">"07:00:00"</span>,</span></span>
+<span class="r-in"><span>  to <span class="op">=</span> <span class="st">"09:00:00"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">trip_segment_dur</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      trip_id segment duration</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       &lt;char&gt;   &lt;int&gt;    &lt;num&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1: 2002-10-0       1 2.166667</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2: 2161-10-0       1 1.733333</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3: 4491-10-0       1 1.600000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4: 4491-10-0       2 1.600000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5: 4491-10-0       3 1.600000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6: 4491-10-0       4 1.600000</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

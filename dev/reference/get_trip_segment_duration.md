@@ -6,7 +6,14 @@ Returns the duration of segments between stops of each specified
 ## Usage
 
 ``` r
-get_trip_segment_duration(gtfs, trip_id = NULL, unit = "min", sort_sequence)
+get_trip_segment_duration(
+  gtfs,
+  trip_id = NULL,
+  unit = "min",
+  sort_sequence,
+  from = NULL,
+  to = NULL
+)
 ```
 
 ## Arguments
@@ -34,6 +41,18 @@ get_trip_segment_duration(gtfs, trip_id = NULL, unit = "min", sort_sequence)
   `stop_sequence`. Passing `TRUE` raises a warning, and passing `FALSE`
   raises an error.
 
+- from:
+
+  A string, in the "HH:MM:SS" format. Only segments that depart from
+  their first stop at or after `from` are included. If `NULL` (the
+  default), there is no lower limit.
+
+- to:
+
+  A string, in the "HH:MM:SS" format. Only segments that depart from
+  their first stop at or before `to` are included. If `NULL` (the
+  default), there is no upper limit.
+
 ## Value
 
 A `data.table` containing the segments' duration of each specified trip.
@@ -48,6 +67,13 @@ in the `stop_times` file.
 Existing `_secs` columns in `stop_times` (e.g. created with
 [`convert_time_to_seconds()`](https://ipea.github.io/gtfstools/dev/reference/convert_time_to_seconds.md))
 are used as-is, not recalculated from the time strings.
+
+`from` and `to` are compared with the departure time of the first stop
+of each segment, read as the durations are (from `departure_time_secs`,
+if present), so use times past `"24:00:00"` for departures after
+midnight. For trips listed in `frequencies`, these are template times,
+not the times of each departure. Segments whose departure is blank are
+never included when `from` or `to` is given.
 
 ## Examples
 
@@ -112,4 +138,21 @@ trip_segment_dur
 #> 15: CPTM L07-0      15      480
 #> 16: CPTM L07-0      16      480
 #> 17: CPTM L07-0      17      480
+
+# use the from and to arguments to keep only the segments that depart
+# within a time of day
+trip_segment_dur <- get_trip_segment_duration(
+  gtfs,
+  from = "07:00:00",
+  to = "09:00:00"
+)
+head(trip_segment_dur)
+#>      trip_id segment duration
+#>       <char>   <int>    <num>
+#> 1: 2002-10-0       1 2.166667
+#> 2: 2161-10-0       1 1.733333
+#> 3: 4491-10-0       1 1.600000
+#> 4: 4491-10-0       2 1.600000
+#> 5: 4491-10-0       3 1.600000
+#> 6: 4491-10-0       4 1.600000
 ```

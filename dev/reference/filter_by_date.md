@@ -99,4 +99,17 @@ smaller_gtfs$calendar
 #>    start_date   end_date
 #>        <Date>     <Date>
 #> 1: 2006-07-01 2006-07-31
+
+# a vector of dates keeps the services that run on at least one of them
+week <- seq(as.Date("2006-07-01"), as.Date("2006-07-07"), by = "day")
+smaller_gtfs <- filter_by_date(gtfs, week)
+smaller_gtfs$calendar
+#>    service_id monday tuesday wednesday thursday friday saturday sunday
+#>        <char>  <int>   <int>     <int>    <int>  <int>    <int>  <int>
+#> 1:         WE      0       0         0        0      0        1      1
+#> 2:         WD      1       1         1        1      1        0      0
+#>    start_date   end_date
+#>        <Date>     <Date>
+#> 1: 2006-07-01 2006-07-31
+#> 2: 2006-07-01 2006-07-31
 ```

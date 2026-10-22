@@ -7,7 +7,14 @@ frequency-based trip, described in the `frequencies` table.
 ## Usage
 
 ``` r
-set_route_frequency(gtfs, route_id, headway, from, to)
+set_route_frequency(
+  gtfs,
+  route_id = NULL,
+  headway,
+  from,
+  to,
+  route_type = NULL
+)
 ```
 
 ## Arguments
@@ -20,7 +27,9 @@ set_route_frequency(gtfs, route_id, headway, from, to)
 - route_id:
 
   A character vector including the `route_id`s to have their frequency
-  set. `route_id`s not listed in `trips` are ignored, with a warning.
+  set. `route_id`s not listed in `trips` are ignored, with a warning. If
+  `NULL` (the default), `route_type` must be given, and the frequency of
+  every route of these types is set.
 
 - headway:
 
@@ -37,6 +46,15 @@ set_route_frequency(gtfs, route_id, headway, from, to)
 
   A string. The ending point of the time of day, in the "HH:MM:SS"
   format. Must be later than `from`.
+
+- route_type:
+
+  An integer vector of `route_type`s (see
+  [`filter_by_route_type()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_route_type.md)).
+  If given, only routes of these types are changed; together with
+  `route_id`, it restricts the given routes. `route_type`s not listed in
+  `routes` are ignored. If `NULL` (the default), routes of any type are
+  changed.
 
 ## Value
 

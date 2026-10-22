@@ -60,7 +60,14 @@ described in the <code>frequencies</code> table.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">set_route_frequency</span><span class="op">(</span><span class="va">gtfs</span>, <span class="va">route_id</span>, <span class="va">headway</span>, <span class="va">from</span>, <span class="va">to</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">set_route_frequency</span><span class="op">(</span></span>
+<span>  <span class="va">gtfs</span>,</span>
+<span>  route_id <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">headway</span>,</span>
+<span>  <span class="va">from</span>,</span>
+<span>  <span class="va">to</span>,</span>
+<span>  route_type <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -74,7 +81,8 @@ described in the <code>frequencies</code> table.</p>
 <dt id="arg-route-id">route_id<a class="anchor" aria-label="anchor" href="#arg-route-id"></a></dt>
 <dd><p>A character vector including the <code>route_id</code>s to have their
 frequency set. <code>route_id</code>s not listed in <code>trips</code> are ignored, with a
-warning.</p></dd>
+warning. If <code>NULL</code> (the default), <code>route_type</code> must be given, and the
+frequency of every route of these types is set.</p></dd>
 
 
 <dt id="arg-headway">headway<a class="anchor" aria-label="anchor" href="#arg-headway"></a></dt>
@@ -91,6 +99,14 @@ per route to set different headways).</p></dd>
 <dt id="arg-to">to<a class="anchor" aria-label="anchor" href="#arg-to"></a></dt>
 <dd><p>A string. The ending point of the time of day, in the "HH:MM:SS"
 format. Must be later than <code>from</code>.</p></dd>
+
+
+<dt id="arg-route-type">route_type<a class="anchor" aria-label="anchor" href="#arg-route-type"></a></dt>
+<dd><p>An integer vector of <code>route_type</code>s (see
+<code><a href="filter_by_route_type.html">filter_by_route_type()</a></code>). If given, only routes of these types are
+changed; together with <code>route_id</code>, it restricts the given routes.
+<code>route_type</code>s not listed in <code>routes</code> are ignored. If <code>NULL</code> (the
+default), routes of any type are changed.</p></dd>
 
 </dl></div>
     <div class="section level2">

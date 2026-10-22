@@ -63,7 +63,18 @@ trips that are already slower are left unchanged.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">set_max_speed</span><span class="op">(</span><span class="va">gtfs</span>, <span class="va">max_speed</span>, route_id <span class="op">=</span> <span class="cn">NULL</span>, trip_id <span class="op">=</span> <span class="cn">NULL</span>, unit <span class="op">=</span> <span class="st">"km/h"</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">set_max_speed</span><span class="op">(</span></span>
+<span>  <span class="va">gtfs</span>,</span>
+<span>  <span class="va">max_speed</span>,</span>
+<span>  route_id <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  trip_id <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  unit <span class="op">=</span> <span class="st">"km/h"</span>,</span>
+<span>  first_stop <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  last_stop <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  from <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  to <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  route_type <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -81,8 +92,8 @@ trips that are already slower are left unchanged.</p>
 
 <dt id="arg-route-id">route_id<a class="anchor" aria-label="anchor" href="#arg-route-id"></a></dt>
 <dd><p>A character vector including the <code>route_id</code>s whose trips
-have their speeds capped. If both <code>route_id</code> and <code>trip_id</code> are <code>NULL</code>
-(the default), the speeds of every trip in the GTFS are capped.
+have their speeds capped. If <code>route_id</code>, <code>trip_id</code> and <code>route_type</code> are
+all <code>NULL</code> (the default), the speeds of every trip in the GTFS are capped.
 <code>route_id</code>s not listed in <code>trips</code> are ignored, with a warning.</p></dd>
 
 
@@ -95,6 +106,37 @@ capped.</p></dd>
 <dt id="arg-unit">unit<a class="anchor" aria-label="anchor" href="#arg-unit"></a></dt>
 <dd><p>A string representing the unit in which the speed is given. One
 of <code>"km/h"</code> (the default), <code>"m/s"</code> or <code>"mph"</code> (miles per hour).</p></dd>
+
+
+<dt id="arg-first-stop">first_stop<a class="anchor" aria-label="anchor" href="#arg-first-stop"></a></dt>
+<dd><p>A string. The <code>stop_id</code> where the segment whose speeds
+are capped starts. If <code>NULL</code> (the default), the segment starts at each
+trip's first stop.</p></dd>
+
+
+<dt id="arg-last-stop">last_stop<a class="anchor" aria-label="anchor" href="#arg-last-stop"></a></dt>
+<dd><p>A string. The <code>stop_id</code> where the segment ends. If <code>NULL</code>
+(the default), the segment ends at each trip's last stop.</p></dd>
+
+
+<dt id="arg-from">from<a class="anchor" aria-label="anchor" href="#arg-from"></a></dt>
+<dd><p>A string, in the "HH:MM:SS" format. Only trips that depart from
+the segment's first stop at or after <code>from</code> are changed. If <code>NULL</code> (the
+default), there is no lower limit.</p></dd>
+
+
+<dt id="arg-to">to<a class="anchor" aria-label="anchor" href="#arg-to"></a></dt>
+<dd><p>A string, in the "HH:MM:SS" format. Only trips that depart from
+the segment's first stop at or before <code>to</code> are changed. If <code>NULL</code> (the
+default), there is no upper limit.</p></dd>
+
+
+<dt id="arg-route-type">route_type<a class="anchor" aria-label="anchor" href="#arg-route-type"></a></dt>
+<dd><p>An integer vector of <code>route_type</code>s (see
+<code><a href="filter_by_route_type.html">filter_by_route_type()</a></code>). If given, only trips of routes of these types
+are changed; together with the other selection arguments, it restricts
+their selection. <code>route_type</code>s not listed in <code>routes</code> are ignored. If
+<code>NULL</code> (the default), trips of any type are changed.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -121,6 +163,22 @@ Spans whose arrival is earlier than the previous departure are left
 unchanged, with a warning. This usually happens when times after midnight
 are written as <code>"00:30:00"</code> instead of <code>"24:30:00"</code>. Only <code>stop_times</code> is
 modified.</p>
+<p>With <code>first_stop</code> and <code>last_stop</code>, only the spans between them are capped.
+<code>first_stop</code> is matched at its first visit in <code>stop_sequence</code> order, and
+<code>last_stop</code> at its next visit after that (which may be the same stop), as
+in <code><a href="set_trip_speed.html">set_trip_speed()</a></code>. Times before <code>first_stop</code> don't change, and the times
+at and after <code>last_stop</code> are shifted by the extra time. The given stops must
+have a time, so that no span crosses them. If only <code>last_stop</code> is given,
+the trip's first stop doesn't need one, because spans start at stops with
+times. Trips that don't visit <code>first_stop</code> and then <code>last_stop</code>, or that
+have blank times there, are left unchanged, with a warning if they were
+given in <code>trip_id</code> or <code>route_id</code> (not if they were selected only by
+<code>route_type</code>). <code>from</code> and <code>to</code> are compared with the
+departure at the segment's first stop (or its arrival, if the departure is
+blank) as written in <code>stop_times</code>, so use times past <code>"24:00:00"</code> for
+departures after midnight. For trips listed in <code>frequencies</code>, these are
+template times, not actual departures. Trips without a time there are left
+unchanged.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -184,6 +242,36 @@ modified.</p>
 <span class="r-in"><span> <span class="fu"><a href="get_start_and_end_times.html">get_start_and_end_times</a></span><span class="op">(</span><span class="va">gtfs_capped</span>, trip_id <span class="op">=</span> <span class="st">"CPTM L07-0"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> start_time   end_time </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> "04:00:00" "06:31:13" </span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># cap the speed only between two stops. the spans before and after them</span></span></span>
+<span class="r-in"><span><span class="co"># are not capped</span></span></span>
+<span class="r-in"><span><span class="va">gtfs_capped</span> <span class="op">&lt;-</span> <span class="fu">set_max_speed</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">gtfs</span>,</span></span>
+<span class="r-in"><span>  max_speed <span class="op">=</span> <span class="fl">30</span>,</span></span>
+<span class="r-in"><span>  trip_id <span class="op">=</span> <span class="st">"CPTM L07-0"</span>,</span></span>
+<span class="r-in"><span>  first_stop <span class="op">=</span> <span class="st">"18921"</span>,</span></span>
+<span class="r-in"><span>  last_stop <span class="op">=</span> <span class="st">"18974"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="get_trip_speed.html">get_trip_speed</a></span><span class="op">(</span><span class="va">gtfs_capped</span>, <span class="st">"CPTM L07-0"</span>, by <span class="op">=</span> <span class="st">"segment"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     route_id    trip_id segment from_stop_id to_stop_id    speed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       &lt;char&gt;     &lt;char&gt;   &lt;int&gt;       &lt;char&gt;     &lt;char&gt;    &lt;num&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1: CPTM L07 CPTM L07-0       1        18940      18920 26.60738</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  2: CPTM L07 CPTM L07-0       2        18920      18919 18.18377</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  3: CPTM L07 CPTM L07-0       3        18919      18917 11.93590</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  4: CPTM L07 CPTM L07-0       4        18917      18916 15.07881</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  5: CPTM L07 CPTM L07-0       5        18916      18965 16.28882</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  6: CPTM L07 CPTM L07-0       6        18965      18923 21.31043</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  7: CPTM L07 CPTM L07-0       7        18923      18922 15.08821</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  8: CPTM L07 CPTM L07-0       8        18922    4114459 17.68714</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  9: CPTM L07 CPTM L07-0       9      4114459      18921 31.53864</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10: CPTM L07 CPTM L07-0      10        18921      18924 29.98277</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11: CPTM L07 CPTM L07-0      11        18924      18925 29.98309</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12: CPTM L07 CPTM L07-0      12        18925      18926 20.48514</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13: CPTM L07 CPTM L07-0      13        18926      18971 26.54381</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14: CPTM L07 CPTM L07-0      14        18971      18972 29.98556</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15: CPTM L07 CPTM L07-0      15        18972      18973 28.27469</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16: CPTM L07 CPTM L07-0      16        18973      18974 29.98277</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17: CPTM L07 CPTM L07-0      17        18974      18975 38.29072</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># cap the speed of all the trips of all routes of the GTFS feed</span></span></span>
 <span class="r-in"><span><span class="va">gtfs_capped</span> <span class="op">&lt;-</span> <span class="fu">set_max_speed</span><span class="op">(</span><span class="va">gtfs</span>, max_speed <span class="op">=</span> <span class="fl">8</span><span class="op">)</span></span></span>

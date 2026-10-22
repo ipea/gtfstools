@@ -8,7 +8,18 @@ the trips that are already slower are left unchanged.
 ## Usage
 
 ``` r
-set_max_speed(gtfs, max_speed, route_id = NULL, trip_id = NULL, unit = "km/h")
+set_max_speed(
+  gtfs,
+  max_speed,
+  route_id = NULL,
+  trip_id = NULL,
+  unit = "km/h",
+  first_stop = NULL,
+  last_stop = NULL,
+  from = NULL,
+  to = NULL,
+  route_type = NULL
+)
 ```
 
 ## Arguments
@@ -25,9 +36,9 @@ set_max_speed(gtfs, max_speed, route_id = NULL, trip_id = NULL, unit = "km/h")
 - route_id:
 
   A character vector including the `route_id`s whose trips have their
-  speeds capped. If both `route_id` and `trip_id` are `NULL` (the
-  default), the speeds of every trip in the GTFS are capped. `route_id`s
-  not listed in `trips` are ignored, with a warning.
+  speeds capped. If `route_id`, `trip_id` and `route_type` are all
+  `NULL` (the default), the speeds of every trip in the GTFS are capped.
+  `route_id`s not listed in `trips` are ignored, with a warning.
 
 - trip_id:
 
@@ -39,6 +50,38 @@ set_max_speed(gtfs, max_speed, route_id = NULL, trip_id = NULL, unit = "km/h")
 
   A string representing the unit in which the speed is given. One of
   `"km/h"` (the default), `"m/s"` or `"mph"` (miles per hour).
+
+- first_stop:
+
+  A string. The `stop_id` where the segment whose speeds are capped
+  starts. If `NULL` (the default), the segment starts at each trip's
+  first stop.
+
+- last_stop:
+
+  A string. The `stop_id` where the segment ends. If `NULL` (the
+  default), the segment ends at each trip's last stop.
+
+- from:
+
+  A string, in the "HH:MM:SS" format. Only trips that depart from the
+  segment's first stop at or after `from` are changed. If `NULL` (the
+  default), there is no lower limit.
+
+- to:
+
+  A string, in the "HH:MM:SS" format. Only trips that depart from the
+  segment's first stop at or before `to` are changed. If `NULL` (the
+  default), there is no upper limit.
+
+- route_type:
+
+  An integer vector of `route_type`s (see
+  [`filter_by_route_type()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_route_type.md)).
+  If given, only trips of routes of these types are changed; together
+  with the other selection arguments, it restricts their selection.
+  `route_type`s not listed in `routes` are ignored. If `NULL` (the
+  default), trips of any type are changed.
 
 ## Value
 
@@ -65,6 +108,25 @@ dwell times are kept. Spans whose arrival is earlier than the previous
 departure are left unchanged, with a warning. This usually happens when
 times after midnight are written as `"00:30:00"` instead of
 `"24:30:00"`. Only `stop_times` is modified.
+
+With `first_stop` and `last_stop`, only the spans between them are
+capped. `first_stop` is matched at its first visit in `stop_sequence`
+order, and `last_stop` at its next visit after that (which may be the
+same stop), as in
+[`set_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.md).
+Times before `first_stop` don't change, and the times at and after
+`last_stop` are shifted by the extra time. The given stops must have a
+time, so that no span crosses them. If only `last_stop` is given, the
+trip's first stop doesn't need one, because spans start at stops with
+times. Trips that don't visit `first_stop` and then `last_stop`, or that
+have blank times there, are left unchanged, with a warning if they were
+given in `trip_id` or `route_id` (not if they were selected only by
+`route_type`). `from` and `to` are compared with the departure at the
+segment's first stop (or its arrival, if the departure is blank) as
+written in `stop_times`, so use times past `"24:00:00"` for departures
+after midnight. For trips listed in `frequencies`, these are template
+times, not actual departures. Trips without a time there are left
+unchanged.
 
 ## See also
 
@@ -129,6 +191,36 @@ get_trip_speed(gtfs_capped, "CPTM L07-0", by = "segment")
  get_start_and_end_times(gtfs_capped, trip_id = "CPTM L07-0")
 #> start_time   end_time 
 #> "04:00:00" "06:31:13" 
+
+# cap the speed only between two stops. the spans before and after them
+# are not capped
+gtfs_capped <- set_max_speed(
+  gtfs,
+  max_speed = 30,
+  trip_id = "CPTM L07-0",
+  first_stop = "18921",
+  last_stop = "18974"
+)
+get_trip_speed(gtfs_capped, "CPTM L07-0", by = "segment")
+#>     route_id    trip_id segment from_stop_id to_stop_id    speed
+#>       <char>     <char>   <int>       <char>     <char>    <num>
+#>  1: CPTM L07 CPTM L07-0       1        18940      18920 26.60738
+#>  2: CPTM L07 CPTM L07-0       2        18920      18919 18.18377
+#>  3: CPTM L07 CPTM L07-0       3        18919      18917 11.93590
+#>  4: CPTM L07 CPTM L07-0       4        18917      18916 15.07881
+#>  5: CPTM L07 CPTM L07-0       5        18916      18965 16.28882
+#>  6: CPTM L07 CPTM L07-0       6        18965      18923 21.31043
+#>  7: CPTM L07 CPTM L07-0       7        18923      18922 15.08821
+#>  8: CPTM L07 CPTM L07-0       8        18922    4114459 17.68714
+#>  9: CPTM L07 CPTM L07-0       9      4114459      18921 31.53864
+#> 10: CPTM L07 CPTM L07-0      10        18921      18924 29.98277
+#> 11: CPTM L07 CPTM L07-0      11        18924      18925 29.98309
+#> 12: CPTM L07 CPTM L07-0      12        18925      18926 20.48514
+#> 13: CPTM L07 CPTM L07-0      13        18926      18971 26.54381
+#> 14: CPTM L07 CPTM L07-0      14        18971      18972 29.98556
+#> 15: CPTM L07 CPTM L07-0      15        18972      18973 28.27469
+#> 16: CPTM L07 CPTM L07-0      16        18973      18974 29.98277
+#> 17: CPTM L07 CPTM L07-0      17        18974      18975 38.29072
 
 # cap the speed of all the trips of all routes of the GTFS feed
 gtfs_capped <- set_max_speed(gtfs, max_speed = 8)

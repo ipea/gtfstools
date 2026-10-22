@@ -70,7 +70,9 @@ between stops.</p>
 <span>  by <span class="op">=</span> <span class="st">"trip"</span>,</span>
 <span>  unit <span class="op">=</span> <span class="st">"km"</span>,</span>
 <span>  <span class="va">sort_sequence</span>,</span>
-<span>  file <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  file <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  from <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  to <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -118,6 +120,20 @@ now always sorted by <code>stop_sequence</code> and <code>shape_pt_sequence</cod
 <dd><p>Deprecated. Use <code>method</code> instead (<code>file = "stop_times"</code>
 corresponds to <code>method = "euclidean"</code>).</p></dd>
 
+
+<dt id="arg-from">from<a class="anchor" aria-label="anchor" href="#arg-from"></a></dt>
+<dd><p>A string, in the "HH:MM:SS" format. With <code>by = "trip"</code>, only
+trips that depart from their first stop at or after <code>from</code> are included.
+With <code>by = "segment"</code>, only segments that depart from their first stop at
+or after <code>from</code> are included. If <code>NULL</code> (the default), there is no lower
+limit.</p></dd>
+
+
+<dt id="arg-to">to<a class="anchor" aria-label="anchor" href="#arg-to"></a></dt>
+<dd><p>A string, in the "HH:MM:SS" format. Only trips (or segments) that
+depart from their first stop at or before <code>to</code> are included. If <code>NULL</code>
+(the default), there is no upper limit.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -150,6 +166,12 @@ two distinct points have <code>NA</code> lengths, with a warning. Use
 <p>Lengths are great-circle (haversine) distances on the sphere used by
 <code>{s2}</code>. Stops with missing coordinates, or not listed in <code>stops</code>, result in
 <code>NA</code> lengths for their segments and trips.</p>
+<p><code>from</code> and <code>to</code> are compared with the <code>departure_time</code> of the first stop of
+each trip (in <code>stop_sequence</code> order) or segment, as written in
+<code>stop_times</code>, so use times past <code>"24:00:00"</code> for departures after midnight.
+For trips listed in <code>frequencies</code>, these are template times, not the times
+of each departure. Trips and segments whose departure is blank are never
+included when <code>from</code> or <code>to</code> is given.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

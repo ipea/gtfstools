@@ -100,11 +100,14 @@ and the columns <code>start_date</code>, <code>end_date</code> (both included in
 per feed and service day, and the columns <code>feed</code>, <code>date</code>, <code>n_trips</code> (the
 number of trips that run on the day) and <code>overlap</code> (whether all feeds have
 service on the day).</p>
-<p>If <code>plot = TRUE</code>, a <code>ggplot</code> object. With <code>resolution = "periods"</code>, it
-shows one bar per feed (top to bottom in the given order) spanning its
-service days. With <code>resolution = "daily"</code>, it shows the density of each
-feed's trips over time (weighted by the number of trips per day), one
-panel per feed. In both, the overlap periods are shaded.</p>
+<p>If <code>plot = TRUE</code>, a <code>ggplot</code> object with dates on the x axis and one row
+per feed (top to bottom in the given order). With
+<code>resolution = "periods"</code>, it shows a bar spanning each feed's service
+days. With <code>resolution = "daily"</code>, it shows a box plot of when each
+feed's trips run: the box spans the days by which a quarter and three
+quarters of its trips have run, with a line on the day by which half
+have, and the whiskers reach its first and last service days. In both,
+the overlap periods are shaded.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -118,7 +121,8 @@ in <code>calendar_dates</code> (<code>exception_type</code> 2), plus the days ad
 addition wins. Either table may be missing. If the feed has a <code>trips</code>
 table with a <code>service_id</code> field, services not used by any trip are ignored.
 <code>feed_info</code> dates are not used. A warning is raised for feeds without any
-service day.</p>
+service day, and a message when two or more feeds have no day with service
+in all of them.</p>
 <p>The number of trips on a day is the number of trips of the services that
 run on it. A trip listed in <code>frequencies</code> counts once per departure, every
 <code>headway_secs</code> from <code>start_time</code> until (but not including) <code>end_time</code> (an
@@ -130,7 +134,7 @@ which keeps only their unique departures. A trip with an invalid
 service day, so departures after midnight (with times later than
 <code>"24:00:00"</code>) count on the previous day. If the feed
 has no <code>trips</code> table with a <code>service_id</code> field, <code>n_trips</code> is <code>NA</code>, and the
-daily plot shows the density of its service days instead.</p>
+daily plot shows no box for it.</p>
 <p>Feeds are named after their file names (without the extension) or after the
 list names. Unnamed feeds are named after their position (<code>"feed_1"</code>,
 <code>"feed_2"</code>, etc.), and duplicated names are made unique. Plots of feeds

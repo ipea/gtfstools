@@ -59,13 +59,14 @@ by changing the <code>arrival_time</code> and <code>departure_time</code> column
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">set_trip_speed</span><span class="op">(</span></span>
 <span>  <span class="va">gtfs</span>,</span>
-<span>  <span class="va">trip_id</span>,</span>
+<span>  trip_id <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">speed</span>,</span>
 <span>  unit <span class="op">=</span> <span class="st">"km/h"</span>,</span>
 <span>  first_stop <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  last_stop <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  from <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  to <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  route_type <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  by_reference <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -80,14 +81,16 @@ by changing the <code>arrival_time</code> and <code>departure_time</code> column
 
 <dt id="arg-trip-id">trip_id<a class="anchor" aria-label="anchor" href="#arg-trip-id"></a></dt>
 <dd><p>A string vector including the <code>trip_id</code>s to have their
-average speed set.</p></dd>
+average speed set. If <code>NULL</code> (the default), <code>route_type</code> must be given,
+and the speed of every trip of these types is set.</p></dd>
 
 
 <dt id="arg-speed">speed<a class="anchor" aria-label="anchor" href="#arg-speed"></a></dt>
 <dd><p>A numeric representing the speed to be set. Its length must
 either equal 1, in which case the value is recycled for all
 <code>trip_id</code>s, or equal <code>trip_id</code>'s length. Must be positive and finite. A
-<code>trip_id</code> listed more than once must be given the same speed.</p></dd>
+<code>trip_id</code> listed more than once must be given the same speed. Must be a
+single number when <code>trip_id</code> is <code>NULL</code>.</p></dd>
 
 
 <dt id="arg-unit">unit<a class="anchor" aria-label="anchor" href="#arg-unit"></a></dt>
@@ -116,6 +119,14 @@ default), there is no lower limit.</p></dd>
 <dd><p>A string, in the "HH:MM:SS" format. Only trips that depart from
 the segment's first stop at or before <code>to</code> are changed. If <code>NULL</code> (the
 default), there is no upper limit.</p></dd>
+
+
+<dt id="arg-route-type">route_type<a class="anchor" aria-label="anchor" href="#arg-route-type"></a></dt>
+<dd><p>An integer vector of <code>route_type</code>s (see
+<code><a href="filter_by_route_type.html">filter_by_route_type()</a></code>). If given, only trips of routes of these types
+are changed; together with the other selection arguments, it restricts
+their selection. <code>route_type</code>s not listed in <code>routes</code> are ignored. If
+<code>NULL</code> (the default), trips of any type are changed.</p></dd>
 
 
 <dt id="arg-by-reference">by_reference<a class="anchor" aria-label="anchor" href="#arg-by-reference"></a></dt>
@@ -148,8 +159,9 @@ these times from the average speed.</p>
 after <code>last_stop</code> are shifted by the change in the segment's duration. Dwell
 times at <code>first_stop</code> and <code>last_stop</code> are kept, except at the trip's first
 and last stops. Trips that don't visit <code>first_stop</code> and then <code>last_stop</code>, or
-that have blank times there, are left unchanged with a warning. <code>from</code> and
-<code>to</code> are compared with the <code>departure_time</code> at <code>first_stop</code> as written in
+that have blank times there, are left unchanged, with a warning if they were
+given in <code>trip_id</code> (not if they were selected only by <code>route_type</code>). <code>from</code>
+and <code>to</code> are compared with the <code>departure_time</code> at <code>first_stop</code> as written in
 <code>stop_times</code>, so use times past <code>"24:00:00"</code> for departures after midnight.
 For trips listed in <code>frequencies</code>, these are template times, not actual
 departures. Trips whose departure there is blank are left unchanged.</p>

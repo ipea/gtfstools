@@ -9,13 +9,14 @@ columns in `stop_times`.
 ``` r
 set_route_speed(
   gtfs,
-  route_id,
+  route_id = NULL,
   speed,
   unit = "km/h",
   first_stop = NULL,
   last_stop = NULL,
   from = NULL,
   to = NULL,
+  route_type = NULL,
   by_reference = FALSE
 )
 ```
@@ -31,7 +32,8 @@ set_route_speed(
 
   A character vector including the `route_id`s to have the average speed
   of their trips set. `route_id`s not listed in `trips` are ignored,
-  with a warning.
+  with a warning. If `NULL` (the default), `route_type` must be given,
+  and the speed of every trip of these types is set.
 
 - speed:
 
@@ -64,6 +66,15 @@ set_route_speed(
   A string, in the "HH:MM:SS" format. Only trips that depart from the
   segment's first stop at or before `to` are changed. If `NULL` (the
   default), there is no upper limit.
+
+- route_type:
+
+  An integer vector of `route_type`s (see
+  [`filter_by_route_type()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_route_type.md)).
+  If given, only trips of routes of these types are changed; together
+  with the other selection arguments, it restricts their selection.
+  `route_type`s not listed in `routes` are ignored. If `NULL` (the
+  default), trips of any type are changed.
 
 - by_reference:
 

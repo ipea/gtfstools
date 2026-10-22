@@ -44,11 +44,14 @@ row per feed and service day, and the columns `feed`, `date`, `n_trips`
 (the number of trips that run on the day) and `overlap` (whether all
 feeds have service on the day).
 
-If `plot = TRUE`, a `ggplot` object. With `resolution = "periods"`, it
-shows one bar per feed (top to bottom in the given order) spanning its
-service days. With `resolution = "daily"`, it shows the density of each
-feed's trips over time (weighted by the number of trips per day), one
-panel per feed. In both, the overlap periods are shaded.
+If `plot = TRUE`, a `ggplot` object with dates on the x axis and one row
+per feed (top to bottom in the given order). With
+`resolution = "periods"`, it shows a bar spanning each feed's service
+days. With `resolution = "daily"`, it shows a box plot of when each
+feed's trips run: the box spans the days by which a quarter and three
+quarters of its trips have run, with a line on the day by which half
+have, and the whiskers reach its first and last service days. In both,
+the overlap periods are shaded.
 
 ## Details
 
@@ -60,7 +63,8 @@ it (`exception_type` 1). If a service is both added and removed on a
 day, the addition wins. Either table may be missing. If the feed has a
 `trips` table with a `service_id` field, services not used by any trip
 are ignored. `feed_info` dates are not used. A warning is raised for
-feeds without any service day.
+feeds without any service day, and a message when two or more feeds have
+no day with service in all of them.
 
 The number of trips on a day is the number of trips of the services that
 run on it. A trip listed in `frequencies` counts once per departure,
@@ -74,7 +78,7 @@ which keeps only their unique departures. A trip with an invalid
 service day, so departures after midnight (with times later than
 `"24:00:00"`) count on the previous day. If the feed has no `trips`
 table with a `service_id` field, `n_trips` is `NA`, and the daily plot
-shows the density of its service days instead.
+shows no box for it.
 
 Feeds are named after their file names (without the extension) or after
 the list names. Unnamed feeds are named after their position

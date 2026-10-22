@@ -6,7 +6,14 @@ specified `route_id`.
 ## Usage
 
 ``` r
-get_route_speed(gtfs, route_id = NULL, method = "shapes", unit = "km/h")
+get_route_speed(
+  gtfs,
+  route_id = NULL,
+  method = "shapes",
+  unit = "km/h",
+  from = NULL,
+  to = NULL
+)
 ```
 
 ## Arguments
@@ -37,6 +44,18 @@ get_route_speed(gtfs, route_id = NULL, method = "shapes", unit = "km/h")
   A string representing the unit in which the speeds are desired. One of
   `"km/h"` (the default), `"m/s"` or `"mph"` (miles per hour).
 
+- from:
+
+  A string, in the "HH:MM:SS" format. Only trips that depart from their
+  first stop at or after `from` are included. If `NULL` (the default),
+  there is no lower limit.
+
+- to:
+
+  A string, in the "HH:MM:SS" format. Only trips that depart from their
+  first stop at or before `to` are included. If `NULL` (the default),
+  there is no upper limit.
+
 ## Value
 
 A `data.table` with the `route_id` and the minimum (`min_speed`), mean
@@ -57,7 +76,8 @@ their headways.
 Trips with `NA` speeds are ignored. Routes whose trips all have `NA`
 speeds get `NA` statistics, and `sd_speed` is `NA` for routes with a
 single trip with a known speed. Routes without any trip in `stop_times`
-are not returned.
+(or, if `from` or `to` is given, without any trip departing within the
+time of day) are not returned.
 
 ## See also
 

@@ -14,7 +14,9 @@ get_trip_speed(
   by = "trip",
   unit = "km/h",
   sort_sequence,
-  file = NULL
+  file = NULL,
+  from = NULL,
+  to = NULL
 )
 ```
 
@@ -63,6 +65,20 @@ get_trip_speed(
   Deprecated. Use `method` instead (`file = "stop_times"` corresponds to
   `method = "euclidean"`).
 
+- from:
+
+  A string, in the "HH:MM:SS" format. With `by = "trip"`, only trips
+  that depart from their first stop at or after `from` are included.
+  With `by = "segment"`, only segments that depart from their first stop
+  at or after `from` are included. If `NULL` (the default), there is no
+  lower limit.
+
+- to:
+
+  A string, in the "HH:MM:SS" format. Only trips (or segments) that
+  depart from their first stop at or before `to` are included. If `NULL`
+  (the default), there is no upper limit.
+
 ## Value
 
 With `by = "trip"`, a `data.table` with the `route_id`, the `trip_id`
@@ -92,6 +108,10 @@ have an `NA` `route_id`.
 Existing `_secs` columns in `stop_times` (e.g. created with
 [`convert_time_to_seconds()`](https://ipea.github.io/gtfstools/dev/reference/convert_time_to_seconds.md))
 are used as-is, not recalculated from the time strings.
+
+`from` and `to` select the trips (or segments) as in
+[`get_trip_length()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_length.md),
+from the `departure_time` strings, even if `_secs` columns exist.
 
 ## See also
 
@@ -156,4 +176,16 @@ head(segment_speed)
 #> 4: CPTM L07 CPTM L07-0       4        18917      18916 15.07881
 #> 5: CPTM L07 CPTM L07-0       5        18916      18965 16.28882
 #> 6: CPTM L07 CPTM L07-0       6        18965      18923 21.31043
+
+# speed of the trips that depart within a time of day
+peak_speed <- get_trip_speed(gtfs, from = "07:00:00", to = "09:00:00")
+head(peak_speed)
+#> Key: <trip_id>
+#>    route_id   trip_id     speed
+#>      <char>    <char>     <num>
+#> 1:  2002-10 2002-10-0  8.360838
+#> 2:  2161-10 2161-10-0 11.172445
+#> 3:  4491-10 4491-10-0 12.011979
+#> 4:  5290-10 5290-10-0 10.636326
+#> 5:  6450-51 6450-51-0 11.450417
 ```

@@ -59,6 +59,10 @@ Other contributors:
 
 - Christopher Higgins \[contributor\]
 
+- Gonçalo F. Matos \[contributor\]
+
+- Yigit Han Eroglu \[contributor\]
+
 - Arthur Bazolli <baz.arthur@gmail.com> \[contributor\]
 
 - Marcus Saraiva ([ORCID](https://orcid.org/0000-0001-6218-2338))

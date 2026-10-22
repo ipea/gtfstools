@@ -95,6 +95,7 @@
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/remove_duplicates.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/remove_unused_ids.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/report_deps_available.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/route_type_ids.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/seconds_to_string.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/set_dwell_time.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/set_max_speed.html</loc></url>

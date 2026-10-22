@@ -76,21 +76,22 @@ already read with
 names are used as feed names,
 e.g. `get_calendar_overlap(list(spo = spo_gtfs, poa = poa_gtfs))`.
 
-With `plot = TRUE`, the density of each feed’s trips over time is
-plotted in a panel of its own, weighting each day by its number of
-trips. The days on which all feeds have service are shaded:
+With `plot = TRUE`, a box plot shows when each feed’s trips run. The box
+spans the days by which a quarter and three quarters of the feed’s trips
+have run, with a line on the day by which half have, and the whiskers
+reach its first and last service days. The days on which all feeds have
+service are shaded:
 
 ``` r
 
-get_calendar_overlap(c(spo_path, poa_path), plot = TRUE) +
-  coord_cartesian(xlim = as.Date(c("2019-01-01", "2019-05-01")))
+get_calendar_overlap(c(spo_path, poa_path), plot = TRUE)
 ```
 
 ![](calendar_overlap_files/figure-html/unnamed-chunk-5-1.png)
 
 The result is a regular `ggplot` object, so it can be customised with
 [ggplot2](https://ggplot2.tidyverse.org) functions, e.g. to zoom in on a
-period, as above.
+period, as in the timeline below.
 
 The daily trips help pick a departure date on which every feed runs its
 usual level of service, such as a regular weekday away from holidays.
@@ -126,8 +127,8 @@ get_calendar_overlap(c(spo_path, poa_path), resolution = "periods")
 ```
 
 The São Paulo and Porto Alegre feeds overlap for 91 days, from January
-18 to April 18, 2019. When the feeds don’t overlap, the result has no
-rows:
+18 to April 18, 2019. When the feeds don’t overlap, a message is printed
+and the result has no rows:
 
 ``` r
 
@@ -135,6 +136,7 @@ ber_path <- system.file("extdata/ber_gtfs.zip", package = "gtfstools")
 feeds <- c(spo_path, poa_path, ber_path)
 
 get_calendar_overlap(feeds, resolution = "periods")
+#> No day has service in all feeds.
 #> Empty data.table (0 rows and 3 cols): start_date,end_date,n_days
 ```
 
@@ -147,6 +149,7 @@ so the plot is zoomed in:
 
 get_calendar_overlap(feeds, resolution = "periods", plot = TRUE) +
   coord_cartesian(xlim = as.Date(c("2018-12-01", "2021-07-01")))
+#> No day has service in all feeds.
 ```
 
 ![](calendar_overlap_files/figure-html/unnamed-chunk-9-1.png)

@@ -57,7 +57,14 @@ specified <code>route_id</code>.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_route_speed</span><span class="op">(</span><span class="va">gtfs</span>, route_id <span class="op">=</span> <span class="cn">NULL</span>, method <span class="op">=</span> <span class="st">"shapes"</span>, unit <span class="op">=</span> <span class="st">"km/h"</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_route_speed</span><span class="op">(</span></span>
+<span>  <span class="va">gtfs</span>,</span>
+<span>  route_id <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  method <span class="op">=</span> <span class="st">"shapes"</span>,</span>
+<span>  unit <span class="op">=</span> <span class="st">"km/h"</span>,</span>
+<span>  from <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  to <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -88,6 +95,18 @@ doesn't have a <code>shapes</code> table, or if its <code>trips</code> table doe
 <dd><p>A string representing the unit in which the speeds are desired.
 One of <code>"km/h"</code> (the default), <code>"m/s"</code> or <code>"mph"</code> (miles per hour).</p></dd>
 
+
+<dt id="arg-from">from<a class="anchor" aria-label="anchor" href="#arg-from"></a></dt>
+<dd><p>A string, in the "HH:MM:SS" format. Only trips that depart from
+their first stop at or after <code>from</code> are included. If <code>NULL</code> (the
+default), there is no lower limit.</p></dd>
+
+
+<dt id="arg-to">to<a class="anchor" aria-label="anchor" href="#arg-to"></a></dt>
+<dd><p>A string, in the "HH:MM:SS" format. Only trips that depart from
+their first stop at or before <code>to</code> are included. If <code>NULL</code> (the default),
+there is no upper limit.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -107,8 +126,9 @@ speeds, not the total length of the trips divided by their total duration.
 Trips listed in <code>frequencies</code> count once, regardless of their headways.</p>
 <p>Trips with <code>NA</code> speeds are ignored. Routes whose trips all have <code>NA</code> speeds
 get <code>NA</code> statistics, and <code>sd_speed</code> is <code>NA</code> for routes with a single trip
-with a known speed. Routes without any trip in <code>stop_times</code> are not
-returned.</p>
+with a known speed. Routes without any trip in <code>stop_times</code> (or, if <code>from</code>
+or <code>to</code> is given, without any trip departing within the time of day) are
+not returned.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

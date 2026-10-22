@@ -15,7 +15,9 @@ get_trip_length(
   by = "trip",
   unit = "km",
   sort_sequence,
-  file = NULL
+  file = NULL,
+  from = NULL,
+  to = NULL
 )
 ```
 
@@ -63,6 +65,20 @@ get_trip_length(
   Deprecated. Use `method` instead (`file = "stop_times"` corresponds to
   `method = "euclidean"`).
 
+- from:
+
+  A string, in the "HH:MM:SS" format. With `by = "trip"`, only trips
+  that depart from their first stop at or after `from` are included.
+  With `by = "segment"`, only segments that depart from their first stop
+  at or after `from` are included. If `NULL` (the default), there is no
+  lower limit.
+
+- to:
+
+  A string, in the "HH:MM:SS" format. Only trips (or segments) that
+  depart from their first stop at or before `to` are included. If `NULL`
+  (the default), there is no upper limit.
+
 ## Value
 
 With `by = "trip"`, a `data.table` with the `trip_id` and the `length`
@@ -101,6 +117,13 @@ for the length of entire shapes.
 Lengths are great-circle (haversine) distances on the sphere used by
 `{s2}`. Stops with missing coordinates, or not listed in `stops`, result
 in `NA` lengths for their segments and trips.
+
+`from` and `to` are compared with the `departure_time` of the first stop
+of each trip (in `stop_sequence` order) or segment, as written in
+`stop_times`, so use times past `"24:00:00"` for departures after
+midnight. For trips listed in `frequencies`, these are template times,
+not the times of each departure. Trips and segments whose departure is
+blank are never included when `from` or `to` is given.
 
 ## See also
 

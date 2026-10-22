@@ -64,7 +64,9 @@ to the last stop of the trip or between each pair of consecutive stops.</p>
 <span>  by <span class="op">=</span> <span class="st">"trip"</span>,</span>
 <span>  unit <span class="op">=</span> <span class="st">"km/h"</span>,</span>
 <span>  <span class="va">sort_sequence</span>,</span>
-<span>  file <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  file <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  from <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  to <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -113,6 +115,20 @@ now always sorted by <code>stop_sequence</code> and <code>shape_pt_sequence</cod
 <dd><p>Deprecated. Use <code>method</code> instead (<code>file = "stop_times"</code>
 corresponds to <code>method = "euclidean"</code>).</p></dd>
 
+
+<dt id="arg-from">from<a class="anchor" aria-label="anchor" href="#arg-from"></a></dt>
+<dd><p>A string, in the "HH:MM:SS" format. With <code>by = "trip"</code>, only
+trips that depart from their first stop at or after <code>from</code> are included.
+With <code>by = "segment"</code>, only segments that depart from their first stop at
+or after <code>from</code> are included. If <code>NULL</code> (the default), there is no lower
+limit.</p></dd>
+
+
+<dt id="arg-to">to<a class="anchor" aria-label="anchor" href="#arg-to"></a></dt>
+<dd><p>A string, in the "HH:MM:SS" format. Only trips (or segments) that
+depart from their first stop at or before <code>to</code> are included. If <code>NULL</code>
+(the default), there is no upper limit.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -139,6 +155,8 @@ of <code><a href="get_trip_duration.html">get_trip_duration()</a></code>.</p>
 <p>Existing <code>_secs</code> columns in <code>stop_times</code> (e.g. created with
 <code><a href="convert_time_to_seconds.html">convert_time_to_seconds()</a></code>) are used as-is, not recalculated from the time
 strings.</p>
+<p><code>from</code> and <code>to</code> select the trips (or segments) as in <code><a href="get_trip_length.html">get_trip_length()</a></code>,
+from the <code>departure_time</code> strings, even if <code>_secs</code> columns exist.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -199,6 +217,18 @@ strings.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 4: CPTM L07 CPTM L07-0       4        18917      18916 15.07881</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5: CPTM L07 CPTM L07-0       5        18916      18965 16.28882</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6: CPTM L07 CPTM L07-0       6        18965      18923 21.31043</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># speed of the trips that depart within a time of day</span></span></span>
+<span class="r-in"><span><span class="va">peak_speed</span> <span class="op">&lt;-</span> <span class="fu">get_trip_speed</span><span class="op">(</span><span class="va">gtfs</span>, from <span class="op">=</span> <span class="st">"07:00:00"</span>, to <span class="op">=</span> <span class="st">"09:00:00"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">peak_speed</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Key: &lt;trip_id&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    route_id   trip_id     speed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      &lt;char&gt;    &lt;char&gt;     &lt;num&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:  2002-10 2002-10-0  8.360838</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:  2161-10 2161-10-0 11.172445</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:  4491-10 4491-10-0 12.011979</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:  5290-10 5290-10-0 10.636326</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5:  6450-51 6450-51-0 11.450417</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

@@ -9,13 +9,14 @@ it, by changing the `arrival_time` and `departure_time` columns in
 ``` r
 set_trip_speed(
   gtfs,
-  trip_id,
+  trip_id = NULL,
   speed,
   unit = "km/h",
   first_stop = NULL,
   last_stop = NULL,
   from = NULL,
   to = NULL,
+  route_type = NULL,
   by_reference = FALSE
 )
 ```
@@ -30,14 +31,16 @@ set_trip_speed(
 - trip_id:
 
   A string vector including the `trip_id`s to have their average speed
-  set.
+  set. If `NULL` (the default), `route_type` must be given, and the
+  speed of every trip of these types is set.
 
 - speed:
 
   A numeric representing the speed to be set. Its length must either
   equal 1, in which case the value is recycled for all `trip_id`s, or
   equal `trip_id`'s length. Must be positive and finite. A `trip_id`
-  listed more than once must be given the same speed.
+  listed more than once must be given the same speed. Must be a single
+  number when `trip_id` is `NULL`.
 
 - unit:
 
@@ -65,6 +68,15 @@ set_trip_speed(
   A string, in the "HH:MM:SS" format. Only trips that depart from the
   segment's first stop at or before `to` are changed. If `NULL` (the
   default), there is no upper limit.
+
+- route_type:
+
+  An integer vector of `route_type`s (see
+  [`filter_by_route_type()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_route_type.md)).
+  If given, only trips of routes of these types are changed; together
+  with the other selection arguments, it restricts their selection.
+  `route_type`s not listed in `routes` are ignored. If `NULL` (the
+  default), trips of any type are changed.
 
 - by_reference:
 
@@ -100,11 +112,12 @@ times from the average speed.
 Times after `last_stop` are shifted by the change in the segment's
 duration. Dwell times at `first_stop` and `last_stop` are kept, except
 at the trip's first and last stops. Trips that don't visit `first_stop`
-and then `last_stop`, or that have blank times there, are left unchanged
-with a warning. `from` and `to` are compared with the `departure_time`
-at `first_stop` as written in `stop_times`, so use times past
-`"24:00:00"` for departures after midnight. For trips listed in
-`frequencies`, these are template times, not actual departures. Trips
+and then `last_stop`, or that have blank times there, are left
+unchanged, with a warning if they were given in `trip_id` (not if they
+were selected only by `route_type`). `from` and `to` are compared with
+the `departure_time` at `first_stop` as written in `stop_times`, so use
+times past `"24:00:00"` for departures after midnight. For trips listed
+in `frequencies`, these are template times, not actual departures. Trips
 whose departure there is blank are left unchanged.
 
 ## See also

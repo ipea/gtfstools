@@ -5,7 +5,7 @@ Returns the duration of each specified `trip_id`.
 ## Usage
 
 ``` r
-get_trip_duration(gtfs, trip_id = NULL, unit = "min")
+get_trip_duration(gtfs, trip_id = NULL, unit = "min", from = NULL, to = NULL)
 ```
 
 ## Arguments
@@ -27,6 +27,18 @@ get_trip_duration(gtfs, trip_id = NULL, unit = "min")
   One of `"s"` (seconds), `"min"` (minutes, the default), `"h"` (hours)
   or `"d"` (days).
 
+- from:
+
+  A string, in the "HH:MM:SS" format. Only trips that depart from their
+  first stop at or after `from` are included. If `NULL` (the default),
+  there is no lower limit.
+
+- to:
+
+  A string, in the "HH:MM:SS" format. Only trips that depart from their
+  first stop at or before `to` are included. If `NULL` (the default),
+  there is no upper limit.
+
 ## Value
 
 A `data.table` containing the duration of each specified trip.
@@ -41,6 +53,15 @@ departure time get a `NA` duration, with a warning.
 Existing `_secs` columns in `stop_times` (e.g. created with
 [`convert_time_to_seconds()`](https://ipea.github.io/gtfstools/dev/reference/convert_time_to_seconds.md))
 are used as-is, not recalculated from the time strings.
+
+`from` and `to` are compared with the departure time of the first stop
+of each trip, in `stop_sequence` order (which must then be an integer
+column). The time is read as the durations are: from
+`departure_time_secs`, if present, or else from `departure_time`, so use
+times past `"24:00:00"` for departures after midnight. For trips listed
+in `frequencies`, these are template times, not the times of each
+departure. Trips whose first departure is blank are never included when
+`from` or `to` is given.
 
 ## Examples
 
