@@ -141,6 +141,8 @@
   : Interpolate the distances travelled along shapes
 - [`merge_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/merge_gtfs.md)
   : Merge GTFS files
+- [`combine_nearby_stops()`](https://ipea.github.io/gtfstools/dev/reference/combine_nearby_stops.md)
+  : Combine nearby stops
 - [`remove_duplicates()`](https://ipea.github.io/gtfstools/dev/reference/remove_duplicates.md)
   : Remove duplicated entries
 - [`remove_unused_ids()`](https://ipea.github.io/gtfstools/dev/reference/remove_unused_ids.md)

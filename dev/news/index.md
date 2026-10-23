@@ -82,6 +82,17 @@
 
 ### New features
 
+- New function
+  [`combine_nearby_stops()`](https://ipea.github.io/gtfstools/dev/reference/combine_nearby_stops.md),
+  which combines the stops within a given distance of each other into a
+  single stop. Stops are first merged into their parent stations, and
+  then by distance, closest pairs first, comparing each station at the
+  mean of its platforms’ coordinates. A merged stop gets the ids and
+  names of its stops joined by `"-"` and the mean of their coordinates,
+  and the ids of merged stops are replaced in `stop_times`, `transfers`
+  and the other files that refer to stops. Stations are replaced by the
+  stop merged from their platforms, and entrances, generic nodes,
+  boarding areas and `pathways` are removed.
 - The `path` argument of
   [`download_validator()`](https://ipea.github.io/gtfstools/dev/reference/download_validator.md)
   now defaults to [`tempdir()`](https://rdrr.io/r/base/tempfile.html),

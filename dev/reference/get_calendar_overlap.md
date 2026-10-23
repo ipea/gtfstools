@@ -85,6 +85,8 @@ the list names. Unnamed feeds are named after their position
 (`"feed_1"`, `"feed_2"`, etc.), and duplicated names are made unique.
 Plots of feeds spanning long periods can be zoomed in with
 [`ggplot2::coord_cartesian()`](https://ggplot2.tidyverse.org/reference/coord_cartesian.html).
+The days on which all feeds have service are shaded in the plots only
+when two or more feeds are given.
 
 ## See also
 
