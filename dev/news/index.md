@@ -520,6 +520,13 @@
   the number of threads. On platforms whose compilers don’t support
   OpenMP, the code runs on a single thread.
 
+- [`get_stop_distances()`](https://ipea.github.io/gtfstools/dev/reference/get_stop_distances.md)
+  is about 1.5 times faster and allocates about 35% less memory than in
+  earlier development versions (on a feed with 1.9 million pairs of
+  stops), as the radians and the cosine of the latitude of each stop are
+  calculated only once. Results are unchanged, up to floating-point
+  rounding on some platforms.
+
 - gtfstools now requires [units](https://r-quantities.github.io/units/)
   \>= 1.0-1, which fixed an out-of-bounds read flagged by CRAN’s
   sanitizer checks
