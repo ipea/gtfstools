@@ -85,25 +85,29 @@ Other validation:
 data_path <- system.file("extdata/spo_gtfs.zip", package = "gtfstools")
 output_path <- tempfile("validation_result")
 validator_path <- download_validator(tempdir())
-gtfs <- read_gtfs(data_path)
 
-validate_gtfs(gtfs, output_path, validator_path)
-list.files(output_path)
+# download_validator() returns NULL if the validator can't be downloaded
+if (!is.null(validator_path)) {
+  gtfs <- read_gtfs(data_path)
+
+  validate_gtfs(gtfs, output_path, validator_path)
+  print(list.files(output_path))
+
+  # works with feeds saved to disk
+  new_output_path <- tempfile("new_validation_result")
+  validate_gtfs(data_path, new_output_path, validator_path)
+  print(list.files(new_output_path))
+
+  # and with feeds pointed by an url
+  newer_output_path <- tempfile("newer_validation_result")
+  gtfs_url <- "https://github.com/ipea/gtfstools/raw/main/inst/extdata/spo_gtfs.zip"
+  validate_gtfs(gtfs_url, newer_output_path, validator_path)
+  print(list.files(newer_output_path))
+}
 #> [1] "report.html"           "report.json"           "system_errors.json"   
 #> [4] "validation_stderr.txt"
-
-# works with feeds saved to disk
-new_output_path <- tempfile("new_validation_result")
-validate_gtfs(data_path, new_output_path, validator_path)
-list.files(new_output_path)
 #> [1] "report.html"           "report.json"           "system_errors.json"   
 #> [4] "validation_stderr.txt"
-
-# and with feeds pointed by an url
-newer_output_path <- tempfile("newer_validation_result")
-gtfs_url <- "https://github.com/ipea/gtfstools/raw/main/inst/extdata/spo_gtfs.zip"
-validate_gtfs(gtfs_url, newer_output_path, validator_path)
-list.files(newer_output_path)
 #> [1] "report.html"           "report.json"           "system_errors.json"   
 #> [4] "validation_stderr.txt"
 ```

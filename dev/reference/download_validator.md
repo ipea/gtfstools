@@ -5,14 +5,20 @@ Downloads MobilityData's command line tool to validate GTFS feeds.
 ## Usage
 
 ``` r
-download_validator(path, version = "latest", force = FALSE, quiet = TRUE)
+download_validator(
+  path = tempdir(),
+  version = "latest",
+  force = FALSE,
+  quiet = TRUE
+)
 ```
 
 ## Arguments
 
 - path:
 
-  A string. The directory where the validator should be saved to.
+  A string. The directory where the validator should be saved to. By
+  default, the function downloads the validator to a temp directory.
 
 - version:
 
@@ -35,7 +41,10 @@ download_validator(path, version = "latest", force = FALSE, quiet = TRUE)
 
 ## Value
 
-Invisibly returns the normalized path to the downloaded validator.
+Invisibly returns the normalized path to the downloaded validator. If
+the validator can't be downloaded due to network problems (e.g. no
+internet connection or GitHub being unavailable), it informs that with a
+message and invisibly returns `NULL`.
 
 ## See also
 

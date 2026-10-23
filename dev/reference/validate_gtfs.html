@@ -148,25 +148,29 @@ validation results were saved to.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">data_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/spo_gtfs.zip"</span>, package <span class="op">=</span> <span class="st">"gtfstools"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">output_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="st">"validation_result"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">validator_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="download_validator.html">download_validator</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">gtfs</span> <span class="op">&lt;-</span> <span class="fu"><a href="read_gtfs.html">read_gtfs</a></span><span class="op">(</span><span class="va">data_path</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu">validate_gtfs</span><span class="op">(</span><span class="va">gtfs</span>, <span class="va">output_path</span>, <span class="va">validator_path</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">output_path</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># download_validator() returns NULL if the validator can't be downloaded</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">validator_path</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="va">gtfs</span> <span class="op">&lt;-</span> <span class="fu"><a href="read_gtfs.html">read_gtfs</a></span><span class="op">(</span><span class="va">data_path</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="fu">validate_gtfs</span><span class="op">(</span><span class="va">gtfs</span>, <span class="va">output_path</span>, <span class="va">validator_path</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">output_path</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="co"># works with feeds saved to disk</span></span></span>
+<span class="r-in"><span>  <span class="va">new_output_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="st">"new_validation_result"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu">validate_gtfs</span><span class="op">(</span><span class="va">data_path</span>, <span class="va">new_output_path</span>, <span class="va">validator_path</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">new_output_path</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="co"># and with feeds pointed by an url</span></span></span>
+<span class="r-in"><span>  <span class="va">newer_output_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="st">"newer_validation_result"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">gtfs_url</span> <span class="op">&lt;-</span> <span class="st">"https://github.com/ipea/gtfstools/raw/main/inst/extdata/spo_gtfs.zip"</span></span></span>
+<span class="r-in"><span>  <span class="fu">validate_gtfs</span><span class="op">(</span><span class="va">gtfs_url</span>, <span class="va">newer_output_path</span>, <span class="va">validator_path</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">newer_output_path</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "report.html"           "report.json"           "system_errors.json"   </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [4] "validation_stderr.txt"</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># works with feeds saved to disk</span></span></span>
-<span class="r-in"><span><span class="va">new_output_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="st">"new_validation_result"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">validate_gtfs</span><span class="op">(</span><span class="va">data_path</span>, <span class="va">new_output_path</span>, <span class="va">validator_path</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">new_output_path</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "report.html"           "report.json"           "system_errors.json"   </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [4] "validation_stderr.txt"</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># and with feeds pointed by an url</span></span></span>
-<span class="r-in"><span><span class="va">newer_output_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="st">"newer_validation_result"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">gtfs_url</span> <span class="op">&lt;-</span> <span class="st">"https://github.com/ipea/gtfstools/raw/main/inst/extdata/spo_gtfs.zip"</span></span></span>
-<span class="r-in"><span><span class="fu">validate_gtfs</span><span class="op">(</span><span class="va">gtfs_url</span>, <span class="va">newer_output_path</span>, <span class="va">validator_path</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">newer_output_path</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "report.html"           "report.json"           "system_errors.json"   </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [4] "validation_stderr.txt"</span>
 </code></pre></div>

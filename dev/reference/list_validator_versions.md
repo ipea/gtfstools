@@ -11,7 +11,9 @@ list_validator_versions()
 
 ## Value
 
-A data.table with each CLI version, published date, and download URL.
+A data.table with each CLI version, published date, and download URL. If
+the versions can't be listed due to network problems, it informs that
+with a message and invisibly returns `NULL`.
 
 ## See also
 

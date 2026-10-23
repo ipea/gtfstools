@@ -40,8 +40,12 @@ behavior.
 library(gtfstools)
 
 latest_validator <- download_validator(tempdir())
+```
+
+``` r
+
 latest_validator
-#> [1] "/tmp/RtmpUb1Syv/gtfs-validator-v8.0.1.jar"
+#> [1] "/tmp/RtmpZOiIjA/gtfs-validator-v8.0.1.jar"
 ```
 
 The second (and final) step is actually running

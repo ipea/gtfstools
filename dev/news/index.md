@@ -82,6 +82,11 @@
 
 ### New features
 
+- The `path` argument of
+  [`download_validator()`](https://ipea.github.io/gtfstools/dev/reference/download_validator.md)
+  now defaults to [`tempdir()`](https://rdrr.io/r/base/tempfile.html),
+  so the validator is downloaded to a temporary directory unless another
+  one is given.
 - New function
   [`crop_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/crop_gtfs.md),
   which crops a feed to a spatial extent: it keeps the stops inside it
@@ -342,6 +347,21 @@
 
 ### Bug fixes
 
+- [`download_validator()`](https://ipea.github.io/gtfstools/dev/reference/download_validator.md)
+  and
+  [`list_validator_versions()`](https://ipea.github.io/gtfstools/dev/reference/list_validator_versions.md)
+  now fail gracefully on network problems, as CRAN requires: they retry
+  transient failures and, if GitHub still can’t be reached, inform that
+  with a message (class `gtfstools_validator_download_failure`) and
+  invisibly return `NULL`, instead of raising an error. Previously,
+  [`download_validator()`](https://ipea.github.io/gtfstools/dev/reference/download_validator.md)
+  reported any network problem as a misleading “invalid URL” error. A
+  version that doesn’t exist still raises an error, now with its own
+  class (`gtfstools_invalid_validator_version`).
+- [`download_validator()`](https://ipea.github.io/gtfstools/dev/reference/download_validator.md)
+  now downloads the validator only once, instead of twice. When an
+  explicit `version` was already downloaded to `path`, it no longer goes
+  online at all. With `quiet = FALSE`, it now shows a progress bar.
 - [`get_trip_duration()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_duration.md)
   no longer adds temporary columns to the `stop_times` table of the
   given GTFS object, which could be left behind if an error happened
@@ -526,6 +546,21 @@
   stops), as the radians and the cosine of the latitude of each stop are
   calculated only once. Results are unchanged, up to floating-point
   rounding on some platforms.
+
+- [`get_trip_length()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_length.md)
+  and the functions that use it
+  ([`get_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_speed.md),
+  [`set_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.md),
+  [`interpolate_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_stop_times.md),
+  [`interpolate_shape_dist_traveled()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_shape_dist_traveled.md)
+  and
+  [`crop_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/crop_gtfs.md))
+  are about 1.3 times faster than in earlier development versions, and
+  [`get_trip_geometry()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_geometry.md)
+  about 1.05 to 1.25 times faster (on a feed with 900,000 shape points
+  and 2,200 trip patterns and on smaller feeds, with 2 threads), as each
+  stop is now compared only with the parts of its trip’s shape near it,
+  instead of with the whole shape. Results are unchanged.
 
 - gtfstools now requires [units](https://r-quantities.github.io/units/)
   \>= 1.0-1, which fixed an out-of-bounds read flagged by CRAN’s
