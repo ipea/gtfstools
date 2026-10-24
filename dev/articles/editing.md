@@ -43,8 +43,9 @@ functions currently available are:
 - [`fix_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/fix_gtfs.md):
   cleans a feed in one call, removing duplicated entries and unused ids,
   optionally capping the speed of trips, filling blank stop times,
-  optionally setting a minimum dwell time at stops and recalculating the
-  distances travelled along shapes (replacing any existing ones).
+  optionally setting a minimum dwell time at intermediate stops and
+  recalculating the distances travelled along shapes (replacing any
+  existing ones).
 
 This vignette will introduce you to the first four functions and will
 cover their usage in detail. By default, they return an edited copy of

@@ -2,7 +2,7 @@
 
 Cleans a GTFS feed in one call, by removing duplicated entries and
 unused ids, optionally capping the speed of trips, filling blank stop
-times, optionally setting a minimum dwell time at stops and
+times, optionally setting a minimum dwell time at intermediate stops and
 recalculating the distances travelled along shapes (replacing any
 existing ones).
 
@@ -85,11 +85,11 @@ The feed goes through the following steps, in this order:
     rounded to the second. The later times of each changed trip are
     shifted accordingly, so the trip ends later (for trips listed in
     `frequencies`, every departure gets longer). This is done after
-    filling blank times, so the filled stops also get the minimum. The
-    first and last stops with times of each trip are left unchanged, so
-    trips keep their start times, as are stops whose departure is
-    earlier than their arrival (e.g. times after midnight written as
-    `"00:30:00"`);
+    filling blank times, so the filled stops also get the minimum. Only
+    the stops between the first and the last stop with times of each
+    trip get the minimum, so trips keep their start times. Stops with
+    negative dwell times (departures earlier than arrivals, e.g. times
+    after midnight written as `"00:30:00"`) don't get it either;
 
 6.  [`interpolate_shape_dist_traveled()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_shape_dist_traveled.md),
     only if the feed has a `shapes` table and `trips` has a `shape_id`
