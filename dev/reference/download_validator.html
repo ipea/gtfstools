@@ -68,7 +68,9 @@
 
 <dl><dt id="arg-path">path<a class="anchor" aria-label="anchor" href="#arg-path"></a></dt>
 <dd><p>A string. The directory where the validator should be saved to.
-By default, the function downloads the validator to a temp directory.</p></dd>
+By default, the function downloads the validator to a temporary
+directory, which is removed when the R session ends. Use a persistent
+directory to reuse the validator across sessions.</p></dd>
 
 
 <dt id="arg-version">version<a class="anchor" aria-label="anchor" href="#arg-version"></a></dt>

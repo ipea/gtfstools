@@ -26,26 +26,26 @@ is very simple and requires no more than a few function calls. First we
 need to download the validator command-line tool. We can do it manually
 from MobilityData releases, or we can use
 [`download_validator()`](https://ipea.github.io/gtfstools/dev/reference/download_validator.md).
-This function takes a path to a directory where the validator should be
-saved to and a validator version, which defaults to the latest release,
-and returns the path to the downloaded validator. Please note that
-manually downloaded validators should be saved with the same filename
-convention used by the function (i.e. `gtfs-validator-vX.Y.Z.jar`). This
-is important to make sure that our validation function can correctly
-parse the command-line tool version, which controls some of its
-behavior.
+This function takes the directory where the validator should be saved to
+(by default, a temporary directory, which is removed when the R session
+ends) and a validator version, which defaults to the latest release, and
+returns the path to the downloaded validator. Please note that manually
+downloaded validators should be saved with the same filename convention
+used by the function (i.e. `gtfs-validator-vX.Y.Z.jar`). This is
+important to make sure that our validation function can correctly parse
+the command-line tool version, which controls some of its behavior.
 
 ``` r
 
 library(gtfstools)
 
-latest_validator <- download_validator(tempdir())
+latest_validator <- download_validator()
 ```
 
 ``` r
 
 latest_validator
-#> [1] "/tmp/RtmpWgqWgB/gtfs-validator-v8.0.1.jar"
+#> [1] "/tmp/RtmpTL9a34/gtfs-validator-v8.0.1.jar"
 ```
 
 The second (and final) step is actually running
