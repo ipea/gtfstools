@@ -83,6 +83,24 @@
 ### New features
 
 - New function
+  [`build_graph()`](https://ipea.github.io/gtfstools/dev/reference/build_graph.md),
+  which builds a frequency-based transit network from the trips that
+  depart within a time of day and returns it as the node, link and
+  config tables of the General Modeling Network Specification (GMNS), or
+  as an [igraph](https://r.igraph.org/) or
+  [tidygraph](https://tidygraph.data-imaginist.com) graph (these
+  packages are suggested, and the function offers to install them in
+  interactive sessions). The network has a node for each stop and for
+  each route and direction at each stop, linked by in-vehicle links
+  (with the mean travel time between stops), boarding links (with the
+  number of departures and the mean waiting time), alighting links and
+  walking transfer links between nearby stops. The direction of trips
+  without `direction_id` is inferred from the stops they share. See the
+  new “Building transit network graphs” vignette, which also shows how
+  to calculate the centrality of stops and how to map the network with
+  [sfnetworks](https://luukvdmeer.github.io/sfnetworks/) and
+  [ggraph](https://ggraph.data-imaginist.com).
+- New function
   [`combine_nearby_stops()`](https://ipea.github.io/gtfstools/dev/reference/combine_nearby_stops.md),
   which combines the stops within a given distance of each other into a
   single stop. Stops are first merged into their parent stations, and
@@ -265,7 +283,10 @@
   entries and unused ids, optionally caps the speed of trips with
   [`set_max_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_max_speed.md),
   fills blank stop times with
-  [`interpolate_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_stop_times.md)
+  [`interpolate_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_stop_times.md),
+  optionally sets a minimum dwell time at the intermediate stops of each
+  trip with
+  [`set_dwell_time()`](https://ipea.github.io/gtfstools/dev/reference/set_dwell_time.md)
   and, in feeds with shapes, recalculates the distances travelled along
   shapes with
   [`interpolate_shape_dist_traveled()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_shape_dist_traveled.md),
@@ -433,7 +454,8 @@
   at 08:00 and 08:30 only.
 - Functions that convert times to seconds now convert malformed times
   (e.g. `"5:30"`, `"12:60:00"`) to `NA` with a warning, instead of
-  silently returning wrong values.
+  silently returning wrong values. Non-ASCII strings marked as `"bytes"`
+  also become `NA` with a warning, instead of raising an error.
   [`convert_time_to_seconds()`](https://ipea.github.io/gtfstools/dev/reference/convert_time_to_seconds.md)
   also no longer skips `arrival_time` and `end_time` when only one
   column of a pair is present.
@@ -621,7 +643,8 @@
   on feeds with large `calendar_dates` tables.
 
 - Converting times between `"HH:MM:SS"` strings and seconds is now
-  faster, as each distinct time is converted only once. This speeds up
+  faster, as each distinct time is converted only once and parsed
+  without being copied. This speeds up
   [`convert_time_to_seconds()`](https://ipea.github.io/gtfstools/dev/reference/convert_time_to_seconds.md)
   (about 20 times faster on a feed with 900,000 `stop_times` rows),
   [`filter_by_time_of_day()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_time_of_day.md)

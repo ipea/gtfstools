@@ -182,6 +182,11 @@
 - [`convert_seconds_to_time()`](https://ipea.github.io/gtfstools/dev/reference/convert_seconds_to_time.md)
   : Convert seconds after midnight to time strings
 
+## Network analysis
+
+- [`build_graph()`](https://ipea.github.io/gtfstools/dev/reference/build_graph.md)
+  : Build a transit network graph
+
 ## Interoperability between GTFS packages
 
 - [`as_dt_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/as_dt_gtfs.md)

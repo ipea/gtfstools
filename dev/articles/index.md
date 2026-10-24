@@ -8,6 +8,8 @@
   feeds](https://ipea.github.io/gtfstools/dev/articles/editing.md):
 - [Filtering GTFS
   feeds](https://ipea.github.io/gtfstools/dev/articles/filtering.md):
+- [Building transit network
+  graphs](https://ipea.github.io/gtfstools/dev/articles/graphs.md):
 - [Introduction to
   gtfstools](https://ipea.github.io/gtfstools/dev/articles/gtfstools.md):
 - [Mapping GTFS

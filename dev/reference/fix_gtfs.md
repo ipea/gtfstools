@@ -2,13 +2,20 @@
 
 Cleans a GTFS feed in one call, by removing duplicated entries and
 unused ids, optionally capping the speed of trips, filling blank stop
-times and recalculating the distances travelled along shapes (replacing
-any existing ones).
+times, optionally setting a minimum dwell time at stops and
+recalculating the distances travelled along shapes (replacing any
+existing ones).
 
 ## Usage
 
 ``` r
-fix_gtfs(gtfs, max_speed = NULL, unit = "km/h")
+fix_gtfs(
+  gtfs,
+  max_speed = NULL,
+  speed_unit = "km/h",
+  min_dwell_time = NULL,
+  dwell_time_unit = "s"
+)
 ```
 
 ## Arguments
@@ -20,13 +27,26 @@ fix_gtfs(gtfs, max_speed = NULL, unit = "km/h")
 
 - max_speed:
 
-  A number. The maximum speed of trips, in the unit given by `unit`. If
-  `NULL` (the default), speeds are not capped.
+  A number. The maximum speed of trips, in the unit given by
+  `speed_unit`. If `NULL` (the default), speeds are not capped.
 
-- unit:
+- speed_unit:
 
   A string representing the unit in which `max_speed` is given. One of
   `"km/h"` (the default), `"m/s"` or `"mph"` (miles per hour).
+
+- min_dwell_time:
+
+  A non-negative number. The minimum time vehicles remain stopped at
+  each intermediate stop of their trips, with their doors open to serve
+  passengers, in the unit given by `dwell_time_unit`. If `NULL` (the
+  default), dwell times are not changed.
+
+- dwell_time_unit:
+
+  A string representing the time unit in which `min_dwell_time` is
+  given. One of `"s"` (seconds, the default), `"min"` (minutes), `"h"`
+  (hours) or `"d"` (days).
 
 ## Value
 
@@ -58,7 +78,20 @@ The feed goes through the following steps, in this order:
     Stops whose times can't be interpolated are left blank, with a
     warning;
 
-5.  [`interpolate_shape_dist_traveled()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_shape_dist_traveled.md),
+5.  [`set_dwell_time()`](https://ipea.github.io/gtfstools/dev/reference/set_dwell_time.md),
+    only if `min_dwell_time` is given, delays the departure from each
+    intermediate stop whose dwell time is shorter than `min_dwell_time`,
+    so that vehicles stay there for at least that long. The minimum is
+    rounded to the second. The later times of each changed trip are
+    shifted accordingly, so the trip ends later (for trips listed in
+    `frequencies`, every departure gets longer). This is done after
+    filling blank times, so the filled stops also get the minimum. The
+    first and last stops with times of each trip are left unchanged, so
+    trips keep their start times, as are stops whose departure is
+    earlier than their arrival (e.g. times after midnight written as
+    `"00:30:00"`);
+
+6.  [`interpolate_shape_dist_traveled()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_shape_dist_traveled.md),
     only if the feed has a `shapes` table and `trips` has a `shape_id`
     column, replaces the `shape_dist_traveled` columns of `stop_times`
     and `shapes` with the distances, in meters, from the start of each
@@ -77,6 +110,7 @@ shape) may be raised more than once.
 [`remove_unused_ids()`](https://ipea.github.io/gtfstools/dev/reference/remove_unused_ids.md),
 [`set_max_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_max_speed.md),
 [`interpolate_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_stop_times.md),
+[`set_dwell_time()`](https://ipea.github.io/gtfstools/dev/reference/set_dwell_time.md),
 [`interpolate_shape_dist_traveled()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_shape_dist_traveled.md)
 
 ## Examples
@@ -88,9 +122,10 @@ data_path <- system.file("extdata/spo_gtfs.zip", package = "gtfstools")
 
 gtfs <- read_gtfs(data_path)
 
-fixed_gtfs <- fix_gtfs(gtfs, max_speed = 40)
+fixed_gtfs <- fix_gtfs(gtfs, max_speed = 40, min_dwell_time = 30)
 
-# duplicated agencies were removed, and the trip is now slower
+# duplicated agencies were removed, and the trip is now slower and stays at
+# least 30 seconds at each intermediate stop
 gtfs$agency
 #>    agency_id agency_name                               agency_url
 #>       <char>      <char>                                   <char>
@@ -120,7 +155,7 @@ fixed_gtfs$stop_times |>
   slice_tail(n = 1)
 #>       trip_id arrival_time departure_time stop_id stop_sequence
 #>        <char>       <char>         <char>  <char>         <int>
-#> 1: CPTM L07-0     06:19:33       06:19:33   18975            18
+#> 1: CPTM L07-0     06:27:33       06:27:33   18975            18
 #>    shape_dist_traveled
 #>                  <num>
 #> 1:            60598.61

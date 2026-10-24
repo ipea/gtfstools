@@ -4,6 +4,7 @@
 <url><loc>https://ipea.github.io/gtfstools/dev/articles/calendar_overlap.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/articles/editing.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/articles/filtering.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/articles/graphs.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/articles/gtfstools.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/articles/index.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/articles/mapping.html</loc></url>
@@ -13,7 +14,9 @@
 <url><loc>https://ipea.github.io/gtfstools/dev/index.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/news/index.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/as_dt_gtfs.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/build_graph.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/build_linestrings.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/build_service_network.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/build_shape_cuts.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/build_timetable.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/check_deprecated_sort_sequence.html</loc></url>
@@ -34,6 +37,7 @@
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/date_to_integer.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/dates_to_periods.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/download_validator.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/empty_service_network.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/empty_trip_length.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/filter_by_agency_id.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/filter_by_date.html</loc></url>
@@ -48,6 +52,7 @@
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/filter_by_time_of_day.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/filter_by_trip_id.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/filter_by_weekday.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/find_stop_pairs_within.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/fix_gtfs.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/frequencies_to_stop_times.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/get_active_services.html</loc></url>
@@ -86,6 +91,7 @@
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/gtfstools.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/has_shapes.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/index.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/infer_trip_directions.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/integer_to_date.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/interpolate_cropped_trips.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/interpolate_shape_dist_traveled.html</loc></url>
@@ -123,6 +129,7 @@
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/summarise_distribution.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/summarise_route_frequency.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/summarise_services.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/time_of_day_window.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/validate_gtfs.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/warn_missing_ids.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/warn_times_not_interpolated.html</loc></url>

@@ -78,6 +78,10 @@ Please read **gtfstools** vignettes for more on the package usage:
   [`vignette("calendar_overlap", package = "gtfstools")`](https://ipea.github.io/gtfstools/dev/articles/calendar_overlap.md)
   or check it on the website ([Checking the calendar overlap of GTFS
   feeds](https://ipea.github.io/gtfstools/articles/calendar_overlap.html)).
+- Building transit network graphs. Run
+  [`vignette("graphs", package = "gtfstools")`](https://ipea.github.io/gtfstools/dev/articles/graphs.md)
+  or check it on the website ([Building transit network
+  graphs](https://ipea.github.io/gtfstools/articles/graphs.html)).
 
 ## Related packages
 
