@@ -74,12 +74,12 @@ issues in the GTFS feed. To do that, use <code><a href="validate_gtfs.html">vali
 <span>  <span class="va">gtfs</span>,</span>
 <span>  date <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  route_id <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  mode <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  agency <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  route_type <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  agency_id <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  from <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  to <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  output_dir <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  open_browser <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  output_path <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  html_preview <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  by_route_type <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  unit <span class="op">=</span> <span class="st">"km/h"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -106,16 +106,17 @@ the whole period covered by the feed is described.</p></dd>
 described. If <code>NULL</code> (the default), all routes are described.</p></dd>
 
 
-<dt id="arg-mode">mode<a class="anchor" aria-label="anchor" href="#arg-mode"></a></dt>
+<dt id="arg-route-type">route_type<a class="anchor" aria-label="anchor" href="#arg-route-type"></a></dt>
 <dd><p>An integer vector of <code>route_type</code>s (see
-<code><a href="filter_by_route_type.html">filter_by_route_type()</a></code>) or a character vector of mode names (<code>"tram"</code>,
-<code>"subway"</code>, <code>"rail"</code>, <code>"bus"</code>, <code>"ferry"</code>, <code>"cable_tram"</code>, <code>"aerial_lift"</code>,
-<code>"funicular"</code>, <code>"trolleybus"</code> and <code>"monorail"</code>, which correspond to the
-basic <code>route_type</code>s). If given, only routes of these modes are described.
-If <code>NULL</code> (the default), all modes are described.</p></dd>
+<code><a href="filter_by_route_type.html">filter_by_route_type()</a></code>) or, unlike in other functions, a character
+vector of mode names (<code>"tram"</code>, <code>"subway"</code>, <code>"rail"</code>, <code>"bus"</code>, <code>"ferry"</code>,
+<code>"cable_tram"</code>, <code>"aerial_lift"</code>, <code>"funicular"</code>, <code>"trolleybus"</code> and
+<code>"monorail"</code>, which correspond to the basic <code>route_type</code>s). If given, only
+routes of these modes are described. If <code>NULL</code> (the default), all modes
+are described.</p></dd>
 
 
-<dt id="arg-agency">agency<a class="anchor" aria-label="anchor" href="#arg-agency"></a></dt>
+<dt id="arg-agency-id">agency_id<a class="anchor" aria-label="anchor" href="#arg-agency-id"></a></dt>
 <dd><p>A character vector of <code>agency_id</code>s. If given, only the
 services of these agencies are described. If <code>NULL</code> (the default), all
 agencies are described.</p></dd>
@@ -127,14 +128,14 @@ only the trips that run within this time of day are described. If <code>NULL</co
 (the default), the whole day is described.</p></dd>
 
 
-<dt id="arg-output-dir">output_dir<a class="anchor" aria-label="anchor" href="#arg-output-dir"></a></dt>
+<dt id="arg-output-path">output_path<a class="anchor" aria-label="anchor" href="#arg-output-path"></a></dt>
 <dd><p>A string. The directory in which the report is saved
 (created if needed). If <code>NULL</code> (the default), a <code>gtfstools</code> directory
 inside <code><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir()</a></code> is used. Existing reports in this directory are
 overwritten.</p></dd>
 
 
-<dt id="arg-open-browser">open_browser<a class="anchor" aria-label="anchor" href="#arg-open-browser"></a></dt>
+<dt id="arg-html-preview">html_preview<a class="anchor" aria-label="anchor" href="#arg-html-preview"></a></dt>
 <dd><p>A logical. Whether to open the HTML report in the
 browser, in interactive sessions (defaults to <code>TRUE</code>).</p></dd>
 
@@ -192,7 +193,7 @@ in miles per hour (<code>mph</code>), and the rows <code>vkt_total</code> and <c
 of <code>totals</code> are named <code>vmt_total</code> and <code>vmt_daily_mean</code> (vehicle-miles
 travelled).</p>
 <p>The report is saved as <code>gtfs_summary.md</code> and <code>gtfs_summary.html</code>
-(together with its figures) in <code>output_dir</code>.</p>
+(together with its figures) in <code>output_path</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -218,14 +219,14 @@ of the trip on every counted day on which its service runs. The counted days
 are the given <code>date</code>s or, if <code>date</code> is <code>NULL</code>, every day on which the
 selected services run, and <code>vkt_daily_mean</code> is the mean over those on which
 at least one counted departure runs. With <code>from</code> and <code>to</code>, only the
-departures at or after <code>from</code> and before <code>to</code> are counted, as listed in the
-feed before it is filtered by time of day, so selected trips that depart
-before <code>from</code> add nothing to the VKT. If no selected trip departs on the
-counted days (within the time of day), <code>vkt_total</code> and <code>vkt_daily_mean</code> are
-<code>NA</code>. An error is raised if the <code>frequencies</code> table has invalid entries for
-selected trips that run on the counted days. With <code>unit = "mph"</code>, the VKT
-are instead the vehicle-miles travelled (VMT), as in <code><a href="get_vmt.html">get_vmt()</a></code>, reported
-in the rows <code>vmt_total</code> and <code>vmt_daily_mean</code>.</p>
+departures at or after <code>from</code> and at or before <code>to</code> are counted, as listed
+in the feed before it is filtered by time of day, so selected trips that
+depart before <code>from</code> add nothing to the VKT. If no selected trip departs on
+the counted days (within the time of day), <code>vkt_total</code> and <code>vkt_daily_mean</code>
+are <code>NA</code>. An error is raised if the <code>frequencies</code> table has invalid entries
+for selected trips that run on the counted days. With <code>unit = "mph"</code>, the
+VKT are instead the vehicle-miles travelled (VMT), as in <code><a href="get_vmt.html">get_vmt()</a></code>,
+reported in the rows <code>vmt_total</code> and <code>vmt_daily_mean</code>.</p>
 <p>The <code>services</code> summary and the calendar chart in the report describe the
 whole calendar of the selected services: when <code>date</code> is given, the
 services that run on these dates are kept as a whole (see
@@ -236,11 +237,12 @@ each departure listed in <code>frequencies</code>.</p>
 by <code>direction_id</code>, if the field is present in the <code>trips</code> table), on a
 single day: the day with the most trips among the given <code>date</code>s, or in the
 whole feed if <code>date</code> is <code>NULL</code> (the earliest one, in case of ties). They
-are measured within the given time of day or, if <code>from</code> and <code>to</code> are
-<code>NULL</code>, from the first to the last departure of that day, rounded out to
-whole hours. Trips that start on the previous day and run after midnight
-are not counted, and times are in the local time of each agency.</p>
-<p>With <code>by_route_type = TRUE</code>, modes are named as in the <code>mode</code> argument,
+are measured within the given time of day (not including <code>to</code>, as in
+<code><a href="get_route_frequency.html">get_route_frequency()</a></code>, unlike the other indicators) or, if <code>from</code> and
+<code>to</code> are <code>NULL</code>, from the first to the last departure of that day, rounded
+out to whole hours. Trips that start on the previous day and run after
+midnight are not counted, and times are in the local time of each agency.</p>
+<p>With <code>by_route_type = TRUE</code>, modes are named as in the <code>route_type</code> argument,
 extended <code>route_type</code>s by their code, and trips whose <code>route_type</code> is
 unknown are grouped as <code>"unknown"</code>. Modes are ordered by <code>route_type</code>, with
 <code>"unknown"</code> last. Each mode is described as if it were selected alone
@@ -266,26 +268,26 @@ report, the histograms of the modes are overlaid.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="va">feed_summary</span> <span class="op">&lt;-</span> <span class="fu">get_summary</span><span class="op">(</span></span></span>
 <span class="r-in"><span>    <span class="va">data_path</span>,</span></span>
-<span class="r-in"><span>    output_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>    open_browser <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span>    output_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    html_preview <span class="op">=</span> <span class="cn">FALSE</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">feed_summary</span><span class="op">$</span><span class="va">totals</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span>  <span class="va">feed_summary</span> <span class="op">&lt;-</span> <span class="fu">get_summary</span><span class="op">(</span></span></span>
 <span class="r-in"><span>    <span class="va">data_path</span>,</span></span>
-<span class="r-in"><span>    mode <span class="op">=</span> <span class="st">"bus"</span>,</span></span>
+<span class="r-in"><span>    route_type <span class="op">=</span> <span class="st">"bus"</span>,</span></span>
 <span class="r-in"><span>    from <span class="op">=</span> <span class="st">"07:00:00"</span>,</span></span>
 <span class="r-in"><span>    to <span class="op">=</span> <span class="st">"09:00:00"</span>,</span></span>
-<span class="r-in"><span>    output_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>    open_browser <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span>    output_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    html_preview <span class="op">=</span> <span class="cn">FALSE</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">feed_summary</span><span class="op">$</span><span class="va">frequency</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="va">feed_summary</span> <span class="op">&lt;-</span> <span class="fu">get_summary</span><span class="op">(</span></span></span>
 <span class="r-in"><span>    <span class="va">data_path</span>,</span></span>
-<span class="r-in"><span>    output_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>    open_browser <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
+<span class="r-in"><span>    output_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    html_preview <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
 <span class="r-in"><span>    by_route_type <span class="op">=</span> <span class="cn">TRUE</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">feed_summary</span><span class="op">$</span><span class="va">totals</span></span></span>

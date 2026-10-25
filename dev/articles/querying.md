@@ -197,7 +197,7 @@ default in interactive sessions:
 
 ``` r
 
-feed_summary <- get_summary(spo_path, open_browser = FALSE)
+feed_summary <- get_summary(spo_path, html_preview = FALSE)
 
 feed_summary$totals
 #>               indicator        value   unit

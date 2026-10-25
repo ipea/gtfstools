@@ -8,7 +8,7 @@ the field is present in the `trips` table).
 ## Usage
 
 ``` r
-get_stop_frequency(gtfs, stop_id = NULL, by_route = FALSE, from, to)
+get_stop_frequency(gtfs, stop_id = NULL, from, to, by_route = FALSE)
 ```
 
 ## Arguments
@@ -24,13 +24,6 @@ get_stop_frequency(gtfs, stop_id = NULL, by_route = FALSE, from, to)
   calculated. If `NULL` (the default), the function calculates the
   frequency of every `stop_id` in the GTFS.
 
-- by_route:
-
-  A logical. Whether the departures should be counted by `route_id` (and
-  by `direction_id`, if present in the `trips` table) at each stop.
-  Defaults to `FALSE`, in which case the departures of every route that
-  serves a stop are pooled together.
-
 - from:
 
   A string. The starting point of the time of day, in the "HH:MM:SS"
@@ -40,6 +33,13 @@ get_stop_frequency(gtfs, stop_id = NULL, by_route = FALSE, from, to)
 
   A string. The ending point of the time of day, in the "HH:MM:SS"
   format. Must be later than `from`.
+
+- by_route:
+
+  A logical. Whether the departures should be counted by `route_id` (and
+  by `direction_id`, if present in the `trips` table) at each stop.
+  Defaults to `FALSE`, in which case the departures of every route that
+  serves a stop are pooled together.
 
 ## Value
 
@@ -122,9 +122,9 @@ stop_ids <- c("18848", "18960")
 stop_frequency <- get_stop_frequency(
   gtfs,
   stop_id = stop_ids,
-  by_route = TRUE,
   from = "07:00:00",
-  to = "09:00:00"
+  to = "09:00:00",
+  by_route = TRUE
 )
 stop_frequency
 #> Key: <stop_id, route_id, direction_id, service_id>

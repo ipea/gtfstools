@@ -8,7 +8,7 @@ some dates and to a time of day.
 ## Usage
 
 ``` r
-get_vmt(gtfs, route_id = NULL, from = NULL, to = NULL, date = NULL)
+get_vmt(gtfs, route_id = NULL, date = NULL, from = NULL, to = NULL)
 ```
 
 ## Arguments
@@ -25,18 +25,18 @@ get_vmt(gtfs, route_id = NULL, from = NULL, to = NULL, date = NULL)
   of every `route_id` in the GTFS. `route_id`s not listed in `trips` are
   ignored, with a warning.
 
-- from, to:
-
-  Strings in the `"HH:MM:SS"` format. If given (both must be), only the
-  departures at or after `from` and before `to` are counted. If `NULL`
-  (the default), every departure is counted.
-
 - date:
 
   A `Date` vector (including `IDate`) or a character vector of dates in
   the `"YYYYMMDD"` or `"YYYY-MM-DD"` formats. If given, only these dates
   are counted. If `NULL` (the default), every day on which the services
   of the routes run is counted.
+
+- from, to:
+
+  Strings in the `"HH:MM:SS"` format. If given (both must be), only the
+  departures at or after `from` and at or before `to` are counted. If
+  `NULL` (the default), every departure is counted.
 
 ## Value
 
@@ -83,12 +83,12 @@ head(vmt)
 get_vmt(
   gtfs,
   route_id = c("CPTM L07", "2002-10"),
+  date = "2019-03-04",
   from = "07:00:00",
-  to = "09:00:00",
-  date = "2019-03-04"
+  to = "09:00:00"
 )
 #>    route_id n_days        vmt vmt_daily_mean
 #>      <char>  <int>      <num>          <num>
-#> 1:  2002-10      1   83.12294       83.12294
-#> 2: CPTM L07      1 1505.90637     1505.90637
+#> 1:  2002-10      1   87.27909       87.27909
+#> 2: CPTM L07      1 1581.20168     1581.20168
 ```

@@ -139,8 +139,9 @@ in <code>frequencies</code>, every departure gets longer). This is done after
 filling blank times, so the filled stops also get the minimum. Only the
 stops between the first and the last stop with times of each trip get
 the minimum, so trips keep their start times. Stops with negative dwell
-times (departures earlier than arrivals, e.g. times after midnight
-written as <code>"00:30:00"</code>) don't get it either;</p></li>
+times (departures earlier than arrivals) also get it, see
+<code><a href="set_min_dwell_time.html">set_min_dwell_time()</a></code> for times after midnight written as
+<code>"00:30:00"</code>;</p></li>
 <li><p><code><a href="interpolate_shape_dist_traveled.html">interpolate_shape_dist_traveled()</a></code>, only if the feed has a <code>shapes</code>
 table and <code>trips</code> has a <code>shape_id</code> column, replaces the
 <code>shape_dist_traveled</code> columns of <code>stop_times</code> and <code>shapes</code> with the

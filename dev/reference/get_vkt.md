@@ -8,7 +8,7 @@ restricted to some dates and to a time of day.
 ## Usage
 
 ``` r
-get_vkt(gtfs, route_id = NULL, from = NULL, to = NULL, date = NULL)
+get_vkt(gtfs, route_id = NULL, date = NULL, from = NULL, to = NULL)
 ```
 
 ## Arguments
@@ -25,18 +25,18 @@ get_vkt(gtfs, route_id = NULL, from = NULL, to = NULL, date = NULL)
   of every `route_id` in the GTFS. `route_id`s not listed in `trips` are
   ignored, with a warning.
 
-- from, to:
-
-  Strings in the `"HH:MM:SS"` format. If given (both must be), only the
-  departures at or after `from` and before `to` are counted. If `NULL`
-  (the default), every departure is counted.
-
 - date:
 
   A `Date` vector (including `IDate`) or a character vector of dates in
   the `"YYYYMMDD"` or `"YYYY-MM-DD"` formats. If given, only these dates
   are counted. If `NULL` (the default), every day on which the services
   of the routes run is counted.
+
+- from, to:
+
+  Strings in the `"HH:MM:SS"` format. If given (both must be), only the
+  departures at or after `from` and at or before `to` are counted. If
+  `NULL` (the default), every departure is counted.
 
 ## Value
 
@@ -56,8 +56,9 @@ tables. Departures are counted as in
 [`get_route_frequency()`](https://ipea.github.io/gtfstools/dev/reference/get_route_frequency.md):
 trips listed in the `frequencies` table depart once per headway, the
 other trips depart once, and departures after midnight belong to the
-previous service day. Please note that the time of day doesn't include
-`to`, unlike in
+previous service day. Unlike in
+[`get_route_frequency()`](https://ipea.github.io/gtfstools/dev/reference/get_route_frequency.md),
+the time of day includes `to`, as in
 [`get_trip_length()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_length.md).
 An error is raised if the `frequencies` table has invalid entries for
 trips that run on the counted days.
@@ -103,12 +104,12 @@ head(vkt)
 get_vkt(
   gtfs,
   route_id = c("CPTM L07", "2002-10"),
+  date = "2019-03-04",
   from = "07:00:00",
-  to = "09:00:00",
-  date = "2019-03-04"
+  to = "09:00:00"
 )
 #>    route_id n_days       vkt vkt_daily_mean
 #>      <char>  <int>     <num>          <num>
-#> 1:  2002-10      1  133.7734       133.7734
-#> 2: CPTM L07      1 2423.5214      2423.5214
+#> 1:  2002-10      1  140.4621       140.4621
+#> 2: CPTM L07      1 2544.6974      2544.6974
 ```

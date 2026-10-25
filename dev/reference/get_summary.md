@@ -15,12 +15,12 @@ get_summary(
   gtfs,
   date = NULL,
   route_id = NULL,
-  mode = NULL,
-  agency = NULL,
+  route_type = NULL,
+  agency_id = NULL,
   from = NULL,
   to = NULL,
-  output_dir = NULL,
-  open_browser = TRUE,
+  output_path = NULL,
+  html_preview = TRUE,
   by_route_type = FALSE,
   unit = "km/h"
 )
@@ -46,17 +46,17 @@ get_summary(
   A character vector. If given, only these routes are described. If
   `NULL` (the default), all routes are described.
 
-- mode:
+- route_type:
 
   An integer vector of `route_type`s (see
   [`filter_by_route_type()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_route_type.md))
-  or a character vector of mode names (`"tram"`, `"subway"`, `"rail"`,
-  `"bus"`, `"ferry"`, `"cable_tram"`, `"aerial_lift"`, `"funicular"`,
-  `"trolleybus"` and `"monorail"`, which correspond to the basic
-  `route_type`s). If given, only routes of these modes are described. If
-  `NULL` (the default), all modes are described.
+  or, unlike in other functions, a character vector of mode names
+  (`"tram"`, `"subway"`, `"rail"`, `"bus"`, `"ferry"`, `"cable_tram"`,
+  `"aerial_lift"`, `"funicular"`, `"trolleybus"` and `"monorail"`, which
+  correspond to the basic `route_type`s). If given, only routes of these
+  modes are described. If `NULL` (the default), all modes are described.
 
-- agency:
+- agency_id:
 
   A character vector of `agency_id`s. If given, only the services of
   these agencies are described. If `NULL` (the default), all agencies
@@ -68,14 +68,14 @@ get_summary(
   trips that run within this time of day are described. If `NULL` (the
   default), the whole day is described.
 
-- output_dir:
+- output_path:
 
   A string. The directory in which the report is saved (created if
   needed). If `NULL` (the default), a `gtfstools` directory inside
   [`tempdir()`](https://rdrr.io/r/base/tempfile.html) is used. Existing
   reports in this directory are overwritten.
 
-- open_browser:
+- html_preview:
 
   A logical. Whether to open the HTML report in the browser, in
   interactive sessions (defaults to `TRUE`).
@@ -141,7 +141,7 @@ speeds in miles per hour (`mph`), and the rows `vkt_total` and
 (vehicle-miles travelled).
 
 The report is saved as `gtfs_summary.md` and `gtfs_summary.html`
-(together with its figures) in `output_dir`.
+(together with its figures) in `output_path`.
 
 ## Details
 
@@ -175,7 +175,7 @@ departure of the trip on every counted day on which its service runs.
 The counted days are the given `date`s or, if `date` is `NULL`, every
 day on which the selected services run, and `vkt_daily_mean` is the mean
 over those on which at least one counted departure runs. With `from` and
-`to`, only the departures at or after `from` and before `to` are
+`to`, only the departures at or after `from` and at or before `to` are
 counted, as listed in the feed before it is filtered by time of day, so
 selected trips that depart before `from` add nothing to the VKT. If no
 selected trip departs on the counted days (within the time of day),
@@ -200,24 +200,27 @@ Route headways are calculated with
 by route (and by `direction_id`, if the field is present in the `trips`
 table), on a single day: the day with the most trips among the given
 `date`s, or in the whole feed if `date` is `NULL` (the earliest one, in
-case of ties). They are measured within the given time of day or, if
-`from` and `to` are `NULL`, from the first to the last departure of that
-day, rounded out to whole hours. Trips that start on the previous day
-and run after midnight are not counted, and times are in the local time
-of each agency.
+case of ties). They are measured within the given time of day (not
+including `to`, as in
+[`get_route_frequency()`](https://ipea.github.io/gtfstools/dev/reference/get_route_frequency.md),
+unlike the other indicators) or, if `from` and `to` are `NULL`, from the
+first to the last departure of that day, rounded out to whole hours.
+Trips that start on the previous day and run after midnight are not
+counted, and times are in the local time of each agency.
 
-With `by_route_type = TRUE`, modes are named as in the `mode` argument,
-extended `route_type`s by their code, and trips whose `route_type` is
-unknown are grouped as `"unknown"`. Modes are ordered by `route_type`,
-with `"unknown"` last. Each mode is described as if it were selected
-alone (except that the headways of all modes are measured on the same
-day and time of day), so stops, shapes and agencies shared by several
-modes count in each of them. Only the numbers of routes and trips, the
-total trip lengths and durations and `vkt_total` (or `vmt_total`) add up
-to the `all` column. Modes whose routes have blank `agency_id`s count
-all the agencies of the selection, and trips listed in `stop_times` but
-not in `trips` only count in `all` (and not in the VKT, since they have
-no service). In the report, the histograms of the modes are overlaid.
+With `by_route_type = TRUE`, modes are named as in the `route_type`
+argument, extended `route_type`s by their code, and trips whose
+`route_type` is unknown are grouped as `"unknown"`. Modes are ordered by
+`route_type`, with `"unknown"` last. Each mode is described as if it
+were selected alone (except that the headways of all modes are measured
+on the same day and time of day), so stops, shapes and agencies shared
+by several modes count in each of them. Only the numbers of routes and
+trips, the total trip lengths and durations and `vkt_total` (or
+`vmt_total`) add up to the `all` column. Modes whose routes have blank
+`agency_id`s count all the agencies of the selection, and trips listed
+in `stop_times` but not in `trips` only count in `all` (and not in the
+VKT, since they have no service). In the report, the histograms of the
+modes are overlaid.
 
 ## Examples
 
@@ -232,26 +235,26 @@ if (
 
   feed_summary <- get_summary(
     data_path,
-    output_dir = tempdir(),
-    open_browser = FALSE
+    output_path = tempdir(),
+    html_preview = FALSE
   )
   feed_summary$totals
 
   # \donttest{
   feed_summary <- get_summary(
     data_path,
-    mode = "bus",
+    route_type = "bus",
     from = "07:00:00",
     to = "09:00:00",
-    output_dir = tempdir(),
-    open_browser = FALSE
+    output_path = tempdir(),
+    html_preview = FALSE
   )
   feed_summary$frequency
 
   feed_summary <- get_summary(
     data_path,
-    output_dir = tempdir(),
-    open_browser = FALSE,
+    output_path = tempdir(),
+    html_preview = FALSE,
     by_route_type = TRUE
   )
   feed_summary$totals

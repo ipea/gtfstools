@@ -95,14 +95,22 @@ to the arrival time plus `min_dwell_time`. The later times of the trip
 are shifted accordingly, so the trip ends later. Longer dwell times are
 kept, so no dwell time is ever shortened.
 
-The first and last visits of each trip with both an arrival and a
-departure time are never changed, so trips keep their start times. These
-are found among all the visits of the trip, not only the selected ones.
-Visits whose departure is earlier than their arrival (negative dwell
-times, e.g. times after midnight written as `"00:30:00"`) are not
-changed either. Use
+The dwell times of the first and last visits of each trip with both an
+arrival and a departure time are never raised, so trips keep their start
+times. They are found among all the visits of the trip, not only the
+selected ones, and the times of the last visit may still be shifted by
+an earlier visit. Use
 [`set_dwell_time()`](https://ipea.github.io/gtfstools/dev/reference/set_dwell_time.md)
-to change these visits.
+to change their dwell times.
+
+Negative dwell times, of visits whose departure is earlier than their
+arrival, are raised like any other shorter dwell time, so a
+`min_dwell_time` of 0 raises only these. When they come from times after
+midnight written as `"00:30:00"` instead of `"24:30:00"`, the departure
+becomes the arrival plus `min_dwell_time`, even if the vehicle actually
+stays there longer, and the later times of the trip are shifted by about
+a day (later times also written as `"00:30:00"` thus end up past
+`"24:00:00"`).
 
 Otherwise it works as
 [`set_dwell_time()`](https://ipea.github.io/gtfstools/dev/reference/set_dwell_time.md).

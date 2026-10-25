@@ -11,9 +11,9 @@ the trips that are already slower are left unchanged.
 set_max_speed(
   gtfs,
   max_speed,
+  unit = "km/h",
   route_id = NULL,
   trip_id = NULL,
-  unit = "km/h",
   first_stop = NULL,
   last_stop = NULL,
   from = NULL,
@@ -33,6 +33,11 @@ set_max_speed(
 
   A number. The maximum speed allowed, in the unit given by `unit`.
 
+- unit:
+
+  A string representing the unit in which the speed is given. One of
+  `"km/h"` (the default), `"m/s"` or `"mph"` (miles per hour).
+
 - route_id:
 
   A character vector including the `route_id`s whose trips have their
@@ -45,11 +50,6 @@ set_max_speed(
   A character vector including the `trip_id`s to have their speeds
   capped. When given together with `route_id`, the trips of both are
   capped.
-
-- unit:
-
-  A string representing the unit in which the speed is given. One of
-  `"km/h"` (the default), `"m/s"` or `"mph"` (miles per hour).
 
 - first_stop:
 

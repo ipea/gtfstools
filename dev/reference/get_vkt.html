@@ -64,7 +64,7 @@ dates and to a time of day.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_vkt</span><span class="op">(</span><span class="va">gtfs</span>, route_id <span class="op">=</span> <span class="cn">NULL</span>, from <span class="op">=</span> <span class="cn">NULL</span>, to <span class="op">=</span> <span class="cn">NULL</span>, date <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_vkt</span><span class="op">(</span><span class="va">gtfs</span>, route_id <span class="op">=</span> <span class="cn">NULL</span>, date <span class="op">=</span> <span class="cn">NULL</span>, from <span class="op">=</span> <span class="cn">NULL</span>, to <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -82,17 +82,17 @@ of every <code>route_id</code> in the GTFS. <code>route_id</code>s not listed in
 ignored, with a warning.</p></dd>
 
 
-<dt id="arg-from-to">from, to<a class="anchor" aria-label="anchor" href="#arg-from-to"></a></dt>
-<dd><p>Strings in the <code>"HH:MM:SS"</code> format. If given (both must be),
-only the departures at or after <code>from</code> and before <code>to</code> are counted. If
-<code>NULL</code> (the default), every departure is counted.</p></dd>
-
-
 <dt id="arg-date">date<a class="anchor" aria-label="anchor" href="#arg-date"></a></dt>
 <dd><p>A <code>Date</code> vector (including <code>IDate</code>) or a character vector of
 dates in the <code>"YYYYMMDD"</code> or <code>"YYYY-MM-DD"</code> formats. If given, only these
 dates are counted. If <code>NULL</code> (the default), every day on which the
 services of the routes run is counted.</p></dd>
+
+
+<dt id="arg-from-to">from, to<a class="anchor" aria-label="anchor" href="#arg-from-to"></a></dt>
+<dd><p>Strings in the <code>"HH:MM:SS"</code> format. If given (both must be),
+only the departures at or after <code>from</code> and at or before <code>to</code> are
+counted. If <code>NULL</code> (the default), every departure is counted.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -114,8 +114,8 @@ times its number of departures times the number of counted days on which
 its service runs, according to the <code>calendar</code> and <code>calendar_dates</code> tables.
 Departures are counted as in <code><a href="get_route_frequency.html">get_route_frequency()</a></code>: trips listed in the
 <code>frequencies</code> table depart once per headway, the other trips depart once,
-and departures after midnight belong to the previous service day. Please
-note that the time of day doesn't include <code>to</code>, unlike in
+and departures after midnight belong to the previous service day. Unlike in
+<code><a href="get_route_frequency.html">get_route_frequency()</a></code>, the time of day includes <code>to</code>, as in
 <code><a href="get_trip_length.html">get_trip_length()</a></code>. An error is raised if the <code>frequencies</code> table has
 invalid entries for trips that run on the counted days.</p>
 <p>Trip lengths are calculated with <code><a href="get_trip_length.html">get_trip_length()</a></code>, along the shape of
@@ -155,14 +155,14 @@ nothing to the VKT, but the days on which they run still count in
 <span class="r-in"><span><span class="fu">get_vkt</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="va">gtfs</span>,</span></span>
 <span class="r-in"><span>  route_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CPTM L07"</span>, <span class="st">"2002-10"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  date <span class="op">=</span> <span class="st">"2019-03-04"</span>,</span></span>
 <span class="r-in"><span>  from <span class="op">=</span> <span class="st">"07:00:00"</span>,</span></span>
-<span class="r-in"><span>  to <span class="op">=</span> <span class="st">"09:00:00"</span>,</span></span>
-<span class="r-in"><span>  date <span class="op">=</span> <span class="st">"2019-03-04"</span></span></span>
+<span class="r-in"><span>  to <span class="op">=</span> <span class="st">"09:00:00"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    route_id n_days       vkt vkt_daily_mean</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      &lt;char&gt;  &lt;int&gt;     &lt;num&gt;          &lt;num&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:  2002-10      1  133.7734       133.7734</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2: CPTM L07      1 2423.5214      2423.5214</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:  2002-10      1  140.4621       140.4621</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2: CPTM L07      1 2544.6974      2544.6974</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

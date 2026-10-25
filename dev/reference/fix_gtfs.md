@@ -88,8 +88,10 @@ The feed goes through the following steps, in this order:
     filling blank times, so the filled stops also get the minimum. Only
     the stops between the first and the last stop with times of each
     trip get the minimum, so trips keep their start times. Stops with
-    negative dwell times (departures earlier than arrivals, e.g. times
-    after midnight written as `"00:30:00"`) don't get it either;
+    negative dwell times (departures earlier than arrivals) also get it,
+    see
+    [`set_min_dwell_time()`](https://ipea.github.io/gtfstools/dev/reference/set_min_dwell_time.md)
+    for times after midnight written as `"00:30:00"`;
 
 6.  [`interpolate_shape_dist_traveled()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_shape_dist_traveled.md),
     only if the feed has a `shapes` table and `trips` has a `shape_id`
