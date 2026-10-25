@@ -200,20 +200,22 @@ default in interactive sessions:
 feed_summary <- get_summary(spo_path, open_browser = FALSE)
 
 feed_summary$totals
-#>               indicator     value   unit
-#>                  <char>     <num> <char>
-#>  1:          n_agencies   1.00000   <NA>
-#>  2:            n_routes  19.00000   <NA>
-#>  3:             n_trips  36.00000   <NA>
-#>  4:             n_stops 654.00000   <NA>
-#>  5:  total_shape_length 895.92810     km
-#>  6:   mean_shape_length  24.88689     km
-#>  7:   total_trip_length 891.57769     km
-#>  8:    mean_trip_length  24.76605     km
-#>  9: total_trip_duration  42.74667      h
-#> 10:  mean_trip_duration  71.24444    min
-#> 11:     mean_trip_speed  23.46380   km/h
-#> 12:  mean_route_headway  24.43757    min
+#>               indicator        value   unit
+#>                  <char>        <num> <char>
+#>  1:          n_agencies 1.000000e+00   <NA>
+#>  2:            n_routes 1.900000e+01   <NA>
+#>  3:             n_trips 3.600000e+01   <NA>
+#>  4:             n_stops 6.540000e+02   <NA>
+#>  5:  total_shape_length 8.959281e+02     km
+#>  6:   mean_shape_length 2.488689e+01     km
+#>  7:   total_trip_length 8.915777e+02     km
+#>  8:    mean_trip_length 2.476605e+01     km
+#>  9:           vkt_total 8.606771e+08     km
+#> 10:      vkt_daily_mean 1.910493e+05 km/day
+#> 11: total_trip_duration 4.274667e+01      h
+#> 12:  mean_trip_duration 7.124444e+01    min
+#> 13:     mean_trip_speed 2.346380e+01   km/h
+#> 14:  mean_route_headway 2.443757e+01    min
 ```
 
 **Note:**

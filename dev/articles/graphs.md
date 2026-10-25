@@ -50,18 +50,12 @@ remove services running on weekends with
 
 library(gtfstools)
 library(dplyr)
-#> 
-#> Attaching package: 'dplyr'
-#> The following objects are masked from 'package:stats':
-#> 
-#>     filter, lag
-#> The following objects are masked from 'package:base':
-#> 
-#>     intersect, setdiff, setequal, union
 
+# read GTFS feed
 path <- system.file("extdata/poa_gtfs.zip", package = "gtfstools")
 gtfs <- read_gtfs(path)
 
+# drop weekends
 gtfs <- filter_by_weekday(
   gtfs,
   weekday = c("saturday", "sunday"), 
@@ -81,14 +75,14 @@ time of 30 seconds to allow passengers to board and alight.
 
 ``` r
 
-gtfs <- fix_gtfs(gtfs)
+gtfs <- fix_gtfs(gtfs, max_speed = 25, min_dwell_time = 30)
 ```
 
 obs. in this case,
 [`fix_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/fix_gtfs.md)
-throws a warning that refers to a few late night trips whose times go
-back to “00:00:00” after midnight, which depart outside the time of day
-used below:
+throws two warnings that refer to a few late night trips whose times go
+back to “00:00:00” after midnight. These trips depart outside the time
+of day used below, so they don’t affect the network.
 
 ## Building a GMNS network
 
@@ -126,20 +120,20 @@ head(g_gmns$node)
 head(g_gmns$link)
 #>    link_id from_node_id to_node_id directed    length free_speed  link_type
 #>      <int>        <int>      <int>   <lgcl>     <num>      <num>     <char>
-#> 1:       1          184        185     TRUE  965.4371   27.80459 in_vehicle
-#> 2:       2          185        201     TRUE 1279.7466   29.34451 in_vehicle
-#> 3:       3          186        187     TRUE  241.8582   25.60852 in_vehicle
-#> 4:       4          187        338     TRUE  510.1041   25.50520 in_vehicle
-#> 5:       5          188        189     TRUE  171.8830   25.78245 in_vehicle
-#> 6:       6          189        190     TRUE  307.4807   25.74257 in_vehicle
+#> 1:       1          184        185     TRUE  965.4371   21.85895 in_vehicle
+#> 2:       2          185        201     TRUE 1279.7466   22.80737 in_vehicle
+#> 3:       3          186        187     TRUE  241.8582   24.41186 in_vehicle
+#> 4:       4          187        338     TRUE  510.1041   24.59430 in_vehicle
+#> 5:       5          188        189     TRUE  171.8830   24.75115 in_vehicle
+#> 6:       6          189        190     TRUE  307.4807   24.41759 in_vehicle
 #>    travel_time departures route_id direction_id inferred_direction
 #>          <num>      <int>   <char>        <int>              <int>
-#> 1:   2.0833333         17      R10            1                 NA
-#> 2:   2.6166667         17      R10            1                 NA
-#> 3:   0.5666667          6      176            0                 NA
-#> 4:   1.2000000          6      176            0                 NA
-#> 5:   0.4000000          6      176            0                 NA
-#> 6:   0.7166667          6      176            0                 NA
+#> 1:   2.6500000         17      R10            1                 NA
+#> 2:   3.3666667         17      R10            1                 NA
+#> 3:   0.5944444          6      176            0                 NA
+#> 4:   1.2444444          6      176            0                 NA
+#> 5:   0.4166667          6      176            0                 NA
+#> 6:   0.7555556          6      176            0                 NA
 
 g_gmns$link |>
   dplyr::count(link_type)
@@ -168,17 +162,6 @@ where vehicles are boarded:
 ``` r
 
 library(igraph)
-#> 
-#> Attaching package: 'igraph'
-#> The following objects are masked from 'package:dplyr':
-#> 
-#>     as_data_frame, groups, union
-#> The following objects are masked from 'package:stats':
-#> 
-#>     decompose, spectrum
-#> The following object is masked from 'package:base':
-#> 
-#>     union
 
 g_igraph <- build_graph(
   gtfs, 
@@ -188,7 +171,6 @@ g_igraph <- build_graph(
   )
 
 # get stop nodes
-# stop_nodes <- igraph::V(g_igraph)[igraph::V(g_igraph)$node_type == "stop"]
 stop_nodes <- igraph::V(g_igraph)[node_type == "stop"]
 
 # get travel times between stops
@@ -232,27 +214,27 @@ closeness <- data.frame(
 closeness |>
   dplyr::slice_max(closeness, n = 10)
 #>     stop_id                           stop_name closeness_from closeness_to
-#> 109    5065         TRES FIGUEIRAS CARLOS GOMES     0.05761972   0.04751497
-#> 70     2920         TRES FIGUEIRAS CARLOS GOMES     0.05743938   0.04733027
-#> 105    5056             PETROPOLIS CARLOS GOMES     0.04980748   0.04768110
-#> 66     2874         TRES FIGUEIRAS CARLOS GOMES     0.04955955   0.04754615
-#> 139    6133 JARDIM BOTANICO SENADOR TARSO DUTRA     0.04863296   0.04290521
-#> 64     2849 JARDIM BOTANICO SENADOR TARSO DUTRA     0.04856490   0.04296696
-#> 42     1784        MEDIANEIRA DR CARLOS BARBOSA     0.03617761   0.04672303
-#> 41     1783        MEDIANEIRA DR CARLOS BARBOSA     0.03565377   0.04638727
-#> 157    6414          MENINO DEUS PRAIA DE BELAS     0.03109753   0.04893337
-#> 11     1456                      PRAIA DE BELAS     0.03077372   0.04861097
+#> 109    5065         TRES FIGUEIRAS CARLOS GOMES     0.05738224   0.04751497
+#> 70     2920         TRES FIGUEIRAS CARLOS GOMES     0.05720156   0.04733027
+#> 105    5056             PETROPOLIS CARLOS GOMES     0.04954473   0.04768110
+#> 66     2874         TRES FIGUEIRAS CARLOS GOMES     0.04929724   0.04754615
+#> 139    6133 JARDIM BOTANICO SENADOR TARSO DUTRA     0.04830932   0.04290521
+#> 64     2849 JARDIM BOTANICO SENADOR TARSO DUTRA     0.04824188   0.04296696
+#> 42     1784        MEDIANEIRA DR CARLOS BARBOSA     0.03520531   0.04540470
+#> 41     1783        MEDIANEIRA DR CARLOS BARBOSA     0.03464400   0.04498900
+#> 157    6414          MENINO DEUS PRAIA DE BELAS     0.03057636   0.04848460
+#> 62     2702  JARDIM BOTANICO DR SALVADOR FRANCA     0.04206430   0.03652148
 #>      closeness
-#> 109 0.05256734
-#> 70  0.05238483
-#> 105 0.04874429
-#> 66  0.04855285
-#> 139 0.04576908
-#> 64  0.04576593
-#> 42  0.04145032
-#> 41  0.04102052
-#> 157 0.04001545
-#> 11  0.03969235
+#> 109 0.05244860
+#> 70  0.05226592
+#> 105 0.04861292
+#> 66  0.04842169
+#> 139 0.04560726
+#> 64  0.04560442
+#> 42  0.04030501
+#> 41  0.03981650
+#> 157 0.03953048
+#> 62  0.03929289
 ```
 
 ## Plotting the network with tidygraph, sfnetworks and ggraph
@@ -298,9 +280,9 @@ a
 #> # Edge Data: 860 × 14
 #>    from    to link_id from_node_id to_node_id directed length free_speed
 #>   <int> <int>   <int>        <int>      <int> <lgl>     <dbl>      <dbl>
-#> 1   184   185       1          184        185 TRUE       965.       27.8
-#> 2   185   201       2          185        201 TRUE      1280.       29.3
-#> 3   186   187       3          186        187 TRUE       242.       25.6
+#> 1   184   185       1          184        185 TRUE       965.       21.9
+#> 2   185   201       2          185        201 TRUE      1280.       22.8
+#> 3   186   187       3          186        187 TRUE       242.       24.4
 #> # ℹ 857 more rows
 #> # ℹ 6 more variables: link_type <chr>, travel_time <dbl>, departures <int>,
 #> #   route_id <chr>, direction_id <int>, inferred_direction <int>

@@ -51,6 +51,10 @@
   : Get trip segments' duration
 - [`get_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_speed.md)
   : Get trip speed
+- [`get_vkt()`](https://ipea.github.io/gtfstools/dev/reference/get_vkt.md)
+  : Get vehicle-kilometres travelled
+- [`get_vmt()`](https://ipea.github.io/gtfstools/dev/reference/get_vmt.md)
+  : Get vehicle-miles travelled
 
 ## Filter GTFS feeds
 
@@ -151,6 +155,8 @@
   : Fix common problems in GTFS feeds
 - [`set_dwell_time()`](https://ipea.github.io/gtfstools/dev/reference/set_dwell_time.md)
   : Set dwell time
+- [`set_min_dwell_time()`](https://ipea.github.io/gtfstools/dev/reference/set_min_dwell_time.md)
+  : Set a minimum dwell time
 - [`set_max_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_max_speed.md)
   : Set trip maximum speed
 - [`set_route_frequency()`](https://ipea.github.io/gtfstools/dev/reference/set_route_frequency.md)

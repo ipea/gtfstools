@@ -78,7 +78,7 @@ The feed goes through the following steps, in this order:
     Stops whose times can't be interpolated are left blank, with a
     warning;
 
-5.  [`set_dwell_time()`](https://ipea.github.io/gtfstools/dev/reference/set_dwell_time.md),
+5.  [`set_min_dwell_time()`](https://ipea.github.io/gtfstools/dev/reference/set_min_dwell_time.md),
     only if `min_dwell_time` is given, delays the departure from each
     intermediate stop whose dwell time is shorter than `min_dwell_time`,
     so that vehicles stay there for at least that long. The minimum is
@@ -110,7 +110,7 @@ shape) may be raised more than once.
 [`remove_unused_ids()`](https://ipea.github.io/gtfstools/dev/reference/remove_unused_ids.md),
 [`set_max_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_max_speed.md),
 [`interpolate_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_stop_times.md),
-[`set_dwell_time()`](https://ipea.github.io/gtfstools/dev/reference/set_dwell_time.md),
+[`set_min_dwell_time()`](https://ipea.github.io/gtfstools/dev/reference/set_min_dwell_time.md),
 [`interpolate_shape_dist_traveled()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_shape_dist_traveled.md)
 
 ## Examples

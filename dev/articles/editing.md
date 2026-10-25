@@ -47,9 +47,10 @@ functions currently available are:
   recalculating the distances travelled along shapes (replacing any
   existing ones).
 
-This vignette will introduce you to the first four functions and will
-cover their usage in detail. By default, they return an edited copy of
-the feed and leave the given GTFS object unchanged.
+This vignette will introduce you to the first four functions and to
+[`fix_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/fix_gtfs.md),
+and will cover their usage in detail. By default, they return an edited
+copy of the feed and leave the given GTFS object unchanged.
 
 We will start by loading the packages required by this demonstration
 into the current **R** session:
@@ -357,6 +358,61 @@ may be left blank, with a warning: for example, a few trips of Porto
 Alegre’s feed list their times after midnight as `"00:xx:xx"`, instead
 of `"24:xx:xx"`, so they seem to arrive before they depart and can’t be
 interpolated.
+
+## Fixing common problems
+
+GTFS feeds often come with small problems that get in the way of an
+analysis, such as duplicated entries, ids that no trip uses, blank stop
+times and missing distances travelled along shapes.
+[`fix_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/fix_gtfs.md)
+fixes them in one call, chaining several of the functions listed above.
+
+In this example below, we fix Porto Alegre’s feed, capping maximum
+speeds to 25 Km/h and making vehicles stay at least 20 seconds at each
+intermediate stop for passengers to board and alight:
+
+``` r
+
+fixed_gtfs <- fix_gtfs(
+  gtfs, 
+  max_speed = 25, 
+  min_dwell_time = 20
+  )
+#> Warning: 10 trips have stops whose arrival is earlier than the previous departure, so
+#> their speeds were not capped between them: "176-1@1#2310", "A141-1@3#2340",
+#> "A141-1@5#2340", "T2-1@1#2310", "T2-1@1#2332" and 5 more.
+#> ℹ This usually happens when times after midnight are written as "00:30:00"
+#>   instead of "24:30:00".
+#> Warning: 558 stop times could not be interpolated and were left blank.
+#> ℹ 10 trips have an arrival earlier than the previous departure, e.g. times
+#>   after midnight written as "00:30:00" instead of "24:30:00": "176-1@1#2310",
+#>   "A141-1@3#2340", "A141-1@5#2340", "T2-1@1#2310", "T2-1@1#2332",
+#>   "T2-1@1#2357", "T2-1@2#2332", "T2-1@2#2357", "T2-1@5#2334", and
+#>   "T2-1@5#2357".
+```
+
+With
+[`fix_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/fix_gtfs.md),
+the feed goes through the following steps, in this order:
+
+1.  [`remove_duplicates()`](https://ipea.github.io/gtfstools/dev/reference/remove_duplicates.md)
+    removes duplicated entries from every table;
+2.  [`remove_unused_ids()`](https://ipea.github.io/gtfstools/dev/reference/remove_unused_ids.md)
+    removes the trips without stop times and the entries of every table
+    that no remaining trip uses (e.g. stods that are not used in any
+    trip);
+3.  [`set_max_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_max_speed.md),
+    only if `max_speed` is given, slows down the parts of trips that are
+    faster than `max_speed`;
+4.  [`interpolate_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_stop_times.md)
+    fills blank stop times. Since this runs after the speed cap, the
+    filled times follow the capped ones;
+5.  [`set_min_dwell_time()`](https://ipea.github.io/gtfstools/dev/reference/set_min_dwell_time.md)
+    forces every vehicle to remain stopped at each intermediate stop for
+    at least `min_dwell_time` for passengers to board and alight;
+6.  [`interpolate_shape_dist_traveled()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_shape_dist_traveled.md),
+    in feeds with shapes, adds the distances, in meters, travelled from
+    the start of each shape to each stop and shape point.
 
 **Note:**
 

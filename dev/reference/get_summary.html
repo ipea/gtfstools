@@ -80,7 +80,8 @@ issues in the GTFS feed. To do that, use <code><a href="validate_gtfs.html">vali
 <span>  to <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  output_dir <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  open_browser <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  by_route_type <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  by_route_type <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  unit <span class="op">=</span> <span class="st">"km/h"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -143,6 +144,12 @@ browser, in interactive sessions (defaults to <code>TRUE</code>).</p></dd>
 distances and frequencies by transport mode (<code>route_type</code>), in addition
 to the whole selection (defaults to <code>FALSE</code>).</p></dd>
 
+
+<dt id="arg-unit">unit<a class="anchor" aria-label="anchor" href="#arg-unit"></a></dt>
+<dd><p>A string. Either <code>"km/h"</code> (the default), to report distances in
+km and speeds in km/h, or <code>"mph"</code>, to report them in miles and miles per
+hour.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -163,10 +170,13 @@ with the most trips and its number of trips) and <code>feed_start_date</code> an
 <code>feed_end_date</code> (from <code>feed_info</code>, <code>NA</code> if absent);</p></li>
 <li><p><code>totals</code>: the columns <code>indicator</code>, <code>value</code> and <code>unit</code>, with the number
 of agencies, routes, trips and stops, the total and mean length of the
-shapes and of the trips (in km), the total duration of the trips (in
-hours), the mean duration of the trips (in minutes), the mean trip
-speed (in km/h) and the mean route headway (in minutes). The means are
-taken over the shapes and trips whose value is known. If
+shapes and of the trips (in km), the vehicle-kilometres travelled
+(<code>vkt_total</code>, in km) and their mean per day (<code>vkt_daily_mean</code>, in
+km/day), the total duration of the trips (in hours), the mean duration
+of the trips (in minutes), the mean trip speed (in km/h) and the mean
+route headway (in minutes). The means of lengths, durations and speeds
+are taken over the shapes and trips whose value is known, and
+<code>vkt_daily_mean</code> over the days with counted departures (see Details). If
 <code>by_route_type = TRUE</code>, <code>value</code> is replaced by one column per mode
 followed by the column <code>all</code> (codes of extended <code>route_type</code>s, such as
 <code>"700"</code>, are non-syntactic names, so they need backticks);</p></li>
@@ -177,7 +187,11 @@ minutes). <code>frequency</code> also has the columns <code>date</code>, <code>f
 the day and the time of day in which the headways were measured. If
 <code>by_route_type = TRUE</code>, these tables start with a <code>mode</code> column and
 have one row per mode followed by the row <code>all</code>.</p></li>
-</ul><p>The report is saved as <code>gtfs_summary.md</code> and <code>gtfs_summary.html</code>
+</ul><p>With <code>unit = "mph"</code>, distances are in miles (<code>mi</code> and <code>mi/day</code>) and speeds
+in miles per hour (<code>mph</code>), and the rows <code>vkt_total</code> and <code>vkt_daily_mean</code>
+of <code>totals</code> are named <code>vmt_total</code> and <code>vmt_daily_mean</code> (vehicle-miles
+travelled).</p>
+<p>The report is saved as <code>gtfs_summary.md</code> and <code>gtfs_summary.html</code>
 (together with its figures) in <code>output_dir</code>.</p>
     </div>
     <div class="section level2">
@@ -191,12 +205,27 @@ order. The time-of-day filter keeps the whole trips that run within it
 (see <code><a href="filter_by_time_of_day.html">filter_by_time_of_day()</a></code> with <code>full_trips = TRUE</code>), so the trip
 speeds and lengths refer to whole trips.</p>
 <p>Trip lengths, durations and speeds are calculated with <code><a href="get_trip_length.html">get_trip_length()</a></code>,
-<code><a href="get_trip_duration.html">get_trip_duration()</a></code> and <code><a href="get_trip_speed.html">get_trip_speed()</a></code>. Each trip is counted once,
-however many days it runs on and however many departures the <code>frequencies</code>
-table lists for it. Trips with a zero or negative duration count in the
-total and mean durations, but have no speed. The total and mean shape lengths
-count each shape used by the selected trips once, and the number of stops
-counts the stops visited by the selected trips.</p>
+<code><a href="get_trip_duration.html">get_trip_duration()</a></code> and <code><a href="get_trip_speed.html">get_trip_speed()</a></code>. In their totals and means,
+each trip is counted once, however many days it runs on and however many
+departures the <code>frequencies</code> table lists for it. Trips with a zero or
+negative duration count in the total and mean durations, but have no speed.
+The total and mean shape lengths count each shape used by the selected trips
+once, and the number of stops counts the stops visited by the selected
+trips.</p>
+<p>The vehicle-kilometres travelled (VKT) are calculated as in <code><a href="get_vkt.html">get_vkt()</a></code> for
+the selected trips: the length of each trip counts once for every departure
+of the trip on every counted day on which its service runs. The counted days
+are the given <code>date</code>s or, if <code>date</code> is <code>NULL</code>, every day on which the
+selected services run, and <code>vkt_daily_mean</code> is the mean over those on which
+at least one counted departure runs. With <code>from</code> and <code>to</code>, only the
+departures at or after <code>from</code> and before <code>to</code> are counted, as listed in the
+feed before it is filtered by time of day, so selected trips that depart
+before <code>from</code> add nothing to the VKT. If no selected trip departs on the
+counted days (within the time of day), <code>vkt_total</code> and <code>vkt_daily_mean</code> are
+<code>NA</code>. An error is raised if the <code>frequencies</code> table has invalid entries for
+selected trips that run on the counted days. With <code>unit = "mph"</code>, the VKT
+are instead the vehicle-miles travelled (VMT), as in <code><a href="get_vmt.html">get_vmt()</a></code>, reported
+in the rows <code>vmt_total</code> and <code>vmt_daily_mean</code>.</p>
 <p>The <code>services</code> summary and the calendar chart in the report describe the
 whole calendar of the selected services: when <code>date</code> is given, the
 services that run on these dates are kept as a whole (see
@@ -217,10 +246,11 @@ unknown are grouped as <code>"unknown"</code>. Modes are ordered by <code>route_
 <code>"unknown"</code> last. Each mode is described as if it were selected alone
 (except that the headways of all modes are measured on the same day and
 time of day), so stops, shapes and agencies shared by several modes count
-in each of them. Only the numbers of routes and trips and the total trip
-lengths and durations add up to the <code>all</code> column. Modes whose routes have
-blank <code>agency_id</code>s count all the agencies of the selection, and trips
-listed in <code>stop_times</code> but not in <code>trips</code> only count in <code>all</code>. In the
+in each of them. Only the numbers of routes and trips, the total trip
+lengths and durations and <code>vkt_total</code> (or <code>vmt_total</code>) add up to the <code>all</code>
+column. Modes whose routes have blank <code>agency_id</code>s count all the agencies of
+the selection, and trips listed in <code>stop_times</code> but not in <code>trips</code> only
+count in <code>all</code> (and not in the VKT, since they have no service). In the
 report, the histograms of the modes are overlaid.</p>
     </div>
 
@@ -261,20 +291,38 @@ report, the histograms of the modes are overlaid.</p>
 <span class="r-in"><span>  <span class="va">feed_summary</span><span class="op">$</span><span class="va">totals</span></span></span>
 <span class="r-in"><span>  <span class="co"># }</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>               indicator     subway      rail       bus       all   unit</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                  &lt;char&gt;      &lt;num&gt;     &lt;num&gt;     &lt;num&gt;     &lt;num&gt; &lt;char&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  1:          n_agencies   1.000000   1.00000   1.00000   1.00000   &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  2:            n_routes   6.000000   7.00000   6.00000  19.00000   &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  3:             n_trips  12.000000  14.00000  10.00000  36.00000   &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  4:             n_stops  88.000000 100.00000 466.00000 654.00000   &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  5:  total_shape_length 196.966795 525.64661 173.31469 895.92810     km</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  6:   mean_shape_length  16.413900  37.54619  17.33147  24.88689     km</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  7:   total_trip_length 195.942016 524.74754 170.88814 891.57769     km</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  8:    mean_trip_length  16.328501  37.48197  17.08881  24.76605     km</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  9: total_trip_duration   7.263333  19.66667  15.81667  42.74667      h</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10:  mean_trip_duration  36.316667  84.28571  94.90000  71.24444    min</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11:     mean_trip_speed  27.364010  29.06481  10.94215  23.46380   km/h</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12:  mean_route_headway   6.283301  10.96129  65.08947  24.43757    min</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>               indicator       subway         rail          bus          all</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                  &lt;char&gt;        &lt;num&gt;        &lt;num&gt;        &lt;num&gt;        &lt;num&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1:          n_agencies 1.000000e+00 1.000000e+00 1.000000e+00 1.000000e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  2:            n_routes 6.000000e+00 7.000000e+00 6.000000e+00 1.900000e+01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  3:             n_trips 1.200000e+01 1.400000e+01 1.000000e+01 3.600000e+01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  4:             n_stops 8.800000e+01 1.000000e+02 4.660000e+02 6.540000e+02</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  5:  total_shape_length 1.969668e+02 5.256466e+02 1.733147e+02 8.959281e+02</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  6:   mean_shape_length 1.641390e+01 3.754619e+01 1.733147e+01 2.488689e+01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  7:   total_trip_length 1.959420e+02 5.247475e+02 1.708881e+02 8.915777e+02</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  8:    mean_trip_length 1.632850e+01 3.748197e+01 1.708881e+01 2.476605e+01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  9:           vkt_total 3.833453e+08 4.255697e+08 5.176208e+07 8.606771e+08</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10:      vkt_daily_mean 8.509330e+04 9.446608e+04 1.148992e+04 1.910493e+05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11: total_trip_duration 7.263333e+00 1.966667e+01 1.581667e+01 4.274667e+01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12:  mean_trip_duration 3.631667e+01 8.428571e+01 9.490000e+01 7.124444e+01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13:     mean_trip_speed 2.736401e+01 2.906481e+01 1.094215e+01 2.346380e+01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14:  mean_route_headway 6.283301e+00 1.096129e+01 6.508947e+01 2.443757e+01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       unit</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     &lt;char&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1:   &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  2:   &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  3:   &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  4:   &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  5:     km</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  6:     km</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  7:     km</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  8:     km</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  9:     km</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10: km/day</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11:      h</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12:    min</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13:   km/h</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14:    min</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

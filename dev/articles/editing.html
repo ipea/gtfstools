@@ -134,9 +134,10 @@ trips, filling blank stop times, optionally setting a minimum dwell time
 at intermediate stops and recalculating the distances travelled along
 shapes (replacing any existing ones).</li>
 </ul>
-<p>This vignette will introduce you to the first four functions and will
-cover their usage in detail. By default, they return an edited copy of
-the feed and leave the given GTFS object unchanged.</p>
+<p>This vignette will introduce you to the first four functions and to
+<code><a href="../reference/fix_gtfs.html">fix_gtfs()</a></code>, and will cover their usage in detail. By
+default, they return an edited copy of the feed and leave the given GTFS
+object unchanged.</p>
 <p>We will start by loading the packages required by this demonstration
 into the current <strong>R</strong> session:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
@@ -418,6 +419,62 @@ feed. Some stops may be left blank, with a warning: for example, a few
 trips of Porto Alegre’s feed list their times after midnight as
 <code>"00:xx:xx"</code>, instead of <code>"24:xx:xx"</code>, so they
 seem to arrive before they depart and can’t be interpolated.</p>
+</div>
+<div class="section level2">
+<h2 id="fixing-common-problems">Fixing common problems<a class="anchor" aria-label="anchor" href="#fixing-common-problems"></a>
+</h2>
+<p>GTFS feeds often come with small problems that get in the way of an
+analysis, such as duplicated entries, ids that no trip uses, blank stop
+times and missing distances travelled along shapes.
+<code><a href="../reference/fix_gtfs.html">fix_gtfs()</a></code> fixes them in one call, chaining several of the
+functions listed above.</p>
+<p>In this example below, we fix Porto Alegre’s feed, capping maximum
+speeds to 25 Km/h and making vehicles stay at least 20 seconds at each
+intermediate stop for passengers to board and alight:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">fixed_gtfs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fix_gtfs.html">fix_gtfs</a></span><span class="op">(</span></span>
+<span>  <span class="va">gtfs</span>, </span>
+<span>  max_speed <span class="op">=</span> <span class="fl">25</span>, </span>
+<span>  min_dwell_time <span class="op">=</span> <span class="fl">20</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: 10 trips have stops whose arrival is earlier than the previous departure, so</span></span>
+<span><span class="co">#&gt; their speeds were not capped between them: <span style="color: #0000BB;">"176-1@1#2310"</span>, <span style="color: #0000BB;">"A141-1@3#2340"</span>,</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">"A141-1@5#2340"</span>, <span style="color: #0000BB;">"T2-1@1#2310"</span>, <span style="color: #0000BB;">"T2-1@1#2332"</span> and 5 more.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> This usually happens when times after midnight are written as <span style="color: #0000BB;">"00:30:00"</span></span></span>
+<span><span class="co">#&gt;   instead of <span style="color: #0000BB;">"24:30:00"</span>.</span></span>
+<span><span class="co">#&gt; Warning: 558 stop times could not be interpolated and were left blank.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> 10 trips have an arrival earlier than the previous departure, e.g. times</span></span>
+<span><span class="co">#&gt;   after midnight written as <span style="color: #0000BB;">"00:30:00"</span> instead of <span style="color: #0000BB;">"24:30:00"</span>: <span style="color: #0000BB;">"176-1@1#2310"</span>,</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">"A141-1@3#2340"</span>, <span style="color: #0000BB;">"A141-1@5#2340"</span>, <span style="color: #0000BB;">"T2-1@1#2310"</span>, <span style="color: #0000BB;">"T2-1@1#2332"</span>,</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">"T2-1@1#2357"</span>, <span style="color: #0000BB;">"T2-1@2#2332"</span>, <span style="color: #0000BB;">"T2-1@2#2357"</span>, <span style="color: #0000BB;">"T2-1@5#2334"</span>, and</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">"T2-1@5#2357"</span>.</span></span></code></pre></div>
+<p>With <code><a href="../reference/fix_gtfs.html">fix_gtfs()</a></code>, the feed goes through the following
+steps, in this order:</p>
+<ol style="list-style-type: decimal">
+<li>
+<code><a href="../reference/remove_duplicates.html">remove_duplicates()</a></code> removes duplicated entries from
+every table;</li>
+<li>
+<code><a href="../reference/remove_unused_ids.html">remove_unused_ids()</a></code> removes the trips without stop
+times and the entries of every table that no remaining trip uses
+(e.g. stods that are not used in any trip);</li>
+<li>
+<code><a href="../reference/set_max_speed.html">set_max_speed()</a></code>, only if <code>max_speed</code> is
+given, slows down the parts of trips that are faster than
+<code>max_speed</code>;</li>
+<li>
+<code><a href="../reference/interpolate_stop_times.html">interpolate_stop_times()</a></code> fills blank stop times. Since
+this runs after the speed cap, the filled times follow the capped
+ones;</li>
+<li>
+<code><a href="../reference/set_min_dwell_time.html">set_min_dwell_time()</a></code> forces every vehicle to remain
+stopped at each intermediate stop for at least
+<code>min_dwell_time</code> for passengers to board and alight;</li>
+<li>
+<code><a href="../reference/interpolate_shape_dist_traveled.html">interpolate_shape_dist_traveled()</a></code>, in feeds with
+shapes, adds the distances, in meters, travelled from the start of each
+shape to each stop and shape point.</li>
+</ol>
 <p><strong>Note:</strong></p>
 <p>All editing functions return a GTFS object readily available to be
 manipulated and analyzed using the rest of <strong>gtfstools</strong>’

@@ -21,7 +21,8 @@ get_summary(
   to = NULL,
   output_dir = NULL,
   open_browser = TRUE,
-  by_route_type = FALSE
+  by_route_type = FALSE,
+  unit = "km/h"
 )
 ```
 
@@ -85,6 +86,12 @@ get_summary(
   frequencies by transport mode (`route_type`), in addition to the whole
   selection (defaults to `FALSE`).
 
+- unit:
+
+  A string. Either `"km/h"` (the default), to report distances in km and
+  speeds in km/h, or `"mph"`, to report them in miles and miles per
+  hour.
+
 ## Value
 
 A named list of `data.table`s (invisibly, if the report was opened in
@@ -109,11 +116,14 @@ the browser):
 
 - `totals`: the columns `indicator`, `value` and `unit`, with the number
   of agencies, routes, trips and stops, the total and mean length of the
-  shapes and of the trips (in km), the total duration of the trips (in
-  hours), the mean duration of the trips (in minutes), the mean trip
-  speed (in km/h) and the mean route headway (in minutes). The means are
-  taken over the shapes and trips whose value is known. If
-  `by_route_type = TRUE`, `value` is replaced by one column per mode
+  shapes and of the trips (in km), the vehicle-kilometres travelled
+  (`vkt_total`, in km) and their mean per day (`vkt_daily_mean`, in
+  km/day), the total duration of the trips (in hours), the mean duration
+  of the trips (in minutes), the mean trip speed (in km/h) and the mean
+  route headway (in minutes). The means of lengths, durations and speeds
+  are taken over the shapes and trips whose value is known, and
+  `vkt_daily_mean` over the days with counted departures (see Details).
+  If `by_route_type = TRUE`, `value` is replaced by one column per mode
   followed by the column `all` (codes of extended `route_type`s, such as
   `"700"`, are non-syntactic names, so they need backticks);
 
@@ -124,6 +134,11 @@ the browser):
   with the day and the time of day in which the headways were measured.
   If `by_route_type = TRUE`, these tables start with a `mode` column and
   have one row per mode followed by the row `all`.
+
+With `unit = "mph"`, distances are in miles (`mi` and `mi/day`) and
+speeds in miles per hour (`mph`), and the rows `vkt_total` and
+`vkt_daily_mean` of `totals` are named `vmt_total` and `vmt_daily_mean`
+(vehicle-miles travelled).
 
 The report is saved as `gtfs_summary.md` and `gtfs_summary.html`
 (together with its figures) in `output_dir`.
@@ -146,12 +161,30 @@ Trip lengths, durations and speeds are calculated with
 [`get_trip_duration()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_duration.md)
 and
 [`get_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_speed.md).
-Each trip is counted once, however many days it runs on and however many
-departures the `frequencies` table lists for it. Trips with a zero or
-negative duration count in the total and mean durations, but have no
-speed. The total and mean shape lengths count each shape used by the
-selected trips once, and the number of stops counts the stops visited by
-the selected trips.
+In their totals and means, each trip is counted once, however many days
+it runs on and however many departures the `frequencies` table lists for
+it. Trips with a zero or negative duration count in the total and mean
+durations, but have no speed. The total and mean shape lengths count
+each shape used by the selected trips once, and the number of stops
+counts the stops visited by the selected trips.
+
+The vehicle-kilometres travelled (VKT) are calculated as in
+[`get_vkt()`](https://ipea.github.io/gtfstools/dev/reference/get_vkt.md)
+for the selected trips: the length of each trip counts once for every
+departure of the trip on every counted day on which its service runs.
+The counted days are the given `date`s or, if `date` is `NULL`, every
+day on which the selected services run, and `vkt_daily_mean` is the mean
+over those on which at least one counted departure runs. With `from` and
+`to`, only the departures at or after `from` and before `to` are
+counted, as listed in the feed before it is filtered by time of day, so
+selected trips that depart before `from` add nothing to the VKT. If no
+selected trip departs on the counted days (within the time of day),
+`vkt_total` and `vkt_daily_mean` are `NA`. An error is raised if the
+`frequencies` table has invalid entries for selected trips that run on
+the counted days. With `unit = "mph"`, the VKT are instead the
+vehicle-miles travelled (VMT), as in
+[`get_vmt()`](https://ipea.github.io/gtfstools/dev/reference/get_vmt.md),
+reported in the rows `vmt_total` and `vmt_daily_mean`.
 
 The `services` summary and the calendar chart in the report describe the
 whole calendar of the selected services: when `date` is given, the
@@ -179,11 +212,12 @@ unknown are grouped as `"unknown"`. Modes are ordered by `route_type`,
 with `"unknown"` last. Each mode is described as if it were selected
 alone (except that the headways of all modes are measured on the same
 day and time of day), so stops, shapes and agencies shared by several
-modes count in each of them. Only the numbers of routes and trips and
-the total trip lengths and durations add up to the `all` column. Modes
-whose routes have blank `agency_id`s count all the agencies of the
-selection, and trips listed in `stop_times` but not in `trips` only
-count in `all`. In the report, the histograms of the modes are overlaid.
+modes count in each of them. Only the numbers of routes and trips, the
+total trip lengths and durations and `vkt_total` (or `vmt_total`) add up
+to the `all` column. Modes whose routes have blank `agency_id`s count
+all the agencies of the selection, and trips listed in `stop_times` but
+not in `trips` only count in `all` (and not in the VKT, since they have
+no service). In the report, the histograms of the modes are overlaid.
 
 ## Examples
 
@@ -223,18 +257,36 @@ if (
   feed_summary$totals
   # }
 }
-#>               indicator     subway      rail       bus       all   unit
-#>                  <char>      <num>     <num>     <num>     <num> <char>
-#>  1:          n_agencies   1.000000   1.00000   1.00000   1.00000   <NA>
-#>  2:            n_routes   6.000000   7.00000   6.00000  19.00000   <NA>
-#>  3:             n_trips  12.000000  14.00000  10.00000  36.00000   <NA>
-#>  4:             n_stops  88.000000 100.00000 466.00000 654.00000   <NA>
-#>  5:  total_shape_length 196.966795 525.64661 173.31469 895.92810     km
-#>  6:   mean_shape_length  16.413900  37.54619  17.33147  24.88689     km
-#>  7:   total_trip_length 195.942016 524.74754 170.88814 891.57769     km
-#>  8:    mean_trip_length  16.328501  37.48197  17.08881  24.76605     km
-#>  9: total_trip_duration   7.263333  19.66667  15.81667  42.74667      h
-#> 10:  mean_trip_duration  36.316667  84.28571  94.90000  71.24444    min
-#> 11:     mean_trip_speed  27.364010  29.06481  10.94215  23.46380   km/h
-#> 12:  mean_route_headway   6.283301  10.96129  65.08947  24.43757    min
+#>               indicator       subway         rail          bus          all
+#>                  <char>        <num>        <num>        <num>        <num>
+#>  1:          n_agencies 1.000000e+00 1.000000e+00 1.000000e+00 1.000000e+00
+#>  2:            n_routes 6.000000e+00 7.000000e+00 6.000000e+00 1.900000e+01
+#>  3:             n_trips 1.200000e+01 1.400000e+01 1.000000e+01 3.600000e+01
+#>  4:             n_stops 8.800000e+01 1.000000e+02 4.660000e+02 6.540000e+02
+#>  5:  total_shape_length 1.969668e+02 5.256466e+02 1.733147e+02 8.959281e+02
+#>  6:   mean_shape_length 1.641390e+01 3.754619e+01 1.733147e+01 2.488689e+01
+#>  7:   total_trip_length 1.959420e+02 5.247475e+02 1.708881e+02 8.915777e+02
+#>  8:    mean_trip_length 1.632850e+01 3.748197e+01 1.708881e+01 2.476605e+01
+#>  9:           vkt_total 3.833453e+08 4.255697e+08 5.176208e+07 8.606771e+08
+#> 10:      vkt_daily_mean 8.509330e+04 9.446608e+04 1.148992e+04 1.910493e+05
+#> 11: total_trip_duration 7.263333e+00 1.966667e+01 1.581667e+01 4.274667e+01
+#> 12:  mean_trip_duration 3.631667e+01 8.428571e+01 9.490000e+01 7.124444e+01
+#> 13:     mean_trip_speed 2.736401e+01 2.906481e+01 1.094215e+01 2.346380e+01
+#> 14:  mean_route_headway 6.283301e+00 1.096129e+01 6.508947e+01 2.443757e+01
+#>       unit
+#>     <char>
+#>  1:   <NA>
+#>  2:   <NA>
+#>  3:   <NA>
+#>  4:   <NA>
+#>  5:     km
+#>  6:     km
+#>  7:     km
+#>  8:     km
+#>  9:     km
+#> 10: km/day
+#> 11:      h
+#> 12:    min
+#> 13:   km/h
+#> 14:    min
 ```

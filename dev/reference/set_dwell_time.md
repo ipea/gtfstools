@@ -10,10 +10,10 @@ times of the trips accordingly.
 ``` r
 set_dwell_time(
   gtfs,
-  trip_id = NULL,
-  stop_id = NULL,
   dwell_time,
   unit = "s",
+  trip_id = NULL,
+  stop_id = NULL,
   from = NULL,
   to = NULL,
   route_type = NULL,
@@ -28,18 +28,6 @@ set_dwell_time(
   A GTFS object, as created by
   [`read_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/read_gtfs.md).
 
-- trip_id:
-
-  A character vector including the `trip_id`s to have their dwell times
-  set. If `NULL` (the default), the dwell times of every `trip_id` in
-  the GTFS (or of every trip of the given `route_type`s) are set.
-
-- stop_id:
-
-  A character vector including the `stop_id`s at which the dwell times
-  are set. If `NULL` (the default), the dwell times are set at every
-  `stop_id` in the GTFS.
-
 - dwell_time:
 
   A non-negative number, the dwell time to be set, in `unit`. It's
@@ -51,6 +39,18 @@ set_dwell_time(
   A string representing the time unit in which `dwell_time` is given.
   One of `"s"` (seconds, the default), `"min"` (minutes), `"h"` (hours)
   or `"d"` (days).
+
+- trip_id:
+
+  A character vector including the `trip_id`s to have their dwell times
+  set. If `NULL` (the default), the dwell times of every `trip_id` in
+  the GTFS (or of every trip of the given `route_type`s) are set.
+
+- stop_id:
+
+  A character vector including the `stop_id`s at which the dwell times
+  are set. If `NULL` (the default), the dwell times are set at every
+  `stop_id` in the GTFS.
 
 - from:
 
@@ -104,10 +104,10 @@ trip. At its last stop, only the departure time changes. A stop visited
 more than once by the same trip (e.g. in a loop) has its dwell time set
 at each visit.
 
-Blank times are never filled, and later blank times stay blank. Selected
-visits with a blank arrival or departure time have no dwell time to
-change, so their dwell time is not set and they don't shift the later
-times. When `stop_id` is given, this raises a warning. Use
+Blank stop times are never filled, and later blank times stay blank.
+Selected visits with a blank arrival or departure time have no dwell
+time to change, so their dwell time is not set and they don't shift the
+later times. When `stop_id` is given, this raises a warning. Use
 [`interpolate_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_stop_times.md)
 to fill blank times beforehand. The function raises an error if a shift
 would result in a negative time, which only happens when the times of a
@@ -151,6 +151,7 @@ are updated to match.
 ## See also
 
 [`get_dwell_time()`](https://ipea.github.io/gtfstools/dev/reference/get_dwell_time.md),
+[`set_min_dwell_time()`](https://ipea.github.io/gtfstools/dev/reference/set_min_dwell_time.md),
 [`set_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.md)
 
 ## Examples

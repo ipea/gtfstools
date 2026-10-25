@@ -102,7 +102,8 @@ are not used.
 
 ## See also
 
-[`set_dwell_time()`](https://ipea.github.io/gtfstools/dev/reference/set_dwell_time.md)
+[`set_dwell_time()`](https://ipea.github.io/gtfstools/dev/reference/set_dwell_time.md),
+[`set_min_dwell_time()`](https://ipea.github.io/gtfstools/dev/reference/set_min_dwell_time.md)
 
 ## Examples
 

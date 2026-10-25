@@ -131,7 +131,8 @@
   proposal and discussion.
 - New function
   [`get_summary()`](https://ipea.github.io/gtfstools/dev/reference/get_summary.md),
-  which summarises a feed (its files, agencies, service calendar, totals
+  which summarises a feed (its files, agencies, service calendar,
+  totals, including the vehicle-kilometres (or vehicle-miles) travelled,
   and the distributions of trip speeds, trip lengths and route
   headways), optionally restricted to some dates, routes, modes,
   agencies and a time of day. It returns a list of `data.table`s and
@@ -141,7 +142,18 @@
   [rmarkdown](https://github.com/rstudio/rmarkdown) and Pandoc). With
   `by_route_type = TRUE`, the totals, speeds, lengths and headways are
   also broken down by transport mode
-  ([\#127](https://github.com/ipea/gtfstools/issues/127)).
+  ([\#127](https://github.com/ipea/gtfstools/issues/127)). Distances and
+  speeds are reported in km and km/h, or in miles and mph with
+  `unit = "mph"`.
+- New function
+  [`get_vkt()`](https://ipea.github.io/gtfstools/dev/reference/get_vkt.md),
+  which returns the vehicle-kilometres travelled (VKT) by each route:
+  the length of each of its trips, counted once for every departure
+  (including each departure listed in `frequencies`) on every day on
+  which its service runs. VKT can be restricted to some dates and to a
+  time of day.
+  [`get_vmt()`](https://ipea.github.io/gtfstools/dev/reference/get_vmt.md)
+  returns the same measure in vehicle-miles travelled (VMT).
 - New function
   [`get_route_speed()`](https://ipea.github.io/gtfstools/dev/reference/get_route_speed.md),
   which returns the minimum, mean, median, maximum and standard
@@ -278,6 +290,11 @@
   for trips departing within a time of day (`from`, `to`), and for trips
   of the given transport modes (`route_type`).
 - New function
+  [`set_min_dwell_time()`](https://ipea.github.io/gtfstools/dev/reference/set_min_dwell_time.md),
+  which makes vehicles stay at least a minimum time at the intermediate
+  stops of the given trips, raising only shorter dwell times and
+  shifting the later times of each trip accordingly.
+- New function
   [`fix_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/fix_gtfs.md),
   a wrapper that cleans a feed in one call: it removes duplicated
   entries and unused ids, optionally caps the speed of trips with
@@ -286,7 +303,7 @@
   [`interpolate_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_stop_times.md),
   optionally sets a minimum dwell time at the intermediate stops of each
   trip with
-  [`set_dwell_time()`](https://ipea.github.io/gtfstools/dev/reference/set_dwell_time.md)
+  [`set_min_dwell_time()`](https://ipea.github.io/gtfstools/dev/reference/set_min_dwell_time.md)
   and, in feeds with shapes, recalculates the distances travelled along
   shapes with
   [`interpolate_shape_dist_traveled()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_shape_dist_traveled.md),
@@ -356,9 +373,10 @@
   feeds and demonstrates
   [`set_route_frequency()`](https://ipea.github.io/gtfstools/dev/reference/set_route_frequency.md),
   [`set_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.md),
-  [`stop_times_to_frequencies()`](https://ipea.github.io/gtfstools/dev/reference/stop_times_to_frequencies.md)
+  [`stop_times_to_frequencies()`](https://ipea.github.io/gtfstools/dev/reference/stop_times_to_frequencies.md),
+  [`interpolate_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_stop_times.md)
   and
-  [`interpolate_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_stop_times.md).
+  [`fix_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/fix_gtfs.md).
 - New vignette “Querying GTFS feeds”, which demonstrates
   [`get_route_frequency()`](https://ipea.github.io/gtfstools/dev/reference/get_route_frequency.md),
   [`get_stop_frequency()`](https://ipea.github.io/gtfstools/dev/reference/get_stop_frequency.md),

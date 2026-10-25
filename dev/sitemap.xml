@@ -19,6 +19,7 @@
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/build_service_network.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/build_shape_cuts.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/build_timetable.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/calculate_vkt.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/check_deprecated_sort_sequence.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/cluster_stop_nodes.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/combine_nearby_stops.html</loc></url>
@@ -88,6 +89,8 @@
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/get_trip_segment_duration.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/get_trip_speed.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/get_usable_shapes.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/get_vkt.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/get_vmt.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/gtfstools.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/has_shapes.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/index.html</loc></url>
@@ -118,6 +121,7 @@
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/seconds_to_string.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/set_dwell_time.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/set_max_speed.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/set_min_dwell_time.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/set_route_frequency.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/set_route_speed.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.html</loc></url>
