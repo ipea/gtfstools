@@ -130,7 +130,7 @@ process.</p>
 <span class="r-in"><span><span class="va">shape_sf</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_shapes_geometry.html">get_shapes_geometry</a></span><span class="op">(</span><span class="va">gtfs</span>, <span class="va">shape_id</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">bbox</span> <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_bbox.html" class="external-link">st_bbox</a></span><span class="op">(</span><span class="va">shape_sf</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/object.size.html" class="external-link">object.size</a></span><span class="op">(</span><span class="va">gtfs</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 860808 bytes</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 811304 bytes</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># keeps entries that intersect with the specified polygon</span></span></span>
 <span class="r-in"><span><span class="va">smaller_gtfs</span> <span class="op">&lt;-</span> <span class="fu">filter_by_spatial_extent</span><span class="op">(</span><span class="va">gtfs</span>, <span class="va">bbox</span><span class="op">)</span></span></span>

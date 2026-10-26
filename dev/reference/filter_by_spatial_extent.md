@@ -79,7 +79,7 @@ shape_id <- "68962"
 shape_sf <- get_shapes_geometry(gtfs, shape_id)
 bbox <- sf::st_bbox(shape_sf)
 object.size(gtfs)
-#> 860808 bytes
+#> 811304 bytes
 
 # keeps entries that intersect with the specified polygon
 smaller_gtfs <- filter_by_spatial_extent(gtfs, bbox)

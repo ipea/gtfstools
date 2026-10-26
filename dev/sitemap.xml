@@ -14,12 +14,15 @@
 <url><loc>https://ipea.github.io/gtfstools/dev/index.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/news/index.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/as_dt_gtfs.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/assert_shapes_fields.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/assert_trip_stops_fields.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/build_graph.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/build_linestrings.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/build_service_network.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/build_shape_cuts.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/build_timetable.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/calculate_vkt.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/calendar_service_intervals.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/check_deprecated_sort_sequence.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/check_stop_pair_count.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/cluster_stop_nodes.html</loc></url>
@@ -55,6 +58,7 @@
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/filter_by_trip_id.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/filter_by_weekday.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/find_stop_pairs_within.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/first_departure_per_trip.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/fix_gtfs.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/frequencies_to_stop_times.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/get_active_services.html</loc></url>
@@ -111,6 +115,7 @@
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/merge_service_intervals.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/parse_dates.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/paste_stop_names.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/prepare_shape_points.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/prepare_trip_stops.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/read_gtfs.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/refresh_secs_columns.html</loc></url>
@@ -119,6 +124,7 @@
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/replace_cropped_shapes.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/replace_stop_ids.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/report_deps_available.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/resolve_shapes_method.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/route_type_ids.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/seconds_to_string.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/set_dwell_time.html</loc></url>
@@ -127,6 +133,7 @@
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/set_route_frequency.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/set_route_speed.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/shape_point_distances.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/shift_cropped_frequencies.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/stop_id_references.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/stop_times_to_frequencies.html</loc></url>
