@@ -134,7 +134,7 @@
 <li>
 <code><a href="../reference/download_validator.html">download_validator()</a></code> now downloads the validator only once, instead of twice. When an explicit <code>version</code> was already downloaded to <code>path</code>, it no longer goes online at all. With <code>quiet = FALSE</code>, it now shows a progress bar.</li>
 <li>
-<code><a href="../reference/get_trip_duration.html">get_trip_duration()</a></code> no longer adds temporary columns to the <code>stop_times</code> table of the given GTFS object, which could be left behind if an error happened during the calculation.</li>
+<code><a href="../reference/get_trip_duration.html">get_trip_duration()</a></code>, <code><a href="../reference/get_trip_segment_duration.html">get_trip_segment_duration()</a></code> and <code><a href="../reference/filter_by_time_of_day.html">filter_by_time_of_day()</a></code> no longer add temporary columns to the <code>stop_times</code> table (and, in <code><a href="../reference/filter_by_time_of_day.html">filter_by_time_of_day()</a></code>, the <code>frequencies</code> table) of the given GTFS object, which could be left behind if an error happened during the calculation.</li>
 <li>The <code>filter_by_*()</code> functions no longer drop:
 <ul><li>rows whose blank keys mean “applies to all”: zone <code>fare_rules</code> without <code>route_id</code>, <code>transfers</code> without <code>from_stop_id</code>/<code>to_stop_id</code> and <code>attributions</code> without <code>agency_id</code>;</li>
 <li>the <code>agency</code> of single-agency feeds whose <code>routes.agency_id</code> is blank or absent;</li>

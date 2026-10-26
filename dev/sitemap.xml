@@ -136,6 +136,7 @@
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/summarise_route_frequency.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/summarise_services.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/time_of_day_window.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/time_secs.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/validate_gtfs.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/warn_invalid_ids.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/warn_missing_ids.html</loc></url>

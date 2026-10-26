@@ -412,10 +412,14 @@
   now downloads the validator only once, instead of twice. When an
   explicit `version` was already downloaded to `path`, it no longer goes
   online at all. With `quiet = FALSE`, it now shows a progress bar.
-- [`get_trip_duration()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_duration.md)
-  no longer adds temporary columns to the `stop_times` table of the
-  given GTFS object, which could be left behind if an error happened
-  during the calculation.
+- [`get_trip_duration()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_duration.md),
+  [`get_trip_segment_duration()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_segment_duration.md)
+  and
+  [`filter_by_time_of_day()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_time_of_day.md)
+  no longer add temporary columns to the `stop_times` table (and, in
+  [`filter_by_time_of_day()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_time_of_day.md),
+  the `frequencies` table) of the given GTFS object, which could be left
+  behind if an error happened during the calculation.
 - The `filter_by_*()` functions no longer drop:
   - rows whose blank keys mean “applies to all”: zone `fare_rules`
     without `route_id`, `transfers` without `from_stop_id`/`to_stop_id`
