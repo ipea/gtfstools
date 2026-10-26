@@ -17,5 +17,6 @@ is_blank_time(x)
 ## Value
 
 A logical vector, `TRUE` where the time is `NA`, an empty or
-whitespace-only string, or `"NA"`, as in
-[`interpolate_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_stop_times.md).
+whitespace-only string, or `"NA"`.
+[`interpolate_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_stop_times.md)
+uses the same rule.

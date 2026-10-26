@@ -141,7 +141,7 @@
 <li>the station entrances, generic nodes and boarding areas of kept stations and platforms, with their pathways and levels.</li>
 </ul></li>
 <li>
-<code><a href="../reference/filter_by_trip_id.html">filter_by_trip_id()</a></code> and the filters built on it no longer keep <code>fare_attributes</code> (and their agencies) whose <code>fare_rules</code> were all dropped by zone.</li>
+<code><a href="../reference/filter_by_trip_id.html">filter_by_trip_id()</a></code>, <code><a href="../reference/filter_by_service_id.html">filter_by_service_id()</a></code> and <code><a href="../reference/filter_by_shape_id.html">filter_by_shape_id()</a></code>, and the functions built on them (such as <code><a href="../reference/filter_by_date.html">filter_by_date()</a></code>, <code><a href="../reference/filter_by_period.html">filter_by_period()</a></code>, <code><a href="../reference/filter_by_weekday.html">filter_by_weekday()</a></code> and <code><a href="../reference/filter_by_spatial_extent.html">filter_by_spatial_extent()</a></code>), no longer keep <code>fare_attributes</code> (and their agencies) whose <code>fare_rules</code> were all dropped by zone.</li>
 <li>
 <code><a href="../reference/filter_by_route_id.html">filter_by_route_id()</a></code> and <code><a href="../reference/filter_by_route_type.html">filter_by_route_type()</a></code> filtered <code>fare_rules</code> by <code>level_id</code> instead of <code>route_id</code>.</li>
 <li>
@@ -267,6 +267,7 @@
 <td>1.9</td>
 </tr></tbody></table></li>
 <li><p>The package documentation website moved to <a href="https://ipea.github.io/gtfstools/" class="uri">https://ipea.github.io/gtfstools/</a> and the GitHub repository to <a href="https://github.com/ipea/gtfstools" class="external-link uri">https://github.com/ipea/gtfstools</a>. All links were updated.</p></li>
+<li><p>The warnings about <code>route_id</code>s, <code>trip_id</code>s and <code>stop_id</code>s not found in a feed (classes <code>gtfstools_invalid_route_id</code>, <code>gtfstools_invalid_trip_id</code> and <code>gtfstools_invalid_stop_id</code>) now list each missing id once. <code><a href="../reference/get_route_frequency.html">get_route_frequency()</a></code>, <code><a href="../reference/get_stop_frequency.html">get_stop_frequency()</a></code>, <code><a href="../reference/get_vkt.html">get_vkt()</a></code> and <code><a href="../reference/set_route_frequency.html">set_route_frequency()</a></code> used to list an id that was given twice, twice.</p></li>
 </ul></div>
 </div>
     <div class="section level2">

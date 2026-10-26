@@ -21,6 +21,7 @@
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/build_timetable.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/calculate_vkt.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/check_deprecated_sort_sequence.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/check_stop_pair_count.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/cluster_stop_nodes.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/combine_nearby_stops.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/convert_from_standard.html</loc></url>
@@ -112,6 +113,7 @@
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/paste_stop_names.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/prepare_trip_stops.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/read_gtfs.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/refresh_secs_columns.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/remove_duplicates.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/remove_unused_ids.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/replace_cropped_shapes.html</loc></url>
@@ -135,6 +137,7 @@
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/summarise_services.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/time_of_day_window.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/validate_gtfs.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/warn_invalid_ids.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/warn_missing_ids.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/warn_times_not_interpolated.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/warn_trips_without_shape.html</loc></url>

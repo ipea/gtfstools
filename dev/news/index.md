@@ -424,9 +424,18 @@
     blank or absent;
   - the station entrances, generic nodes and boarding areas of kept
     stations and platforms, with their pathways and levels.
-- [`filter_by_trip_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_trip_id.md)
-  and the filters built on it no longer keep `fare_attributes` (and
-  their agencies) whose `fare_rules` were all dropped by zone.
+- [`filter_by_trip_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_trip_id.md),
+  [`filter_by_service_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_service_id.md)
+  and
+  [`filter_by_shape_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_shape_id.md),
+  and the functions built on them (such as
+  [`filter_by_date()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_date.md),
+  [`filter_by_period()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_period.md),
+  [`filter_by_weekday()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_weekday.md)
+  and
+  [`filter_by_spatial_extent()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_spatial_extent.md)),
+  no longer keep `fare_attributes` (and their agencies) whose
+  `fare_rules` were all dropped by zone.
 - [`filter_by_route_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_route_id.md)
   and
   [`filter_by_route_type()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_route_type.md)
@@ -754,6 +763,17 @@
 - The package documentation website moved to
   <https://ipea.github.io/gtfstools/> and the GitHub repository to
   <https://github.com/ipea/gtfstools>. All links were updated.
+
+- The warnings about `route_id`s, `trip_id`s and `stop_id`s not found in
+  a feed (classes `gtfstools_invalid_route_id`,
+  `gtfstools_invalid_trip_id` and `gtfstools_invalid_stop_id`) now list
+  each missing id once.
+  [`get_route_frequency()`](https://ipea.github.io/gtfstools/dev/reference/get_route_frequency.md),
+  [`get_stop_frequency()`](https://ipea.github.io/gtfstools/dev/reference/get_stop_frequency.md),
+  [`get_vkt()`](https://ipea.github.io/gtfstools/dev/reference/get_vkt.md)
+  and
+  [`set_route_frequency()`](https://ipea.github.io/gtfstools/dev/reference/set_route_frequency.md)
+  used to list an id that was given twice, twice.
 
 ## gtfstools 1.4.0
 
