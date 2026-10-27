@@ -1,10 +1,8 @@
 # Filter GTFS object by time of day
 
-Filters a GTFS object by time of day, keeping (or dropping) the relevant
-entries in each file. Please see the details section for more
-information on how this function filters the `frequencies` and
-`stop_times` tables, as well as how it handles `stop_times` tables that
-contain trips with some empty departure and arrival times.
+Filters a GTFS object by time of day, keeping (or dropping) the
+`stop_times` and `frequencies` entries within it, and keeping the
+entries of the other tables related to the trips that remain.
 
 ## Usage
 
@@ -63,72 +61,34 @@ process.
 
 ## Details
 
-When filtering the `frequencies` table, `filter_by_time_of_day()`
-respects the `exact_times` field. This field indicates whether the
-service follows a fixed schedule throughout the day or not. If it's 0
-(or if it's not present), the service does not follow a fixed schedule.
-Instead, the operators try to maintain the listed headways. In such
-cases, if `update_frequencies` is `TRUE` we just update `start_time` and
-`end_time` to the appropriate value of `from` or `to` (which of this
-value is used depends on `keep`). The time of day includes both `from`
-and `to`. As required by the GTFS specification, no trip departs at the
-`end_time` of an entry, so when `keep` is `TRUE`, `end_time` is set to
-one second after `to`, which keeps a departure that happens exactly at
-`to` (e.g. when converting the filtered feed with
-[`frequencies_to_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/frequencies_to_stop_times.md)).
-When `keep` is `FALSE`, the entries that cross `to` start one second
-after it. Entries left without any departure are removed.
+The time of day includes both `from` and `to`.
 
-If `exact_times` is 1, however, operators try to strictly adhere to the
-start times and headway. As a result, when updating the `start_time`
-field we need to follow the listed headway. For example, take a trip
-that has its start time listed as 06:00:00, its end time listed as
-08:00:00 and its headway listed as 300 secs (5 minutes). If you decide
-to filter the feed to keep the time of day between 06:32:00 and 08:00:00
-while updating `frequencies`, the `start_time` field must be updated to
-06:35:00 in order to preserve the correct departure times of this trips,
-instead of simply updating it to 06:32:00.
+Trips listed in `frequencies` are filtered through their `frequencies`
+entries; their `stop_times` entries are templates and are kept whatever
+their times. With `keep = TRUE`, the entries that overlap the time of
+day are kept; with `keep = FALSE`, those entirely within it are dropped.
+With `update_frequencies = TRUE` and `keep = TRUE`, an entry that starts
+before `from` starts at `from` (or, if `exact_times` is 1, at its first
+departure at or after `from`), and an entry that ends after `to` ends
+one second after `to`, so that a departure exactly at `to` is kept. With
+`update_frequencies = TRUE` and `keep = FALSE`, an entry that crosses
+`from` ends at `from`, an entry that crosses `to` starts one second
+after `to` (or, if `exact_times` is 1, at its first departure after
+`to`), and an entry that spans the whole time of day is split in two.
+Entries left without any departure are removed, and trips left without
+any entry are dropped from the feed.
 
-Another things to keep an eye on when filtering the `frequencies` table
-is that the corresponding `stop_times` entries of trips listed in the
-`frequencies` table should not be filtered, even if their departure and
-arrival times fall outside the specified time of day. This is because
-the `stop_times` entries of `frequencies`' trips are just templates that
-describe how long a segment between two stops takes, so the departure
-and arrival times listed there do not actually represent the actual
-departure and arrival times seen in practice. Taking the same example
-listed above, the corresponding `stop_times` entries of that trip could
-describe a departure from the first stop at 12:00:00 and an arrival at
-the second stop at 12:03:00. That doesn't mean the trip will actually
-leave and arrive at the stops at these times, but rather that it takes 3
-minutes to get from the first to the second stop. So when the trip
-departs from the first stop at 06:35:00, it will get to the second at
-06:38:00.
-
-When filtering the `stop_times` table, a few other details should be
-observed. First, one could wish to filter a GTFS object in order to keep
-all trips that cross a given time of day, whereas others may want to
-keep only the specific entries that fall inside the specified time of
-day. For example, take a trip that leaves the first stop at 06:30:00,
-gets to the second at 06:35:00 and then gets to the third at 06:45:00.
-When filtering to keep entire trips that cross the time of day between
-06:30:00 and 06:40:00, all three stops will have to be kept. If,
-however, you want to keep only the entries that fall within the
-specified time of day, only the first two should be kept. To control
-such behaviour you need to set the `full_trips` parameter. When it's
-`TRUE`, the function behaves like the first case, and when it's `FALSE`,
-like the second.
-
-When using `full_trips` in conjunction with `keep`, please note how
-their behaviour stack. When both are `TRUE`, trips are always fully
-kept. When `keep` is `FALSE`, however, trips are fully dropped, even if
-some of their stops are visited outside the specified time of day.
-
-Finally, please note that many GTFS feeds may contain `stop_times`
-entries with empty departure and arrival times. In such cases, filtering
-by time of day with `full_trips` as `FALSE` will drop the entries with
-empty times. Please set `full_trips` to `TRUE` to preserve these
-entries.
+The other trips are filtered through their `stop_times` entries, which
+are within the time of day when the visit, from `arrival_time` to
+`departure_time`, overlaps it (a blank time is ignored when the other is
+known). With `full_trips = FALSE`, each entry is kept or dropped on its
+own, and entries with both times blank (or, with `keep = FALSE`, either)
+are dropped. With `full_trips = TRUE`, a trip with any entry within the
+time of day is kept (`keep = TRUE`) or dropped (`keep = FALSE`) as a
+whole, including its blank entries. The other tables are then filtered
+to the trips left in `stop_times`, as in
+[`filter_by_trip_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_trip_id.md),
+with a warning if `stop_times` lists trips missing from `trips`.
 
 Existing `_secs` columns in `stop_times` and `frequencies` (e.g. created
 with

@@ -86,31 +86,24 @@ invisibly (note that in this case the original GTFS object is altered).
 
 ## Details
 
-The function selects the visits of every specified trip to every
-specified stop, within the time of day if `from` or `to` is given, as
-[`set_dwell_time()`](https://ipea.github.io/gtfstools/dev/reference/set_dwell_time.md)
-does. At each selected visit whose dwell time is shorter than
+Visits are selected as in
+[`set_dwell_time()`](https://ipea.github.io/gtfstools/dev/reference/set_dwell_time.md).
+At each selected visit whose dwell time is shorter than
 `min_dwell_time`, the arrival time is kept and the departure time is set
-to the arrival time plus `min_dwell_time`. The later times of the trip
-are shifted accordingly, so the trip ends later. Longer dwell times are
-kept, so no dwell time is ever shortened.
+to the arrival time plus `min_dwell_time`.
 
-The dwell times of the first and last visits of each trip with both an
-arrival and a departure time are never raised, so trips keep their start
-times. They are found among all the visits of the trip, not only the
-selected ones, and the times of the last visit may still be shifted by
-an earlier visit. Use
+The first and last visits with both an arrival and a departure time of
+each trip are never raised (use
 [`set_dwell_time()`](https://ipea.github.io/gtfstools/dev/reference/set_dwell_time.md)
-to change their dwell times.
+for them). They are found among all the visits of the trip, not only the
+selected ones, and the times of the last visit may still be shifted by
+an earlier visit.
 
-Negative dwell times, of visits whose departure is earlier than their
-arrival, are raised like any other shorter dwell time, so a
-`min_dwell_time` of 0 raises only these. When they come from times after
-midnight written as `"00:30:00"` instead of `"24:30:00"`, the departure
-becomes the arrival plus `min_dwell_time`, even if the vehicle actually
-stays there longer, and the later times of the trip are shifted by about
-a day (later times also written as `"00:30:00"` thus end up past
-`"24:00:00"`).
+Negative dwell times (departure earlier than arrival) are raised like
+any other shorter dwell time, so a `min_dwell_time` of 0 raises only
+these. When they come from times after midnight written as `"00:30:00"`
+instead of `"24:30:00"`, the later times of the trip are shifted by
+about a day.
 
 Otherwise it works as
 [`set_dwell_time()`](https://ipea.github.io/gtfstools/dev/reference/set_dwell_time.md).

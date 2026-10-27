@@ -79,10 +79,20 @@ not merged and are left out of the result, with a warning.</p></dd>
 Whether to add a prefix to the value of id fields that identify from which
 GTFS object the value comes from. If <code>TRUE</code>, the prefixes will range from
 <code>"1"</code> to <code>n</code>, where <code>n</code> is the number of objects passed to the function. If a
-character vector, its elements will be used to identify the GTFS objects, and
-the length of the vector must equal the total amount of objects passed in
-<code>...</code> (the first element will identify the first GTFS, the second element the
-second GTFS, and so on).</p></dd>
+character vector, its elements, which must be unique, will be used to
+identify the GTFS objects, and the length of the vector must equal the total
+amount of objects passed in <code>...</code> (the first element will identify the first
+GTFS, the second element the second GTFS, and so on). If <code>FALSE</code> and two or
+more GTFS objects are merged, rows that are identical in every column are
+kept only once (as in <code><a href="remove_duplicates.html">remove_duplicates()</a></code>, also when they come from the
+same GTFS object; a column that a GTFS object lacks counts as empty), and
+the GTFS objects may share ids (e.g. the same stop in two feeds) only if
+their data are identical in all of them: rows are compared on all columns,
+including columns that only some GTFS objects have, and a trip, for example,
+must also have the same <code>stop_times</code> and <code>frequencies</code>. Otherwise an error is
+raised; use <code>prefix = TRUE</code> in that case. This happens with versions of the
+same feed, but also with unrelated feeds that use simple ids (e.g. both have
+an <code>agency_id</code> <code>"1"</code>).</p></dd>
 
 </dl></div>
     <div class="section level2">

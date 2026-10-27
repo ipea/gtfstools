@@ -64,53 +64,50 @@ tables (and `transfers`, when present). If the given GTFS object has no
 
 ## Details
 
-The departures of the routes are grouped as in
-[`get_route_frequency()`](https://ipea.github.io/gtfstools/dev/reference/get_route_frequency.md):
-by `route_id`, `service_id` and `direction_id` (if present in `trips`).
-The function changes existing service, it does not create it, so groups
-with no departure within the time of day are not modified. In each of
-the other groups:
+Departures are grouped by `route_id`, `service_id` and `direction_id`
+(if present in `trips`) and counted within the time of day (at or after
+`from` and before `to`) as in
+[`get_route_frequency()`](https://ipea.github.io/gtfstools/dev/reference/get_route_frequency.md),
+which thus reports the new headway (exactly, when the length of the time
+of day is a multiple of `headway`). Departures after midnight are listed
+with times past "24:00:00", so use a time of day such as
+"24:00:00"-"26:00:00" for them.
+
+The function changes existing service, it does not create it: groups
+with no departure within the time of day are not modified, and scheduled
+trips that depart before `from` are not changed, even if they run within
+the time of day. In each other group:
 
 - the trips that depart within the time of day are replaced by a single
-  template trip: among the trips of the stop pattern (as identified by
+  template: among the trips of the stop pattern (see
   [`get_stop_times_patterns()`](https://ipea.github.io/gtfstools/dev/reference/get_stop_times_patterns.md))
   with the most departures within the time of day, the one that departs
-  first. Its travel times apply to all the new departures. The trips of
-  other patterns that depart within the time of day are removed
-  (frequency-based ones lose their `frequencies` entries within the time
-  of day, see below);
+  first. Its travel times apply to all the new departures. The other
+  trips that depart within the time of day are removed (frequency-based
+  ones instead lose their `frequencies` entries within the time of day,
+  see below);
 
 - a `frequencies` entry is added for the template, from `from` to `to`,
-  with `headway_secs` set to `headway` and `exact_times = 0`
-  (frequency-based service). A scheduled template thus becomes a
-  frequency-based trip, and the `transfers` entries that refer to it now
-  apply to all of its departures;
+  with `headway_secs` set to `headway` and `exact_times = 0`; the
+  `transfers` entries that refer to the template then apply to all of
+  its departures;
 
-- the existing `frequencies` entries of the group's trips are clipped to
-  the time of day, keeping the departures outside it exactly as before
-  (when converted with
+- the existing `frequencies` entries of the group's trips are cut at
+  `from` and `to`, keeping their departures outside the time of day
+  exactly as before (as converted by
   [`frequencies_to_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/frequencies_to_stop_times.md)
   with `strategy = "exact"`). Trips left without any departure are
   removed from `trips`, `stop_times` and `transfers`.
 
-As in
-[`get_route_frequency()`](https://ipea.github.io/gtfstools/dev/reference/get_route_frequency.md),
-a departure is within the time of day when it happens at or after `from`
-and before `to`, so
-[`get_route_frequency()`](https://ipea.github.io/gtfstools/dev/reference/get_route_frequency.md)
-reports the new headway (exactly, when the length of the time of day is
-a multiple of `headway`). Departures after midnight are listed with
-times greater than "24:00:00", so a time of day such as
-"24:00:00"-"26:00:00" should be used for them. Scheduled trips that
-depart before `from` are not changed, even if they run within the time
-of day. Groups whose trips within the time of day have no departure time
-in `stop_times` can't have a template, and are left unchanged with a
+Groups whose trips within the time of day have no departure time in
+`stop_times` can't have a template and are left unchanged, with a
 warning. Removed trips may leave unused entries in other tables, such as
-`shapes` and `calendar`, which can be removed with
-[`remove_unused_ids()`](https://ipea.github.io/gtfstools/dev/reference/remove_unused_ids.md).
+`shapes` and `calendar`, which
+[`remove_unused_ids()`](https://ipea.github.io/gtfstools/dev/reference/remove_unused_ids.md)
+removes.
 
-The `stop_times` table requires the `stop_id` and `stop_sequence`
-fields. Existing `_secs` columns in `frequencies` (e.g. created with
+`stop_times` requires the `stop_id` and `stop_sequence` fields. Existing
+`_secs` columns in `frequencies` (e.g. created with
 [`convert_time_to_seconds()`](https://ipea.github.io/gtfstools/dev/reference/convert_time_to_seconds.md))
 are updated.
 

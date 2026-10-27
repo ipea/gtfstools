@@ -158,7 +158,8 @@ The Berlin feed starts in November 2020, after the São Paulo feed ends,
 so no date has service in all three feeds.
 
 Once a date is chosen, the feeds can be combined into a single one with
-[`merge_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/merge_gtfs.md),
-or reduced to the services of that date with the filtering functions
-(see the [filtering
+[`merge_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/merge_gtfs.md)
+(with `prefix = TRUE` if they share ids, such as two versions of the
+same feed), or reduced to the services of that date with the filtering
+functions (see the [filtering
 vignette](https://ipea.github.io/gtfstools/dev/articles/filtering.md)).

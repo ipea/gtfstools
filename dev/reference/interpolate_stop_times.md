@@ -40,22 +40,17 @@ is not modified.
 
 ## Details
 
-Within each trip, ordered by `stop_sequence`, a stop whose arrival and
+Within each trip, in `stop_sequence` order, a stop whose arrival and
 departure times are both blank gets a time interpolated linearly on the
 distance travelled from the preceding timepoint, as measured by
-[`get_trip_length()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_length.md).
-In other words, the vehicle travels between two timepoints at a constant
-speed: the distance between them divided by the time from the departure
-at the first to the arrival at the second. Interpolated stops get equal
-arrival and departure times (no dwell time), rounded to the nearest
-second. Times past `"24:00:00"` are supported. If the distance between
-two timepoints is 0, their times are spread evenly between the stops in
-between.
-
-A timepoint with only one of its two times blank gets the other time in
-both columns. If `stop_times` has a `timepoint` column, interpolated
-stops get `timepoint = 0` (approximate times). The column is not created
-if it doesn't exist.
+[`get_trip_length()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_length.md)
+(if the distance between two timepoints is 0, their times are spread
+evenly between the stops in between). Interpolated stops get equal
+arrival and departure times, rounded to the nearest second. Times past
+`"24:00:00"` are supported. A timepoint with only one of its two times
+blank gets the other time in both columns. If `stop_times` has a
+`timepoint` column, interpolated stops get `timepoint = 0`; the column
+is not created otherwise.
 
 Some stops are left blank, with a warning:
 
@@ -66,22 +61,19 @@ Some stops are left blank, with a warning:
   trips not linked to a shape or stops without coordinates;
 
 - stops between timepoints in which the arrival is earlier than the
-  previous departure. This usually happens when times after midnight are
-  written as `"00:30:00"` instead of `"24:30:00"`.
+  previous departure, usually times after midnight written as
+  `"00:30:00"` instead of `"24:30:00"`.
 
 Times are blank when they are `NA`, empty or whitespace-only strings, or
 `"NA"`. Malformed time strings are left unchanged, with a warning, and
 are not used as timepoints. Rows without a `trip_id` are left unchanged.
+For trips listed in `frequencies`, the template times are interpolated.
 Times are read from the time strings, and existing `_secs` columns (e.g.
 created with
 [`convert_time_to_seconds()`](https://ipea.github.io/gtfstools/dev/reference/convert_time_to_seconds.md))
-are updated to match. For trips listed in `frequencies`, the template
-times are interpolated.
+are updated to match.
 
-The `stops` table is required to interpolate times between timepoints,
-as well as the `shapes` table and the `shape_id` column in `trips` with
-`method = "shapes"` (see
-[`get_trip_length()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_length.md)).
+Interpolating between timepoints requires the `stops` table.
 
 ## See also
 

@@ -120,40 +120,37 @@ tables (and <code>transfers</code>, when present). If the given GTFS object has 
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
 
 
-<p>The departures of the routes are grouped as in <code><a href="get_route_frequency.html">get_route_frequency()</a></code>: by
-<code>route_id</code>, <code>service_id</code> and <code>direction_id</code> (if present in <code>trips</code>). The
-function changes existing service, it does not create it, so groups with no
-departure within the time of day are not modified. In each of the other
-groups:</p><ul><li><p>the trips that depart within the time of day are replaced by a single
-template trip: among the trips of the stop pattern (as identified by
+<p>Departures are grouped by <code>route_id</code>, <code>service_id</code> and <code>direction_id</code> (if
+present in <code>trips</code>) and counted within the time of day (at or after <code>from</code>
+and before <code>to</code>) as in <code><a href="get_route_frequency.html">get_route_frequency()</a></code>, which thus reports the new
+headway (exactly, when the length of the time of day is a multiple of
+<code>headway</code>). Departures after midnight are listed with times past
+"24:00:00", so use a time of day such as "24:00:00"-"26:00:00" for them.</p>
+<p>The function changes existing service, it does not create it: groups with
+no departure within the time of day are not modified, and scheduled trips
+that depart before <code>from</code> are not changed, even if they run within the time
+of day. In each other group:</p><ul><li><p>the trips that depart within the time of day are replaced by a single
+template: among the trips of the stop pattern (see
 <code><a href="get_stop_times_patterns.html">get_stop_times_patterns()</a></code>) with the most departures within the time of
 day, the one that departs first. Its travel times apply to all the new
-departures. The trips of other patterns that depart within the time of
-day are removed (frequency-based ones lose their <code>frequencies</code> entries
+departures. The other trips that depart within the time of day are
+removed (frequency-based ones instead lose their <code>frequencies</code> entries
 within the time of day, see below);</p></li>
 <li><p>a <code>frequencies</code> entry is added for the template, from <code>from</code> to <code>to</code>,
-with <code>headway_secs</code> set to <code>headway</code> and <code>exact_times = 0</code>
-(frequency-based service). A scheduled template thus becomes a
-frequency-based trip, and the <code>transfers</code> entries that refer to it now
-apply to all of its departures;</p></li>
-<li><p>the existing <code>frequencies</code> entries of the group's trips are clipped to the
-time of day, keeping the departures outside it exactly as before (when
-converted with <code><a href="frequencies_to_stop_times.html">frequencies_to_stop_times()</a></code> with <code>strategy = "exact"</code>).
-Trips left without any departure are removed from <code>trips</code>, <code>stop_times</code>
-and <code>transfers</code>.</p></li>
-</ul><p>As in <code><a href="get_route_frequency.html">get_route_frequency()</a></code>, a departure is within the time of day when
-it happens at or after <code>from</code> and before <code>to</code>, so
-<code><a href="get_route_frequency.html">get_route_frequency()</a></code> reports the new headway (exactly, when the length
-of the time of day is a multiple of <code>headway</code>). Departures after midnight
-are listed with times greater than "24:00:00", so a time of day such as
-"24:00:00"-"26:00:00" should be used for them. Scheduled trips that depart
-before <code>from</code> are not changed, even if they run within the time of day.
-Groups whose trips within the time of day have no departure time in
-<code>stop_times</code> can't have a template, and are left unchanged with a warning.
+with <code>headway_secs</code> set to <code>headway</code> and <code>exact_times = 0</code>; the
+<code>transfers</code> entries that refer to the template then apply to all of its
+departures;</p></li>
+<li><p>the existing <code>frequencies</code> entries of the group's trips are cut at <code>from</code>
+and <code>to</code>, keeping their departures outside the time of day exactly as
+before (as converted by <code><a href="frequencies_to_stop_times.html">frequencies_to_stop_times()</a></code> with
+<code>strategy = "exact"</code>). Trips left without any departure are removed from
+<code>trips</code>, <code>stop_times</code> and <code>transfers</code>.</p></li>
+</ul><p>Groups whose trips within the time of day have no departure time in
+<code>stop_times</code> can't have a template and are left unchanged, with a warning.
 Removed trips may leave unused entries in other tables, such as <code>shapes</code>
-and <code>calendar</code>, which can be removed with <code><a href="remove_unused_ids.html">remove_unused_ids()</a></code>.</p>
-<p>The <code>stop_times</code> table requires the <code>stop_id</code> and <code>stop_sequence</code> fields.
-Existing <code>_secs</code> columns in <code>frequencies</code> (e.g. created with
+and <code>calendar</code>, which <code><a href="remove_unused_ids.html">remove_unused_ids()</a></code> removes.</p>
+<p><code>stop_times</code> requires the <code>stop_id</code> and <code>stop_sequence</code> fields. Existing
+<code>_secs</code> columns in <code>frequencies</code> (e.g. created with
 <code><a href="convert_time_to_seconds.html">convert_time_to_seconds()</a></code>) are updated.</p>
     </div>
 

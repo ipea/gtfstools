@@ -88,47 +88,40 @@ stops merged together.</p></dd>
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
 
 
-<p>Stops with a <code>parent_station</code> are always merged into one stop with the
-<code>stop_id</code> of the parent station, regardless of the distance between them.
-This stop is named after the parent station if it's listed in <code>stops</code>, or
-else after its platforms. Then stops are merged by distance, so
-that every pair of stops merged together is at most <code>max_dist</code> apart. The
-closest pairs are merged first. Stops that were already merged by their
+<p>Stops with a <code>parent_station</code> are first merged into one stop with the
+<code>stop_id</code> of the station, regardless of the distance between them, named
+after the station if it's listed in <code>stops</code> or else after its platforms.
+Stops are then merged by distance, closest pairs first, so that every pair
+of stops merged together is at most <code>max_dist</code> apart (great-circle
+distance, as in <code><a href="get_stop_distances.html">get_stop_distances()</a></code>). Stops already merged by their
 parent station are compared by the mean of their coordinates, so their own
-platforms may be farther apart. Distances are great-circle distances, as in
-<code><a href="get_stop_distances.html">get_stop_distances()</a></code>. Stops without coordinates are only merged by their
-parent station.</p>
-<p>A stop merged from several stops has a <code>stop_id</code> and a <code>stop_name</code> made of
-the ids and names of the merged stops, separated by <code>"-"</code> (repeated names
-are listed only once), and the mean of their coordinates. Its other fields,
-such as <code>zone_id</code> and <code>level_id</code>, are those of the merged stop whose
-<code>stop_id</code> comes first. If a <code>stop_id</code> is listed more than once in <code>stops</code>,
-only its first entry is used.</p>
+platforms may be farther apart. Stops without coordinates are only merged
+by their parent station.</p>
+<p>A merged stop has a <code>stop_id</code> and a <code>stop_name</code> made of the ids and names
+of the merged stops joined by <code>"-"</code> (repeated names listed once) and the
+mean of their coordinates; its other fields (e.g. <code>zone_id</code>, <code>level_id</code>)
+are those of the merged stop whose <code>stop_id</code> comes first. Only the first
+entry of a <code>stop_id</code> listed more than once in <code>stops</code> is used. Merged
+<code>stop_id</code>s are ambiguous when the original <code>stop_id</code>s include <code>"-"</code>, and an
+error is raised if two resulting <code>stop_id</code>s are identical.</p>
 <p>The result has only plain stops (<code>location_type</code> 0) without
 <code>parent_station</code>: stations are replaced by the stop merged from their
 platforms, and stations without platforms, entrances, generic nodes,
 boarding areas and <code>pathways</code> are removed. The <code>stop_id</code>s of merged stops
 and stations are updated in <code>stop_times</code>, <code>transfers</code>, <code>stop_areas</code>,
-<code>location_group_stops</code> and <code>fare_leg_join_rules</code>, but references to
-removed stops are left as they are. Transfers between stops that were
-merged together become transfers within the merged stop, and when several
-transfers end up with the same stops, routes and trips, only the first one
-is kept, even if their <code>transfer_type</code> or <code>min_transfer_time</code> differ. The
-other fields of transfers are not changed, so a <code>min_transfer_time</code>
-between platforms that were merged now applies within the merged stop, and
-may no longer be accurate. Since <code>transfers</code> is optional, it can be removed
-(<code>gtfs$transfers &lt;- NULL</code>) when these rules are not needed. Duplicated
-rows of <code>stop_areas</code> and <code>location_group_stops</code> are removed. Translations
-of merged stops are not updated. References to
-removed stops and their translations can be removed with
-<code><a href="remove_unused_ids.html">remove_unused_ids()</a></code>.</p>
-<p>An error is raised if <code>max_dist</code> is so large that all stops would be merged
-into a single one. Large values of <code>max_dist</code> in dense feeds compare many
-pairs of stops, which is slow and raises a warning when it may use a lot of
-memory, or an error when there are too many pairs to compare.</p>
-<p>Merged <code>stop_id</code>s can be long at large terminals, and are ambiguous when
-the original <code>stop_id</code>s include <code>"-"</code>. Feeds that cross the antimeridian
-are not supported.</p>
+<code>location_group_stops</code> and <code>fare_leg_join_rules</code>; references to removed
+stops are left as they are (they and their translations can be removed
+with <code><a href="remove_unused_ids.html">remove_unused_ids()</a></code>). Transfers between stops merged together become
+transfers within the merged stop, and when several transfers end up with
+the same stops, routes and trips, only the first is kept, even if their
+<code>transfer_type</code> or <code>min_transfer_time</code> differ; the other fields of
+transfers are not changed. Duplicated rows of <code>stop_areas</code> and
+<code>location_group_stops</code> are removed. Translations of merged stops are not
+updated.</p>
+<p>An error is raised if <code>max_dist</code> would merge all stops into a single one.
+Large values of <code>max_dist</code> in dense feeds raise a warning when comparing
+the pairs of stops may use a lot of memory, or an error when there are too
+many pairs. Feeds that cross the antimeridian are not supported.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

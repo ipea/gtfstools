@@ -55,38 +55,28 @@ the overlap periods are shaded.
 
 ## Details
 
-A feed has service on a day if at least one of its services runs on it.
-A service runs on the days between the `start_date` and `end_date` of
-its `calendar` entry whose weekday is flagged, minus the days removed
-from it in `calendar_dates` (`exception_type` 2), plus the days added to
-it (`exception_type` 1). If a service is both added and removed on a
-day, the addition wins. Either table may be missing. If the feed has a
-`trips` table with a `service_id` field, services not used by any trip
-are ignored. `feed_info` dates are not used. A warning is raised for
-feeds without any service day, and a message when two or more feeds have
-no day with service in all of them.
+A feed has service on a day if at least one of its services runs on it,
+according to `calendar` and `calendar_dates` (either may be missing). A
+service both added and removed on a day in `calendar_dates` runs on it.
+If `trips` has a `service_id` field, services not used by any trip are
+ignored. `feed_info` dates are not used. A warning is raised for feeds
+without any service day, and a message when two or more feeds have no
+day with service in all of them.
 
-The number of trips on a day is the number of trips of the services that
-run on it. A trip listed in `frequencies` counts once per departure,
-every `headway_secs` from `start_time` until (but not including)
-`end_time` (an entry whose `start_time` and `end_time` are equal departs
-once), and the departures of overlapping entries of the same trip are
-added up (identical entries count once), unlike in
-[`frequencies_to_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/frequencies_to_stop_times.md),
-which keeps only their unique departures. A trip with an invalid
-`frequencies` entry counts once, with a warning. Trips count on their
-service day, so departures after midnight (with times later than
-`"24:00:00"`) count on the previous day. If the feed has no `trips`
-table with a `service_id` field, `n_trips` is `NA`, and the daily plot
-shows no box for it.
+In `n_trips`, a trip listed in `frequencies` counts once per departure,
+as in
+[`frequencies_to_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/frequencies_to_stop_times.md)
+with `strategy = "exact"`, except that the departures of overlapping
+entries of the same trip are added up (identical entries count once). A
+trip with an invalid `frequencies` entry counts once, with a warning.
+Departures after midnight (times past `"24:00:00"`) count on the
+previous day. Without a `trips` table with a `service_id` field,
+`n_trips` is `NA` and the daily plot shows no box for the feed.
 
-Feeds are named after their file names (without the extension) or after
-the list names. Unnamed feeds are named after their position
-(`"feed_1"`, `"feed_2"`, etc.), and duplicated names are made unique.
-Plots of feeds spanning long periods can be zoomed in with
-[`ggplot2::coord_cartesian()`](https://ggplot2.tidyverse.org/reference/coord_cartesian.html).
-The days on which all feeds have service are shaded in the plots only
-when two or more feeds are given.
+Feeds are named after their file names (without the extension) or list
+names; unnamed feeds are named `"feed_1"`, `"feed_2"`, etc., and
+duplicated names are made unique. Overlap periods are shaded only when
+two or more feeds are given.
 
 ## See also
 

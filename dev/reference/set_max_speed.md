@@ -89,44 +89,41 @@ A GTFS object with the time columns of its `stop_times` adjusted.
 
 ## Details
 
-The speed of each span between two consecutive stops with times is its
-length, as calculated by
+A span is the part of a trip between two consecutive stops with times;
+stops with blank times inside it are kept blank. Its speed is its
+length, calculated by
 [`get_trip_length()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_length.md)
-along the trip's shape (or as straight lines between stops, with a
-warning, if there are no shapes), divided by the time between the
-departure from the first stop and the arrival at the second. Stops with
-blank times inside a span are kept blank. The `stops` table is required.
-Spans whose length is `NA` (e.g. in trips not linked to a shape) are
-left unchanged.
+along the trip's shape (or, with a warning, as straight lines between
+stops if there are no shapes; the `stops` table is required), divided by
+the time from the departure at its first stop to the arrival at its
+second. Spans whose length is `NA` (e.g. in trips not linked to a shape)
+are left unchanged.
 
-Each span faster than `max_speed` has its duration increased to its
-length divided by `max_speed`, rounded up to the next second, so new
-times may include seconds even if the original times were given in whole
-minutes. Spans with zero duration are treated the same way. All the
-later times of the trip are shifted by the accumulated extra time, so
-dwell times are kept. Spans whose arrival is earlier than the previous
-departure are left unchanged, with a warning. This usually happens when
-times after midnight are written as `"00:30:00"` instead of
-`"24:30:00"`. Only `stop_times` is modified.
+Each span faster than `max_speed`, or with a zero duration, has its
+duration raised to its length divided by `max_speed`, rounded up to the
+next second. All the later times of the trip are shifted by the
+accumulated extra time, so dwell times are kept. Spans whose arrival is
+earlier than the previous departure (usually times after midnight
+written as `"00:30:00"` instead of `"24:30:00"`) are left unchanged,
+with a warning. An error is raised if a shift would result in a time
+later than `"9999:59:59"`. Only `stop_times` is modified; its existing
+`_secs` columns are updated to match.
 
-With `first_stop` and `last_stop`, only the spans between them are
-capped. `first_stop` is matched at its first visit in `stop_sequence`
-order, and `last_stop` at its next visit after that (which may be the
-same stop), as in
-[`set_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.md).
-Times before `first_stop` don't change, and the times at and after
-`last_stop` are shifted by the extra time. The given stops must have a
-time, so that no span crosses them. If only `last_stop` is given, the
-trip's first stop doesn't need one, because spans start at stops with
-times. Trips that don't visit `first_stop` and then `last_stop`, or that
-have blank times there, are left unchanged, with a warning if they were
-given in `trip_id` or `route_id` (not if they were selected only by
-`route_type`). `from` and `to` are compared with the departure at the
-segment's first stop (or its arrival, if the departure is blank) as
-written in `stop_times`, so use times past `"24:00:00"` for departures
-after midnight. For trips listed in `frequencies`, these are template
-times, not actual departures. Trips without a time there are left
-unchanged.
+With `first_stop` and `last_stop`, matched as in
+[`set_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.md),
+only the spans between them are capped: times before `first_stop` don't
+change, and the times at and after `last_stop` are shifted. The given
+stops must have a time, so that no span crosses them (if only
+`last_stop` is given, the trip's first stop needs none). Trips that
+don't visit `first_stop` and then `last_stop`, or have blank times
+there, are left unchanged, with a warning if they were given in
+`trip_id` or `route_id`.
+
+`from` and `to` are compared with the departure at the segment's first
+stop (or its arrival, if the departure is blank) as written in
+`stop_times` (template times, for trips listed in `frequencies`), so use
+times past `"24:00:00"` for departures after midnight. Trips without a
+time there are left unchanged.
 
 ## See also
 

@@ -125,94 +125,77 @@ directed <code>igraph</code> graph, and with <code>format = "tidygraph"</code>, 
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
 
 
-<p>The network has two types of nodes (<code>node_type</code>):</p><ul><li><p><code>"stop"</code> nodes, one for each stop visited by the trips, placed at the
-stop's coordinates.</p></li>
-<li><p><code>"service"</code> nodes, one for each route and direction at each of its stops,
-placed at the coordinates of the stop (its <code>parent_node_id</code>).</p></li>
-</ul><p>And four types of links (<code>link_type</code>), all of them directed:</p><ul><li><p><code>"in_vehicle"</code> links connect the service nodes of consecutive stops of
-the trips. Their <code>travel_time</code> is the mean time between the departure
-from a stop and the arrival at the next one, over the trips with a
-departure time at the stop and an arrival time at the next one (times
-that decrease are not used), weighted by the number of departures of
-each trip, so dwell times are not included. Their <code>departures</code> is the
-number of departures of the trips of the network (see below) that run
-through them. Their <code>length</code> is the great-circle distance between the
-stops, as in <code><a href="get_stop_distances.html">get_stop_distances()</a></code>, and their <code>free_speed</code> is the length
-divided by the travel time (<code>NA</code> when the travel time is 0 or either is
-missing).</p></li>
+<p>Nodes (<code>node_type</code>) are <code>"stop"</code> nodes, one per stop visited by the trips,
+at the stop's coordinates, and <code>"service"</code> nodes, one per route and
+direction at each of its stops, at the coordinates of the stop (their
+<code>parent_node_id</code>). Links (<code>link_type</code>) are all directed:</p><ul><li><p><code>"in_vehicle"</code> links connect the service nodes of consecutive stops of
+the trips. <code>travel_time</code> is the mean time from the departure at a stop to
+the arrival at the next, over the trips with both times (decreasing times
+are not used), weighted by their departures. <code>departures</code> is the number
+of departures of the trips of the network that run through the link.
+<code>length</code> is the great-circle distance between the stops, as in
+<code><a href="get_stop_distances.html">get_stop_distances()</a></code>, and <code>free_speed</code> the length divided by the travel
+time (<code>NA</code> when the travel time is 0 or either is missing).</p></li>
 <li><p><code>"boarding"</code> links connect each stop to the service nodes from which
-trips depart. Their <code>departures</code> is the number of departures from the
-stop of the trips of the network, so it may include departures after
-<code>to</code> from stops far along their routes. Their <code>travel_time</code> is the mean
-waiting time: half of the mean headway, which is the length of the time
-of day divided by the number of <code>departures</code>. Frequency-based assignment
-models should use <code>departures</code> instead.</p></li>
+trips depart. <code>departures</code> is the number of departures from the stop of
+the trips of the network, so it may include departures after <code>to</code> from
+stops far along their routes. <code>travel_time</code> is half the mean headway (the
+length of the time of day divided by <code>departures</code>).</p></li>
 <li><p><code>"alighting"</code> links connect each service node back to its stop, with a
 <code>travel_time</code> of 0.</p></li>
 <li><p><code>"transfer"</code> links connect, in both directions, the stops at most
-<code>max_walk_dist</code> apart. Their <code>travel_time</code> is their length divided by
+<code>max_walk_dist</code> apart. <code>travel_time</code> is the length divided by
 <code>walk_speed</code>, which is also their <code>free_speed</code>.</p></li>
 </ul><p>Lengths are in meters, travel times in minutes and speeds in km/h.
-Boarding and alighting links have a <code>length</code> of 0 and an <code>NA</code> <code>free_speed</code>,
-and alighting and transfer links have <code>NA</code> <code>departures</code>. The <code>route_id</code>,
-<code>direction_id</code> and <code>inferred_direction</code> of in-vehicle, boarding and
-alighting links are those of their service nodes, and are <code>NA</code> in transfer
-links.</p>
-<p>The network only includes the trips that depart from their first stop at
-or after <code>from</code> and before <code>to</code>, as in <code><a href="get_route_frequency.html">get_route_frequency()</a></code>, so trips
-already running at <code>from</code> are not included. The trips listed in the
-<code>frequencies</code> table are included once for each departure generated from
-it within the time of day, and their <code>stop_times</code> entries are used as
-templates. Trips without <code>stop_times</code> entries are not included. The trips
-of every <code>service_id</code> are pooled together, so the feed should usually be
-filtered to the services of a single day first, with <code><a href="filter_by_date.html">filter_by_date()</a></code> or
-<code><a href="filter_by_weekday.html">filter_by_weekday()</a></code>. Departures after midnight are listed with times
-greater than "24:00:00" and belong to the previous service day, so a time
-of day such as "24:00:00"-"26:00:00" should be used to account for them.
+Boarding and alighting links have a <code>length</code> of 0 and an <code>NA</code> <code>free_speed</code>;
+alighting and transfer links have <code>NA</code> <code>departures</code>. <code>route_id</code>,
+<code>direction_id</code> and <code>inferred_direction</code> are those of the link's service
+node, and <code>NA</code> in transfer links.</p>
+<p>The network includes the trips that depart from their first stop at or
+after <code>from</code> and before <code>to</code>, as in <code><a href="get_route_frequency.html">get_route_frequency()</a></code>, so trips
+already running at <code>from</code> are not included. Trips listed in <code>frequencies</code>
+are included once per departure generated within the time of day, with
+their <code>stop_times</code> entries as templates. Trips without <code>stop_times</code> entries
+are not included. The trips of every <code>service_id</code> are pooled, so the feed
+should usually be filtered to a single day first, with <code><a href="filter_by_date.html">filter_by_date()</a></code>
+or <code><a href="filter_by_weekday.html">filter_by_weekday()</a></code>. Departures after midnight have times past
+"24:00:00", so use a time of day such as "24:00:00"-"26:00:00" for them.
 Trips whose times wrongly go back to "00:00:00" after midnight are placed
 by their earliest time.</p>
-<p>Within each trip, consecutive <code>stop_times</code> entries at the same stop are
-merged into one visit, which arrives at the first known time of the
-entries and departs at the last one. A trip that visits a stop more than
-once uses a different service node at each visit (<code>visit</code> 1, 2, ...), so
-that the network doesn't skip the part of the trip between the visits.</p>
-<p>The direction of the trips comes from the <code>direction_id</code> field of <code>trips</code>.
-The trips without it (or with a blank <code>direction_id</code>) are assigned an
-<code>inferred_direction</code> instead: the trips of a route that share a pair of
-consecutive stops, in the same order, are in the same direction, and so
-are trips that share pairs with them. So branches and short-turns of a
-route are in the same direction, while the trips that run in opposite
-directions are not. However, the opposite directions of routes that run
-through a one-way loop or street, in which they share a pair of stops in
-the same order, are inferred as a single direction. Trips with a blank
-<code>direction_id</code> are never assigned the direction of other trips of their
-route.</p>
+<p>Within a trip, consecutive <code>stop_times</code> entries at the same stop are one
+visit, arriving at their first known time and departing at their last. A
+trip that visits a stop more than once uses a different service node at
+each visit (<code>visit</code> 1, 2, ...).</p>
+<p>Directions come from the <code>direction_id</code> field of <code>trips</code>. Trips without it
+(or with a blank <code>direction_id</code>) get an <code>inferred_direction</code> instead: trips
+of a route that share a pair of consecutive stops, in the same order, are
+in the same direction, and so are trips that share pairs with them. The
+opposite directions of routes that share a pair of stops in the same order
+(e.g. through a one-way loop or street) are thus inferred as a single
+direction. Trips with a blank <code>direction_id</code> are never assigned the
+direction of other trips of their route.</p>
 <p>In-vehicle links whose trips all have blank or decreasing times have an
-<code>NA</code> <code>travel_time</code>, which <code><a href="https://r.igraph.org/reference/distances.html" class="external-link">igraph::distances()</a></code> doesn't accept as a
-weight. Blank times can be filled beforehand with
-<code><a href="interpolate_stop_times.html">interpolate_stop_times()</a></code>.
-Alighting links, in-vehicle links between stops with the same times and
-transfer links between stops at the same coordinates have a travel time of
-0. <code><a href="https://r.igraph.org/reference/distances.html" class="external-link">igraph::distances()</a></code> accepts it as a weight, but <code><a href="https://r.igraph.org/reference/closeness.html" class="external-link">igraph::closeness()</a></code>
-and <code><a href="https://r.igraph.org/reference/betweenness.html" class="external-link">igraph::betweenness()</a></code> require positive weights, such as
-<code>pmax(igraph::E(graph)$travel_time, 1e-6)</code>.</p>
-<p>Departures are counted at every visit but the last of each trip, even
-when its departure time is blank, unlike in <code><a href="get_stop_frequency.html">get_stop_frequency()</a></code>. The
-<code>transfers</code> and <code>pathways</code> tables, <code>parent_station</code>s and the <code>pickup_type</code>
-and <code>drop_off_type</code> fields are not used. Large values of <code>max_walk_dist</code> in
-dense feeds compare many pairs of stops, which raises a warning when it may
-use a lot of memory, or an error when there are too many pairs to compare.
-Transfer links are not created across the antimeridian.</p>
+<code>NA</code> <code>travel_time</code>, with a warning; <code><a href="https://r.igraph.org/reference/distances.html" class="external-link">igraph::distances()</a></code> doesn't accept it
+as a weight, and blank times can be filled beforehand with
+<code><a href="interpolate_stop_times.html">interpolate_stop_times()</a></code>. Alighting links, in-vehicle links between stops
+with the same times and transfer links between stops at the same
+coordinates have a travel time of 0; <code><a href="https://r.igraph.org/reference/closeness.html" class="external-link">igraph::closeness()</a></code> and
+<code><a href="https://r.igraph.org/reference/betweenness.html" class="external-link">igraph::betweenness()</a></code> require positive weights.</p>
+<p>Departures are counted at every visit but the last of each trip, even with
+a blank departure time, unlike in <code><a href="get_stop_frequency.html">get_stop_frequency()</a></code>. The <code>transfers</code>
+and <code>pathways</code> tables, <code>parent_station</code>s and the <code>pickup_type</code> and
+<code>drop_off_type</code> fields are not used. Large values of <code>max_walk_dist</code> in
+dense feeds raise a warning when comparing the pairs of stops may use a lot
+of memory, or an error when there are too many pairs. Transfer links are
+not created across the antimeridian.</p>
 <p>In the GMNS format, <code>node_id</code>, <code>x_coord</code>, <code>y_coord</code>, <code>node_type</code>,
 <code>parent_node_id</code>, <code>link_id</code>, <code>from_node_id</code>, <code>to_node_id</code>, <code>directed</code>,
-<code>length</code> and <code>free_speed</code> are GMNS fields. The other columns are fields
-added by this function, as allowed by GMNS. The <code>config</code> table lists the
-units and the coordinate reference system (EPSG:4326) of the network, the
-version of GMNS (0.96) and the time of day. Stops that are not listed in
-<code>stops</code>, or that don't have coordinates, have <code>NA</code> coordinates. GMNS
-requires node coordinates, so a warning is raised. Free speeds may be
-higher than the maximum of 200 km/h checked by GMNS validators, for example
-in high-speed rail.</p>
+<code>length</code> and <code>free_speed</code> are GMNS fields; the other columns are additional
+fields, as allowed by GMNS. <code>config</code> lists the units, the coordinate
+reference system (EPSG:4326), the GMNS version (0.96) and the time of day.
+Stops not listed in <code>stops</code> or without coordinates have <code>NA</code> coordinates,
+with a warning (GMNS requires them). Free speeds may exceed the 200 km/h
+maximum checked by GMNS validators.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

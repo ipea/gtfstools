@@ -64,41 +64,30 @@ the given `unit`, and `NA` where a time is blank.
 
 ## Details
 
-The dwell time of a trip at a stop is the time difference between the
-`departure_time` and the `arrival_time` of that visit in `stop_times`.
-When both `trip_id` and `stop_id` are given, the function returns the
-visits of every specified trip to every specified stop (not of pairs
-formed by their elements).
+The dwell time of a visit is its `departure_time` minus its
+`arrival_time` in `stop_times`. When both `trip_id` and `stop_id` are
+given, the visits of every specified trip to every specified stop are
+returned (not of pairs formed by their elements). The first and last
+stops of each trip are included. For trips listed in `frequencies`, one
+dwell time is returned per visit of the template, not per departure.
 
-The dwell time is `NA` when either time is blank, as is common at stops
-that are not timepoints. Use
-[`interpolate_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_stop_times.md)
-to fill these times beforehand. The first and last stops of each trip
-are included, usually with a dwell time of 0. Negative dwell times mean
-that the departure is earlier than the arrival, which usually indicates
-inconsistent times.
+Blank times (`NA` dwell times) can be filled beforehand with
+[`interpolate_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_stop_times.md).
+Negative dwell times (departure earlier than arrival) are returned as
+they are.
 
-A stop visited more than once by the same trip (e.g. in a loop) has one
-row per visit, told apart by `stop_sequence`. For trips listed in
-`frequencies`, the times in `stop_times` are a template that applies to
-each of their departures, so one dwell time is returned per visit, not
-per departure.
+`from` and `to` are compared with the `arrival_time` of each visit as
+written in `stop_times` (template times, for trips listed in
+`frequencies`), so use times past `"24:00:00"` for arrivals after
+midnight. Visits with a blank arrival time are never included when
+`from` or `to` is given.
 
-`from` and `to` are compared with the `arrival_time` of each visit, as
-written in `stop_times`, so use times past `"24:00:00"` for arrivals
-after midnight. For trips listed in `frequencies`, these are template
-times, not the times of each departure. Visits with a blank arrival time
-are never included when `from` or `to` is given.
-
-`stop_id`s are matched exactly against the `stop_id`s in `stop_times`,
-which are never stations. To get the dwell times at a station, use
-[`get_children_stops()`](https://ipea.github.io/gtfstools/dev/reference/get_children_stops.md)
-to list its children and pass those that appear in `stop_times`.
-
-Times are read from the time strings: existing `_secs` columns in
-`stop_times` (e.g. created with
-[`convert_time_to_seconds()`](https://ipea.github.io/gtfstools/dev/reference/convert_time_to_seconds.md))
-are not used.
+`stop_id`s are matched against the `stop_id`s in `stop_times`, which are
+never stations: to get the dwell times at a station, pass its children
+that appear in `stop_times` (see
+[`get_children_stops()`](https://ipea.github.io/gtfstools/dev/reference/get_children_stops.md)).
+Existing `_secs` columns in `stop_times` are not used; times are read
+from the time strings.
 
 ## See also
 

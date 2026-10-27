@@ -28,10 +28,23 @@ merge_gtfs(..., files = NULL, prefix = FALSE)
   to add a prefix to the value of id fields that identify from which
   GTFS object the value comes from. If `TRUE`, the prefixes will range
   from `"1"` to `n`, where `n` is the number of objects passed to the
-  function. If a character vector, its elements will be used to identify
-  the GTFS objects, and the length of the vector must equal the total
-  amount of objects passed in `...` (the first element will identify the
-  first GTFS, the second element the second GTFS, and so on).
+  function. If a character vector, its elements, which must be unique,
+  will be used to identify the GTFS objects, and the length of the
+  vector must equal the total amount of objects passed in `...` (the
+  first element will identify the first GTFS, the second element the
+  second GTFS, and so on). If `FALSE` and two or more GTFS objects are
+  merged, rows that are identical in every column are kept only once (as
+  in
+  [`remove_duplicates()`](https://ipea.github.io/gtfstools/dev/reference/remove_duplicates.md),
+  also when they come from the same GTFS object; a column that a GTFS
+  object lacks counts as empty), and the GTFS objects may share ids
+  (e.g. the same stop in two feeds) only if their data are identical in
+  all of them: rows are compared on all columns, including columns that
+  only some GTFS objects have, and a trip, for example, must also have
+  the same `stop_times` and `frequencies`. Otherwise an error is raised;
+  use `prefix = TRUE` in that case. This happens with versions of the
+  same feed, but also with unrelated feeds that use simple ids (e.g.
+  both have an `agency_id` `"1"`).
 
 ## Value
 

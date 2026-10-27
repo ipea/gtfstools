@@ -4,6 +4,20 @@
 
 ### Breaking changes
 
+- With `prefix = FALSE`, the default,
+  [`merge_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/merge_gtfs.md)
+  now keeps rows that are identical in every column only once (as
+  [`remove_duplicates()`](https://ipea.github.io/gtfstools/dev/reference/remove_duplicates.md)
+  does), and raises an error when the GTFS objects share ids whose data
+  differ (such as a `stop_id` with different coordinates, or a `trip_id`
+  with different `stop_times`). Merging a feed with itself, or feeds
+  that share identical stops, now works, but merging versions of the
+  same feed, or unrelated feeds that use simple ids (e.g. both have an
+  `agency_id` `"1"`), usually raises the error. Such shared ids made the
+  merged feed inconsistent and broke functions such as
+  [`get_summary()`](https://ipea.github.io/gtfstools/dev/reference/get_summary.md).
+  Use `prefix = TRUE` to make the ids of each GTFS object unique. For
+  the same reason, a character `prefix` must now have unique elements.
 - [`filter_by_sf()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_sf.md),
   deprecated in version 1.3.0, is now defunct. Use
   [`filter_by_spatial_extent()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_spatial_extent.md),
@@ -397,6 +411,11 @@
 
 ### Bug fixes
 
+- Fixed a bug in
+  [`merge_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/merge_gtfs.md)
+  that, when the GTFS objects were passed with names
+  (e.g. `merge_gtfs(a = gtfs1, b = gtfs2, prefix = TRUE)`), prefixed the
+  ids with `"NA_"` instead of the given prefixes.
 - [`download_validator()`](https://ipea.github.io/gtfstools/dev/reference/download_validator.md)
   and
   [`list_validator_versions()`](https://ipea.github.io/gtfstools/dev/reference/list_validator_versions.md)
@@ -626,10 +645,16 @@
   stop is now compared only with the parts of its trip’s shape near it,
   instead of with the whole shape. Results are unchanged.
 
-- gtfstools now requires [units](https://r-quantities.github.io/units/)
-  \>= 1.0-1, which fixed an out-of-bounds read flagged by CRAN’s
-  sanitizer checks
+- gtfstools no longer depends on
+  [units](https://r-quantities.github.io/units/)
   ([\#84](https://github.com/ipea/gtfstools/issues/84)).
+  [`set_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.md)
+  now converts speeds given in m/s or mph with exact factors (1 m/s =
+  3.6 km/h, 1 mile = 1.609344 km), the same ones
+  [`set_max_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_max_speed.md)
+  uses, so in rare borderline cases the new times of a trip may be one
+  second earlier than in version 1.4.0, which converted m/s through
+  [units](https://r-quantities.github.io/units/).
 
 - [`download_validator()`](https://ipea.github.io/gtfstools/dev/reference/download_validator.md)
   now automatically detects the latest validator version. PR
@@ -712,6 +737,16 @@
   micrometre. With `sf::sf_use_s2(FALSE)`, the previous version
   calculated ellipsoidal distances, which differ from the spherical ones
   by up to about 0.4%; distances are now always spherical.
+
+- [`merge_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/merge_gtfs.md)
+  with `prefix` is about 2.3 times faster on a feed with 1.15 million
+  `stop_times` rows, as each distinct id is prefixed only once.
+  [`get_trip_segment_duration()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_segment_duration.md),
+  `get_trip_geometry(method = "euclidean")` (which now builds the
+  geometry of each distinct sequence of stops only once) and the
+  functions that count the departures of scheduled trips, such as
+  [`get_route_frequency()`](https://ipea.github.io/gtfstools/dev/reference/get_route_frequency.md),
+  are slightly faster. Results are unchanged.
 
 - The table below compares the speed of each exported function with the
   CRAN release (1.4.0), on the example feeds shipped with the package

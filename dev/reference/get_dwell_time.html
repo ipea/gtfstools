@@ -122,32 +122,24 @@ blank.</p>
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
 
 
-<p>The dwell time of a trip at a stop is the time difference between the
-<code>departure_time</code> and the <code>arrival_time</code> of that visit in <code>stop_times</code>. When
-both <code>trip_id</code> and <code>stop_id</code> are given, the function returns the visits of
-every specified trip to every specified stop (not of pairs formed by their
-elements).</p>
-<p>The dwell time is <code>NA</code> when either time is blank, as is common at stops
-that are not timepoints. Use <code><a href="interpolate_stop_times.html">interpolate_stop_times()</a></code> to fill these times
-beforehand. The first and last stops of each trip are included, usually
-with a dwell time of 0. Negative dwell times mean that the departure is
-earlier than the arrival, which usually indicates inconsistent times.</p>
-<p>A stop visited more than once by the same trip (e.g. in a loop) has one row
-per visit, told apart by <code>stop_sequence</code>. For trips listed in
-<code>frequencies</code>, the times in <code>stop_times</code> are a template that applies to each
-of their departures, so one dwell time is returned per visit, not per
-departure.</p>
-<p><code>from</code> and <code>to</code> are compared with the <code>arrival_time</code> of each visit, as
-written in <code>stop_times</code>, so use times past <code>"24:00:00"</code> for arrivals after
-midnight. For trips listed in <code>frequencies</code>, these are template times, not
-the times of each departure. Visits with a blank arrival time are never
-included when <code>from</code> or <code>to</code> is given.</p>
-<p><code>stop_id</code>s are matched exactly against the <code>stop_id</code>s in <code>stop_times</code>, which
-are never stations. To get the dwell times at a station, use
-<code><a href="get_children_stops.html">get_children_stops()</a></code> to list its children and pass those that appear in
-<code>stop_times</code>.</p>
-<p>Times are read from the time strings: existing <code>_secs</code> columns in
-<code>stop_times</code> (e.g. created with <code><a href="convert_time_to_seconds.html">convert_time_to_seconds()</a></code>) are not used.</p>
+<p>The dwell time of a visit is its <code>departure_time</code> minus its <code>arrival_time</code>
+in <code>stop_times</code>. When both <code>trip_id</code> and <code>stop_id</code> are given, the visits of
+every specified trip to every specified stop are returned (not of pairs
+formed by their elements). The first and last stops of each trip are
+included. For trips listed in <code>frequencies</code>, one dwell time is returned per
+visit of the template, not per departure.</p>
+<p>Blank times (<code>NA</code> dwell times) can be filled beforehand with
+<code><a href="interpolate_stop_times.html">interpolate_stop_times()</a></code>. Negative dwell times (departure earlier than
+arrival) are returned as they are.</p>
+<p><code>from</code> and <code>to</code> are compared with the <code>arrival_time</code> of each visit as
+written in <code>stop_times</code> (template times, for trips listed in
+<code>frequencies</code>), so use times past <code>"24:00:00"</code> for arrivals after midnight.
+Visits with a blank arrival time are never included when <code>from</code> or <code>to</code> is
+given.</p>
+<p><code>stop_id</code>s are matched against the <code>stop_id</code>s in <code>stop_times</code>, which are
+never stations: to get the dwell times at a station, pass its children that
+appear in <code>stop_times</code> (see <code><a href="get_children_stops.html">get_children_stops()</a></code>). Existing <code>_secs</code>
+columns in <code>stop_times</code> are not used; times are read from the time strings.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

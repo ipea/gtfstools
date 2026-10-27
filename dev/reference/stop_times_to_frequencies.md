@@ -33,64 +33,43 @@ tables (and `transfers`, when present). If the given GTFS object has no
 
 ## Details
 
-Trips are grouped together when they share the same `route_id`,
-`service_id`, `direction_id` and `shape_id` (these last two only when
-present in `trips`) and the same sequence of stops (their spatial
-pattern, as identified by
-[`get_stop_times_patterns()`](https://ipea.github.io/gtfstools/dev/reference/get_stop_times_patterns.md)).
-Each group is then split into one-hour slots of the clock, from
-`HH:00:00` (included) to the next `HH:00:00` (not included), according
-to the earliest `departure_time` of each trip in `stop_times`,
-regardless of `stop_sequence`. This is the departure from the trip's
-first stop in valid feeds, but not when later times are written
-incorrectly (e.g. times after midnight written as `"00:30:00"` instead
-of `"24:30:00"`). Slots after midnight are kept as such (e.g. from
-`"25:00:00"` to `"26:00:00"`).
+Trips are grouped by `route_id`, `service_id`, `direction_id` and
+`shape_id` (the last two only if present in `trips`) and by their
+sequence of stops, as identified by
+[`get_stop_times_patterns()`](https://ipea.github.io/gtfstools/dev/reference/get_stop_times_patterns.md).
+Each group is split into one-hour slots of the clock, from `HH:00:00`
+(included) to the next `HH:00:00` (excluded), by the earliest
+`departure_time` of each trip in `stop_times`, regardless of
+`stop_sequence` (so times after midnight written as `"00:30:00"` instead
+of `"24:30:00"` misplace the trip). Slots after midnight are kept as
+such (e.g. `"25:00:00"` to `"26:00:00"`).
 
-In each slot with `n` trips:
+In each slot with `n` trips, the trip with the earliest departure (ties
+broken by `trip_id`) becomes the template and keeps its `trip_id` and
+its `trips` and `stop_times` entries. A `frequencies` entry is added for
+it, from the start to the end of the slot, with
+`headway_secs = ceiling(3600 / n)` and `exact_times = 0`. The other
+trips are removed from `trips`, `stop_times` and `transfers`;
+`transfers` entries of the template now apply to all of its departures.
+Other tables that may refer to trips, such as `attributions` and
+`translations`, are not changed.
 
-- the trip with the earliest departure (ties broken by `trip_id`)
-  becomes the template. It keeps its `trip_id`, its `trips` entry and
-  its `stop_times` entries, so travel times may differ from one hour to
-  another. As in any frequency-based trip, only its times relative to
-  its first departure matter;
-
-- a `frequencies` entry is added for the template, from the start to the
-  end of the slot, with `headway_secs = ceiling(3600 / n)` and
-  `exact_times = 0` (frequency-based service);
-
-- the other trips are removed from `trips`, `stop_times` and
-  `transfers`. Their own departure times, travel times and other `trips`
-  fields (e.g. `trip_headsign`, `block_id`) are lost. `transfers`
-  entries that refer to the template now apply to all of its departures.
-  Other tables that may refer to trips, such as `attributions` and
-  `translations`, are not changed.
-
-Slots with a single trip are also converted (with a headway of one
-hour), so that every converted trip becomes frequency-based. Only the
-trips in `trip_id` are grouped and converted: other trips are never
-removed, even if they share a group and a slot with converted ones.
-Trips already listed in `frequencies` (with a warning, if listed in
-`trip_id`), trips not listed in `trips` and trips without any
-`departure_time` are left unchanged.
-
-This conversion is useful for tools that treat frequency-based trips
-differently from scheduled ones, such as the `time_window` parameter of
-`{r5r}`, which draws departure times within the headways of
-frequency-based trips.
+Slots with a single trip are also converted. Only the trips in `trip_id`
+are grouped and converted; other trips are never removed, even if they
+share a group and a slot with converted ones. Trips already listed in
+`frequencies` (with a warning, if listed in `trip_id`), trips not listed
+in `trips` and trips without any `departure_time` are left unchanged.
 
 Converting the result back with
 [`frequencies_to_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/frequencies_to_stop_times.md)
-yields the same number of trips in each slot, as long as it has at most
-60 trips (one departure per minute). Slots with more trips yield
-approximately the same number of trips. The departures of the new trips,
-however, are evenly spaced from the start of the slot.
+yields the same number of trips in each slot with at most 60 trips
+(approximately the same otherwise), evenly spaced from the start of the
+slot.
 
 Existing `_secs` columns in `stop_times` and `frequencies` (e.g. created
 with
 [`convert_time_to_seconds()`](https://ipea.github.io/gtfstools/dev/reference/convert_time_to_seconds.md))
-are used as-is, not recalculated from the time strings, and are filled
-in for the new `frequencies` entries.
+are used as-is and filled in for the new `frequencies` entries.
 
 ## Examples
 

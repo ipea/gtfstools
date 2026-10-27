@@ -144,26 +144,17 @@ invisibly (note that in this case the original GTFS object is altered).</p>
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
 
 
-<p>The function selects the visits of every specified trip to every specified
-stop, within the time of day if <code>from</code> or <code>to</code> is given, as
-<code><a href="set_dwell_time.html">set_dwell_time()</a></code> does. At each selected visit whose dwell time is
-shorter than <code>min_dwell_time</code>, the arrival time is kept and the departure
-time is set to the arrival time plus <code>min_dwell_time</code>. The later times of
-the trip are shifted accordingly, so the trip ends later. Longer dwell
-times are kept, so no dwell time is ever shortened.</p>
-<p>The dwell times of the first and last visits of each trip with both an
-arrival and a departure time are never raised, so trips keep their start
-times. They are found among all the visits of the trip, not only the
-selected ones, and the times of the last visit may still be shifted by an
-earlier visit. Use <code><a href="set_dwell_time.html">set_dwell_time()</a></code> to change their dwell times.</p>
-<p>Negative dwell times, of visits whose departure is earlier than their
-arrival, are raised like any other shorter dwell time, so a
-<code>min_dwell_time</code> of 0 raises only these. When they come from times after
-midnight written as <code>"00:30:00"</code> instead of <code>"24:30:00"</code>, the departure
-becomes the arrival plus <code>min_dwell_time</code>, even if the vehicle actually
-stays there longer, and the later times of the trip are shifted by about a
-day (later times also written as <code>"00:30:00"</code> thus end up past
-<code>"24:00:00"</code>).</p>
+<p>Visits are selected as in <code><a href="set_dwell_time.html">set_dwell_time()</a></code>. At each selected visit whose
+dwell time is shorter than <code>min_dwell_time</code>, the arrival time is kept and
+the departure time is set to the arrival time plus <code>min_dwell_time</code>.</p>
+<p>The first and last visits with both an arrival and a departure time of each
+trip are never raised (use <code><a href="set_dwell_time.html">set_dwell_time()</a></code> for them). They are found
+among all the visits of the trip, not only the selected ones, and the times
+of the last visit may still be shifted by an earlier visit.</p>
+<p>Negative dwell times (departure earlier than arrival) are raised like any
+other shorter dwell time, so a <code>min_dwell_time</code> of 0 raises only these.
+When they come from times after midnight written as <code>"00:30:00"</code> instead of
+<code>"24:30:00"</code>, the later times of the trip are shifted by about a day.</p>
 <p>Otherwise it works as <code><a href="set_dwell_time.html">set_dwell_time()</a></code>.</p>
     </div>
     <div class="section level2">

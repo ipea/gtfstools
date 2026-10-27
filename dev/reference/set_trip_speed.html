@@ -145,27 +145,30 @@ invisibly (note that in this case the original GTFS object is altered).</p>
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
 
 
-<p>The duration of each trip's segment (from the departure at <code>first_stop</code> to
-the arrival at <code>last_stop</code>; by default the whole trip) is set to its length,
-as calculated by <code><a href="get_trip_length.html">get_trip_length()</a></code> along the trip's shape (or as straight
-lines between stops, with a warning, if there are no shapes), divided by
-<code>speed</code>. The <code>stops</code> table is required. Trips whose length is <code>NA</code> (e.g.
-trips not linked to a shape) are left unchanged.</p>
-<p>The arrival and departure times at stops strictly inside the segment are set
-to <code>""</code>, which is written as <code>NA</code> by <code><a href="write_gtfs.html">write_gtfs()</a></code>. Some routing software,
-such as <a href="http://www.opentripplanner.org/" class="external-link">OpenTripPlanner</a>, interpolates
-these times from the average speed.</p>
-<p><code>first_stop</code> is matched at its first visit in <code>stop_sequence</code> order, and
-<code>last_stop</code> at its next visit after that (which may be the same stop). Times
-after <code>last_stop</code> are shifted by the change in the segment's duration. Dwell
-times at <code>first_stop</code> and <code>last_stop</code> are kept, except at the trip's first
-and last stops. Trips that don't visit <code>first_stop</code> and then <code>last_stop</code>, or
-that have blank times there, are left unchanged, with a warning if they were
-given in <code>trip_id</code> (not if they were selected only by <code>route_type</code>). <code>from</code>
-and <code>to</code> are compared with the <code>departure_time</code> at <code>first_stop</code> as written in
-<code>stop_times</code>, so use times past <code>"24:00:00"</code> for departures after midnight.
-For trips listed in <code>frequencies</code>, these are template times, not actual
-departures. Trips whose departure there is blank are left unchanged.</p>
+<p>The duration of each trip's segment, from the departure at <code>first_stop</code> to
+the arrival at <code>last_stop</code>, is set to its length divided by <code>speed</code>.
+Lengths are calculated by <code><a href="get_trip_length.html">get_trip_length()</a></code> along the trip's shape, or as
+straight lines between stops, with a warning, if there are no shapes; the
+<code>stops</code> table is required. Trips whose length is <code>NA</code> (e.g. not linked to a
+shape) are left unchanged.</p>
+<p>The times at stops strictly inside the segment are set to <code>""</code> (written as
+<code>NA</code> by <code><a href="write_gtfs.html">write_gtfs()</a></code>). Times after <code>last_stop</code> are shifted by the change
+in the segment's duration. Dwell times at <code>first_stop</code> and <code>last_stop</code> are
+kept, except at the trip's first and last stops, whose dwell time becomes
+0. <code>first_stop</code> is matched at its first visit in <code>stop_sequence</code> order, and
+<code>last_stop</code> at its next visit after that (which may be the same stop).
+Blank times at <code>last_stop</code> are filled if it's the trip's last stop.</p>
+<p>With <code>first_stop</code> or <code>last_stop</code>, trips that don't visit <code>first_stop</code> and
+then <code>last_stop</code>, or whose departure at <code>first_stop</code> is blank, or whose
+times at <code>last_stop</code> are both blank (unless it's the trip's last stop), are
+left unchanged, with a warning if they were given in <code>trip_id</code>. Without
+<code>first_stop</code>, <code>last_stop</code>, <code>from</code> and <code>to</code>, a blank departure at the trip's
+first stop leaves all the times of the trip blank, without a warning.</p>
+<p><code>from</code> and <code>to</code> are compared with the <code>departure_time</code> at <code>first_stop</code> as
+written in <code>stop_times</code> (template times, for trips listed in
+<code>frequencies</code>), so use times past <code>"24:00:00"</code> for departures after
+midnight; trips whose departure there is blank are then left unchanged.
+Existing <code>_secs</code> columns in <code>stop_times</code> are updated to match.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

@@ -102,33 +102,25 @@ within the time of day are not included.</p>
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
 
 
-<p>The function counts trips, not stop visits: each trip is counted once, at
-its departure time, however many stops it visits within the time of day.
-Its results are therefore not comparable to those of functions that count
-the departures from each stop of a route, such as
-<code>tidytransit::get_route_frequency()</code>.</p>
-<p>The departure time of a trip is the earliest departure time listed for it in
-<code>stop_times</code> (blank times are ignored). Trips listed in the <code>frequencies</code>
-table depart every <code>headway_secs</code> from <code>start_time</code> until (but not
-including) <code>end_time</code>, as in <code><a href="frequencies_to_stop_times.html">frequencies_to_stop_times()</a></code>, so their
-<code>stop_times</code> entries, which are just templates, are not used (and these
-trips are counted even if they are not listed in <code>stop_times</code>). Trips not
-listed in <code>frequencies</code> use their <code>stop_times</code> departure times, and trips
-without any departure time are ignored. An error is raised if the
-<code>frequencies</code> table has invalid entries for the specified routes.</p>
-<p>A departure is counted when it happens at or after <code>from</code> and before <code>to</code>, so
-that consecutive time windows (e.g. "06:00:00"-"07:00:00" and
-"07:00:00"-"08:00:00") don't count the same departure twice. Please note
-that this differs from <code><a href="filter_by_time_of_day.html">filter_by_time_of_day()</a></code>, which keeps entries whose
-times are equal to <code>to</code>. Departures after midnight are listed with times
-greater than "24:00:00" and belong to the previous service day, so a time
-of day such as "24:00:00"-"26:00:00" should be used to account for them.</p>
+<p>Each departure of a trip is counted once, however many stops it visits
+within the time of day (unlike <code><a href="get_stop_frequency.html">get_stop_frequency()</a></code> and
+<code>tidytransit::get_route_frequency()</code>, which count stop departures).
+Scheduled trips depart at their earliest <code>departure_time</code> in <code>stop_times</code>
+(blank times are ignored); trips without any departure time are not
+counted. Trips listed in <code>frequencies</code> depart every <code>headway_secs</code> from
+<code>start_time</code> until (but not including) <code>end_time</code>, as in
+<code><a href="frequencies_to_stop_times.html">frequencies_to_stop_times()</a></code>, even if they are not listed in <code>stop_times</code>;
+their <code>stop_times</code> entries are templates and are not used. An error is
+raised if <code>frequencies</code> has invalid entries for the specified routes.</p>
+<p>A departure is counted when it happens at or after <code>from</code> and before <code>to</code>
+(unlike in <code><a href="filter_by_time_of_day.html">filter_by_time_of_day()</a></code>, which also keeps entries at <code>to</code>).
+Departures after midnight are listed with times past "24:00:00", so use a
+time of day such as "24:00:00"-"26:00:00" to count them.</p>
 <p>The mean headway is the length of the time of day divided by the number of
-departures. It is an average over the whole time of day, so it is larger
-than the actual headway when service starts or ends within it. When the
-<code>trips</code> table does not have a <code>direction_id</code> field, the departures of both
-directions are pooled together. Trips with an <code>NA</code> <code>direction_id</code> are
-grouped together.</p>
+departures, so it overstates the actual headway when service starts or ends
+within the time of day. Without a <code>direction_id</code> field in <code>trips</code>, the
+departures of both directions are pooled; trips with an <code>NA</code> <code>direction_id</code>
+are grouped together.</p>
     </div>
 
     <div class="section level2">

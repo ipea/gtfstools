@@ -199,61 +199,53 @@ travelled).</p>
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
 
 
-<p>The report requires the <code>{ggplot2}</code>, <code>{knitr}</code> and <code>{rmarkdown}</code> packages,
-and <a href="https://pandoc.org/" class="external-link">Pandoc</a>, which is shipped with RStudio.</p>
-<p>The feed is filtered by agency, mode, route, date and time of day, in this
-order. The time-of-day filter keeps the whole trips that run within it
-(see <code><a href="filter_by_time_of_day.html">filter_by_time_of_day()</a></code> with <code>full_trips = TRUE</code>), so the trip
-speeds and lengths refer to whole trips.</p>
+<p>The report requires the <code>{ggplot2}</code>, <code>{knitr}</code> and <code>{rmarkdown}</code> packages
+and <a href="https://pandoc.org/" class="external-link">Pandoc</a>.</p>
+<p>The time-of-day filter keeps whole trips (as <code><a href="filter_by_time_of_day.html">filter_by_time_of_day()</a></code> with
+<code>full_trips = TRUE</code>), so trip speeds and lengths refer to whole trips.</p>
 <p>Trip lengths, durations and speeds are calculated with <code><a href="get_trip_length.html">get_trip_length()</a></code>,
-<code><a href="get_trip_duration.html">get_trip_duration()</a></code> and <code><a href="get_trip_speed.html">get_trip_speed()</a></code>. In their totals and means,
-each trip is counted once, however many days it runs on and however many
-departures the <code>frequencies</code> table lists for it. Trips with a zero or
-negative duration count in the total and mean durations, but have no speed.
-The total and mean shape lengths count each shape used by the selected trips
-once, and the number of stops counts the stops visited by the selected
-trips.</p>
-<p>The vehicle-kilometres travelled (VKT) are calculated as in <code><a href="get_vkt.html">get_vkt()</a></code> for
-the selected trips: the length of each trip counts once for every departure
-of the trip on every counted day on which its service runs. The counted days
-are the given <code>date</code>s or, if <code>date</code> is <code>NULL</code>, every day on which the
-selected services run, and <code>vkt_daily_mean</code> is the mean over those on which
+<code><a href="get_trip_duration.html">get_trip_duration()</a></code> and <code><a href="get_trip_speed.html">get_trip_speed()</a></code>, counting each trip once,
+however many days it runs on or departures <code>frequencies</code> lists for it.
+Trips with a zero or negative duration count in the durations but have no
+speed. Shape lengths count each shape used by the selected trips once, and
+the number of stops counts the stops visited by the selected trips.</p>
+<p>The VKT are calculated as in <code><a href="get_vkt.html">get_vkt()</a></code> (or <code><a href="get_vmt.html">get_vmt()</a></code>, with
+<code>unit = "mph"</code>): the length of each selected trip counts once per departure
+on every counted day on which its service runs. The counted days are the
+given <code>date</code>s or, if <code>date</code> is <code>NULL</code>, every day on which the selected
+services run; <code>vkt_daily_mean</code> is the mean over the counted days on which
 at least one counted departure runs. With <code>from</code> and <code>to</code>, only the
 departures at or after <code>from</code> and at or before <code>to</code> are counted, as listed
-in the feed before it is filtered by time of day, so selected trips that
-depart before <code>from</code> add nothing to the VKT. If no selected trip departs on
-the counted days (within the time of day), <code>vkt_total</code> and <code>vkt_daily_mean</code>
-are <code>NA</code>. An error is raised if the <code>frequencies</code> table has invalid entries
-for selected trips that run on the counted days. With <code>unit = "mph"</code>, the
-VKT are instead the vehicle-miles travelled (VMT), as in <code><a href="get_vmt.html">get_vmt()</a></code>,
-reported in the rows <code>vmt_total</code> and <code>vmt_daily_mean</code>.</p>
-<p>The <code>services</code> summary and the calendar chart in the report describe the
-whole calendar of the selected services: when <code>date</code> is given, the
-services that run on these dates are kept as a whole (see
-<code><a href="filter_by_date.html">filter_by_date()</a></code>), so they may also cover other days. The number of
-trips on each day is calculated as in <code><a href="get_calendar_overlap.html">get_calendar_overlap()</a></code>, counting
-each departure listed in <code>frequencies</code>.</p>
+before the feed is filtered by time of day, so selected trips that depart
+before <code>from</code> add nothing. <code>vkt_total</code> and <code>vkt_daily_mean</code> are <code>NA</code> if no
+selected trip departs on the counted days (within the time of day, if
+given). An error is raised if <code>frequencies</code> has invalid entries for
+selected trips that run on the counted days.</p>
+<p><code>services</code> and the calendar chart describe the whole calendar of the
+selected services: with <code>date</code>, the services running on these dates are
+kept whole (as in <code><a href="filter_by_date.html">filter_by_date()</a></code>), so they may cover other days too.
+The trips per day are counted as in <code><a href="get_calendar_overlap.html">get_calendar_overlap()</a></code>.</p>
 <p>Route headways are calculated with <code><a href="get_route_frequency.html">get_route_frequency()</a></code>, by route (and
-by <code>direction_id</code>, if the field is present in the <code>trips</code> table), on a
-single day: the day with the most trips among the given <code>date</code>s, or in the
-whole feed if <code>date</code> is <code>NULL</code> (the earliest one, in case of ties). They
-are measured within the given time of day (not including <code>to</code>, as in
-<code><a href="get_route_frequency.html">get_route_frequency()</a></code>, unlike the other indicators) or, if <code>from</code> and
-<code>to</code> are <code>NULL</code>, from the first to the last departure of that day, rounded
-out to whole hours. Trips that start on the previous day and run after
-midnight are not counted, and times are in the local time of each agency.</p>
-<p>With <code>by_route_type = TRUE</code>, modes are named as in the <code>route_type</code> argument,
-extended <code>route_type</code>s by their code, and trips whose <code>route_type</code> is
-unknown are grouped as <code>"unknown"</code>. Modes are ordered by <code>route_type</code>, with
-<code>"unknown"</code> last. Each mode is described as if it were selected alone
-(except that the headways of all modes are measured on the same day and
-time of day), so stops, shapes and agencies shared by several modes count
-in each of them. Only the numbers of routes and trips, the total trip
-lengths and durations and <code>vkt_total</code> (or <code>vmt_total</code>) add up to the <code>all</code>
-column. Modes whose routes have blank <code>agency_id</code>s count all the agencies of
-the selection, and trips listed in <code>stop_times</code> but not in <code>trips</code> only
-count in <code>all</code> (and not in the VKT, since they have no service). In the
-report, the histograms of the modes are overlaid.</p>
+<code>direction_id</code>, if present in <code>trips</code>), on a single day: the one with the
+most trips among the given <code>date</code>s or in the whole feed (the earliest, on
+ties). They are measured within the given time of day (excluding <code>to</code>, as
+in <code><a href="get_route_frequency.html">get_route_frequency()</a></code>, unlike the other indicators) or, without <code>from</code>
+and <code>to</code>, from the first to the last departure of that day, rounded out to
+whole hours. Trips of the previous service day running after midnight are
+not counted. With <code>from</code> and <code>to</code>, headways and trips per day are counted on
+the time-filtered feed, whose <code>frequencies</code> entries crossing <code>from</code> start
+at <code>from</code> (unless <code>exact_times</code> is 1), so they may differ from
+<code><a href="get_route_frequency.html">get_route_frequency()</a></code> and <code><a href="get_calendar_overlap.html">get_calendar_overlap()</a></code> on the full feed.</p>
+<p>With <code>by_route_type = TRUE</code>, modes are named as in the <code>route_type</code>
+argument, extended <code>route_type</code>s by their code and trips of unknown
+<code>route_type</code> as <code>"unknown"</code>, ordered by <code>route_type</code> with <code>"unknown"</code> last.
+Each mode is described as if selected alone (except that all headways share
+the same day and time of day), so stops, shapes and agencies shared by
+modes count in each. Only the numbers of routes and trips, the total trip
+lengths and durations and <code>vkt_total</code> (or <code>vmt_total</code>) add up to <code>all</code>.
+Modes whose routes have blank <code>agency_id</code>s count all the agencies of the
+selection. Trips listed in <code>stop_times</code> but not in <code>trips</code> count only in
+<code>all</code> (and not in the VKT, as they have no service).</p>
     </div>
 
     <div class="section level2">

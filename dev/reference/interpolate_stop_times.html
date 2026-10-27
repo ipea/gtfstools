@@ -97,36 +97,30 @@ not modified.</p>
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
 
 
-<p>Within each trip, ordered by <code>stop_sequence</code>, a stop whose arrival and
+<p>Within each trip, in <code>stop_sequence</code> order, a stop whose arrival and
 departure times are both blank gets a time interpolated linearly on the
 distance travelled from the preceding timepoint, as measured by
-<code><a href="get_trip_length.html">get_trip_length()</a></code>. In other words, the vehicle travels between two
-timepoints at a constant speed: the distance between them divided by the
-time from the departure at the first to the arrival at the second.
-Interpolated stops get equal arrival and departure times (no dwell time),
-rounded to the nearest second. Times past <code>"24:00:00"</code> are supported. If
-the distance between two timepoints is 0, their times are spread evenly
-between the stops in between.</p>
-<p>A timepoint with only one of its two times blank gets the other time in
-both columns. If <code>stop_times</code> has a <code>timepoint</code> column, interpolated stops
-get <code>timepoint = 0</code> (approximate times). The column is not created if it
-doesn't exist.</p>
+<code><a href="get_trip_length.html">get_trip_length()</a></code> (if the distance between two timepoints is 0, their
+times are spread evenly between the stops in between). Interpolated stops
+get equal arrival and departure times, rounded to the nearest second.
+Times past <code>"24:00:00"</code> are supported. A timepoint with only one of its
+two times blank gets the other time in both columns. If <code>stop_times</code> has a
+<code>timepoint</code> column, interpolated stops get <code>timepoint = 0</code>; the column is
+not created otherwise.</p>
 <p>Some stops are left blank, with a warning:</p><ul><li><p>stops before a trip's first or after its last timepoint, including every
 stop of trips with fewer than two timepoints;</p></li>
 <li><p>stops between timepoints whose distance can't be calculated, e.g. trips
 not linked to a shape or stops without coordinates;</p></li>
 <li><p>stops between timepoints in which the arrival is earlier than the
-previous departure. This usually happens when times after midnight are
-written as <code>"00:30:00"</code> instead of <code>"24:30:00"</code>.</p></li>
+previous departure, usually times after midnight written as
+<code>"00:30:00"</code> instead of <code>"24:30:00"</code>.</p></li>
 </ul><p>Times are blank when they are <code>NA</code>, empty or whitespace-only strings, or
 <code>"NA"</code>. Malformed time strings are left unchanged, with a warning, and are
-not used as timepoints. Rows without a <code>trip_id</code> are left unchanged. Times
+not used as timepoints. Rows without a <code>trip_id</code> are left unchanged. For
+trips listed in <code>frequencies</code>, the template times are interpolated. Times
 are read from the time strings, and existing <code>_secs</code> columns (e.g. created
-with <code><a href="convert_time_to_seconds.html">convert_time_to_seconds()</a></code>) are updated to match. For trips listed in
-<code>frequencies</code>, the template times are interpolated.</p>
-<p>The <code>stops</code> table is required to interpolate times between timepoints, as
-well as the <code>shapes</code> table and the <code>shape_id</code> column in <code>trips</code> with
-<code>method = "shapes"</code> (see <code><a href="get_trip_length.html">get_trip_length()</a></code>).</p>
+with <code><a href="convert_time_to_seconds.html">convert_time_to_seconds()</a></code>) are updated to match.</p>
+<p>Interpolating between timepoints requires the <code>stops</code> table.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

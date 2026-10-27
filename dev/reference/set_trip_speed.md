@@ -91,34 +91,37 @@ invisibly (note that in this case the original GTFS object is altered).
 
 ## Details
 
-The duration of each trip's segment (from the departure at `first_stop`
-to the arrival at `last_stop`; by default the whole trip) is set to its
-length, as calculated by
+The duration of each trip's segment, from the departure at `first_stop`
+to the arrival at `last_stop`, is set to its length divided by `speed`.
+Lengths are calculated by
 [`get_trip_length()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_length.md)
-along the trip's shape (or as straight lines between stops, with a
-warning, if there are no shapes), divided by `speed`. The `stops` table
-is required. Trips whose length is `NA` (e.g. trips not linked to a
-shape) are left unchanged.
+along the trip's shape, or as straight lines between stops, with a
+warning, if there are no shapes; the `stops` table is required. Trips
+whose length is `NA` (e.g. not linked to a shape) are left unchanged.
 
-The arrival and departure times at stops strictly inside the segment are
-set to `""`, which is written as `NA` by
-[`write_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/write_gtfs.md).
-Some routing software, such as
-[OpenTripPlanner](http://www.opentripplanner.org/), interpolates these
-times from the average speed.
-
-`first_stop` is matched at its first visit in `stop_sequence` order, and
-`last_stop` at its next visit after that (which may be the same stop).
+The times at stops strictly inside the segment are set to `""` (written
+as `NA` by
+[`write_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/write_gtfs.md)).
 Times after `last_stop` are shifted by the change in the segment's
 duration. Dwell times at `first_stop` and `last_stop` are kept, except
-at the trip's first and last stops. Trips that don't visit `first_stop`
-and then `last_stop`, or that have blank times there, are left
-unchanged, with a warning if they were given in `trip_id` (not if they
-were selected only by `route_type`). `from` and `to` are compared with
-the `departure_time` at `first_stop` as written in `stop_times`, so use
-times past `"24:00:00"` for departures after midnight. For trips listed
-in `frequencies`, these are template times, not actual departures. Trips
-whose departure there is blank are left unchanged.
+at the trip's first and last stops, whose dwell time becomes 0.
+`first_stop` is matched at its first visit in `stop_sequence` order, and
+`last_stop` at its next visit after that (which may be the same stop).
+Blank times at `last_stop` are filled if it's the trip's last stop.
+
+With `first_stop` or `last_stop`, trips that don't visit `first_stop`
+and then `last_stop`, or whose departure at `first_stop` is blank, or
+whose times at `last_stop` are both blank (unless it's the trip's last
+stop), are left unchanged, with a warning if they were given in
+`trip_id`. Without `first_stop`, `last_stop`, `from` and `to`, a blank
+departure at the trip's first stop leaves all the times of the trip
+blank, without a warning.
+
+`from` and `to` are compared with the `departure_time` at `first_stop`
+as written in `stop_times` (template times, for trips listed in
+`frequencies`), so use times past `"24:00:00"` for departures after
+midnight; trips whose departure there is blank are then left unchanged.
+Existing `_secs` columns in `stop_times` are updated to match.
 
 ## See also
 

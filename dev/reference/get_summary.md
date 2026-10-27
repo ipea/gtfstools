@@ -146,81 +146,77 @@ The report is saved as `gtfs_summary.md` and `gtfs_summary.html`
 ## Details
 
 The report requires the `{ggplot2}`, `{knitr}` and `{rmarkdown}`
-packages, and [Pandoc](https://pandoc.org/), which is shipped with
-RStudio.
+packages and [Pandoc](https://pandoc.org/).
 
-The feed is filtered by agency, mode, route, date and time of day, in
-this order. The time-of-day filter keeps the whole trips that run within
-it (see
+The time-of-day filter keeps whole trips (as
 [`filter_by_time_of_day()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_time_of_day.md)
-with `full_trips = TRUE`), so the trip speeds and lengths refer to whole
+with `full_trips = TRUE`), so trip speeds and lengths refer to whole
 trips.
 
 Trip lengths, durations and speeds are calculated with
 [`get_trip_length()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_length.md),
 [`get_trip_duration()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_duration.md)
 and
-[`get_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_speed.md).
-In their totals and means, each trip is counted once, however many days
-it runs on and however many departures the `frequencies` table lists for
-it. Trips with a zero or negative duration count in the total and mean
-durations, but have no speed. The total and mean shape lengths count
-each shape used by the selected trips once, and the number of stops
-counts the stops visited by the selected trips.
+[`get_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_speed.md),
+counting each trip once, however many days it runs on or departures
+`frequencies` lists for it. Trips with a zero or negative duration count
+in the durations but have no speed. Shape lengths count each shape used
+by the selected trips once, and the number of stops counts the stops
+visited by the selected trips.
 
-The vehicle-kilometres travelled (VKT) are calculated as in
+The VKT are calculated as in
 [`get_vkt()`](https://ipea.github.io/gtfstools/dev/reference/get_vkt.md)
-for the selected trips: the length of each trip counts once for every
-departure of the trip on every counted day on which its service runs.
-The counted days are the given `date`s or, if `date` is `NULL`, every
-day on which the selected services run, and `vkt_daily_mean` is the mean
-over those on which at least one counted departure runs. With `from` and
-`to`, only the departures at or after `from` and at or before `to` are
-counted, as listed in the feed before it is filtered by time of day, so
-selected trips that depart before `from` add nothing to the VKT. If no
-selected trip departs on the counted days (within the time of day),
-`vkt_total` and `vkt_daily_mean` are `NA`. An error is raised if the
-`frequencies` table has invalid entries for selected trips that run on
-the counted days. With `unit = "mph"`, the VKT are instead the
-vehicle-miles travelled (VMT), as in
+(or
 [`get_vmt()`](https://ipea.github.io/gtfstools/dev/reference/get_vmt.md),
-reported in the rows `vmt_total` and `vmt_daily_mean`.
+with `unit = "mph"`): the length of each selected trip counts once per
+departure on every counted day on which its service runs. The counted
+days are the given `date`s or, if `date` is `NULL`, every day on which
+the selected services run; `vkt_daily_mean` is the mean over the counted
+days on which at least one counted departure runs. With `from` and `to`,
+only the departures at or after `from` and at or before `to` are
+counted, as listed before the feed is filtered by time of day, so
+selected trips that depart before `from` add nothing. `vkt_total` and
+`vkt_daily_mean` are `NA` if no selected trip departs on the counted
+days (within the time of day, if given). An error is raised if
+`frequencies` has invalid entries for selected trips that run on the
+counted days.
 
-The `services` summary and the calendar chart in the report describe the
-whole calendar of the selected services: when `date` is given, the
-services that run on these dates are kept as a whole (see
+`services` and the calendar chart describe the whole calendar of the
+selected services: with `date`, the services running on these dates are
+kept whole (as in
 [`filter_by_date()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_date.md)),
-so they may also cover other days. The number of trips on each day is
-calculated as in
-[`get_calendar_overlap()`](https://ipea.github.io/gtfstools/dev/reference/get_calendar_overlap.md),
-counting each departure listed in `frequencies`.
+so they may cover other days too. The trips per day are counted as in
+[`get_calendar_overlap()`](https://ipea.github.io/gtfstools/dev/reference/get_calendar_overlap.md).
 
 Route headways are calculated with
 [`get_route_frequency()`](https://ipea.github.io/gtfstools/dev/reference/get_route_frequency.md),
-by route (and by `direction_id`, if the field is present in the `trips`
-table), on a single day: the day with the most trips among the given
-`date`s, or in the whole feed if `date` is `NULL` (the earliest one, in
-case of ties). They are measured within the given time of day (not
-including `to`, as in
+by route (and `direction_id`, if present in `trips`), on a single day:
+the one with the most trips among the given `date`s or in the whole feed
+(the earliest, on ties). They are measured within the given time of day
+(excluding `to`, as in
 [`get_route_frequency()`](https://ipea.github.io/gtfstools/dev/reference/get_route_frequency.md),
-unlike the other indicators) or, if `from` and `to` are `NULL`, from the
-first to the last departure of that day, rounded out to whole hours.
-Trips that start on the previous day and run after midnight are not
-counted, and times are in the local time of each agency.
+unlike the other indicators) or, without `from` and `to`, from the first
+to the last departure of that day, rounded out to whole hours. Trips of
+the previous service day running after midnight are not counted. With
+`from` and `to`, headways and trips per day are counted on the
+time-filtered feed, whose `frequencies` entries crossing `from` start at
+`from` (unless `exact_times` is 1), so they may differ from
+[`get_route_frequency()`](https://ipea.github.io/gtfstools/dev/reference/get_route_frequency.md)
+and
+[`get_calendar_overlap()`](https://ipea.github.io/gtfstools/dev/reference/get_calendar_overlap.md)
+on the full feed.
 
 With `by_route_type = TRUE`, modes are named as in the `route_type`
-argument, extended `route_type`s by their code, and trips whose
-`route_type` is unknown are grouped as `"unknown"`. Modes are ordered by
-`route_type`, with `"unknown"` last. Each mode is described as if it
-were selected alone (except that the headways of all modes are measured
-on the same day and time of day), so stops, shapes and agencies shared
-by several modes count in each of them. Only the numbers of routes and
+argument, extended `route_type`s by their code and trips of unknown
+`route_type` as `"unknown"`, ordered by `route_type` with `"unknown"`
+last. Each mode is described as if selected alone (except that all
+headways share the same day and time of day), so stops, shapes and
+agencies shared by modes count in each. Only the numbers of routes and
 trips, the total trip lengths and durations and `vkt_total` (or
-`vmt_total`) add up to the `all` column. Modes whose routes have blank
-`agency_id`s count all the agencies of the selection, and trips listed
-in `stop_times` but not in `trips` only count in `all` (and not in the
-VKT, since they have no service). In the report, the histograms of the
-modes are overlaid.
+`vmt_total`) add up to `all`. Modes whose routes have blank `agency_id`s
+count all the agencies of the selection. Trips listed in `stop_times`
+but not in `trips` count only in `all` (and not in the VKT, as they have
+no service).
 
 ## Examples
 
