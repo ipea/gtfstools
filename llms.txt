@@ -85,9 +85,22 @@ Please read **gtfstools** vignettes for more on the package usage:
 
 ## Related packages
 
-- [`{tidytransit}`](https://github.com/r-transit/tidytransit)
-- [`{gtfs2gps}`](https://github.com/ipea/gtfs2gps)
-- [`{gtfsrouter}`](https://github.com/UrbanAnalyst/gtfsrouter)
+- [`{gtfs2gps}`](https://github.com/ipea/gtfs2gps): Converting public
+  transport data from GTFS format to GPS-like records
+- [`{gtfs2emis}`](https://github.com/ipea/gtfs2emis): Estimating public
+  transport emissions from GTFS data
+- [`{GTFShift}`](https://u-shift.github.io/GTFShift/): Explore and
+  Analyse GTFS with a Focus on Urban Mobility
+- [`{tidytransit}`](https://github.com/r-transit/tidytransit): Read,
+  Validate, Analyze, and Map GTFS Feeds
+- [`{croquis}`](https://github.com/julian-city/croquis/): Interactive
+  way to create and edit GTFS feeds in R
+- [`{gtfsrealtime}`](https://projects.indicatrix.org/gtfsrealtime-r/):
+  Read GTFS-Realtime Files into Data Frames
+- [`{gtfsrouter}`](https://github.com/UrbanAnalyst/gtfsrouter): Routing
+  with GTFS data
+- [`{r5r}`](https://ipea.github.io/r5r/): Rapid Realistic Routing with
+  R5 in R
 
 ## Acknowledgement [![IPEA](reference/figures/ipea_logo.png)](https://www.ipea.gov.br)
 
