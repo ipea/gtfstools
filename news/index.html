@@ -49,9 +49,9 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="development version" id="gtfstools-development-version">gtfstools (development version)<a class="anchor" aria-label="anchor" href="#gtfstools-development-version"></a></h2>
+<h2 class="pkg-version" data-toc-text="2.0.0" id="gtfstools-v200">gtfstools v2.0.0<a class="anchor" aria-label="anchor" href="#gtfstools-v200"></a></h2>
 <div class="section level3">
-<h3 id="breaking-changes-development-version">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-development-version"></a></h3>
+<h3 id="breaking-changes-2-0-0">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-2-0-0"></a></h3>
 <ul><li>With <code>prefix = FALSE</code>, the default, <code><a href="../reference/merge_gtfs.html">merge_gtfs()</a></code> now keeps rows that are identical in every column only once and raises an error when the GTFS objects share ids whose data differ (e.g. a <code>stop_id</code> with different coordinates, or a <code>trip_id</code> with different <code>stop_times</code>), which used to produce inconsistent feeds. Merging a feed with itself now works, but merging versions of the same feed, or feeds with simple ids (e.g. both with an <code>agency_id</code> <code>"1"</code>), usually raises the error: use <code>prefix = TRUE</code>. A character <code>prefix</code> must now have unique elements.</li>
 <li>
 <code><a href="../reference/filter_by_sf.html">filter_by_sf()</a></code> and the <code>full_trips</code> argument of <code><a href="../reference/filter_by_stop_id.html">filter_by_stop_id()</a></code>, deprecated in version 1.3.0, are now defunct. Use <code><a href="../reference/filter_by_spatial_extent.html">filter_by_spatial_extent()</a></code>, which takes the same arguments. <code><a href="../reference/filter_by_stop_id.html">filter_by_stop_id()</a></code> now always keeps only the <code>stop_times</code> entries at the given stops (by default, it used to keep entire trips): to keep entire trips, pass the <code>trip_id</code>s that serve the stops to <code><a href="../reference/filter_by_trip_id.html">filter_by_trip_id()</a></code> (<a href="https://github.com/ipea/gtfstools/issues/75" class="external-link">#75</a>).</li>
@@ -64,13 +64,13 @@
 <code><a href="../reference/convert_shapes_to_sf.html">convert_shapes_to_sf()</a></code>, <code><a href="../reference/get_trip_geometry.html">get_trip_geometry()</a></code>, <code><a href="../reference/get_trip_length.html">get_trip_length()</a></code>, <code><a href="../reference/get_trip_speed.html">get_trip_speed()</a></code>, <code><a href="../reference/get_trip_segment_duration.html">get_trip_segment_duration()</a></code> and <code><a href="../reference/get_stop_times_patterns.html">get_stop_times_patterns()</a></code> now always order <code>shapes</code> and <code>stop_times</code> by <code>shape_pt_sequence</code>/<code>stop_sequence</code>, which are therefore required. Results only change for feeds not ordered by these columns, which were previously wrong. Their <code>sort_sequence</code> argument is deprecated: <code>TRUE</code> raises a warning and <code>FALSE</code> an error (<a href="https://github.com/ipea/gtfstools/issues/94" class="external-link">#94</a>).</li>
 </ul></div>
 <div class="section level3">
-<h3 id="feature-deprecation-development-version">Feature deprecation<a class="anchor" aria-label="anchor" href="#feature-deprecation-development-version"></a></h3>
+<h3 id="feature-deprecation-2-0-0">Feature deprecation<a class="anchor" aria-label="anchor" href="#feature-deprecation-2-0-0"></a></h3>
 <ul><li>
 <code><a href="../reference/convert_shapes_to_sf.html">convert_shapes_to_sf()</a></code> and <code><a href="../reference/convert_stops_to_sf.html">convert_stops_to_sf()</a></code> are deprecated in favour of <code><a href="../reference/get_shapes_geometry.html">get_shapes_geometry()</a></code> and <code><a href="../reference/get_stops_geometry.html">get_stops_geometry()</a></code>, which take the same arguments (except <code>sort_sequence</code>) and return the same results.</li>
 <li>The <code>file</code> argument of <code><a href="../reference/get_trip_geometry.html">get_trip_geometry()</a></code>, <code><a href="../reference/get_trip_length.html">get_trip_length()</a></code> and <code><a href="../reference/get_trip_speed.html">get_trip_speed()</a></code> is deprecated in favour of <code>method</code> (<code>file = "stop_times"</code> is <code>method = "euclidean"</code>).</li>
 </ul></div>
 <div class="section level3">
-<h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
+<h3 id="new-features-2-0-0">New features<a class="anchor" aria-label="anchor" href="#new-features-2-0-0"></a></h3>
 <ul><li>New functions to query feeds:
 <ul><li>
 <code><a href="../reference/get_summary.html">get_summary()</a></code> summarises a feed (files, agencies, service calendar, totals including the vehicle-kilometres travelled, and the distributions of trip speeds, trip lengths and route headways), optionally restricted to some dates, routes, modes, agencies and a time of day, as a list of <code>data.table</code>s and an HTML report (requires <a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a>, <a href="https://yihui.org/knitr/" class="external-link">knitr</a>, <a href="https://github.com/rstudio/rmarkdown" class="external-link">rmarkdown</a> and Pandoc). <code>by_route_type = TRUE</code> breaks results down by transport mode (<a href="https://github.com/ipea/gtfstools/issues/127" class="external-link">#127</a>), and <code>unit = "mph"</code> reports miles and mph.</li>
@@ -139,7 +139,7 @@
 <li>New vignettes “Editing GTFS feeds”, “Querying GTFS feeds” and “Mapping GTFS feeds”.</li>
 </ul></div>
 <div class="section level3">
-<h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
+<h3 id="bug-fixes-2-0-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-2-0-0"></a></h3>
 <ul><li>
 <code><a href="../reference/merge_gtfs.html">merge_gtfs()</a></code>:
 <ul><li>no longer prefixes ids with <code>"NA_"</code> when the GTFS objects are passed with names (e.g. <code>merge_gtfs(a = gtfs1, b = gtfs2, prefix = TRUE)</code>);</li>
@@ -196,7 +196,7 @@
 <li>The documentation of <code><a href="../reference/filter_by_stop_id.html">filter_by_stop_id()</a></code> now says that it keeps (or drops) the <code>stop_times</code> entries at the given stops, not entire trips.</li>
 </ul></div>
 <div class="section level3">
-<h3 id="notes-development-version">Notes<a class="anchor" aria-label="anchor" href="#notes-development-version"></a></h3>
+<h3 id="notes-2-0-0">Notes<a class="anchor" aria-label="anchor" href="#notes-2-0-0"></a></h3>
 <ul><li>
 <p>Many functions are faster. The table below shows how many times faster than in version 1.4.0 each function of that version is, on the example feeds <code>poa</code> and <code>spo</code> stacked twice with <code><a href="../reference/merge_gtfs.html">merge_gtfs()</a></code> (up to 46,000 <code>stop_times</code> rows), with the default number of threads. Values below 1 mean slower, and ~1 a difference under 1.2 times (measurement noise); functions not listed are ~1 on both feeds, except <code><a href="../reference/get_children_stops.html">get_children_stops()</a></code> and <code><a href="../reference/get_parent_station.html">get_parent_station()</a></code> (the feeds have no <code>parent_station</code>), <code><a href="../reference/validate_gtfs.html">validate_gtfs()</a></code> and <code><a href="../reference/download_validator.html">download_validator()</a></code>, which were not measured. <code>poa</code> has no <code>frequencies</code>. Functions marked with † now do different work (see “Breaking changes”): <code><a href="../reference/merge_gtfs.html">merge_gtfs()</a></code> checks the ids shared by the GTFS objects (with <code>prefix = TRUE</code>, it is 1.2 to 1.8 times faster), and <code><a href="../reference/get_trip_geometry.html">get_trip_geometry()</a></code> cuts shapes at the trips’ first and last stops. On these small feeds, fixed costs dominate: <code><a href="../reference/as_dt_gtfs.html">as_dt_gtfs()</a></code> now converts integer dates (about 1 to 2 milliseconds), <code><a href="../reference/filter_by_trip_id.html">filter_by_trip_id()</a></code> and <code><a href="../reference/filter_by_weekday.html">filter_by_weekday()</a></code> take about 7 milliseconds more, and the deprecated <code><a href="../reference/convert_shapes_to_sf.html">convert_shapes_to_sf()</a></code> and <code><a href="../reference/convert_stops_to_sf.html">convert_stops_to_sf()</a></code> raise a warning, while their replacements, <code><a href="../reference/get_shapes_geometry.html">get_shapes_geometry()</a></code> and <code><a href="../reference/get_stops_geometry.html">get_stops_geometry()</a></code>, are about as fast as they were.</p>
 <table class="table"><thead><tr><th>function</th>
