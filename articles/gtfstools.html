@@ -7,8 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Introduction to gtfstools • gtfstools</title>
 <script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Introduction to gtfstools">
 </head>
@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gtfstools</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.4.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,7 +34,12 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/filtering.html">Filtering GTFS feeds</a></li>
+<li><a class="dropdown-item" href="../articles/calendar_overlap.html">Checking the calendar overlap of GTFS feeds</a></li>
+    <li><a class="dropdown-item" href="../articles/editing.html">Editing GTFS feeds</a></li>
+    <li><a class="dropdown-item" href="../articles/filtering.html">Filtering GTFS feeds</a></li>
+    <li><a class="dropdown-item" href="../articles/graphs.html">Building transit network graphs</a></li>
+    <li><a class="dropdown-item" href="../articles/mapping.html">Mapping GTFS feeds</a></li>
+    <li><a class="dropdown-item" href="../articles/querying.html">Querying GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/validating.html">Validating GTFS feeds</a></li>
   </ul>
 </li>
@@ -44,7 +49,7 @@
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/ipeaGIT/gtfstools/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/ipea/gtfstools/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-lightswitch" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Light switch"><span class="fa fa-sun"></span></button>
   <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-lightswitch">
@@ -68,7 +73,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Introduction to gtfstools</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/ipeaGIT/gtfstools/blob/main/vignettes/gtfstools.Rmd" class="external-link"><code>vignettes/gtfstools.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ipea/gtfstools/blob/main/vignettes/gtfstools.Rmd" class="external-link"><code>vignettes/gtfstools.Rmd</code></a></small>
       <div class="d-none name"><code>gtfstools.Rmd</code></div>
     </div>
 
@@ -120,16 +125,29 @@ stable version from CRAN…</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"gtfstools"</span><span class="op">)</span></span></code></pre></div>
 <p>…or the development version from GitHub.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"gtfstools"</span>, repos <span class="op">=</span> <span class="st">"https://dhersz.r-universe.dev"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># or</span></span>
-<span><span class="co"># install.packages("remotes")</span></span>
-<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"ipeaGIT/gtfstools"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"ipea/gtfstools"</span><span class="op">)</span></span></code></pre></div>
 <p>Then attach it to the current R session:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ipeagit.github.io/gtfstools/">gtfstools</a></span><span class="op">)</span></span></code></pre></div>
-<p>A few sample files are included in the package:</p>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ipea.github.io/gtfstools/">gtfstools</a></span><span class="op">)</span></span></code></pre></div>
+<p>Some functions of the package run part of their computations in
+parallel, such as <code><a href="../reference/get_trip_length.html">get_trip_length()</a></code>,
+<code><a href="../reference/get_trip_speed.html">get_trip_speed()</a></code>, <code><a href="../reference/get_trip_geometry.html">get_trip_geometry()</a></code>,
+<code><a href="../reference/set_trip_speed.html">set_trip_speed()</a></code>, <code><a href="../reference/interpolate_stop_times.html">interpolate_stop_times()</a></code>,
+<code><a href="../reference/get_shape_length.html">get_shape_length()</a></code> and <code><a href="../reference/get_stop_distances.html">get_stop_distances()</a></code>.
+Since <strong>gtfstools</strong> is built on top of
+<a href="https://r-datatable.com" class="external-link">data.table</a>, these functions follow its configuration and,
+by default, use 50% of the available logical CPU cores. Users can change
+the number of threads used by the package with
+<code><a href="https://rdrr.io/pkg/data.table/man/openmp-utils.html" class="external-link">data.table::setDTthreads()</a></code>:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># checks the number of threads currently used</span></span>
+<span><span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/data.table/man/openmp-utils.html" class="external-link">getDTthreads</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># uses 4 threads</span></span>
+<span><span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/data.table/man/openmp-utils.html" class="external-link">setDTthreads</a></span><span class="op">(</span><span class="fl">4</span><span class="op">)</span></span></code></pre></div>
+<p>A few sample files are included in the package:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">data_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, package <span class="op">=</span> <span class="st">"gtfstools"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">data_path</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "ber_gtfs.zip" "ggl_gtfs.zip" "poa_gtfs.zip" "spo_gtfs.zip"</span></span></code></pre></div>
@@ -165,7 +183,7 @@ the function reads all <code>.txt</code> files contained in the main
 of specific files, specially if you’re dealing with some big data sets.
 To do so, specify which file you want to read in the <code>files</code>
 argument (<em>without</em> the <code>.txt</code> extension):</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">spo_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">data_path</span>, <span class="st">"spo_gtfs.zip"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># default behaviour</span></span>
@@ -193,33 +211,39 @@ package always conform to the specification.</p>
 you from getting stuck with repetitive tasks:</p>
 <p><code><a href="../reference/get_trip_geometry.html">get_trip_geometry()</a></code> returns the geometry of each trip in
 a GTFS object as an <code>sf</code> object (please check <a href="https://r-spatial.github.io/sf/" class="external-link"><code>{sf}</code> webpage</a> for
-more details). GTFS data allows you to generate geometries using two
-different methods: either converting the shapes described in the
-<code>shapes.txt</code> file to an <code>sf</code>, or linking the
-subsequent stops of each trip as described in the
-<code>stop_times.txt</code> along a straight line. While the former
-tends to yield more reliable and higher resolution geometries, it may be
-useful to compare the results of both methods to check if the trips
-described in <code>stop_times</code> actually resemble their actual
-shape:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">trip_geom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_trip_geometry.html">get_trip_geometry</a></span><span class="op">(</span><span class="va">spo_gtfs</span>, file <span class="op">=</span> <span class="st">"shapes"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">trip_geom</span><span class="op">$</span><span class="va">geometry</span><span class="op">)</span></span></code></pre></div>
-<p><img src="gtfstools_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
+more details), from its first to its last stop. GTFS data allows you to
+generate geometries using two different methods: either cutting the
+trip’s shape, described in the <code>shapes.txt</code> file, between its
+first and last stops (<code>method = "shapes"</code>, the default), or
+linking the subsequent stops of each trip as described in the
+<code>stop_times.txt</code> along straight lines
+(<code>method = "euclidean"</code>). While the former tends to yield
+more reliable and higher resolution geometries, it may be useful to
+compare the results of both methods to check if the trips described in
+<code>stop_times</code> actually resemble their actual shape:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">trip_geom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_trip_geometry.html">get_trip_geometry</a></span><span class="op">(</span><span class="va">spo_gtfs</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">trip_geom</span><span class="op">$</span><span class="va">geometry</span><span class="op">)</span></span></code></pre></div>
+<p><img src="gtfstools_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="" width="700"></p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">single_trip</span> <span class="op">&lt;-</span> <span class="va">spo_gtfs</span><span class="op">$</span><span class="va">trips</span><span class="op">$</span><span class="va">trip_id</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
 <span><span class="va">single_trip</span></span>
 <span><span class="co">#&gt; [1] "CPTM L07-0"</span></span>
 <span></span>
-<span><span class="co"># 'file' argument defaults to c("shapes", "stop_times")</span></span>
-<span><span class="va">both_geom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_trip_geometry.html">get_trip_geometry</a></span><span class="op">(</span><span class="va">spo_gtfs</span>, trip_id <span class="op">=</span> <span class="va">single_trip</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">both_geom</span><span class="op">[</span><span class="st">"origin_file"</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
-<p><img src="gtfstools_files/figure-html/unnamed-chunk-7-2.png" width="700"></p>
+<span><span class="va">shape_geom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_trip_geometry.html">get_trip_geometry</a></span><span class="op">(</span><span class="va">spo_gtfs</span>, trip_id <span class="op">=</span> <span class="va">single_trip</span><span class="op">)</span></span>
+<span><span class="va">straight_geom</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_trip_geometry.html">get_trip_geometry</a></span><span class="op">(</span></span>
+<span>  <span class="va">spo_gtfs</span>,</span>
+<span>  trip_id <span class="op">=</span> <span class="va">single_trip</span>,</span>
+<span>  method <span class="op">=</span> <span class="st">"euclidean"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">shape_geom</span><span class="op">$</span><span class="va">geometry</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">straight_geom</span><span class="op">$</span><span class="va">geometry</span>, add <span class="op">=</span> <span class="cn">TRUE</span>, col <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="gtfstools_files/figure-html/unnamed-chunk-8-2.png" class="r-plt" alt="" width="700"></p>
 <p><code><a href="../reference/get_trip_duration.html">get_trip_duration()</a></code> returns the duration of each trip in
 a GTFS object, as specified in the <code>stop_times</code> file, in the
 temporal unit of your desire (either seconds, minutes, hours or
 days):</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">trip_durtn</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_trip_duration.html">get_trip_duration</a></span><span class="op">(</span><span class="va">spo_gtfs</span>, unit <span class="op">=</span> <span class="st">"s"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">trip_durtn</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Key: &lt;trip_id&gt;</span></span>
@@ -243,17 +267,17 @@ days):</p>
 even takes the same arguments, but returns the duration of each trip
 <em>segment</em> (i.e. the time interval between two consecutive
 stops).</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">trip_seg_durtn</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_trip_segment_duration.html">get_trip_segment_duration</a></span><span class="op">(</span><span class="va">spo_gtfs</span>, unit <span class="op">=</span> <span class="st">"s"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">trip_seg_durtn</span><span class="op">)</span></span>
-<span><span class="co">#&gt;       trip_id segment duration</span></span>
-<span><span class="co">#&gt;        &lt;char&gt;   &lt;int&gt;    &lt;int&gt;</span></span>
-<span><span class="co">#&gt; 1: CPTM L07-0       1      480</span></span>
-<span><span class="co">#&gt; 2: CPTM L07-0       2      480</span></span>
-<span><span class="co">#&gt; 3: CPTM L07-0       3      480</span></span>
-<span><span class="co">#&gt; 4: CPTM L07-0       4      480</span></span>
-<span><span class="co">#&gt; 5: CPTM L07-0       5      480</span></span>
-<span><span class="co">#&gt; 6: CPTM L07-0       6      480</span></span>
+<span><span class="co">#&gt;      trip_id segment duration</span></span>
+<span><span class="co">#&gt;       &lt;char&gt;   &lt;int&gt;    &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1: 2002-10-0       1      130</span></span>
+<span><span class="co">#&gt; 2: 2002-10-0       2      130</span></span>
+<span><span class="co">#&gt; 3: 2002-10-0       3      130</span></span>
+<span><span class="co">#&gt; 4: 2002-10-0       4      130</span></span>
+<span><span class="co">#&gt; 5: 2002-10-0       5      130</span></span>
+<span><span class="co">#&gt; 6: 2002-10-0       6      130</span></span>
 <span></span>
 <span><span class="va">single_seg_durtn</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_trip_segment_duration.html">get_trip_segment_duration</a></span><span class="op">(</span><span class="va">spo_gtfs</span>, trip_id <span class="op">=</span> <span class="va">single_trip</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">single_seg_durtn</span><span class="op">)</span></span>
@@ -269,27 +293,71 @@ stops).</p>
 diagnosing some problems in your GTFS data: apparently every single trip
 in <code>spo_gtfs</code> is composed by several equally long segments,
 which looks unreasonable.</p>
-<p>Finally, <code><a href="../reference/get_trip_speed.html">get_trip_speed()</a></code> is a helper around
-<code><a href="../reference/get_trip_geometry.html">get_trip_geometry()</a></code> and <code><a href="../reference/get_trip_duration.html">get_trip_duration()</a></code>
-that returns the average speed of each trip in a GTFS object:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<p><code><a href="../reference/get_trip_length.html">get_trip_length()</a></code> returns the length of each trip, from
+its first to its last stop, either along the trip’s shape (the default)
+or as straight lines between consecutive stops
+(<code>method = "euclidean"</code>). Like
+<code><a href="../reference/get_trip_segment_duration.html">get_trip_segment_duration()</a></code>, it can also return the length
+of each trip segment, with <code>by = "segment"</code>.
+<code><a href="../reference/get_shape_length.html">get_shape_length()</a></code> returns the length of entire shapes.</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">trip_length</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_trip_length.html">get_trip_length</a></span><span class="op">(</span><span class="va">spo_gtfs</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">trip_length</span><span class="op">)</span></span>
+<span><span class="co">#&gt;      trip_id   length</span></span>
+<span><span class="co">#&gt;       &lt;char&gt;    &lt;num&gt;</span></span>
+<span><span class="co">#&gt; 1: 2002-10-0  6.68867</span></span>
+<span><span class="co">#&gt; 2: 2105-10-0 18.45188</span></span>
+<span><span class="co">#&gt; 3: 2105-10-1 17.85460</span></span>
+<span><span class="co">#&gt; 4: 2161-10-0 17.50350</span></span>
+<span><span class="co">#&gt; 5: 2161-10-1 18.01943</span></span>
+<span><span class="co">#&gt; 6: 4491-10-0 13.81378</span></span>
+<span></span>
+<span><span class="va">segment_length</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_trip_length.html">get_trip_length</a></span><span class="op">(</span><span class="va">spo_gtfs</span>, <span class="va">single_trip</span>, by <span class="op">=</span> <span class="st">"segment"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">segment_length</span><span class="op">)</span></span>
+<span><span class="co">#&gt;       trip_id segment from_stop_id to_stop_id   length</span></span>
+<span><span class="co">#&gt;        &lt;char&gt;   &lt;int&gt;       &lt;char&gt;     &lt;char&gt;    &lt;num&gt;</span></span>
+<span><span class="co">#&gt; 1: CPTM L07-0       1        18940      18920 3.547651</span></span>
+<span><span class="co">#&gt; 2: CPTM L07-0       2        18920      18919 2.424503</span></span>
+<span><span class="co">#&gt; 3: CPTM L07-0       3        18919      18917 1.591453</span></span>
+<span><span class="co">#&gt; 4: CPTM L07-0       4        18917      18916 2.010508</span></span>
+<span><span class="co">#&gt; 5: CPTM L07-0       5        18916      18965 2.171843</span></span>
+<span><span class="co">#&gt; 6: CPTM L07-0       6        18965      18923 2.841391</span></span></code></pre></div>
+<p>Finally, <code><a href="../reference/get_trip_speed.html">get_trip_speed()</a></code> combines
+<code><a href="../reference/get_trip_length.html">get_trip_length()</a></code> with <code><a href="../reference/get_trip_duration.html">get_trip_duration()</a></code> (or
+<code><a href="../reference/get_trip_segment_duration.html">get_trip_segment_duration()</a></code>, with
+<code>by = "segment"</code>) to return the average speed of each trip or
+segment:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">trip_speed</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_trip_speed.html">get_trip_speed</a></span><span class="op">(</span><span class="va">spo_gtfs</span>, unit <span class="op">=</span> <span class="st">"m/s"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">trip_speed</span><span class="op">)</span></span>
-<span><span class="co">#&gt;      trip_id origin_file    speed</span></span>
-<span><span class="co">#&gt;       &lt;char&gt;      &lt;char&gt;    &lt;num&gt;</span></span>
-<span><span class="co">#&gt; 1: 2002-10-0      shapes 2.486809</span></span>
-<span><span class="co">#&gt; 2: 2105-10-0      shapes 2.848157</span></span>
-<span><span class="co">#&gt; 3: 2105-10-1      shapes 2.720915</span></span>
-<span><span class="co">#&gt; 4: 2161-10-0      shapes 3.106259</span></span>
-<span><span class="co">#&gt; 5: 2161-10-1      shapes 3.273461</span></span>
-<span><span class="co">#&gt; 6: 4491-10-0      shapes 3.667656</span></span>
+<span><span class="co">#&gt; Key: &lt;trip_id&gt;</span></span>
+<span><span class="co">#&gt;    route_id   trip_id    speed</span></span>
+<span><span class="co">#&gt;      &lt;char&gt;    &lt;char&gt;    &lt;num&gt;</span></span>
+<span><span class="co">#&gt; 1:  2002-10 2002-10-0 2.322455</span></span>
+<span><span class="co">#&gt; 2:  2105-10 2105-10-0 2.847512</span></span>
+<span><span class="co">#&gt; 3:  2105-10 2105-10-1 2.680871</span></span>
+<span><span class="co">#&gt; 4:  2161-10 2161-10-0 3.103457</span></span>
+<span><span class="co">#&gt; 5:  2161-10 2161-10-1 3.229289</span></span>
+<span><span class="co">#&gt; 6:  4491-10 4491-10-0 3.336661</span></span>
 <span></span>
 <span><span class="co"># 'unit' argument defaults to "km/h"</span></span>
 <span><span class="va">single_trip_speed</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_trip_speed.html">get_trip_speed</a></span><span class="op">(</span><span class="va">spo_gtfs</span>, trip_id <span class="op">=</span> <span class="va">single_trip</span><span class="op">)</span></span>
 <span><span class="va">single_trip_speed</span></span>
-<span><span class="co">#&gt;       trip_id origin_file    speed</span></span>
-<span><span class="co">#&gt;        &lt;char&gt;      &lt;char&gt;    &lt;num&gt;</span></span>
-<span><span class="co">#&gt; 1: CPTM L07-0      shapes 26.78777</span></span></code></pre></div>
+<span><span class="co">#&gt; Key: &lt;trip_id&gt;</span></span>
+<span><span class="co">#&gt;    route_id    trip_id    speed</span></span>
+<span><span class="co">#&gt;      &lt;char&gt;     &lt;char&gt;    &lt;num&gt;</span></span>
+<span><span class="co">#&gt; 1: CPTM L07 CPTM L07-0 26.73002</span></span>
+<span></span>
+<span><span class="va">segment_speed</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_trip_speed.html">get_trip_speed</a></span><span class="op">(</span><span class="va">spo_gtfs</span>, <span class="va">single_trip</span>, by <span class="op">=</span> <span class="st">"segment"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">segment_speed</span><span class="op">)</span></span>
+<span><span class="co">#&gt;    route_id    trip_id segment from_stop_id to_stop_id    speed</span></span>
+<span><span class="co">#&gt;      &lt;char&gt;     &lt;char&gt;   &lt;int&gt;       &lt;char&gt;     &lt;char&gt;    &lt;num&gt;</span></span>
+<span><span class="co">#&gt; 1: CPTM L07 CPTM L07-0       1        18940      18920 26.60738</span></span>
+<span><span class="co">#&gt; 2: CPTM L07 CPTM L07-0       2        18920      18919 18.18377</span></span>
+<span><span class="co">#&gt; 3: CPTM L07 CPTM L07-0       3        18919      18917 11.93590</span></span>
+<span><span class="co">#&gt; 4: CPTM L07 CPTM L07-0       4        18917      18916 15.07881</span></span>
+<span><span class="co">#&gt; 5: CPTM L07 CPTM L07-0       5        18916      18965 16.28882</span></span>
+<span><span class="co">#&gt; 6: CPTM L07 CPTM L07-0       6        18965      18923 21.31043</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="manipulate-feeds">Manipulate feeds<a class="anchor" aria-label="anchor" href="#manipulate-feeds"></a>
@@ -305,7 +373,7 @@ website</a> for more details on syntax and usage.</p>
 to each table using the <code>$</code> operator. For example, this is
 how you’d remove the <code>headway_secs</code> column from the
 <code>frequencies</code> file and add it again afterwards:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">old_headway_secs</span> <span class="op">&lt;-</span> <span class="va">spo_gtfs</span><span class="op">$</span><span class="va">frequencies</span><span class="op">$</span><span class="va">headway_secs</span></span>
 <span></span>
 <span><span class="va">spo_gtfs</span><span class="op">$</span><span class="va">frequencies</span><span class="op">[</span>, <span class="va">headway_secs</span> <span class="op">:=</span> <span class="cn">NULL</span><span class="op">]</span></span>
@@ -334,7 +402,7 @@ getting over some common tasks. <code><a href="../reference/merge_gtfs.html">mer
 GTFS objects and combines them row-wise. By default the function binds
 every table inside the objects, but you can specify which tables you
 want to merge with the <code>files</code> argument:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ggl_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">data_path</span>, <span class="st">"ggl_gtfs.zip"</span><span class="op">)</span></span>
 <span><span class="va">ggl_gtfs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_gtfs.html">read_gtfs</a></span><span class="op">(</span><span class="va">ggl_path</span><span class="op">)</span></span>
 <span></span>
@@ -363,38 +431,44 @@ want to merge with the <code>files</code> argument:</p>
 <p><code><a href="../reference/set_trip_speed.html">set_trip_speed()</a></code> sets the average speed of specified
 trips by adjusting the <code>arrival_time</code> and
 <code>departure_time</code> columns in the <code>stop_times</code>
-table. Average speed is calculated as the difference between the arrival
-time at the last stop minus the departure time at the first top, divided
-by the trip’s length. Please note that arrival and departure times at
+table. Average speed is calculated as the trip’s length divided by the
+difference between the arrival time at the last stop and the departure
+time at the first stop. Please note that arrival and departure times at
 intermediate stops are set as <code>""</code>. Some transport routing
 software, such as <a href="https://www.opentripplanner.org/" class="external-link">OpenTripPlanner</a> and <a href="https://github.com/conveyal/r5" class="external-link">R5</a>, support specifying stop
 times like so, in which case they interpolate arrival/departure times at
-intermediate stops based on the trip’s average speed and the euclidean
-distance between stops.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+intermediate stops based on the trip’s average speed and the distances
+between stops. The <a href="editing.html">Editing GTFS feeds</a>
+vignette presents other editing functions, such as
+<code><a href="../reference/set_route_speed.html">set_route_speed()</a></code>, which sets the speed of all trips of the
+given routes.</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">selected_trips</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2002-10-0"</span>, <span class="st">"CPTM L07-0"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/get_trip_speed.html">get_trip_speed</a></span><span class="op">(</span><span class="va">spo_gtfs</span>, <span class="va">selected_trips</span>, unit <span class="op">=</span> <span class="st">"km/h"</span><span class="op">)</span></span>
-<span><span class="co">#&gt;       trip_id origin_file     speed</span></span>
-<span><span class="co">#&gt;        &lt;char&gt;      &lt;char&gt;     &lt;num&gt;</span></span>
-<span><span class="co">#&gt; 1:  2002-10-0      shapes  8.952511</span></span>
-<span><span class="co">#&gt; 2: CPTM L07-0      shapes 26.787768</span></span>
+<span><span class="co">#&gt; Key: &lt;trip_id&gt;</span></span>
+<span><span class="co">#&gt;    route_id    trip_id     speed</span></span>
+<span><span class="co">#&gt;      &lt;char&gt;     &lt;char&gt;     &lt;num&gt;</span></span>
+<span><span class="co">#&gt; 1:  2002-10  2002-10-0  8.360838</span></span>
+<span><span class="co">#&gt; 2: CPTM L07 CPTM L07-0 26.730015</span></span>
 <span></span>
 <span><span class="co"># 'speed' is recycled to all trips if only a single value is given</span></span>
 <span><span class="va">new_speed_gtfs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/set_trip_speed.html">set_trip_speed</a></span><span class="op">(</span><span class="va">spo_gtfs</span>, <span class="va">selected_trips</span>, <span class="fl">50</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/get_trip_speed.html">get_trip_speed</a></span><span class="op">(</span><span class="va">new_speed_gtfs</span>, <span class="va">selected_trips</span><span class="op">)</span></span>
-<span><span class="co">#&gt;       trip_id origin_file    speed</span></span>
-<span><span class="co">#&gt;        &lt;char&gt;      &lt;char&gt;    &lt;num&gt;</span></span>
-<span><span class="co">#&gt; 1:  2002-10-0      shapes 50.06453</span></span>
-<span><span class="co">#&gt; 2: CPTM L07-0      shapes 50.00874</span></span>
+<span><span class="co">#&gt; Key: &lt;trip_id&gt;</span></span>
+<span><span class="co">#&gt;    route_id    trip_id    speed</span></span>
+<span><span class="co">#&gt;      &lt;char&gt;     &lt;char&gt;    &lt;num&gt;</span></span>
+<span><span class="co">#&gt; 1:  2002-10  2002-10-0 50.06073</span></span>
+<span><span class="co">#&gt; 2: CPTM L07 CPTM L07-0 50.00388</span></span>
 <span></span>
 <span><span class="co"># but you can also specify different speeds for each trip</span></span>
 <span><span class="va">new_speed_gtfs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/set_trip_speed.html">set_trip_speed</a></span><span class="op">(</span><span class="va">spo_gtfs</span>, <span class="va">selected_trips</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">30</span>, <span class="fl">40</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/get_trip_speed.html">get_trip_speed</a></span><span class="op">(</span><span class="va">new_speed_gtfs</span>, <span class="va">selected_trips</span><span class="op">)</span></span>
-<span><span class="co">#&gt;       trip_id origin_file    speed</span></span>
-<span><span class="co">#&gt;        &lt;char&gt;      &lt;char&gt;    &lt;num&gt;</span></span>
-<span><span class="co">#&gt; 1:  2002-10-0      shapes 30.01541</span></span>
-<span><span class="co">#&gt; 2: CPTM L07-0      shapes 40.00516</span></span></code></pre></div>
+<span><span class="co">#&gt; Key: &lt;trip_id&gt;</span></span>
+<span><span class="co">#&gt;    route_id    trip_id    speed</span></span>
+<span><span class="co">#&gt;      &lt;char&gt;     &lt;char&gt;    &lt;num&gt;</span></span>
+<span><span class="co">#&gt; 1:  2002-10  2002-10-0 30.02396</span></span>
+<span><span class="co">#&gt; 2: CPTM L07 CPTM L07-0 40.00677</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="write-feeds">
@@ -404,7 +478,7 @@ distance between stops.</p>
 objects to disk. It defaults to writing every single table inside the
 object as a <code>.txt</code> file, but you can conditionally exclude
 files if you so wish:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">temp_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"gttools_vig"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">temp_dir</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">temp_dir</span><span class="op">)</span></span>
@@ -438,7 +512,7 @@ specification.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

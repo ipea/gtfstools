@@ -1,0 +1,37 @@
+# Write and render the report of get_summary()
+
+Write and render the report of get_summary()
+
+## Usage
+
+``` r
+write_summary_report(result, values, selection, output_dir)
+```
+
+## Arguments
+
+- result:
+
+  The list of diagnostics returned by
+  [`get_summary()`](https://ipea.github.io/gtfstools/reference/get_summary.md).
+
+- values:
+
+  A named list with the numeric vectors to be plotted (`speed`,
+  `distance` and `frequency`), the calendar chart created by
+  [`get_calendar_overlap()`](https://ipea.github.io/gtfstools/reference/get_calendar_overlap.md)
+  (`calendar`, `NULL` if there is none) and a named list with the mode
+  of each plotted value, as factors (`modes`, empty if the values are
+  not grouped by mode).
+
+- selection:
+
+  A named list with the filters used (`NULL` elements mean no filter).
+
+- output_dir:
+
+  A string. The directory in which the report is saved.
+
+## Value
+
+The path to the HTML report.

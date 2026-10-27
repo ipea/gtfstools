@@ -1,0 +1,22 @@
+# List MobilityData's GTFS validator versions
+
+Lists available versions of MobilityData's command line tool to validate
+GTFS feeds.
+
+## Usage
+
+``` r
+list_validator_versions()
+```
+
+## Value
+
+A data.table with each CLI version, published date, and download URL. If
+the versions can't be listed due to network problems, it informs that
+with a message and invisibly returns `NULL`.
+
+## See also
+
+Other validation:
+[`download_validator()`](https://ipea.github.io/gtfstools/reference/download_validator.md),
+[`validate_gtfs()`](https://ipea.github.io/gtfstools/reference/validate_gtfs.md)

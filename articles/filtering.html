@@ -7,8 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Filtering GTFS feeds • gtfstools</title>
 <script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Filtering GTFS feeds">
 </head>
@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">gtfstools</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">1.4.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">2.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,7 +34,12 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/filtering.html">Filtering GTFS feeds</a></li>
+<li><a class="dropdown-item" href="../articles/calendar_overlap.html">Checking the calendar overlap of GTFS feeds</a></li>
+    <li><a class="dropdown-item" href="../articles/editing.html">Editing GTFS feeds</a></li>
+    <li><a class="dropdown-item" href="../articles/filtering.html">Filtering GTFS feeds</a></li>
+    <li><a class="dropdown-item" href="../articles/graphs.html">Building transit network graphs</a></li>
+    <li><a class="dropdown-item" href="../articles/mapping.html">Mapping GTFS feeds</a></li>
+    <li><a class="dropdown-item" href="../articles/querying.html">Querying GTFS feeds</a></li>
     <li><a class="dropdown-item" href="../articles/validating.html">Validating GTFS feeds</a></li>
   </ul>
 </li>
@@ -44,7 +49,7 @@
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/ipeaGIT/gtfstools/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/ipea/gtfstools/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-lightswitch" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Light switch"><span class="fa fa-sun"></span></button>
   <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-lightswitch">
@@ -68,7 +73,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Filtering GTFS feeds</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/ipeaGIT/gtfstools/blob/main/vignettes/filtering.Rmd" class="external-link"><code>vignettes/filtering.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ipea/gtfstools/blob/main/vignettes/filtering.Rmd" class="external-link"><code>vignettes/filtering.Rmd</code></a></small>
       <div class="d-none name"><code>filtering.Rmd</code></div>
     </div>
 
@@ -76,8 +81,8 @@
     
 <p>GTFS feeds are often used to describe very large and complex public
 transport networks. These large files can become quite cumbersome to
-use, manipulate and move around, and it’s not unfrequent that one wants
-to analyze a specific subset of the data.</p>
+use, manipulate and move around, and it’s not uncommon that one wants to
+analyze a specific subset of the data.</p>
 <p><strong>gtfstools</strong> includes a few functions to filter GTFS
 feeds, thus allowing for faster and more convenient data processing. The
 filtering functions currently available are:</p>
@@ -90,32 +95,38 @@ filtering functions currently available are:</p>
 <li><code><a href="../reference/filter_by_trip_id.html">filter_by_trip_id()</a></code></li>
 <li><code><a href="../reference/filter_by_route_type.html">filter_by_route_type()</a></code></li>
 <li><code><a href="../reference/filter_by_weekday.html">filter_by_weekday()</a></code></li>
+<li><code><a href="../reference/filter_by_date.html">filter_by_date()</a></code></li>
+<li><code><a href="../reference/filter_by_period.html">filter_by_period()</a></code></li>
 <li><code><a href="../reference/filter_by_time_of_day.html">filter_by_time_of_day()</a></code></li>
-<li><code><a href="../reference/filter_by_sf.html">filter_by_sf()</a></code></li>
+<li><code><a href="../reference/filter_by_spatial_extent.html">filter_by_spatial_extent()</a></code></li>
 </ul>
 <p>This vignette will introduce you to these functions and will cover
 their usage in detail.</p>
 <p>We will start by loading the packages required by this demonstration
 into the current <strong>R</strong> session:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ipeagit.github.io/gtfstools/">gtfstools</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ipea.github.io/gtfstools/">gtfstools</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="filtering-by-agency_id-route_id-service_id-shape_id-stop_id-trip_id-or-route_type">Filtering by <code>agency_id</code>, <code>route_id</code>,
 <code>service_id</code>, <code>shape_id</code>, <code>stop_id</code>,
 <code>trip_id</code> or <code>route_type</code>:<a class="anchor" aria-label="anchor" href="#filtering-by-agency_id-route_id-service_id-shape_id-stop_id-trip_id-or-route_type"></a>
 </h2>
-<p>The first six work in a very similar fashion. You specify a vector of
-identifiers, and the function keeps (or drops, as we’ll see soon) all
+<p>The first seven work in a very similar fashion. You specify a vector
+of identifiers, and the function keeps (or drops, as we’ll see soon) all
 the entries that are in any way related to this id. Let’s see how that
 works using <code><a href="../reference/filter_by_trip_id.html">filter_by_trip_id()</a></code>:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/spo_gtfs.zip"</span>, package <span class="op">=</span> <span class="st">"gtfstools"</span><span class="op">)</span></span>
 <span><span class="va">gtfs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_gtfs.html">read_gtfs</a></span><span class="op">(</span><span class="va">path</span><span class="op">)</span></span>
 <span><span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/object.size.html" class="external-link">object.size</a></span><span class="op">(</span><span class="va">gtfs</span><span class="op">)</span></span>
 <span><span class="co">#&gt; 811304 bytes</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">gtfs</span><span class="op">$</span><span class="va">trips</span><span class="op">[</span>, <span class="fu">.</span><span class="op">(</span><span class="va">trip_id</span>, <span class="va">trip_headsign</span>, <span class="va">shape_id</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="va">gtfs</span><span class="op">$</span><span class="va">trips</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">trip_id</span>, <span class="va">trip_headsign</span>, <span class="va">shape_id</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt;       trip_id trip_headsign shape_id</span></span>
 <span><span class="co">#&gt;        &lt;char&gt;        &lt;char&gt;   &lt;char&gt;</span></span>
 <span><span class="co">#&gt; 1: CPTM L07-0       JUNDIAI    17846</span></span>
@@ -130,7 +141,9 @@ works using <code><a href="../reference/filter_by_trip_id.html">filter_by_trip_i
 <span><span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/object.size.html" class="external-link">object.size</a></span><span class="op">(</span><span class="va">smaller_gtfs</span><span class="op">)</span></span>
 <span><span class="co">#&gt; 71592 bytes</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">smaller_gtfs</span><span class="op">$</span><span class="va">trips</span><span class="op">[</span>, <span class="fu">.</span><span class="op">(</span><span class="va">trip_id</span>, <span class="va">trip_headsign</span>, <span class="va">shape_id</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="va">smaller_gtfs</span><span class="op">$</span><span class="va">trips</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">trip_id</span>, <span class="va">trip_headsign</span>, <span class="va">shape_id</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt;       trip_id trip_headsign shape_id</span></span>
 <span><span class="co">#&gt;        &lt;char&gt;        &lt;char&gt;   &lt;char&gt;</span></span>
 <span><span class="co">#&gt; 1: CPTM L07-0       JUNDIAI    17846</span></span>
@@ -149,7 +162,7 @@ and <code>17847</code>, respectively, these are the only shapes kept in
 the entries related to the specified identifiers, you can <em>drop</em>
 them. To do that, set the <code>keep</code> argument to
 <code>FALSE</code>:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># dropping trips CPTM L07-0 and CPTM L07-1</span></span>
 <span><span class="va">smaller_gtfs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/filter_by_trip_id.html">filter_by_trip_id</a></span><span class="op">(</span></span>
 <span>    <span class="va">gtfs</span>,</span>
@@ -159,7 +172,9 @@ them. To do that, set the <code>keep</code> argument to
 <span><span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/object.size.html" class="external-link">object.size</a></span><span class="op">(</span><span class="va">smaller_gtfs</span><span class="op">)</span></span>
 <span><span class="co">#&gt; 762576 bytes</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">smaller_gtfs</span><span class="op">$</span><span class="va">trips</span><span class="op">[</span>, <span class="fu">.</span><span class="op">(</span><span class="va">trip_id</span>, <span class="va">trip_headsign</span>, <span class="va">shape_id</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="va">smaller_gtfs</span><span class="op">$</span><span class="va">trips</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">trip_id</span>, <span class="va">trip_headsign</span>, <span class="va">shape_id</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt;       trip_id       trip_headsign shape_id</span></span>
 <span><span class="co">#&gt;        &lt;char&gt;              &lt;char&gt;   &lt;char&gt;</span></span>
 <span><span class="co">#&gt; 1: CPTM L08-0        AMADOR BUENO    17848</span></span>
@@ -177,8 +192,12 @@ entries in the second case, the resulting GTFS object, though smaller
 than the original, is much larger than in the first case.</p>
 <p>The same logic demonstrated with <code><a href="../reference/filter_by_trip_id.html">filter_by_trip_id()</a></code>
 applies to the functions that filter feeds by <code>agency_id</code>,
-<code>route_id</code>, <code>service_id</code>, <code>shape_id</code>,
-<code>stop_id</code> and <code>route_type</code>.</p>
+<code>route_id</code>, <code>service_id</code>, <code>shape_id</code>
+and <code>route_type</code>. <code><a href="../reference/filter_by_stop_id.html">filter_by_stop_id()</a></code> is
+slightly different: it keeps (or drops) the <code>stop_times</code>
+entries at the given stops, rather than entire trips. To keep or drop
+the entire trips that serve some stops, pass their <code>trip_id</code>s
+to <code><a href="../reference/filter_by_trip_id.html">filter_by_trip_id()</a></code>.</p>
 </div>
 <div class="section level2">
 <h2 id="filtering-by-day-of-the-week-or-time-of-the-day">Filtering by day of the week or time of the day:<a class="anchor" aria-label="anchor" href="#filtering-by-day-of-the-week-or-time-of-the-day"></a>
@@ -186,19 +205,23 @@ applies to the functions that filter feeds by <code>agency_id</code>,
 <p>Frequently enough one wants to analyze service levels on certain days
 of the week or during different times of the day. The functions
 <code><a href="../reference/filter_by_weekday.html">filter_by_weekday()</a></code> and
-<code><a href="../reference/filter_by_time_of_day.html">filter_by_time_of_day()</a></code> can be used to this purpose.</p>
+<code><a href="../reference/filter_by_time_of_day.html">filter_by_time_of_day()</a></code> can be used to this purpose. To
+filter by specific calendar dates instead, use
+<code><a href="../reference/filter_by_date.html">filter_by_date()</a></code>, which keeps (or drops) the services that
+run on the given dates.</p>
 <p>The first one takes the days of the week you want to keep/drop and
 also includes a <code>combine</code> argument that controls how
 multi-day filters work. Let’s see how that works with a few
 examples:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># keeping entries related to services than run on saturdays AND sundays</span></span>
 <span><span class="va">smaller_gtfs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/filter_by_weekday.html">filter_by_weekday</a></span><span class="op">(</span></span>
 <span>  <span class="va">gtfs</span>,</span>
 <span>  weekday <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"saturday"</span>, <span class="st">"sunday"</span><span class="op">)</span>,</span>
 <span>  combine <span class="op">=</span> <span class="st">"and"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">smaller_gtfs</span><span class="op">$</span><span class="va">calendar</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"service_id"</span>, <span class="st">"sunday"</span>, <span class="st">"saturday"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="va">smaller_gtfs</span><span class="op">$</span><span class="va">calendar</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">service_id</span>, <span class="va">sunday</span>, <span class="va">saturday</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    service_id sunday saturday</span></span>
 <span><span class="co">#&gt;        &lt;char&gt;  &lt;int&gt;    &lt;int&gt;</span></span>
 <span><span class="co">#&gt; 1:        USD      1        1</span></span>
@@ -212,7 +235,8 @@ examples:</p>
 <span>  weekday <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sunday"</span>, <span class="st">"saturday"</span><span class="op">)</span>,</span>
 <span>  combine <span class="op">=</span> <span class="st">"or"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">smaller_gtfs</span><span class="op">$</span><span class="va">calendar</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"service_id"</span>, <span class="st">"sunday"</span>, <span class="st">"saturday"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="va">smaller_gtfs</span><span class="op">$</span><span class="va">calendar</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">service_id</span>, <span class="va">sunday</span>, <span class="va">saturday</span><span class="op">)</span></span>
 <span><span class="co">#&gt;     service_id sunday saturday</span></span>
 <span><span class="co">#&gt;         &lt;char&gt;  &lt;int&gt;    &lt;int&gt;</span></span>
 <span><span class="co">#&gt;  1:        USD      1        1</span></span>
@@ -233,7 +257,8 @@ examples:</p>
 <span>  combine <span class="op">=</span> <span class="st">"and"</span>,</span>
 <span>  keep <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">smaller_gtfs</span><span class="op">$</span><span class="va">calendar</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"service_id"</span>, <span class="st">"sunday"</span>, <span class="st">"saturday"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="va">smaller_gtfs</span><span class="op">$</span><span class="va">calendar</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">service_id</span>, <span class="va">sunday</span>, <span class="va">saturday</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    service_id sunday saturday</span></span>
 <span><span class="co">#&gt;        &lt;char&gt;  &lt;int&gt;    &lt;int&gt;</span></span>
 <span><span class="co">#&gt; 1:        U__      0        0</span></span>
@@ -253,7 +278,8 @@ examples:</p>
 <span>  combine <span class="op">=</span> <span class="st">"or"</span>,</span>
 <span>  keep <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">smaller_gtfs</span><span class="op">$</span><span class="va">calendar</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"service_id"</span>, <span class="st">"sunday"</span>, <span class="st">"saturday"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="va">smaller_gtfs</span><span class="op">$</span><span class="va">calendar</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">service_id</span>, <span class="va">sunday</span>, <span class="va">saturday</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    service_id sunday saturday</span></span>
 <span><span class="co">#&gt;        &lt;char&gt;  &lt;int&gt;    &lt;int&gt;</span></span>
 <span><span class="co">#&gt; 1:        U__      0        0</span></span>
@@ -270,22 +296,24 @@ together or using the <code>stop_times</code> table alone: the
 “templates” that describe how long it takes from one stop to another
 (i.e. the departure and arrival times listed there should not be
 considered “as is”). Let’s see what that means with an example:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">smaller_gtfs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/filter_by_time_of_day.html">filter_by_time_of_day</a></span><span class="op">(</span><span class="va">gtfs</span>, from <span class="op">=</span> <span class="st">"05:00:00"</span>, to <span class="op">=</span> <span class="st">"06:00:00"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">smaller_gtfs</span><span class="op">$</span><span class="va">frequencies</span><span class="op">)</span></span>
 <span><span class="co">#&gt;       trip_id start_time end_time headway_secs</span></span>
 <span><span class="co">#&gt;        &lt;char&gt;     &lt;char&gt;   &lt;char&gt;        &lt;int&gt;</span></span>
 <span><span class="co">#&gt; 1: CPTM L07-0   05:00:00 05:59:00          360</span></span>
-<span><span class="co">#&gt; 2: CPTM L07-1   05:00:00 05:59:00          360</span></span>
-<span><span class="co">#&gt; 3: CPTM L08-0   05:00:00 05:59:00          480</span></span>
-<span><span class="co">#&gt; 4: CPTM L08-1   05:00:00 05:59:00          480</span></span>
-<span><span class="co">#&gt; 5: CPTM L09-0   05:00:00 05:59:00          480</span></span>
-<span><span class="co">#&gt; 6: CPTM L09-1   05:00:00 05:59:00          480</span></span>
+<span><span class="co">#&gt; 2: CPTM L07-0   06:00:00 06:00:01          360</span></span>
+<span><span class="co">#&gt; 3: CPTM L07-1   05:00:00 05:59:00          360</span></span>
+<span><span class="co">#&gt; 4: CPTM L07-1   06:00:00 06:00:01          360</span></span>
+<span><span class="co">#&gt; 5: CPTM L08-0   05:00:00 05:59:00          480</span></span>
+<span><span class="co">#&gt; 6: CPTM L08-0   06:00:00 06:00:01          300</span></span>
 <span></span>
 <span><span class="co"># stop_times entries are preserved because they should be interpreted as</span></span>
 <span><span class="co"># "templates"</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">smaller_gtfs</span><span class="op">$</span><span class="va">stop_times</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"trip_id"</span>, <span class="st">"departure_time"</span>, <span class="st">"arrival_time"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="va">smaller_gtfs</span><span class="op">$</span><span class="va">stop_times</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">trip_id</span>, <span class="va">departure_time</span>, <span class="va">arrival_time</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt;       trip_id departure_time arrival_time</span></span>
 <span><span class="co">#&gt;        &lt;char&gt;         &lt;char&gt;       &lt;char&gt;</span></span>
 <span><span class="co">#&gt; 1: CPTM L07-0       04:00:00     04:00:00</span></span>
@@ -301,7 +329,9 @@ considered “as is”). Let’s see what that means with an example:</p>
 <span><span class="va">gtfs</span><span class="op">$</span><span class="va">frequencies</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span>
 <span><span class="va">smaller_gtfs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/filter_by_time_of_day.html">filter_by_time_of_day</a></span><span class="op">(</span><span class="va">gtfs</span>, from <span class="op">=</span> <span class="st">"05:00:00"</span>, to <span class="op">=</span> <span class="st">"06:00:00"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">smaller_gtfs</span><span class="op">$</span><span class="va">stop_times</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"trip_id"</span>, <span class="st">"departure_time"</span>, <span class="st">"arrival_time"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="va">smaller_gtfs</span><span class="op">$</span><span class="va">stop_times</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">trip_id</span>, <span class="va">departure_time</span>, <span class="va">arrival_time</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt;       trip_id departure_time arrival_time</span></span>
 <span><span class="co">#&gt;        &lt;char&gt;         &lt;char&gt;       &lt;char&gt;</span></span>
 <span><span class="co">#&gt; 1: CPTM L07-0       05:04:00     05:04:00</span></span>
@@ -315,7 +345,7 @@ options. We either keep entire trips that cross the specified time
 block, or we keep only the trip segments within this block (default
 behaviour). To control this behaviour you can use the
 <code>full_trips</code> parameter:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">smaller_gtfs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/filter_by_time_of_day.html">filter_by_time_of_day</a></span><span class="op">(</span></span>
 <span>    <span class="va">gtfs</span>,</span>
 <span>    <span class="st">"05:00:00"</span>,</span>
@@ -324,7 +354,9 @@ behaviour). To control this behaviour you can use the
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># CPTM L07-0 trip is kept intact because it crosses the time block</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">smaller_gtfs</span><span class="op">$</span><span class="va">stop_times</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"trip_id"</span>, <span class="st">"departure_time"</span>, <span class="st">"arrival_time"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="va">smaller_gtfs</span><span class="op">$</span><span class="va">stop_times</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">trip_id</span>, <span class="va">departure_time</span>, <span class="va">arrival_time</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt;       trip_id departure_time arrival_time</span></span>
 <span><span class="co">#&gt;        &lt;char&gt;         &lt;char&gt;       &lt;char&gt;</span></span>
 <span><span class="co">#&gt; 1: CPTM L07-0       04:00:00     04:00:00</span></span>
@@ -344,7 +376,9 @@ behaviour). To control this behaviour you can use the
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># CPTM L07-0 trip is gone</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">smaller_gtfs</span><span class="op">$</span><span class="va">stop_times</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"trip_id"</span>, <span class="st">"departure_time"</span>, <span class="st">"arrival_time"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="va">smaller_gtfs</span><span class="op">$</span><span class="va">stop_times</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">trip_id</span>, <span class="va">departure_time</span>, <span class="va">arrival_time</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt;       trip_id departure_time arrival_time</span></span>
 <span><span class="co">#&gt;        &lt;char&gt;         &lt;char&gt;       &lt;char&gt;</span></span>
 <span><span class="co">#&gt; 1: CPTM L09-0       04:00:00     04:00:00</span></span>
@@ -366,25 +400,25 @@ field.</p>
 </h2>
 <p>It’s not uncommon that one wants to analyze only the transit services
 of a smaller region contained inside a feed. The
-<code><a href="../reference/filter_by_sf.html">filter_by_sf()</a></code> function allows you to filter GTFS data
-using a given spatial extent. This functions takes a spatial
+<code><a href="../reference/filter_by_spatial_extent.html">filter_by_spatial_extent()</a></code> function allows you to filter
+GTFS data using a given spatial extent. This functions takes a spatial
 <code>sf</code>/<code>sfc</code> object (or its bounding box) and
 keeps/drops the entries related to shapes and trips selected via a
 specified spatial operation. It may sound a bit complicated, but it’s
 fairly easy to understand when shown. Let’s create an auxiliary function
 to save us some typing:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plotter</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">gtfs</span>,</span>
 <span>                    <span class="va">geom</span>,</span>
 <span>                    <span class="va">spatial_operation</span> <span class="op">=</span> <span class="fu">sf</span><span class="fu">::</span><span class="va"><a href="https://r-spatial.github.io/sf/reference/geos_binary_pred.html" class="external-link">st_intersects</a></span>,</span>
 <span>                    <span class="va">keep</span> <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>                    <span class="va">do_filter</span> <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="va">do_filter</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">gtfs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/filter_by_sf.html">filter_by_sf</a></span><span class="op">(</span><span class="va">gtfs</span>, <span class="va">geom</span>, <span class="va">spatial_operation</span>, <span class="va">keep</span><span class="op">)</span></span>
+<span>    <span class="va">gtfs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/filter_by_spatial_extent.html">filter_by_spatial_extent</a></span><span class="op">(</span><span class="va">gtfs</span>, <span class="va">geom</span>, <span class="va">spatial_operation</span>, <span class="va">keep</span><span class="op">)</span></span>
 <span>  <span class="op">}</span></span>
 <span></span>
-<span>  <span class="va">shapes</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/convert_shapes_to_sf.html">convert_shapes_to_sf</a></span><span class="op">(</span><span class="va">gtfs</span><span class="op">)</span></span>
-<span>  <span class="va">trips</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_trip_geometry.html">get_trip_geometry</a></span><span class="op">(</span><span class="va">gtfs</span>, file <span class="op">=</span> <span class="st">"stop_times"</span><span class="op">)</span></span>
+<span>  <span class="va">shapes</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_shapes_geometry.html">get_shapes_geometry</a></span><span class="op">(</span><span class="va">gtfs</span><span class="op">)</span></span>
+<span>  <span class="va">trips</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_trip_geometry.html">get_trip_geometry</a></span><span class="op">(</span><span class="va">gtfs</span>, method <span class="op">=</span> <span class="st">"euclidean"</span><span class="op">)</span></span>
 <span>  <span class="va">geom</span> <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sfc.html" class="external-link">st_as_sfc</a></span><span class="op">(</span><span class="va">geom</span><span class="op">)</span></span>
 <span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
@@ -400,62 +434,44 @@ to save us some typing:</p>
 respective tables;</li>
 <li>Generates a polygon from the bounding box;</li>
 <li>Plots all the <code>sf</code> objects cited above to show the effect
-of each <code><a href="../reference/filter_by_sf.html">filter_by_sf()</a></code> argument in the final result.</li>
+of each <code><a href="../reference/filter_by_spatial_extent.html">filter_by_spatial_extent()</a></code> argument in the final
+result.</li>
 </ul>
 <p>Also, please note that our <code>plotter()</code> function takes the
-same arguments of <code><a href="../reference/filter_by_sf.html">filter_by_sf()</a></code> (with the exception of
-<code>do_filter</code>, which is used to show the unfiltered data), as
-well as the same defaults.</p>
+same arguments of <code><a href="../reference/filter_by_spatial_extent.html">filter_by_spatial_extent()</a></code> (with the
+exception of <code>do_filter</code>, which is used to show the
+unfiltered data), as well as the same defaults.</p>
 <p>Let’s say that we want to filter GTFS data using the bounding box of
 the shape <code>68962</code>. Here’s how the unfiltered data looks like,
 with the bounding box placed on top of it.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">bbox</span> <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_bbox.html" class="external-link">st_bbox</a></span><span class="op">(</span><span class="fu"><a href="../reference/convert_shapes_to_sf.html">convert_shapes_to_sf</a></span><span class="op">(</span><span class="va">gtfs</span>, shape_id <span class="op">=</span> <span class="st">"68962"</span><span class="op">)</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">bbox</span> <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_bbox.html" class="external-link">st_bbox</a></span><span class="op">(</span><span class="fu"><a href="../reference/get_shapes_geometry.html">get_shapes_geometry</a></span><span class="op">(</span><span class="va">gtfs</span>, shape_id <span class="op">=</span> <span class="st">"68962"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">plotter</span><span class="op">(</span><span class="va">gtfs</span>, <span class="va">bbox</span>, do_filter <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="filtering_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
-<p>By default <code><a href="../reference/filter_by_sf.html">filter_by_sf()</a></code> (and <code>plotter()</code>,
-consequently) keeps all the data related to the trips and shapes that
-intersect the given geometry. Here’s how it looks like:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">plotter</span><span class="op">(</span><span class="va">gtfs</span>, <span class="va">bbox</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: `filter_by_sf()` was deprecated in gtfstools 1.3.0.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use `filter_by_spatial_extent()` instead.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> For backwards compatibility reasons, usage of `filter_by_sf()` is still</span></span>
-<span><span class="co">#&gt;   allowed as of the current version, but the function will be removed from the</span></span>
-<span><span class="co">#&gt;   package in version 2.0.0.</span></span></code></pre></div>
-<p><img src="filtering_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
-<p>Alternatively you can also <em>drop</em> such data:</p>
+<p><img src="filtering_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" alt="" width="700"></p>
+<p>By default <code><a href="../reference/filter_by_spatial_extent.html">filter_by_spatial_extent()</a></code> (and
+<code>plotter()</code>, consequently) keeps all the data related to the
+trips and shapes that intersect the given geometry. Here’s how it looks
+like:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">plotter</span><span class="op">(</span><span class="va">gtfs</span>, <span class="va">bbox</span>, keep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: `filter_by_sf()` was deprecated in gtfstools 1.3.0.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use `filter_by_spatial_extent()` instead.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> For backwards compatibility reasons, usage of `filter_by_sf()` is still</span></span>
-<span><span class="co">#&gt;   allowed as of the current version, but the function will be removed from the</span></span>
-<span><span class="co">#&gt;   package in version 2.0.0.</span></span></code></pre></div>
-<p><img src="filtering_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
+<code class="sourceCode R"><span><span class="fu">plotter</span><span class="op">(</span><span class="va">gtfs</span>, <span class="va">bbox</span><span class="op">)</span></span></code></pre></div>
+<p><img src="filtering_files/figure-html/unnamed-chunk-11-1.png" class="r-plt" alt="" width="700"></p>
+<p>Alternatively you can also <em>drop</em> such data:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">plotter</span><span class="op">(</span><span class="va">gtfs</span>, <span class="va">bbox</span>, keep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<p><img src="filtering_files/figure-html/unnamed-chunk-12-1.png" class="r-plt" alt="" width="700"></p>
 <p>You can also control which spatial operation you want to use to
 filter the data. This is how you’d keep the data that is contained
 inside the given geometry:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">plotter</span><span class="op">(</span><span class="va">gtfs</span>, <span class="va">bbox</span>, spatial_operation <span class="op">=</span> <span class="fu">sf</span><span class="fu">::</span><span class="va"><a href="https://r-spatial.github.io/sf/reference/geos_binary_pred.html" class="external-link">st_contains</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: `filter_by_sf()` was deprecated in gtfstools 1.3.0.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use `filter_by_spatial_extent()` instead.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> For backwards compatibility reasons, usage of `filter_by_sf()` is still</span></span>
-<span><span class="co">#&gt;   allowed as of the current version, but the function will be removed from the</span></span>
-<span><span class="co">#&gt;   package in version 2.0.0.</span></span></code></pre></div>
-<p><img src="filtering_files/figure-html/unnamed-chunk-12-1.png" width="700"></p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">plotter</span><span class="op">(</span><span class="va">gtfs</span>, <span class="va">bbox</span>, spatial_operation <span class="op">=</span> <span class="fu">sf</span><span class="fu">::</span><span class="va"><a href="https://r-spatial.github.io/sf/reference/geos_binary_pred.html" class="external-link">st_contains</a></span><span class="op">)</span></span></code></pre></div>
+<p><img src="filtering_files/figure-html/unnamed-chunk-13-1.png" class="r-plt" alt="" width="700"></p>
 <p>And, simultaneously using <code>spatial_operation</code> and
 <code>keep</code>, this is how you’d drop the data contained inside the
 geometry:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">plotter</span><span class="op">(</span><span class="va">gtfs</span>, <span class="va">bbox</span>, spatial_operation <span class="op">=</span> <span class="fu">sf</span><span class="fu">::</span><span class="va"><a href="https://r-spatial.github.io/sf/reference/geos_binary_pred.html" class="external-link">st_contains</a></span>, keep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: `filter_by_sf()` was deprecated in gtfstools 1.3.0.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use `filter_by_spatial_extent()` instead.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> For backwards compatibility reasons, usage of `filter_by_sf()` is still</span></span>
-<span><span class="co">#&gt;   allowed as of the current version, but the function will be removed from the</span></span>
-<span><span class="co">#&gt;   package in version 2.0.0.</span></span></code></pre></div>
-<p><img src="filtering_files/figure-html/unnamed-chunk-13-1.png" width="700"></p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">plotter</span><span class="op">(</span><span class="va">gtfs</span>, <span class="va">bbox</span>, spatial_operation <span class="op">=</span> <span class="fu">sf</span><span class="fu">::</span><span class="va"><a href="https://r-spatial.github.io/sf/reference/geos_binary_pred.html" class="external-link">st_contains</a></span>, keep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<p><img src="filtering_files/figure-html/unnamed-chunk-14-1.png" class="r-plt" alt="" width="700"></p>
 <p>All filtering functions return a GTFS object readily available to be
 manipulated and analyzed using the rest of <strong>gtfstools</strong>’
 toolkit. For more information on how to use other functions made
@@ -472,7 +488,7 @@ available by the package, please see the <a href="gtfstools.html">introductory v
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

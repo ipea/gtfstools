@@ -1,0 +1,490 @@
+# Introduction to gtfstools
+
+The General Transit Feed Specification (GTFS) data format defines a
+common scheme for describing transit systems, and is widely used by
+transit agencies around the world and consumed by many software
+applications. The **gtfstools** package makes handling GTFS data in
+**R** very easy and fast, offering many utility functions to read,
+manipulate, analyze and write transit feeds in such format.
+
+## GTFS feeds
+
+GTFS feeds exist in two main different forms: the GTFS *static* and the
+GTFS *realtime*. This package allows you to manipulate GTFS *static*
+feeds, the most common variation. These feeds are the collection of many
+`csv`-like files (with a `.txt` extension) contained in a single `.zip`
+file. A GTFS `.zip` file is composed by at least five required files,
+but may also contain a few other conditionally required and optional
+files:
+
+- Required: `agency.txt`, `stops.txt`, `routes.txt`, `trips.txt`,
+  `stop_times.txt`
+- Conditionally required: `calendar.txt`, `calendar_dates.txt`,
+  `feed_info.txt`
+- Optional: `fare_attributes.txt`, `fare_rules.txt`, `shapes.txt`,
+  `frequencies.txt`, `transfers.txt`, `pathways.txt`, `levels.txt`,
+  `translations.txt`, `attributions.txt`
+
+Please check the official [GTFS
+reference](https://developers.google.com/transit/gtfs/reference) for
+more details on the specification.
+
+## Basic usage
+
+Before using **gtfstools** please make sure that you have it installed
+in your computer. You can download either the most stable version from
+CRAN…
+
+``` r
+
+install.packages("gtfstools")
+```
+
+…or the development version from GitHub.
+
+``` r
+
+# install.packages("remotes")
+remotes::install_github("ipea/gtfstools")
+```
+
+Then attach it to the current R session:
+
+``` r
+
+library(gtfstools)
+```
+
+Some functions of the package run part of their computations in
+parallel, such as
+[`get_trip_length()`](https://ipea.github.io/gtfstools/reference/get_trip_length.md),
+[`get_trip_speed()`](https://ipea.github.io/gtfstools/reference/get_trip_speed.md),
+[`get_trip_geometry()`](https://ipea.github.io/gtfstools/reference/get_trip_geometry.md),
+[`set_trip_speed()`](https://ipea.github.io/gtfstools/reference/set_trip_speed.md),
+[`interpolate_stop_times()`](https://ipea.github.io/gtfstools/reference/interpolate_stop_times.md),
+[`get_shape_length()`](https://ipea.github.io/gtfstools/reference/get_shape_length.md)
+and
+[`get_stop_distances()`](https://ipea.github.io/gtfstools/reference/get_stop_distances.md).
+Since **gtfstools** is built on top of
+[data.table](https://r-datatable.com), these functions follow its
+configuration and, by default, use 50% of the available logical CPU
+cores. Users can change the number of threads used by the package with
+[`data.table::setDTthreads()`](https://rdrr.io/pkg/data.table/man/openmp-utils.html):
+
+``` r
+
+# checks the number of threads currently used
+data.table::getDTthreads()
+
+# uses 4 threads
+data.table::setDTthreads(4)
+```
+
+A few sample files are included in the package:
+
+``` r
+
+data_path <- system.file("extdata", package = "gtfstools")
+list.files(data_path)
+#> [1] "ber_gtfs.zip" "ggl_gtfs.zip" "poa_gtfs.zip" "spo_gtfs.zip"
+```
+
+- `ggl_gtfs.zip` has been manually built from the [example GTFS
+  feed](https://developers.google.com/transit/gtfs/examples/gtfs-feed)
+  provided by Google. The files samples are licensed under [Creative
+  Commons Attribution 4.0
+  License](https://creativecommons.org/licenses/by/4.0/).
+- `spo_gtfs.zip` is a subset of the São Paulo’s SPTrans feed, available
+  [here](https://www.sptrans.com.br/desenvolvedores/).
+- `ber_gtfs.zip` is a subset of Berlin’s GTFS, available
+  [here](https://daten.berlin.de/datensaetze/vbb-fahrplandaten-via-gtfs).
+- `poa_gtfs.zip` is a subset of Porto Alegre’s EPTC feed, available
+  [here](https://dadosabertos.poa.br/dataset/gtfs).
+
+Throughout this demonstration we will be using São Paulo’s and Google’s
+feeds.
+
+### Read feeds
+
+**gtfstools** reads feeds as a `list` of `data.table`s, a
+high-performance version of base **R**’s `data.frame`s. Thus, reading,
+writing and manipulating GTFS objects created by **gtfstools** is very
+easy and fast even if some of your tables contain a few million rows.
+
+To read a feed use the
+[`read_gtfs()`](https://ipea.github.io/gtfstools/reference/read_gtfs.md)
+function. By default the function reads all `.txt` files contained in
+the main `.zip` file. It may be useful, however, to read only a couple
+of specific files, specially if you’re dealing with some big data sets.
+To do so, specify which file you want to read in the `files` argument
+(*without* the `.txt` extension):
+
+``` r
+
+spo_path <- file.path(data_path, "spo_gtfs.zip")
+
+# default behaviour
+spo_gtfs <- read_gtfs(spo_path)
+names(spo_gtfs)
+#> [1] "agency"      "calendar"    "frequencies" "routes"      "shapes"     
+#> [6] "stop_times"  "stops"       "trips"
+
+# only reads the 'shapes.txt' and 'trips.txt' files
+spo_shapes <- read_gtfs(spo_path, files = c("shapes", "trips"))
+names(spo_shapes)
+#> [1] "shapes" "trips"
+```
+
+Please note that date fields are read as columns of class `Date`,
+instead of being kept as integers (as specified in the [official
+reference](https://developers.google.com/transit/gtfs/reference)),
+allowing for easier data manipulation. These columns are converted back
+to integers when [writing the GTFS objects](#write-feeds) to a `.zip`
+file, so GTFS files generated by the package always conform to the
+specification.
+
+### Analyse feeds
+
+**gtfstools** also includes a few functions to prevent you from getting
+stuck with repetitive tasks:
+
+[`get_trip_geometry()`](https://ipea.github.io/gtfstools/reference/get_trip_geometry.md)
+returns the geometry of each trip in a GTFS object as an `sf` object
+(please check [`{sf}` webpage](https://r-spatial.github.io/sf/) for more
+details), from its first to its last stop. GTFS data allows you to
+generate geometries using two different methods: either cutting the
+trip’s shape, described in the `shapes.txt` file, between its first and
+last stops (`method = "shapes"`, the default), or linking the subsequent
+stops of each trip as described in the `stop_times.txt` along straight
+lines (`method = "euclidean"`). While the former tends to yield more
+reliable and higher resolution geometries, it may be useful to compare
+the results of both methods to check if the trips described in
+`stop_times` actually resemble their actual shape:
+
+``` r
+
+trip_geom <- get_trip_geometry(spo_gtfs)
+plot(trip_geom$geometry)
+```
+
+![](gtfstools_files/figure-html/unnamed-chunk-8-1.png)
+
+``` r
+
+single_trip <- spo_gtfs$trips$trip_id[1]
+single_trip
+#> [1] "CPTM L07-0"
+
+shape_geom <- get_trip_geometry(spo_gtfs, trip_id = single_trip)
+straight_geom <- get_trip_geometry(
+  spo_gtfs,
+  trip_id = single_trip,
+  method = "euclidean"
+)
+plot(shape_geom$geometry)
+plot(straight_geom$geometry, add = TRUE, col = "red")
+```
+
+![](gtfstools_files/figure-html/unnamed-chunk-8-2.png)
+
+[`get_trip_duration()`](https://ipea.github.io/gtfstools/reference/get_trip_duration.md)
+returns the duration of each trip in a GTFS object, as specified in the
+`stop_times` file, in the temporal unit of your desire (either seconds,
+minutes, hours or days):
+
+``` r
+
+trip_durtn <- get_trip_duration(spo_gtfs, unit = "s")
+head(trip_durtn)
+#> Key: <trip_id>
+#>      trip_id duration
+#>       <char>    <int>
+#> 1: 2002-10-0     2880
+#> 2: 2105-10-0     6480
+#> 3: 2105-10-1     6660
+#> 4: 2161-10-0     5640
+#> 5: 2161-10-1     5580
+#> 6: 4491-10-0     4140
+
+# 'unit' argument defaults to "min"
+single_durtn <- get_trip_duration(spo_gtfs, trip_id = single_trip)
+single_durtn
+#> Key: <trip_id>
+#>       trip_id duration
+#>        <char>    <num>
+#> 1: CPTM L07-0      136
+```
+
+[`get_trip_segment_duration()`](https://ipea.github.io/gtfstools/reference/get_trip_segment_duration.md)
+is a similar function, that even takes the same arguments, but returns
+the duration of each trip *segment* (i.e. the time interval between two
+consecutive stops).
+
+``` r
+
+trip_seg_durtn <- get_trip_segment_duration(spo_gtfs, unit = "s")
+head(trip_seg_durtn)
+#>      trip_id segment duration
+#>       <char>   <int>    <int>
+#> 1: 2002-10-0       1      130
+#> 2: 2002-10-0       2      130
+#> 3: 2002-10-0       3      130
+#> 4: 2002-10-0       4      130
+#> 5: 2002-10-0       5      130
+#> 6: 2002-10-0       6      130
+
+single_seg_durtn <- get_trip_segment_duration(spo_gtfs, trip_id = single_trip)
+head(single_seg_durtn)
+#>       trip_id segment duration
+#>        <char>   <int>    <num>
+#> 1: CPTM L07-0       1        8
+#> 2: CPTM L07-0       2        8
+#> 3: CPTM L07-0       3        8
+#> 4: CPTM L07-0       4        8
+#> 5: CPTM L07-0       5        8
+#> 6: CPTM L07-0       6        8
+```
+
+The quick example above shows how this function may help you diagnosing
+some problems in your GTFS data: apparently every single trip in
+`spo_gtfs` is composed by several equally long segments, which looks
+unreasonable.
+
+[`get_trip_length()`](https://ipea.github.io/gtfstools/reference/get_trip_length.md)
+returns the length of each trip, from its first to its last stop, either
+along the trip’s shape (the default) or as straight lines between
+consecutive stops (`method = "euclidean"`). Like
+[`get_trip_segment_duration()`](https://ipea.github.io/gtfstools/reference/get_trip_segment_duration.md),
+it can also return the length of each trip segment, with
+`by = "segment"`.
+[`get_shape_length()`](https://ipea.github.io/gtfstools/reference/get_shape_length.md)
+returns the length of entire shapes.
+
+``` r
+
+trip_length <- get_trip_length(spo_gtfs)
+head(trip_length)
+#>      trip_id   length
+#>       <char>    <num>
+#> 1: 2002-10-0  6.68867
+#> 2: 2105-10-0 18.45188
+#> 3: 2105-10-1 17.85460
+#> 4: 2161-10-0 17.50350
+#> 5: 2161-10-1 18.01943
+#> 6: 4491-10-0 13.81378
+
+segment_length <- get_trip_length(spo_gtfs, single_trip, by = "segment")
+head(segment_length)
+#>       trip_id segment from_stop_id to_stop_id   length
+#>        <char>   <int>       <char>     <char>    <num>
+#> 1: CPTM L07-0       1        18940      18920 3.547651
+#> 2: CPTM L07-0       2        18920      18919 2.424503
+#> 3: CPTM L07-0       3        18919      18917 1.591453
+#> 4: CPTM L07-0       4        18917      18916 2.010508
+#> 5: CPTM L07-0       5        18916      18965 2.171843
+#> 6: CPTM L07-0       6        18965      18923 2.841391
+```
+
+Finally,
+[`get_trip_speed()`](https://ipea.github.io/gtfstools/reference/get_trip_speed.md)
+combines
+[`get_trip_length()`](https://ipea.github.io/gtfstools/reference/get_trip_length.md)
+with
+[`get_trip_duration()`](https://ipea.github.io/gtfstools/reference/get_trip_duration.md)
+(or
+[`get_trip_segment_duration()`](https://ipea.github.io/gtfstools/reference/get_trip_segment_duration.md),
+with `by = "segment"`) to return the average speed of each trip or
+segment:
+
+``` r
+
+trip_speed <- get_trip_speed(spo_gtfs, unit = "m/s")
+head(trip_speed)
+#> Key: <trip_id>
+#>    route_id   trip_id    speed
+#>      <char>    <char>    <num>
+#> 1:  2002-10 2002-10-0 2.322455
+#> 2:  2105-10 2105-10-0 2.847512
+#> 3:  2105-10 2105-10-1 2.680871
+#> 4:  2161-10 2161-10-0 3.103457
+#> 5:  2161-10 2161-10-1 3.229289
+#> 6:  4491-10 4491-10-0 3.336661
+
+# 'unit' argument defaults to "km/h"
+single_trip_speed <- get_trip_speed(spo_gtfs, trip_id = single_trip)
+single_trip_speed
+#> Key: <trip_id>
+#>    route_id    trip_id    speed
+#>      <char>     <char>    <num>
+#> 1: CPTM L07 CPTM L07-0 26.73002
+
+segment_speed <- get_trip_speed(spo_gtfs, single_trip, by = "segment")
+head(segment_speed)
+#>    route_id    trip_id segment from_stop_id to_stop_id    speed
+#>      <char>     <char>   <int>       <char>     <char>    <num>
+#> 1: CPTM L07 CPTM L07-0       1        18940      18920 26.60738
+#> 2: CPTM L07 CPTM L07-0       2        18920      18919 18.18377
+#> 3: CPTM L07 CPTM L07-0       3        18919      18917 11.93590
+#> 4: CPTM L07 CPTM L07-0       4        18917      18916 15.07881
+#> 5: CPTM L07 CPTM L07-0       5        18916      18965 16.28882
+#> 6: CPTM L07 CPTM L07-0       6        18965      18923 21.31043
+```
+
+### Manipulate feeds
+
+Each table inside a GTFS object can be easily manipulated using the
+usual `data.table` syntax. [data.table](https://r-datatable.com)
+provides many useful features, such as updating columns by reference,
+fast binary search, efficient data aggregation, and many others,
+allowing you to deal with large data sets very efficiently. Please check
+its [official
+website](https://rdatatable.gitlab.io/data.table/index.html) for more
+details on syntax and usage.
+
+Just remember that, since every GTFS object is a *`list`* of
+`data.table`s, you must refer to each table using the `$` operator. For
+example, this is how you’d remove the `headway_secs` column from the
+`frequencies` file and add it again afterwards:
+
+``` r
+
+old_headway_secs <- spo_gtfs$frequencies$headway_secs
+
+spo_gtfs$frequencies[, headway_secs := NULL]
+head(spo_gtfs$frequencies)
+#>       trip_id start_time end_time
+#>        <char>     <char>   <char>
+#> 1: CPTM L07-0   04:00:00 04:59:00
+#> 2: CPTM L07-0   05:00:00 05:59:00
+#> 3: CPTM L07-0   06:00:00 06:59:00
+#> 4: CPTM L07-0   07:00:00 07:59:00
+#> 5: CPTM L07-0   08:00:00 08:59:00
+#> 6: CPTM L07-0   09:00:00 09:59:00
+
+spo_gtfs$frequencies[, headway_secs := old_headway_secs]
+head(spo_gtfs$frequencies)
+#>       trip_id start_time end_time headway_secs
+#>        <char>     <char>   <char>        <int>
+#> 1: CPTM L07-0   04:00:00 04:59:00          720
+#> 2: CPTM L07-0   05:00:00 05:59:00          360
+#> 3: CPTM L07-0   06:00:00 06:59:00          360
+#> 4: CPTM L07-0   07:00:00 07:59:00          360
+#> 5: CPTM L07-0   08:00:00 08:59:00          360
+#> 6: CPTM L07-0   09:00:00 09:59:00          480
+```
+
+**gtfstools** also provides some functions that help you getting over
+some common tasks.
+[`merge_gtfs()`](https://ipea.github.io/gtfstools/reference/merge_gtfs.md)
+takes many GTFS objects and combines them row-wise. By default the
+function binds every table inside the objects, but you can specify which
+tables you want to merge with the `files` argument:
+
+``` r
+
+ggl_path <- file.path(data_path, "ggl_gtfs.zip")
+ggl_gtfs <- read_gtfs(ggl_path)
+
+names(spo_gtfs)
+#> [1] "agency"      "calendar"    "frequencies" "routes"      "shapes"     
+#> [6] "stop_times"  "stops"       "trips"
+names(ggl_gtfs)
+#>  [1] "calendar_dates"  "fare_attributes" "fare_rules"      "feed_info"      
+#>  [5] "frequencies"     "levels"          "pathways"        "routes"         
+#>  [9] "shapes"          "stop_times"      "stops"           "transfers"      
+#> [13] "translations"    "trips"           "agency"          "attributions"   
+#> [17] "calendar"
+
+merged_gtfs <- merge_gtfs(spo_gtfs, ggl_gtfs)
+names(merged_gtfs)
+#>  [1] "agency"          "calendar"        "frequencies"     "routes"         
+#>  [5] "shapes"          "stop_times"      "stops"           "trips"          
+#>  [9] "calendar_dates"  "fare_attributes" "fare_rules"      "feed_info"      
+#> [13] "levels"          "pathways"        "transfers"       "translations"   
+#> [17] "attributions"
+
+# only merges the 'shapes' and 'trips' tables
+merged_files <- merge_gtfs(spo_gtfs, ggl_gtfs, files = c("shapes", "trips"))
+names(merged_files)
+#> [1] "shapes" "trips"
+```
+
+[`set_trip_speed()`](https://ipea.github.io/gtfstools/reference/set_trip_speed.md)
+sets the average speed of specified trips by adjusting the
+`arrival_time` and `departure_time` columns in the `stop_times` table.
+Average speed is calculated as the trip’s length divided by the
+difference between the arrival time at the last stop and the departure
+time at the first stop. Please note that arrival and departure times at
+intermediate stops are set as `""`. Some transport routing software,
+such as [OpenTripPlanner](https://www.opentripplanner.org/) and
+[R5](https://github.com/conveyal/r5), support specifying stop times like
+so, in which case they interpolate arrival/departure times at
+intermediate stops based on the trip’s average speed and the distances
+between stops. The [Editing GTFS
+feeds](https://ipea.github.io/gtfstools/articles/editing.md) vignette
+presents other editing functions, such as
+[`set_route_speed()`](https://ipea.github.io/gtfstools/reference/set_route_speed.md),
+which sets the speed of all trips of the given routes.
+
+``` r
+
+selected_trips <- c("2002-10-0", "CPTM L07-0")
+
+get_trip_speed(spo_gtfs, selected_trips, unit = "km/h")
+#> Key: <trip_id>
+#>    route_id    trip_id     speed
+#>      <char>     <char>     <num>
+#> 1:  2002-10  2002-10-0  8.360838
+#> 2: CPTM L07 CPTM L07-0 26.730015
+
+# 'speed' is recycled to all trips if only a single value is given
+new_speed_gtfs <- set_trip_speed(spo_gtfs, selected_trips, 50)
+get_trip_speed(new_speed_gtfs, selected_trips)
+#> Key: <trip_id>
+#>    route_id    trip_id    speed
+#>      <char>     <char>    <num>
+#> 1:  2002-10  2002-10-0 50.06073
+#> 2: CPTM L07 CPTM L07-0 50.00388
+
+# but you can also specify different speeds for each trip
+new_speed_gtfs <- set_trip_speed(spo_gtfs, selected_trips, c(30, 40))
+get_trip_speed(new_speed_gtfs, selected_trips)
+#> Key: <trip_id>
+#>    route_id    trip_id    speed
+#>      <char>     <char>    <num>
+#> 1:  2002-10  2002-10-0 30.02396
+#> 2: CPTM L07 CPTM L07-0 40.00677
+```
+
+###  Write feeds
+
+Finally,
+[`write_gtfs()`](https://ipea.github.io/gtfstools/reference/write_gtfs.md)
+allows you to save your GTFS objects to disk. It defaults to writing
+every single table inside the object as a `.txt` file, but you can
+conditionally exclude files if you so wish:
+
+``` r
+
+temp_dir <- file.path(tempdir(), "gttools_vig")
+dir.create(temp_dir)
+list.files(temp_dir)
+#> character(0)
+
+filename <- file.path(temp_dir, "spo_gtfs.zip")
+
+write_gtfs(spo_gtfs, filename)
+list.files(temp_dir)
+#> [1] "spo_gtfs.zip"
+zip::zip_list(filename)$filename
+#> [1] "agency.txt"      "calendar.txt"    "frequencies.txt" "routes.txt"     
+#> [5] "shapes.txt"      "stop_times.txt"  "stops.txt"       "trips.txt"
+
+write_gtfs(spo_gtfs, filename, files = c("stop_times", "trips", "calendar"))
+zip::zip_list(filename)$filename
+#> [1] "stop_times.txt" "trips.txt"      "calendar.txt"
+```
+
+[`write_gtfs()`](https://ipea.github.io/gtfstools/reference/write_gtfs.md)
+also converts `Date` columns back to integer, producing GTFS files that
+conform to the official specification.

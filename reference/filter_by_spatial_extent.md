@@ -1,0 +1,102 @@
+# Filter a GTFS object using a spatial extent
+
+Filters a GTFS object using a spatial extent (passed as an `sf` object),
+keeping (or dropping) entries related to shapes and trips whose
+geometries are selected through a specified spatial operation.
+
+## Usage
+
+``` r
+filter_by_spatial_extent(
+  gtfs,
+  geom,
+  spatial_operation = sf::st_intersects,
+  keep = TRUE
+)
+```
+
+## Arguments
+
+- gtfs:
+
+  A GTFS object, as created by
+  [`read_gtfs()`](https://ipea.github.io/gtfstools/reference/read_gtfs.md).
+
+- geom:
+
+  An `sf`, `sfc` or `bbox` object, in WGS 84 (EPSG 4326). Describes the
+  spatial extent used to filter the data. A `bbox` is treated as a
+  rectangle in longitude and latitude (unlike `sf::st_as_sfc(bbox)`,
+  whose edges are geodesics when `{s2}` is used).
+
+- spatial_operation:
+
+  A spatial operation function from the set of options listed in
+  [geos_binary_pred](https://r-spatial.github.io/sf/reference/geos_binary_pred.html).
+  Defaults to
+  [`sf::st_intersects`](https://r-spatial.github.io/sf/reference/geos_binary_pred.html),
+  which tests if the shapes and trips have ANY intersection with the
+  object specified in `geom`. Please note that `geom` is passed as the
+  `x` argument of these functions.
+  [`sf::st_equals_exact()`](https://r-spatial.github.io/sf/reference/geos_binary_pred.html)
+  and
+  [`sf::st_is_within_distance()`](https://r-spatial.github.io/sf/reference/geos_binary_pred.html)
+  are not supported, since they require additional arguments.
+
+- keep:
+
+  A logical. Whether the entries related to the shapes and trips
+  selected by the given spatial operation should be kept or dropped
+  (defaults to `TRUE`, which keeps the entries).
+
+## Value
+
+The GTFS object passed to the `gtfs` parameter, after the filtering
+process.
+
+## See also
+
+Other filtering functions:
+[`filter_by_agency_id()`](https://ipea.github.io/gtfstools/reference/filter_by_agency_id.md),
+[`filter_by_date()`](https://ipea.github.io/gtfstools/reference/filter_by_date.md),
+[`filter_by_period()`](https://ipea.github.io/gtfstools/reference/filter_by_period.md),
+[`filter_by_route_id()`](https://ipea.github.io/gtfstools/reference/filter_by_route_id.md),
+[`filter_by_route_type()`](https://ipea.github.io/gtfstools/reference/filter_by_route_type.md),
+[`filter_by_service_id()`](https://ipea.github.io/gtfstools/reference/filter_by_service_id.md),
+[`filter_by_shape_id()`](https://ipea.github.io/gtfstools/reference/filter_by_shape_id.md),
+[`filter_by_stop_id()`](https://ipea.github.io/gtfstools/reference/filter_by_stop_id.md),
+[`filter_by_time_of_day()`](https://ipea.github.io/gtfstools/reference/filter_by_time_of_day.md),
+[`filter_by_trip_id()`](https://ipea.github.io/gtfstools/reference/filter_by_trip_id.md),
+[`filter_by_weekday()`](https://ipea.github.io/gtfstools/reference/filter_by_weekday.md)
+
+## Examples
+
+``` r
+data_path <- system.file("extdata/spo_gtfs.zip", package = "gtfstools")
+gtfs <- read_gtfs(data_path)
+
+shape_id <- "68962"
+shape_sf <- get_shapes_geometry(gtfs, shape_id)
+bbox <- sf::st_bbox(shape_sf)
+object.size(gtfs)
+#> 811304 bytes
+
+# keeps entries that intersect with the specified polygon
+smaller_gtfs <- filter_by_spatial_extent(gtfs, bbox)
+object.size(smaller_gtfs)
+#> 325096 bytes
+
+# drops entries that intersect with the specified polygon
+smaller_gtfs <- filter_by_spatial_extent(gtfs, bbox, keep = FALSE)
+object.size(smaller_gtfs)
+#> 512352 bytes
+
+# uses a different function to filter the gtfs
+smaller_gtfs <- filter_by_spatial_extent(
+  gtfs,
+  bbox,
+  spatial_operation = sf::st_contains
+)
+object.size(smaller_gtfs)
+#> 69040 bytes
+```
