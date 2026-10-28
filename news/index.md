@@ -59,19 +59,6 @@
   [`set_trip_speed()`](https://ipea.github.io/gtfstools/reference/set_trip_speed.md)
   must now be passed by name
   ([\#89](https://github.com/ipea/gtfstools/issues/89)).
-- [`convert_shapes_to_sf()`](https://ipea.github.io/gtfstools/reference/convert_shapes_to_sf.md),
-  [`get_trip_geometry()`](https://ipea.github.io/gtfstools/reference/get_trip_geometry.md),
-  [`get_trip_length()`](https://ipea.github.io/gtfstools/reference/get_trip_length.md),
-  [`get_trip_speed()`](https://ipea.github.io/gtfstools/reference/get_trip_speed.md),
-  [`get_trip_segment_duration()`](https://ipea.github.io/gtfstools/reference/get_trip_segment_duration.md)
-  and
-  [`get_stop_times_patterns()`](https://ipea.github.io/gtfstools/reference/get_stop_times_patterns.md)
-  now always order `shapes` and `stop_times` by
-  `shape_pt_sequence`/`stop_sequence`, which are therefore required.
-  Results only change for feeds not ordered by these columns, which were
-  previously wrong. Their `sort_sequence` argument is deprecated: `TRUE`
-  raises a warning and `FALSE` an error
-  ([\#94](https://github.com/ipea/gtfstools/issues/94)).
 
 ### Feature deprecation
 
@@ -423,6 +410,19 @@
   [`filter_by_stop_id()`](https://ipea.github.io/gtfstools/reference/filter_by_stop_id.md)
   now says that it keeps (or drops) the `stop_times` entries at the
   given stops, not entire trips.
+- [`convert_shapes_to_sf()`](https://ipea.github.io/gtfstools/reference/convert_shapes_to_sf.md),
+  [`get_trip_geometry()`](https://ipea.github.io/gtfstools/reference/get_trip_geometry.md),
+  [`get_trip_length()`](https://ipea.github.io/gtfstools/reference/get_trip_length.md),
+  [`get_trip_speed()`](https://ipea.github.io/gtfstools/reference/get_trip_speed.md),
+  [`get_trip_segment_duration()`](https://ipea.github.io/gtfstools/reference/get_trip_segment_duration.md)
+  and
+  [`get_stop_times_patterns()`](https://ipea.github.io/gtfstools/reference/get_stop_times_patterns.md)
+  now always order `shapes` and `stop_times` by
+  `shape_pt_sequence`/`stop_sequence`, which are therefore required.
+  Results only change for feeds not ordered by these columns, which were
+  previously wrong. Their `sort_sequence` argument is deprecated: `TRUE`
+  raises a warning and `FALSE` an error
+  ([\#94](https://github.com/ipea/gtfstools/issues/94)).
 
 ### Notes
 
