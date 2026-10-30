@@ -9,10 +9,26 @@
 #'   stop times interpolated. If `NULL` (the default), the function
 #'   interpolates the stop times of every `trip_id` in the GTFS.
 #' @template method
+#' @param overwrite A logical. If `FALSE` (the default), only blank times are
+#'   filled. If `TRUE`, the times of every stop between the first and the last
+#'   stop of each trip (in `stop_sequence` order) are replaced by interpolated
+#'   ones, so only the trips' first and last times are used. Trips whose times
+#'   can't be interpolated keep their original times as they are, with a
+#'   warning, so blanks that `overwrite = FALSE` would fill in some of their
+#'   stops may be left blank.
+#' @param keep_dwell_times A logical. Only used when `overwrite = TRUE`. If
+#'   `TRUE` (the default), the stops between the first and the last keep their
+#'   original dwell times (the difference between their departure and arrival
+#'   times), and the remaining time is spread over the distance travelled.
+#'   Dwell times that can't be calculated (e.g. a blank time) or that are
+#'   negative (e.g. a stop arriving at `"23:59:00"` and departing at
+#'   `"00:01:00"`) are taken as 0. If `FALSE`, interpolated stops get equal
+#'   arrival and departure times.
 #'
-#' @return A GTFS object whose `stop_times` has its blank times filled in. The
-#'   order of the rows and the other columns are kept. The given GTFS object is
-#'   not modified.
+#' @return A GTFS object whose `stop_times` has its blank times filled in (or,
+#'   with `overwrite = TRUE`, the times of its intermediate stops replaced).
+#'   The order of the rows and the other columns are kept. The given GTFS
+#'   object is not modified.
 #'
 #' @section Details:
 #' Within each trip, in `stop_sequence` order, a stop whose arrival and
@@ -20,7 +36,8 @@
 #' distance travelled from the preceding timepoint, as measured by
 #' [get_trip_length()] (if the distance between two timepoints is 0, their
 #' times are spread evenly between the stops in between). Interpolated stops
-#' get equal arrival and departure times, rounded to the nearest second.
+#' get equal arrival and departure times, rounded to the nearest second,
+#' unless they keep their dwell times (see `keep_dwell_times`).
 #' Times past `"24:00:00"` are supported. A timepoint with only one of its
 #' two times blank gets the other time in both columns. If `stop_times` has a
 #' `timepoint` column, interpolated stops get `timepoint = 0`; the column is
@@ -37,11 +54,12 @@
 #'   `"00:30:00"` instead of `"24:30:00"`.
 #'
 #' Times are blank when they are `NA`, empty or whitespace-only strings, or
-#' `"NA"`. Malformed time strings are left unchanged, with a warning, and are
-#' not used as timepoints. Rows without a `trip_id` are left unchanged. For
-#' trips listed in `frequencies`, the template times are interpolated. Times
-#' are read from the time strings, and existing `_secs` columns (e.g. created
-#' with [convert_time_to_seconds()]) are updated to match.
+#' `"NA"`. Malformed time strings are left unchanged (unless overwritten with
+#' `overwrite = TRUE`), with a warning, and are not used as timepoints. Rows
+#' without a `trip_id` are left unchanged. For trips listed in `frequencies`,
+#' the template times are interpolated. Times are read from the time strings,
+#' and existing `_secs` columns (e.g. created with [convert_time_to_seconds()])
+#' are updated to match.
 #'
 #' Interpolating between timepoints requires the `stops` table.
 #'
@@ -84,7 +102,13 @@
 #' \dontshow{data.table::setDTthreads(old_dt_threads)}
 #'
 #' @export
-interpolate_stop_times <- function(gtfs, trip_id = NULL, method = "shapes") {
+interpolate_stop_times <- function(
+  gtfs,
+  trip_id = NULL,
+  method = "shapes",
+  overwrite = FALSE,
+  keep_dwell_times = TRUE
+) {
   gtfs <- assert_and_assign_gtfs_object(gtfs)
   checkmate::assert_character(trip_id, null.ok = TRUE, any.missing = FALSE)
   checkmate::assert(
@@ -92,6 +116,8 @@ interpolate_stop_times <- function(gtfs, trip_id = NULL, method = "shapes") {
     checkmate::check_names(method, subset.of = c("shapes", "euclidean")),
     combine = "and"
   )
+  checkmate::assert_logical(overwrite, len = 1, any.missing = FALSE)
+  checkmate::assert_logical(keep_dwell_times, len = 1, any.missing = FALSE)
   gtfsio::assert_field_class(
     gtfs,
     "stop_times",
@@ -114,15 +140,24 @@ interpolate_stop_times <- function(gtfs, trip_id = NULL, method = "shapes") {
   blank_arr <- is_blank_time(stop_times$arrival_time)
   blank_dep <- is_blank_time(stop_times$departure_time)
 
+  # with overwrite = TRUE every relevant trip is processed, because the times
+  # of its intermediate stops are replaced even when none of them is blank
+
   has_blank <- is_relevant & (blank_arr | blank_dep)
-  if (!any(has_blank)) return(gtfs)
+  if (!overwrite && !any(has_blank)) {
+    return(gtfs)
+  }
 
   # rows without a trip_id can't be interpolated
 
   n_na_trip <- sum(
     has_blank & blank_arr & blank_dep & is.na(stop_times$trip_id)
   )
-  trips <- unique(stop_times$trip_id[has_blank])
+  if (overwrite) {
+    trips <- unique(stop_times$trip_id[is_relevant])
+  } else {
+    trips <- unique(stop_times$trip_id[has_blank])
+  }
   trips <- trips[!is.na(trips)]
 
   if (length(trips) == 0) {
@@ -132,7 +167,7 @@ interpolate_stop_times <- function(gtfs, trip_id = NULL, method = "shapes") {
     return(gtfs)
   }
 
-  # select the rows of the trips with blanks, ordered as in
+  # select the rows of the trips to interpolate, ordered as in
   # prepare_trip_stops(), which sorts by trip_id and stop_sequence with NAs
   # first. the rows of each trip are contiguous
 
@@ -155,6 +190,35 @@ interpolate_stop_times <- function(gtfs, trip_id = NULL, method = "shapes") {
 
   arr <- string_to_seconds(stop_times$arrival_time[rows])
   dep <- string_to_seconds(stop_times$departure_time[rows])
+
+  # with overwrite = TRUE, the intermediate stops of each trip are treated as
+  # blank, but only in these local vectors, so the stops that can't be
+  # interpolated keep their original times. stops with at least one time are
+  # told apart from those that were already blank, for the warnings. their
+  # dwell times are kept, if requested, as doubles to avoid an integer
+  # overflow in the cumulative sum below
+
+  dwell <- numeric(n_rows)
+  is_overwritten <- logical(n_rows)
+
+  if (overwrite) {
+    is_last <- c(tid[-1L] != tid[-n_rows], TRUE)
+    is_mid <- !is_first & !is_last
+    is_overwritten <- is_mid & !(blank_arr & blank_dep)
+
+    if (keep_dwell_times) {
+      dwell[is_mid] <- data.table::fcoalesce(
+        pmax(dep[is_mid] - arr[is_mid], 0),
+        0
+      )
+    }
+
+    arr[is_mid] <- NA_integer_
+    dep[is_mid] <- NA_integer_
+    blank_arr[is_mid] <- TRUE
+    blank_dep[is_mid] <- TRUE
+  }
+
   t_arr <- data.table::fcoalesce(arr, dep)
   t_dep <- data.table::fcoalesce(dep, arr)
 
@@ -181,7 +245,7 @@ interpolate_stop_times <- function(gtfs, trip_id = NULL, method = "shapes") {
   # times after midnight written as "00:xx:xx") are left blank
 
   is_backwards <- t_arr[q] < t_dep[p]
-  back_trips <- unique(tid[i[is_backwards]])
+  back_trips <- unique(tid[i[is_backwards & !is_overwritten[i]]])
   is_backwards_row <- logical(n_rows)
   is_backwards_row[i[is_backwards]] <- TRUE
   i <- i[!is_backwards]
@@ -192,7 +256,9 @@ interpolate_stop_times <- function(gtfs, trip_id = NULL, method = "shapes") {
   # get_trip_length() returns their segments in the same order of 'rows', so
   # the length of the segment ending at each row is assigned without a join
 
-  new_secs <- integer(0)
+  new_arr <- integer(0)
+  new_dep <- integer(0)
+  short_trips <- character(0)
 
   if (length(i) > 0) {
     dist_trips <- unique(tid[i])
@@ -233,12 +299,30 @@ interpolate_stop_times <- function(gtfs, trip_id = NULL, method = "shapes") {
     is_zero <- which(span == 0)
     fraction[is_zero] <- (i[is_zero] - p[is_zero]) / (q[is_zero] - p[is_zero])
 
-    # round half up. times are never negative, and round() is much slower on
-    # long vectors
+    # dwell times kept at the stops of a span are taken out of the time
+    # between its timepoints, and the remaining travel time is spread over
+    # the distance. as with distances, a single cumulative sum is enough.
+    # dwell times are dropped from spans in which they exceed the time
+    # between the timepoints, which only happens with times out of order
 
-    new_secs <- as.integer(
-      t_dep[p] + fraction * (t_arr[q] - t_dep[p]) + 0.5
-    )
+    cum_dwell <- cumsum(dwell)
+    span_dwell <- cum_dwell[q] - cum_dwell[p]
+    prev_dwell <- cum_dwell[i] - dwell[i] - cum_dwell[p]
+    stop_dwell <- dwell[i]
+
+    is_short <- which(t_arr[q] - t_dep[p] < span_dwell)
+    short_trips <- unique(tid[i[is_short]])
+    span_dwell[is_short] <- 0
+    prev_dwell[is_short] <- 0
+    stop_dwell[is_short] <- 0
+
+    # round half up. times are never negative, and round() is much slower on
+    # long vectors. dwell times are whole seconds, so adding them before
+    # rounding doesn't change it
+
+    travel_time <- t_arr[q] - t_dep[p] - span_dwell
+    new_arr <- as.integer(t_dep[p] + fraction * travel_time + 0.5 + prev_dwell)
+    new_dep <- new_arr + as.integer(stop_dwell)
   }
 
   # write only the filled cells, into a copy of stop_times, so the given gtfs
@@ -251,9 +335,11 @@ interpolate_stop_times <- function(gtfs, trip_id = NULL, method = "shapes") {
     if (time_col == "arrival_time") {
       half_blank <- which(is_timepoint & blank_arr)
       half_secs <- t_arr[half_blank]
+      new_secs <- new_arr
     } else {
       half_blank <- which(is_timepoint & blank_dep)
       half_secs <- t_dep[half_blank]
+      new_secs <- new_dep
     }
 
     to_fill <- rows[c(i, half_blank)]
@@ -271,7 +357,13 @@ interpolate_stop_times <- function(gtfs, trip_id = NULL, method = "shapes") {
     data.table::set(stop_times, rows[i], "timepoint", approximate)
   }
 
+  # overwritten stops that couldn't be interpolated keep their original times,
+  # so they are not reported as blank
+
   is_left[i] <- FALSE
+  is_kept <- is_left & is_overwritten
+  is_left <- is_left & !is_overwritten
+
   if (any(is_left) || n_na_trip > 0) {
     left_trips <- unique(tid[is_left & !is_backwards_row])
     warn_times_not_interpolated(
@@ -281,10 +373,39 @@ interpolate_stop_times <- function(gtfs, trip_id = NULL, method = "shapes") {
     )
   }
 
+  if (any(is_kept)) {
+    kept_trips <- unique(tid[is_kept])
+    cli::cli_warn(
+      c(
+        paste0(
+          "The times of {length(kept_trips)} trip{?s} could not be ",
+          "interpolated, so {?its/their} original times were kept: ",
+          "{.val {kept_trips}}."
+        ),
+        "i" = paste0(
+          "Their first or last times may be blank or earlier than the ",
+          "previous ones, or the distance between their stops may not be ",
+          "calculable."
+        )
+      ),
+      class = "gtfstools_times_not_overwritten"
+    )
+  }
+
+  if (length(short_trips) > 0) {
+    cli::cli_warn(
+      paste0(
+        "The dwell times of {length(short_trips)} trip{?s} exceed the time ",
+        "between {?its/their} known times, so they were not kept: ",
+        "{.val {short_trips}}."
+      ),
+      class = "gtfstools_dwell_times_dropped"
+    )
+  }
+
   gtfs$stop_times <- stop_times
   return(gtfs)
 }
-
 
 
 #' Warn about stop times that couldn't be interpolated

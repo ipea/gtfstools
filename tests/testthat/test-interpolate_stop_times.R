@@ -4,8 +4,14 @@ ber_path <- system.file("extdata/ber_gtfs.zip", package = "gtfstools")
 spo_gtfs <- read_gtfs(spo_path)
 poa_gtfs <- read_gtfs(poa_path)
 
-tester <- function(gtfs = poa_gtfs, trip_id = NULL, method = "shapes") {
-  interpolate_stop_times(gtfs, trip_id, method)
+tester <- function(
+  gtfs = poa_gtfs,
+  trip_id = NULL,
+  method = "shapes",
+  overwrite = FALSE,
+  keep_dwell_times = TRUE
+) {
+  interpolate_stop_times(gtfs, trip_id, method, overwrite, keep_dwell_times)
 }
 
 # creates a feed with a single trip that serves stops on the equator, where
@@ -55,6 +61,12 @@ test_that("raises error due to incorrect input types", {
   expect_error(tester(basic_feed, method = "shape"))
   expect_error(tester(basic_feed, method = c("shapes", "euclidean")))
   expect_error(tester(basic_feed, method = 1))
+  expect_error(tester(basic_feed, overwrite = "TRUE"))
+  expect_error(tester(basic_feed, overwrite = NA))
+  expect_error(tester(basic_feed, overwrite = c(TRUE, FALSE)))
+  expect_error(tester(basic_feed, keep_dwell_times = "TRUE"))
+  expect_error(tester(basic_feed, keep_dwell_times = NA))
+  expect_error(tester(basic_feed, keep_dwell_times = c(TRUE, FALSE)))
 
   no_sequence <- copy_gtfs_without_field(
     basic_feed,
@@ -354,6 +366,211 @@ test_that("updates _secs and timepoint columns", {
   expect_identical(result$stop_times$timepoint, c("1", "0", "0", "0", "1"))
 })
 
+test_that("overwrite = TRUE interpolates all but the first and last stops", {
+  feed <- synthetic_feed(
+    c(0, 0.01, 0.02, 0.04, 0.05),
+    arrival_time = c("08:00:00", "08:05:00", "", "08:06:00", "08:10:00"),
+    departure_time = c("08:00:00", "08:05:30", "", "08:06:00", "08:10:00")
+  )
+  # stop_sequence doesn't need to start at 1, nor rows to be ordered
+  feed$stop_times[, stop_sequence := stop_sequence + 10L]
+  feed$stop_times <- feed$stop_times[c(3, 1, 5, 2, 4)]
+  feed <- convert_time_to_seconds(feed, "stop_times")
+  feed$stop_times[, timepoint := 1L]
+
+  result <- tester(
+    feed,
+    method = "euclidean",
+    overwrite = TRUE,
+    keep_dwell_times = FALSE
+  )
+  expected <- c("08:04:00", "08:00:00", "08:10:00", "08:02:00", "08:08:00")
+  expect_identical(result$stop_times$arrival_time, expected)
+  expect_identical(result$stop_times$departure_time, expected)
+  expect_identical(
+    result$stop_times$arrival_time_secs,
+    string_to_seconds(expected)
+  )
+  expect_identical(result$stop_times$timepoint, c(0L, 1L, 1L, 0L, 0L))
+
+  # the default only fills blank times
+  result <- tester(feed, method = "euclidean")
+  expect_identical(
+    result$stop_times$arrival_time,
+    c("08:05:40", "08:00:00", "08:10:00", "08:05:00", "08:06:00")
+  )
+})
+
+test_that("overwrite = TRUE affects only the given trip_ids", {
+  feed <- synthetic_feed(
+    c(0, 0.01, 0.02),
+    c("08:00:00", "08:00:30", "08:02:00")
+  )
+  t2 <- data.table::copy(feed$stop_times)
+  t2[, trip_id := "t2"]
+  feed$stop_times <- rbind(feed$stop_times, t2)
+  feed$trips <- data.table::data.table(
+    trip_id = c("t1", "t2"),
+    shape_id = "sh1"
+  )
+
+  result <- tester(feed, trip_id = "t2", method = "euclidean", overwrite = TRUE)
+  expect_identical(
+    result$stop_times$arrival_time,
+    c("08:00:00", "08:00:30", "08:02:00", "08:00:00", "08:01:00", "08:02:00")
+  )
+
+  # the dwell times of a trip don't affect the next one
+  feed$stop_times[2, departure_time := "08:01:30"]
+  result <- tester(feed, method = "euclidean", overwrite = TRUE)
+  expect_identical(
+    result$stop_times$departure_time,
+    c("08:00:00", "08:01:30", "08:02:00", "08:00:00", "08:01:00", "08:02:00")
+  )
+})
+
+test_that("overwrite = TRUE keeps dwell times", {
+  # dwell times of 30s, 0s (half-blank) and 90s: 120s out of 600s are spent
+  # at stops, and the other 480s are spread over the distance
+  feed <- synthetic_feed(
+    c(0, 0.01, 0.02, 0.04, 0.05),
+    arrival_time = c("08:00:00", "08:01:00", "", "08:05:00", "08:10:00"),
+    departure_time = c(
+      "08:00:00",
+      "08:01:30",
+      "08:03:00",
+      "08:06:30",
+      "08:10:00"
+    )
+  )
+  feed <- convert_time_to_seconds(feed, "stop_times")
+  feed$stop_times[, timepoint := 1L]
+
+  result <- tester(feed, method = "euclidean", overwrite = TRUE)
+  expected_arr <- c("08:00:00", "08:01:36", "08:03:42", "08:06:54", "08:10:00")
+  expected_dep <- c("08:00:00", "08:02:06", "08:03:42", "08:08:24", "08:10:00")
+  expect_identical(result$stop_times$arrival_time, expected_arr)
+  expect_identical(result$stop_times$departure_time, expected_dep)
+  expect_identical(
+    result$stop_times$arrival_time_secs,
+    string_to_seconds(expected_arr)
+  )
+  expect_identical(
+    result$stop_times$departure_time_secs,
+    string_to_seconds(expected_dep)
+  )
+  expect_identical(result$stop_times$timepoint, c(1L, 0L, 0L, 0L, 1L))
+
+  # keep_dwell_times only matters with overwrite = TRUE
+  expect_identical(
+    tester(feed, method = "euclidean", keep_dwell_times = FALSE),
+    tester(feed, method = "euclidean")
+  )
+
+  # times past midnight
+  feed <- synthetic_feed(
+    c(0, 0.01, 0.02),
+    arrival_time = c("24:00:00", "24:00:30", "24:02:00"),
+    departure_time = c("24:00:00", "24:01:00", "24:02:00")
+  )
+  result <- tester(feed, method = "euclidean", overwrite = TRUE)
+  expect_identical(
+    result$stop_times$arrival_time,
+    c("24:00:00", "24:00:45", "24:02:00")
+  )
+  expect_identical(
+    result$stop_times$departure_time,
+    c("24:00:00", "24:01:15", "24:02:00")
+  )
+
+  # stops at the same place
+  feed$stops[, stop_lon := 0]
+  result <- tester(feed, method = "euclidean", overwrite = TRUE)
+  expect_identical(result$stop_times$arrival_time[2], "24:00:45")
+  expect_identical(result$stop_times$departure_time[2], "24:01:15")
+
+  # negative dwell times are taken as 0
+  feed <- synthetic_feed(
+    c(0, 0.01, 0.02),
+    arrival_time = c("08:00:00", "08:01:00", "08:02:00"),
+    departure_time = c("08:00:00", "08:00:30", "08:02:00")
+  )
+  result <- tester(feed, method = "euclidean", overwrite = TRUE)
+  expect_identical(result$stop_times$arrival_time[2], "08:01:00")
+  expect_identical(result$stop_times$departure_time[2], "08:01:00")
+})
+
+test_that("drops dwell times that exceed the time between timepoints", {
+  feed <- synthetic_feed(
+    c(0, 0.01, 0.02),
+    arrival_time = c("08:00:00", "08:05:00", "08:01:00"),
+    departure_time = c("08:00:00", "08:07:00", "08:01:00")
+  )
+  expect_warning(
+    result <- tester(feed, method = "euclidean", overwrite = TRUE),
+    class = "gtfstools_dwell_times_dropped"
+  )
+  expect_identical(
+    result$stop_times$arrival_time,
+    c("08:00:00", "08:00:30", "08:01:00")
+  )
+  expect_identical(
+    result$stop_times$departure_time,
+    c("08:00:00", "08:00:30", "08:01:00")
+  )
+})
+
+test_that("overwrite = TRUE keeps the times of trips it can't interpolate", {
+  # t1's last stop is written as "00:05:00" instead of "24:05:00". t2 can't
+  # be interpolated either, but its intermediate stop was already blank
+  feed <- synthetic_feed(
+    c(0, 0.01, 0.02),
+    arrival_time = c("23:50:00", "", "00:05:00"),
+    departure_time = c("23:50:00", "23:55:00", "00:05:00")
+  )
+  t2 <- data.table::copy(feed$stop_times)
+  t2[, `:=`(trip_id = "t2", arrival_time = c("08:00:00", "", ""))]
+  t2[, departure_time := arrival_time]
+  feed$stop_times <- rbind(feed$stop_times, t2)
+  feed$trips <- data.table::data.table(
+    trip_id = c("t1", "t2"),
+    shape_id = "sh1"
+  )
+
+  conditions <- list()
+  result <- withCallingHandlers(
+    tester(feed, method = "euclidean", overwrite = TRUE),
+    warning = function(cnd) {
+      conditions[[length(conditions) + 1]] <<- cnd
+      invokeRestart("muffleWarning")
+    }
+  )
+  expect_length(conditions, 2)
+  expect_s3_class(conditions[[1]], "gtfstools_times_not_interpolated")
+  expect_match(conditionMessage(conditions[[1]]), "t2")
+  expect_no_match(conditionMessage(conditions[[1]]), "t1")
+  expect_s3_class(conditions[[2]], "gtfstools_times_not_overwritten")
+  expect_match(conditionMessage(conditions[[2]]), "t1")
+  expect_no_match(conditionMessage(conditions[[2]]), "t2")
+
+  # t1's half-blank stop is kept as is
+  expect_identical(result$stop_times, feed$stop_times)
+})
+
+test_that("overwrite = TRUE never makes times decrease within trips", {
+  result <- suppressWarnings(tester(spo_gtfs, overwrite = TRUE))
+  stop_times <- data.table::copy(result$stop_times)
+  data.table::setorderv(stop_times, c("trip_id", "stop_sequence"))
+  arr <- string_to_seconds(stop_times$arrival_time)
+  dep <- string_to_seconds(stop_times$departure_time)
+  n <- nrow(stop_times)
+  is_same_trip <- stop_times$trip_id[-1] == stop_times$trip_id[-n]
+  is_after_previous <- arr[-1] >= dep[-n]
+
+  expect_true(all(dep >= arr, na.rm = TRUE))
+  expect_true(all(is_after_previous[is_same_trip], na.rm = TRUE))
+})
+
 test_that("doesn't change given gtfs", {
   original_gtfs <- read_gtfs(poa_path)
   gtfs <- read_gtfs(poa_path)
@@ -362,10 +579,15 @@ test_that("doesn't change given gtfs", {
   result <- suppressWarnings(tester(gtfs))
   expect_identical(original_gtfs, gtfs)
 
+  result <- suppressWarnings(tester(spo_gtfs, overwrite = TRUE))
+  expect_identical(read_gtfs(spo_path), spo_gtfs)
+
   # existing _secs columns are not updated by reference either
   gtfs <- convert_time_to_seconds(gtfs, "stop_times")
   original_secs <- data.table::copy(gtfs$stop_times)
   result <- suppressWarnings(tester(gtfs))
+  expect_identical(original_secs, gtfs$stop_times)
+  result <- suppressWarnings(tester(gtfs, overwrite = TRUE))
   expect_identical(original_secs, gtfs$stop_times)
 })
 

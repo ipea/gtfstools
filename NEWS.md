@@ -1,5 +1,9 @@
 # gtfstools (development version)
 
+## New features
+
+- `interpolate_stop_times()` gains `overwrite` and `keep_dwell_times`. With `overwrite = TRUE`, the times of every stop between the first and the last stop of each trip are replaced by interpolated ones, instead of only the blank ones. By default (`keep_dwell_times = TRUE`), these stops keep their original dwell times.
+
 ## Bug fixes
 
 - gtfstools functions now accept `dt_gtfs` objects whose tables were turned into tibbles, grouped data frames or plain data frames by other packages (e.g. after `dplyr::group_by()`), converting them back to `data.table` without modifying the input. `as_dt_gtfs()` does the same conversion. With `by_reference = TRUE`, an object with any such table now raises an informative error, since the edits can't be made by reference on a converted copy: convert it first with `as_dt_gtfs()` (#130, reported by @baarthur, who also opened PR #132).
