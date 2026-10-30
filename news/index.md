@@ -1,6 +1,26 @@
 # Changelog
 
+## gtfstools (development version)
+
+### Bug fixes
+
+- gtfstools functions now accept `dt_gtfs` objects whose tables were
+  turned into tibbles, grouped data frames or plain data frames by other
+  packages (e.g. after
+  [`dplyr::group_by()`](https://dplyr.tidyverse.org/reference/group_by.html)),
+  converting them back to `data.table` without modifying the input.
+  [`as_dt_gtfs()`](https://ipea.github.io/gtfstools/reference/as_dt_gtfs.md)
+  does the same conversion. With `by_reference = TRUE`, an object with
+  any such table now raises an informative error, since the edits can’t
+  be made by reference on a converted copy: convert it first with
+  [`as_dt_gtfs()`](https://ipea.github.io/gtfstools/reference/as_dt_gtfs.md)
+  ([\#130](https://github.com/ipea/gtfstools/issues/130), reported by
+  [@baarthur](https://github.com/baarthur), who also opened PR
+  [\#132](https://github.com/ipea/gtfstools/issues/132)).
+
 ## gtfstools v2.0.0
+
+CRAN release: 2026-10-28
 
 ### Breaking changes
 

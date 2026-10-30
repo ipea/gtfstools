@@ -17,7 +17,15 @@ fields of a feed read with
 - `gtfs`: the class of GTFS objects read with
   [`gtfsio::import_gtfs()`](https://r-transit.github.io/gtfsio/reference/import_gtfs.html).
   This method convert all date fields, represented as `integer`s in
-  `{gtfsio}`'s representation, to `Date` objects.
+  `{gtfsio}`'s representation, to `Date` objects. It also converts back
+  to `data.table` any table that lost this class, e.g. after being
+  edited with
+  [`dplyr::group_by()`](https://dplyr.tidyverse.org/reference/group_by.html),
+  so it can be used to repair a `dt_gtfs` whose tables were edited with
+  other packages (the input object is not modified). An `sf` table is
+  converted to a `data.table` with a `geometry` list column; use
+  [`convert_sf_to_shapes()`](https://ipea.github.io/gtfstools/reference/convert_sf_to_shapes.md)
+  to convert `sf` shapes back to a `shapes` table.
 
 - `list`: this method tries to convert the elements of a list into
   `data.table`s. Please note that all list elements must inherit from

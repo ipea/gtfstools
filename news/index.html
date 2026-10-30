@@ -49,7 +49,14 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="2.0.0" id="gtfstools-v200">gtfstools v2.0.0<a class="anchor" aria-label="anchor" href="#gtfstools-v200"></a></h2>
+<h2 class="pkg-version" data-toc-text="development version" id="gtfstools-development-version">gtfstools (development version)<a class="anchor" aria-label="anchor" href="#gtfstools-development-version"></a></h2>
+<div class="section level3">
+<h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
+<ul><li>gtfstools functions now accept <code>dt_gtfs</code> objects whose tables were turned into tibbles, grouped data frames or plain data frames by other packages (e.g. after <code><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">dplyr::group_by()</a></code>), converting them back to <code>data.table</code> without modifying the input. <code><a href="../reference/as_dt_gtfs.html">as_dt_gtfs()</a></code> does the same conversion. With <code>by_reference = TRUE</code>, an object with any such table now raises an informative error, since the edits can’t be made by reference on a converted copy: convert it first with <code><a href="../reference/as_dt_gtfs.html">as_dt_gtfs()</a></code> (<a href="https://github.com/ipea/gtfstools/issues/130" class="external-link">#130</a>, reported by <a href="https://github.com/baarthur" class="external-link">@baarthur</a>, who also opened PR <a href="https://github.com/ipea/gtfstools/issues/132" class="external-link">#132</a>).</li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="2.0.0" id="gtfstools-v200">gtfstools v2.0.0<a class="anchor" aria-label="anchor" href="#gtfstools-v200"></a></h2><p class="text-muted">CRAN release: 2026-10-28</p>
 <div class="section level3">
 <h3 id="breaking-changes-2-0-0">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-2-0-0"></a></h3>
 <ul><li>With <code>prefix = FALSE</code>, the default, <code><a href="../reference/merge_gtfs.html">merge_gtfs()</a></code> now keeps rows that are identical in every column only once and raises an error when the GTFS objects share ids whose data differ (e.g. a <code>stop_id</code> with different coordinates, or a <code>trip_id</code> with different <code>stop_times</code>), which used to produce inconsistent feeds. Merging a feed with itself now works, but merging versions of the same feed, or feeds with simple ids (e.g. both with an <code>agency_id</code> <code>"1"</code>), usually raises the error: use <code>prefix = TRUE</code>. A character <code>prefix</code> must now have unique elements.</li>

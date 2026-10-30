@@ -11,7 +11,12 @@ represented as hms objects in a tidygtfs, to strings in the &quot;HH:MM:SS&quot;
 format.
 gtfs: the class of GTFS objects read with gtfsio::import_gtfs(). This
 method convert all date fields, represented as integers in {gtfsio}'s
-representation, to Date objects.
+representation, to Date objects. It also converts back to data.table
+any table that lost this class, e.g. after being edited with
+dplyr::group_by(), so it can be used to repair a dt_gtfs whose tables
+were edited with other packages (the input object is not modified). An sf
+table is converted to a data.table with a geometry list column; use
+convert_sf_to_shapes() to convert sf shapes back to a shapes table.
 list: this method tries to convert the elements of a list into
 data.tables. Please note that all list elements must inherit from
 data.frame and must be named. Like the gtfs method, it converts date
@@ -30,7 +35,12 @@ represented as hms objects in a tidygtfs, to strings in the &quot;HH:MM:SS&quot;
 format.
 gtfs: the class of GTFS objects read with gtfsio::import_gtfs(). This
 method convert all date fields, represented as integers in {gtfsio}'s
-representation, to Date objects.
+representation, to Date objects. It also converts back to data.table
+any table that lost this class, e.g. after being edited with
+dplyr::group_by(), so it can be used to repair a dt_gtfs whose tables
+were edited with other packages (the input object is not modified). An sf
+table is converted to a data.table with a geometry list column; use
+convert_sf_to_shapes() to convert sf shapes back to a shapes table.
 list: this method tries to convert the elements of a list into
 data.tables. Please note that all list elements must inherit from
 data.frame and must be named. Like the gtfs method, it converts date
@@ -99,7 +109,12 @@ represented as <code>hms</code> objects in a <code>tidygtfs</code>, to strings i
 format.</p></li>
 <li><p><code>gtfs</code>: the class of GTFS objects read with <code><a href="https://r-transit.github.io/gtfsio/reference/import_gtfs.html" class="external-link">gtfsio::import_gtfs()</a></code>. This
 method convert all date fields, represented as <code>integer</code>s in <code>{gtfsio}</code>'s
-representation, to <code>Date</code> objects.</p></li>
+representation, to <code>Date</code> objects. It also converts back to <code>data.table</code>
+any table that lost this class, e.g. after being edited with
+<code><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">dplyr::group_by()</a></code>, so it can be used to repair a <code>dt_gtfs</code> whose tables
+were edited with other packages (the input object is not modified). An <code>sf</code>
+table is converted to a <code>data.table</code> with a <code>geometry</code> list column; use
+<code><a href="convert_sf_to_shapes.html">convert_sf_to_shapes()</a></code> to convert <code>sf</code> shapes back to a <code>shapes</code> table.</p></li>
 <li><p><code>list</code>: this method tries to convert the elements of a list into
 <code>data.table</code>s. Please note that all list elements must inherit from
 <code>data.frame</code> and must be named. Like the <code>gtfs</code> method, it converts date
