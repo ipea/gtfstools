@@ -405,3 +405,17 @@ test_that("fills poa's blank times, which never decrease", {
     poa_gtfs$stop_times$arrival_time[is_timepoint]
   )
 })
+
+test_that("works with stop_times grouped by dplyr (#130)", {
+  skip_if_not_installed("dplyr")
+
+  grouped_gtfs <- read_gtfs(poa_path)
+  grouped_gtfs$stop_times <- dplyr::group_by(grouped_gtfs$stop_times, trip_id)
+
+  # poa_gtfs has trips whose times can't be interpolated, which warn
+
+  result <- suppressWarnings(tester(grouped_gtfs))
+
+  expect_identical(result, suppressWarnings(tester()))
+  expect_s3_class(grouped_gtfs$stop_times, "grouped_df")
+})

@@ -215,6 +215,59 @@ test_that("always returns a dt_gtfs object", {
   expect_s3_class(result, "dt_gtfs")
 })
 
+test_that("converts tables that lost the data.table class back (#130)", {
+  df_gtfs <- read_gtfs(data_path)
+  df_gtfs$stop_times <- as.data.frame(df_gtfs$stop_times)
+
+  result <- assert_and_assign_gtfs_object(df_gtfs)
+  expect_true(data.table::is.data.table(result$stop_times))
+  expect_identical(result$stop_times, gtfs$stop_times)
+
+  result <- assert_and_assign_gtfs_object(df_gtfs, by_reference = FALSE)
+  expect_true(data.table::is.data.table(result$stop_times))
+
+  # the input is not modified
+  expect_identical(class(df_gtfs$stop_times), "data.frame")
+})
+
+test_that("by_reference = TRUE refuses tables that are not data.tables", {
+  df_gtfs <- read_gtfs(data_path)
+  df_gtfs$stop_times <- as.data.frame(df_gtfs$stop_times)
+
+  expect_error(
+    assert_and_assign_gtfs_object(df_gtfs, by_reference = TRUE),
+    class = "gtfstools_not_data_table_error"
+  )
+
+  # the error names the offending tables
+
+  df_gtfs$trips <- as.data.frame(df_gtfs$trips)
+  expect_error(
+    assert_and_assign_gtfs_object(df_gtfs, by_reference = TRUE),
+    "stop_times[[:space:]]+and[[:space:]]+trips[[:space:]]+are[[:space:]]+not",
+    class = "gtfstools_not_data_table_error"
+  )
+
+  # every exported function with by_reference passes it on to the helper
+
+  df_gtfs <- read_gtfs(data_path)
+  df_gtfs$stop_times <- as.data.frame(df_gtfs$stop_times)
+
+  calls <- list(
+    quote(set_trip_speed(df_gtfs, speed = 20, by_reference = TRUE)),
+    quote(set_route_speed(df_gtfs, speed = 20, by_reference = TRUE)),
+    quote(set_dwell_time(df_gtfs, dwell_time = 30, by_reference = TRUE)),
+    quote(
+      set_min_dwell_time(df_gtfs, min_dwell_time = 30, by_reference = TRUE)
+    ),
+    quote(convert_time_to_seconds(df_gtfs, by_reference = TRUE))
+  )
+  for (cl in calls) {
+    expect_error(eval(cl), class = "gtfstools_not_data_table_error")
+  }
+  expect_identical(class(df_gtfs$stop_times), "data.frame")
+})
+
 
 
 # warn_missing_ids --------------------------------------------------------

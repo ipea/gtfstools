@@ -68,7 +68,7 @@ set_min_dwell_time <- function(
   route_type = NULL,
   by_reference = FALSE
 ) {
-  gtfs <- assert_and_assign_gtfs_object(gtfs)
+  gtfs <- assert_and_assign_gtfs_object(gtfs, by_reference = by_reference)
   checkmate::assert_character(trip_id, null.ok = TRUE, any.missing = FALSE)
   checkmate::assert_character(stop_id, null.ok = TRUE, any.missing = FALSE)
   checkmate::assert_string(unit)

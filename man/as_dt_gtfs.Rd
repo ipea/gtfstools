@@ -47,7 +47,12 @@ represented as \code{hms} objects in a \code{tidygtfs}, to strings in the \code{
 format.
 \item \code{gtfs}: the class of GTFS objects read with \code{\link[gtfsio:import_gtfs]{gtfsio::import_gtfs()}}. This
 method convert all date fields, represented as \code{integer}s in \code{{gtfsio}}'s
-representation, to \code{Date} objects.
+representation, to \code{Date} objects. It also converts back to \code{data.table}
+any table that lost this class, e.g. after being edited with
+\code{dplyr::group_by()}, so it can be used to repair a \code{dt_gtfs} whose tables
+were edited with other packages (the input object is not modified). An \code{sf}
+table is converted to a \code{data.table} with a \code{geometry} list column; use
+\code{\link[=convert_sf_to_shapes]{convert_sf_to_shapes()}} to convert \code{sf} shapes back to a \code{shapes} table.
 \item \code{list}: this method tries to convert the elements of a list into
 \code{data.table}s. Please note that all list elements must inherit from
 \code{data.frame} and must be named. Like the \code{gtfs} method, it converts date

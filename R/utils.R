@@ -166,12 +166,57 @@ copy_gtfs_diff_field_class <- function(gtfs, file, field, class) {
 
 
 #' @keywords internal
-assert_and_assign_gtfs_object <- function(gtfs) {
+assert_and_assign_gtfs_object <- function(gtfs, by_reference = FALSE) {
   checkmate::assert_class(gtfs, "gtfs")
 
-  if (!inherits(gtfs, "dt_gtfs")) gtfs <- as_dt_gtfs(gtfs)
+  # a function that edits the tables by reference can't edit a copy made by
+  # as_dt_gtfs(): the caller would silently keep the unedited tables. so these
+  # calls are refused instead
 
-  return(gtfs)
+  if (isTRUE(by_reference)) {
+    not_dt <- names(gtfs)[tables_not_data_table(gtfs)]
+    if (length(not_dt) > 0) {
+      cli::cli_abort(
+        class = "gtfstools_not_data_table_error",
+        call = parent.frame(),
+        message = c(
+          paste0(
+            "{.code by_reference = TRUE} requires every table of {.arg gtfs} ",
+            "to be a {.cls data.table}, but {.field {not_dt}} {?is/are} not."
+          ),
+          "i" = paste0(
+            "Convert them first with {.fn as_dt_gtfs}, or use ",
+            "{.code by_reference = FALSE}."
+          )
+        )
+      )
+    }
+  }
+
+  return(as_dt_gtfs(gtfs))
+}
+
+
+
+#' Which tables of a GTFS object are data.frames but not data.tables
+#'
+#' Tables edited with other tools (e.g. `dplyr::group_by()`) may lose the
+#' `data.table` class. Elements that are not data.frames at all (e.g. the `.`
+#' list of extra tables) are not flagged.
+#'
+#' @template gtfs
+#'
+#' @return A logical vector with one element per element of `gtfs`.
+#'
+#' @keywords internal
+tables_not_data_table <- function(gtfs) {
+  is_dt <- data.table::is.data.table
+  vapply(
+    gtfs,
+    function(x) is.data.frame(x) && !is_dt(x),
+    logical(1),
+    USE.NAMES = FALSE
+  )
 }
 
 

@@ -78,7 +78,7 @@ set_route_speed <- function(
   route_type = NULL,
   by_reference = FALSE
 ) {
-  gtfs <- assert_and_assign_gtfs_object(gtfs)
+  gtfs <- assert_and_assign_gtfs_object(gtfs, by_reference = by_reference)
   if (is.null(route_id) && is.null(route_type)) {
     cli::cli_abort(
       "At least one of {.arg route_id} and {.arg route_type} must be given.",

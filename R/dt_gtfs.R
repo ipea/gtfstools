@@ -17,7 +17,12 @@
 #'
 #' - `gtfs`: the class of GTFS objects read with [gtfsio::import_gtfs()]. This
 #' method convert all date fields, represented as `integer`s in `{gtfsio}`'s
-#' representation, to `Date` objects.
+#' representation, to `Date` objects. It also converts back to `data.table`
+#' any table that lost this class, e.g. after being edited with
+#' `dplyr::group_by()`, so it can be used to repair a `dt_gtfs` whose tables
+#' were edited with other packages (the input object is not modified). An `sf`
+#' table is converted to a `data.table` with a `geometry` list column; use
+#' [convert_sf_to_shapes()] to convert `sf` shapes back to a `shapes` table.
 #'
 #' - `list`: this method tries to convert the elements of a list into
 #' `data.table`s. Please note that all list elements must inherit from
@@ -127,6 +132,17 @@ as_dt_gtfs.tidygtfs <- function(gtfs, calculate_distance = TRUE, ...) {
 #' @rdname as_dt_gtfs
 #' @export
 as_dt_gtfs.gtfs <- function(gtfs, ...) {
+  # tables edited with other tools (e.g. dplyr::group_by()) may have lost the
+  # data.table class. as.data.table() copies, so the caller's object is kept as
+  # is. the groups of a grouped_df are dropped by it, but those of a rowwise_df
+  # are not, so they are removed from the copy. the loop is positional because
+  # gtfsio accepts duplicated names
+
+  for (i in which(tables_not_data_table(gtfs))) {
+    gtfs[[i]] <- data.table::as.data.table(gtfs[[i]])
+    data.table::setattr(gtfs[[i]], "groups", NULL)
+  }
+
   if (!inherits(gtfs, "dt_gtfs")) gtfs <- convert_from_standard(gtfs)
 
   return(gtfs)
