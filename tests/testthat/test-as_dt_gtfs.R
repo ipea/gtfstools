@@ -23,6 +23,59 @@ test_that("doesn't change original gtfs-classed object", {
   expect_identical(gtfs, original_gtfs)
 })
 
+test_that("converts tables that lost the data.table class back (#130)", {
+  skip_if_not_installed("dplyr")
+
+  grouped_gtfs <- read_gtfs(data_path)
+  grouped_gtfs$stop_times <- dplyr::group_by(grouped_gtfs$stop_times, trip_id)
+  expect_s3_class(grouped_gtfs$stop_times, "grouped_df")
+
+  result <- as_dt_gtfs(grouped_gtfs)
+
+  expect_identical(class(result), dt_gtfs_class)
+  expect_true(all(vapply(result, data.table::is.data.table, logical(1))))
+  expect_null(attr(result$stop_times, "groups"))
+  expect_identical(result$stop_times, gtfstools_gtfs$stop_times)
+
+  # the input is not modified
+
+  expect_s3_class(grouped_gtfs$stop_times, "grouped_df")
+  expect_false(is.null(attr(grouped_gtfs$stop_times, "groups")))
+})
+
+test_that("converts plain data.frame tables back to data.table", {
+  df_gtfs <- read_gtfs(data_path)
+  df_gtfs$stop_times <- as.data.frame(df_gtfs$stop_times)
+
+  result <- as_dt_gtfs(df_gtfs)
+
+  expect_identical(class(result), dt_gtfs_class)
+  expect_identical(result$stop_times, gtfstools_gtfs$stop_times)
+  expect_identical(class(df_gtfs$stop_times), "data.frame")
+})
+
+test_that("returns a dt_gtfs with only data.tables unchanged, '.' included", {
+  gtfstools_like_gtfs <- gtfstools_gtfs
+  gtfstools_like_gtfs$. <- list(
+    internal_table = data.table::data.table(a = 1:2, b = 2:3)
+  )
+
+  expect_identical(as_dt_gtfs(gtfstools_like_gtfs), gtfstools_like_gtfs)
+})
+
+test_that("converts gtfsio objects whose tables lost the data.table class", {
+  # calendar is one of the tables convert_from_standard() edits with :=
+
+  gtfs <- gtfsio::import_gtfs(data_path)
+  gtfs$calendar <- as.data.frame(gtfs$calendar)
+
+  result <- as_dt_gtfs(gtfs)
+
+  expect_identical(class(result), dt_gtfs_class)
+  expect_identical(result, gtfstools_gtfs)
+  expect_s3_class(result$calendar$start_date, "Date")
+})
+
 # as_dt_gtfs.tidygtfs() ---------------------------------------------------
 
 # simulating a tidygtfs without depending on tidytransit. times will be

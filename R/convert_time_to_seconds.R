@@ -48,7 +48,7 @@
 #'
 #' @export
 convert_time_to_seconds <- function(gtfs, file = NULL, by_reference = FALSE) {
-  gtfs <- assert_and_assign_gtfs_object(gtfs)
+  gtfs <- assert_and_assign_gtfs_object(gtfs, by_reference = by_reference)
   checkmate::assert_logical(by_reference, len = 1, any.missing = FALSE)
   checkmate::assert_character(file, null.ok = TRUE)
   if (!is.null(file)) {

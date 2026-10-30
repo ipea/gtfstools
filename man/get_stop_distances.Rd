@@ -24,17 +24,20 @@ sorted by \code{from_stop_id} and \code{to_stop_id}. It is empty if fewer than t
 stops are selected.
 }
 \description{
-Returns the great-circle distance between each pair of stops visited by the
-given trips and/or routes.
+Returns the straight-line distance between all pairs of stops visited by
+the given trips and/or routes. Only straight-line distances ("as the crow
+flies", often called Euclidean distances) are calculated. For getting
+information on the distances along the trips' geometry shapes, see
+\code{\link[=interpolate_shape_dist_traveled]{interpolate_shape_dist_traveled()}}.
 }
 \section{Details}{
 
 The stops are selected as in \code{\link[=get_stops]{get_stops()}}: only the stops listed in the
 \code{stop_times} entries of the selected trips are considered.
 
-Distances are great-circle distances ("as the crow flies") between the
-stops' coordinates, not distances along the trips' shapes or the street
-network.
+Distances are calculated from the stops' coordinates with the haversine
+formula, which gives the great-circle distance over the Earth's surface
+(treated as a sphere) rather than a planar distance.
 
 Each pair of stops appears only once, with the \code{stop_id} that comes first
 in the C locale (the order used by \code{data.table}) as \code{from_stop_id}. If a
@@ -65,5 +68,6 @@ distances <- get_stop_distances(gtfs, route_id = "CPTM L07")
 head(distances)
 }
 \seealso{
-\code{\link[=get_stops]{get_stops()}}, \code{\link[=get_trip_length]{get_trip_length()}}
+\code{\link[=get_stops]{get_stops()}}, \code{\link[=get_trip_length]{get_trip_length()}},
+\code{\link[=interpolate_shape_dist_traveled]{interpolate_shape_dist_traveled()}}
 }

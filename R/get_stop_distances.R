@@ -1,7 +1,10 @@
 #' Get distances between stops
 #'
-#' Returns the great-circle distance between each pair of stops visited by the
-#' given trips and/or routes.
+#' Returns the straight-line distance between all pairs of stops visited by
+#' the given trips and/or routes. Only straight-line distances ("as the crow
+#' flies", often called Euclidean distances) are calculated. For getting
+#' information on the distances along the trips' geometry shapes, see
+#' [interpolate_shape_dist_traveled()].
 #'
 #' @template gtfs
 #' @param trip_id A character vector including the `trip_id`s whose stops
@@ -20,9 +23,9 @@
 #' The stops are selected as in [get_stops()]: only the stops listed in the
 #' `stop_times` entries of the selected trips are considered.
 #'
-#' Distances are great-circle distances ("as the crow flies") between the
-#' stops' coordinates, not distances along the trips' shapes or the street
-#' network.
+#' Distances are calculated from the stops' coordinates with the haversine
+#' formula, which gives the great-circle distance over the Earth's surface
+#' (treated as a sphere) rather than a planar distance.
 #'
 #' Each pair of stops appears only once, with the `stop_id` that comes first
 #' in the C locale (the order used by `data.table`) as `from_stop_id`. If a
@@ -35,7 +38,8 @@
 #' please select only the trips or routes of interest. More than 65,536 stops
 #' can't be used at once, raising an error.
 #'
-#' @seealso [get_stops()], [get_trip_length()]
+#' @seealso [get_stops()], [get_trip_length()],
+#'   [interpolate_shape_dist_traveled()]
 #'
 #' @examples
 #' \dontshow{

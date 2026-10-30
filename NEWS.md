@@ -1,4 +1,10 @@
-# gtfstools v2.0.0
+# gtfstools (development version)
+
+## Bug fixes
+
+- gtfstools functions now accept `dt_gtfs` objects whose tables were turned into tibbles, grouped data frames or plain data frames by other packages (e.g. after `dplyr::group_by()`), converting them back to `data.table` without modifying the input. `as_dt_gtfs()` does the same conversion. With `by_reference = TRUE`, an object with any such table now raises an informative error, since the edits can't be made by reference on a converted copy: convert it first with `as_dt_gtfs()` (#130, reported by @baarthur, who also opened PR #132).
+
+# gtfstools 2.0.0
 
 ## Breaking changes
 
