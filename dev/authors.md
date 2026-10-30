@@ -2,10 +2,10 @@
 
 ## Authors
 
-- **Daniel Herszenhut**. Author, maintainer.
+- **Daniel Herszenhut**. Author.
   [](https://orcid.org/0000-0001-8066-1105)
 
-- **Rafael H. M. Pereira**. Author.
+- **Rafael H. M. Pereira**. Author, maintainer.
   [](https://orcid.org/0000-0003-2125-7465)
 
 - **Pedro R. Andrade**. Author.
@@ -36,12 +36,12 @@ Source:
 
 Herszenhut D, Pereira R, Andrade P, Bazzo J (2026). *gtfstools: General
 Transit Feed Specification (GTFS) Editing and Analysing Tools*. R
-package version 1.4.0.9000, <https://ipea.github.io/gtfstools/>.
+package version 2.0.0.9000, <https://ipea.github.io/gtfstools/>.
 
     @Manual{,
       title = {gtfstools: General Transit Feed Specification (GTFS) Editing and Analysing Tools},
       author = {Daniel Herszenhut and Rafael H. M. Pereira and Pedro R. Andrade and Joao Bazzo},
       year = {2026},
-      note = {R package version 1.4.0.9000},
+      note = {R package version 2.0.0.9000},
       url = {https://ipea.github.io/gtfstools/},
     }

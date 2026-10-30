@@ -11,7 +11,7 @@ known times (timepoints)."><meta property="og:image" content="https://ipea.githu
 
     <a class="navbar-brand me-2" href="../index.html">gtfstools</a>
 
-    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">1.4.0.9000</small>
+    <small class="nav-text text-danger me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="In-development version">2.0.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -61,7 +61,13 @@ known times (timepoints).</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">interpolate_stop_times</span><span class="op">(</span><span class="va">gtfs</span>, trip_id <span class="op">=</span> <span class="cn">NULL</span>, method <span class="op">=</span> <span class="st">"shapes"</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">interpolate_stop_times</span><span class="op">(</span></span>
+<span>  <span class="va">gtfs</span>,</span>
+<span>  trip_id <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  method <span class="op">=</span> <span class="st">"shapes"</span>,</span>
+<span>  overwrite <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  keep_dwell_times <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -86,12 +92,34 @@ interpolates the stop times of every <code>trip_id</code> in the GTFS.</p></dd>
 doesn't have a <code>shapes</code> table, or if its <code>trips</code> table doesn't have a
 <code>shape_id</code> column, <code>"euclidean"</code> is used instead, with a warning.</p></dd>
 
+
+<dt id="arg-overwrite">overwrite<a class="anchor" aria-label="anchor" href="#arg-overwrite"></a></dt>
+<dd><p>A logical. If <code>FALSE</code> (the default), only blank times are
+filled. If <code>TRUE</code>, the times of every stop between the first and the last
+stop of each trip (in <code>stop_sequence</code> order) are replaced by interpolated
+ones, so only the trips' first and last times are used. Trips whose times
+can't be interpolated keep their original times as they are, with a
+warning, so blanks that <code>overwrite = FALSE</code> would fill in some of their
+stops may be left blank.</p></dd>
+
+
+<dt id="arg-keep-dwell-times">keep_dwell_times<a class="anchor" aria-label="anchor" href="#arg-keep-dwell-times"></a></dt>
+<dd><p>A logical. Only used when <code>overwrite = TRUE</code>. If
+<code>TRUE</code> (the default), the stops between the first and the last keep their
+original dwell times (the difference between their departure and arrival
+times), and the remaining time is spread over the distance travelled.
+Dwell times that can't be calculated (e.g. a blank time) or that are
+negative (e.g. a stop arriving at <code>"23:59:00"</code> and departing at
+<code>"00:01:00"</code>) are taken as 0. If <code>FALSE</code>, interpolated stops get equal
+arrival and departure times.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A GTFS object whose <code>stop_times</code> has its blank times filled in. The
-order of the rows and the other columns are kept. The given GTFS object is
-not modified.</p>
+    <p>A GTFS object whose <code>stop_times</code> has its blank times filled in (or,
+with <code>overwrite = TRUE</code>, the times of its intermediate stops replaced).
+The order of the rows and the other columns are kept. The given GTFS
+object is not modified.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -102,7 +130,8 @@ departure times are both blank gets a time interpolated linearly on the
 distance travelled from the preceding timepoint, as measured by
 <code><a href="get_trip_length.html">get_trip_length()</a></code> (if the distance between two timepoints is 0, their
 times are spread evenly between the stops in between). Interpolated stops
-get equal arrival and departure times, rounded to the nearest second.
+get equal arrival and departure times, rounded to the nearest second,
+unless they keep their dwell times (see <code>keep_dwell_times</code>).
 Times past <code>"24:00:00"</code> are supported. A timepoint with only one of its
 two times blank gets the other time in both columns. If <code>stop_times</code> has a
 <code>timepoint</code> column, interpolated stops get <code>timepoint = 0</code>; the column is
@@ -115,11 +144,12 @@ not linked to a shape or stops without coordinates;</p></li>
 previous departure, usually times after midnight written as
 <code>"00:30:00"</code> instead of <code>"24:30:00"</code>.</p></li>
 </ul><p>Times are blank when they are <code>NA</code>, empty or whitespace-only strings, or
-<code>"NA"</code>. Malformed time strings are left unchanged, with a warning, and are
-not used as timepoints. Rows without a <code>trip_id</code> are left unchanged. For
-trips listed in <code>frequencies</code>, the template times are interpolated. Times
-are read from the time strings, and existing <code>_secs</code> columns (e.g. created
-with <code><a href="convert_time_to_seconds.html">convert_time_to_seconds()</a></code>) are updated to match.</p>
+<code>"NA"</code>. Malformed time strings are left unchanged (unless overwritten with
+<code>overwrite = TRUE</code>), with a warning, and are not used as timepoints. Rows
+without a <code>trip_id</code> are left unchanged. For trips listed in <code>frequencies</code>,
+the template times are interpolated. Times are read from the time strings,
+and existing <code>_secs</code> columns (e.g. created with <code><a href="convert_time_to_seconds.html">convert_time_to_seconds()</a></code>)
+are updated to match.</p>
 <p>Interpolating between timepoints requires the <code>stops</code> table.</p>
     </div>
     <div class="section level2">

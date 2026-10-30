@@ -399,7 +399,7 @@ the feed goes through the following steps, in this order:
     removes duplicated entries from every table;
 2.  [`remove_unused_ids()`](https://ipea.github.io/gtfstools/dev/reference/remove_unused_ids.md)
     removes the trips without stop times and the entries of every table
-    that no remaining trip uses (e.g. stods that are not used in any
+    that no remaining trip uses (e.g. stops that are not used in any
     trip);
 3.  [`set_max_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_max_speed.md),
     only if `max_speed` is given, slows down the parts of trips that are

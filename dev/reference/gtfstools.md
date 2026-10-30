@@ -39,15 +39,16 @@ Useful links:
 
 ## Author
 
-**Maintainer**: Daniel Herszenhut <dhersz@gmail.com>
-([ORCID](https://orcid.org/0000-0001-8066-1105))
+**Maintainer**: Rafael H. M. Pereira <rafa.pereira.br@gmail.com>
+([ORCID](https://orcid.org/0000-0003-2125-7465))
 
 Authors:
 
+- Rafael H. M. Pereira <rafa.pereira.br@gmail.com>
+  ([ORCID](https://orcid.org/0000-0003-2125-7465))
+
 - Daniel Herszenhut <dhersz@gmail.com>
   ([ORCID](https://orcid.org/0000-0001-8066-1105))
-
-- Rafael H. M. Pereira ([ORCID](https://orcid.org/0000-0003-2125-7465))
 
 - Pedro R. Andrade ([ORCID](https://orcid.org/0000-0001-8675-4046))
 

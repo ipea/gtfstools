@@ -2,6 +2,35 @@
 
 ## gtfstools (development version)
 
+### New features
+
+- [`interpolate_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/interpolate_stop_times.md)
+  gains `overwrite` and `keep_dwell_times`. With `overwrite = TRUE`, the
+  times of every stop between the first and the last stop of each trip
+  are replaced by interpolated ones, instead of only the blank ones. By
+  default (`keep_dwell_times = TRUE`), these stops keep their original
+  dwell times.
+
+### Bug fixes
+
+- gtfstools functions now accept `dt_gtfs` objects whose tables were
+  turned into tibbles, grouped data frames or plain data frames by other
+  packages (e.g. after
+  [`dplyr::group_by()`](https://dplyr.tidyverse.org/reference/group_by.html)),
+  converting them back to `data.table` without modifying the input.
+  [`as_dt_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/as_dt_gtfs.md)
+  does the same conversion. With `by_reference = TRUE`, an object with
+  any such table now raises an informative error, since the edits can’t
+  be made by reference on a converted copy: convert it first with
+  [`as_dt_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/as_dt_gtfs.md)
+  ([\#130](https://github.com/ipea/gtfstools/issues/130), reported by
+  [@baarthur](https://github.com/baarthur), who also opened PR
+  [\#132](https://github.com/ipea/gtfstools/issues/132)).
+
+## gtfstools 2.0.0
+
+CRAN release: 2026-10-28
+
 ### Breaking changes
 
 - With `prefix = FALSE`, the default,
@@ -59,19 +88,6 @@
   [`set_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.md)
   must now be passed by name
   ([\#89](https://github.com/ipea/gtfstools/issues/89)).
-- [`convert_shapes_to_sf()`](https://ipea.github.io/gtfstools/dev/reference/convert_shapes_to_sf.md),
-  [`get_trip_geometry()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_geometry.md),
-  [`get_trip_length()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_length.md),
-  [`get_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_speed.md),
-  [`get_trip_segment_duration()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_segment_duration.md)
-  and
-  [`get_stop_times_patterns()`](https://ipea.github.io/gtfstools/dev/reference/get_stop_times_patterns.md)
-  now always order `shapes` and `stop_times` by
-  `shape_pt_sequence`/`stop_sequence`, which are therefore required.
-  Results only change for feeds not ordered by these columns, which were
-  previously wrong. Their `sort_sequence` argument is deprecated: `TRUE`
-  raises a warning and `FALSE` an error
-  ([\#94](https://github.com/ipea/gtfstools/issues/94)).
 
 ### Feature deprecation
 
@@ -423,6 +439,19 @@
   [`filter_by_stop_id()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_stop_id.md)
   now says that it keeps (or drops) the `stop_times` entries at the
   given stops, not entire trips.
+- [`convert_shapes_to_sf()`](https://ipea.github.io/gtfstools/dev/reference/convert_shapes_to_sf.md),
+  [`get_trip_geometry()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_geometry.md),
+  [`get_trip_length()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_length.md),
+  [`get_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_speed.md),
+  [`get_trip_segment_duration()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_segment_duration.md)
+  and
+  [`get_stop_times_patterns()`](https://ipea.github.io/gtfstools/dev/reference/get_stop_times_patterns.md)
+  now always order `shapes` and `stop_times` by
+  `shape_pt_sequence`/`stop_sequence`, which are therefore required.
+  Results only change for feeds not ordered by these columns, which were
+  previously wrong. Their `sort_sequence` argument is deprecated: `TRUE`
+  raises a warning and `FALSE` an error
+  ([\#94](https://github.com/ipea/gtfstools/issues/94)).
 
 ### Notes
 

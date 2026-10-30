@@ -7,7 +7,13 @@ stops with known times (timepoints).
 ## Usage
 
 ``` r
-interpolate_stop_times(gtfs, trip_id = NULL, method = "shapes")
+interpolate_stop_times(
+  gtfs,
+  trip_id = NULL,
+  method = "shapes",
+  overwrite = FALSE,
+  keep_dwell_times = TRUE
+)
 ```
 
 ## Arguments
@@ -32,9 +38,31 @@ interpolate_stop_times(gtfs, trip_id = NULL, method = "shapes")
   `shapes` table, or if its `trips` table doesn't have a `shape_id`
   column, `"euclidean"` is used instead, with a warning.
 
+- overwrite:
+
+  A logical. If `FALSE` (the default), only blank times are filled. If
+  `TRUE`, the times of every stop between the first and the last stop of
+  each trip (in `stop_sequence` order) are replaced by interpolated
+  ones, so only the trips' first and last times are used. Trips whose
+  times can't be interpolated keep their original times as they are,
+  with a warning, so blanks that `overwrite = FALSE` would fill in some
+  of their stops may be left blank.
+
+- keep_dwell_times:
+
+  A logical. Only used when `overwrite = TRUE`. If `TRUE` (the default),
+  the stops between the first and the last keep their original dwell
+  times (the difference between their departure and arrival times), and
+  the remaining time is spread over the distance travelled. Dwell times
+  that can't be calculated (e.g. a blank time) or that are negative
+  (e.g. a stop arriving at `"23:59:00"` and departing at `"00:01:00"`)
+  are taken as 0. If `FALSE`, interpolated stops get equal arrival and
+  departure times.
+
 ## Value
 
-A GTFS object whose `stop_times` has its blank times filled in. The
+A GTFS object whose `stop_times` has its blank times filled in (or, with
+`overwrite = TRUE`, the times of its intermediate stops replaced). The
 order of the rows and the other columns are kept. The given GTFS object
 is not modified.
 
@@ -46,11 +74,12 @@ distance travelled from the preceding timepoint, as measured by
 [`get_trip_length()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_length.md)
 (if the distance between two timepoints is 0, their times are spread
 evenly between the stops in between). Interpolated stops get equal
-arrival and departure times, rounded to the nearest second. Times past
-`"24:00:00"` are supported. A timepoint with only one of its two times
-blank gets the other time in both columns. If `stop_times` has a
-`timepoint` column, interpolated stops get `timepoint = 0`; the column
-is not created otherwise.
+arrival and departure times, rounded to the nearest second, unless they
+keep their dwell times (see `keep_dwell_times`). Times past `"24:00:00"`
+are supported. A timepoint with only one of its two times blank gets the
+other time in both columns. If `stop_times` has a `timepoint` column,
+interpolated stops get `timepoint = 0`; the column is not created
+otherwise.
 
 Some stops are left blank, with a warning:
 
@@ -65,11 +94,12 @@ Some stops are left blank, with a warning:
   `"00:30:00"` instead of `"24:30:00"`.
 
 Times are blank when they are `NA`, empty or whitespace-only strings, or
-`"NA"`. Malformed time strings are left unchanged, with a warning, and
-are not used as timepoints. Rows without a `trip_id` are left unchanged.
-For trips listed in `frequencies`, the template times are interpolated.
-Times are read from the time strings, and existing `_secs` columns (e.g.
-created with
+`"NA"`. Malformed time strings are left unchanged (unless overwritten
+with `overwrite = TRUE`), with a warning, and are not used as
+timepoints. Rows without a `trip_id` are left unchanged. For trips
+listed in `frequencies`, the template times are interpolated. Times are
+read from the time strings, and existing `_secs` columns (e.g. created
+with
 [`convert_time_to_seconds()`](https://ipea.github.io/gtfstools/dev/reference/convert_time_to_seconds.md))
 are updated to match.
 
