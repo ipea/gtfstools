@@ -221,37 +221,52 @@ test_that("only returns the visits that arrive within the time of day", {
   expect_vector(dwell$dwell_time, numeric(0))
 })
 
-test_that("fixes times after midnight written as early morning times", {
-  # a trip whose times after midnight are written as early morning times,
-  # including the departure from its second stop
+test_that(
+  desc = "fixes times after midnight written as early morning times",
+  code = {
+    # a trip whose times after midnight are written as early morning times,
+    # including the departure from its second stop
 
-  overnight_gtfs <- gtfsio::new_gtfs(
-    list(
-      stop_times = data.table::data.table(
-        trip_id = "t1",
-        stop_id = c("s1", "s2", "s3"),
-        stop_sequence = 1:3,
-        arrival_time = c("23:50:00", "23:58:00", "00:05:00"),
-        departure_time = c("23:50:00", "00:01:00", "00:05:00")
-      )
-    ),
-    "dt_gtfs"
-  )
+    overnight_gtfs <- gtfsio::new_gtfs(
+      x = list(
+        stop_times = data.table::data.table(
+          trip_id = "t1",
+          stop_id = c("s1", "s2", "s3"),
+          stop_sequence = 1:3,
+          arrival_time = c("23:50:00", "23:58:00", "00:05:00"),
+          departure_time = c("23:50:00", "00:01:00", "00:05:00")
+        )
+      ),
+      subclass = "dt_gtfs"
+    )
 
-  original_gtfs <- gtfsio::new_gtfs(
-    lapply(overnight_gtfs, data.table::copy),
-    "dt_gtfs"
-  )
+    original_gtfs <- gtfsio::new_gtfs(
+      x = lapply(X = overnight_gtfs, FUN = data.table::copy),
+      subclass = "dt_gtfs"
+    )
 
-  dwell <- tester(overnight_gtfs)
-  expect_equal(dwell$dwell_time, c(0, 180, 0))
-  expect_equal(overnight_gtfs, original_gtfs, ignore_attr = TRUE)
+    dwell <- tester(gtfs = overnight_gtfs)
+    expect_equal(object = dwell$dwell_time, expected = c(0, 180, 0))
+    expect_equal(
+      object = overnight_gtfs,
+      expected = original_gtfs,
+      ignore_attr = TRUE
+    )
 
-  # the visits after midnight are compared with the time of day as fixed
+    # the visits after midnight are compared with the time of day as fixed
 
-  dwell <- get_dwell_time(overnight_gtfs, from = "00:00:00", to = "01:00:00")
-  expect_identical(nrow(dwell), 0L)
+    dwell <- get_dwell_time(
+      gtfs = overnight_gtfs,
+      from = "00:00:00",
+      to = "01:00:00"
+    )
+    expect_identical(object = nrow(x = dwell), expected = 0L)
 
-  dwell <- get_dwell_time(overnight_gtfs, from = "24:00:00", to = "25:00:00")
-  expect_identical(dwell$stop_id, "s3")
-})
+    dwell <- get_dwell_time(
+      gtfs = overnight_gtfs,
+      from = "24:00:00",
+      to = "25:00:00"
+    )
+    expect_identical(object = dwell$stop_id, expected = "s3")
+  }
+)

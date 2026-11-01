@@ -164,7 +164,11 @@ get_trip_departures <- function(gtfs, trip_id) {
   # times after midnight written as early morning times are fixed first, so
   # each trip departs at its real time. only the relevant trips are fixed
 
-  gtfs <- fix_overnight_in_call(gtfs, relevant_trips, frequencies = TRUE)
+  gtfs <- fix_overnight_in_call(
+    gtfs = gtfs,
+    trip_id = relevant_trips,
+    frequencies = TRUE
+  )
 
   # the departures of trips listed in 'frequencies' come from the
   # 'frequencies' table, while their 'stop_times' entries are just templates

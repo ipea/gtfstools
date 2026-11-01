@@ -108,7 +108,7 @@ get_dwell_time <- function(gtfs,
   # times after midnight written as early morning times are fixed first, so
   # they don't go back
 
-  gtfs <- fix_overnight_in_call(gtfs, trip_id)
+  gtfs <- fix_overnight_in_call(gtfs = gtfs, trip_id = trip_id)
 
   rows <- select_dwell_time_calls(gtfs$stop_times, trip_id, stop_id)
 

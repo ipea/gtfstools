@@ -75,28 +75,28 @@
 #'
 #' @export
 fix_overnight_times <- function(gtfs) {
-  gtfs <- assert_and_assign_gtfs_object(gtfs)
+  gtfs <- assert_and_assign_gtfs_object(gtfs = gtfs)
 
   gtfsio::assert_field_class(
-    gtfs,
-    "stop_times",
-    c("trip_id", "stop_sequence", "arrival_time", "departure_time"),
-    c("character", "integer", "character", "character")
+    x = gtfs,
+    file = "stop_times",
+    fields = c("trip_id", "stop_sequence", "arrival_time", "departure_time"),
+    classes = c("character", "integer", "character", "character")
   )
 
-  if (gtfsio::check_file_exists(gtfs, "frequencies")) {
+  if (gtfsio::check_file_exists(x = gtfs, files = "frequencies")) {
     gtfsio::assert_field_class(
-      gtfs,
-      "frequencies",
-      c("start_time", "end_time"),
-      c("character", "character")
+      x = gtfs,
+      file = "frequencies",
+      fields = c("start_time", "end_time"),
+      classes = c("character", "character")
     )
   }
 
-  gtfs <- fix_overnight_stop_times(gtfs)
-  gtfs <- fix_overnight_frequencies(gtfs)
+  gtfs <- fix_overnight_stop_times(gtfs = gtfs)
+  gtfs <- fix_overnight_frequencies(gtfs = gtfs)
 
-  return(gtfs)
+  return(value = gtfs)
 }
 
 
@@ -135,8 +135,10 @@ fix_overnight_stop_times <- function(
   # rows with a missing trip_id or stop_sequence can't be placed in a trip,
   # so they are left alone
 
-  is_candidate <- !is.na(stop_times$trip_id) & !is.na(stop_times$stop_sequence)
-  if (!is.null(trip_id)) {
+  has_trip <- !is.na(x = stop_times$trip_id)
+  has_sequence <- !is.na(x = stop_times$stop_sequence)
+  is_candidate <- has_trip & has_sequence
+  if (!is.null(x = trip_id)) {
     is_candidate <- is_candidate & stop_times$trip_id %chin% trip_id
   }
 
@@ -145,9 +147,12 @@ fix_overnight_stop_times <- function(
   # the radix sort of order() fails on ids in a native encoding with
   # non-ASCII characters (e.g. on Windows)
 
-  rows <- which(is_candidate)
+  rows <- which(x = is_candidate)
   candidate_trips <- stop_times$trip_id[rows]
-  trip_number <- data.table::chmatch(candidate_trips, unique(candidate_trips))
+  trip_number <- data.table::chmatch(
+    x = candidate_trips,
+    table = unique(x = candidate_trips)
+  )
   ord <- order(trip_number, stop_times$stop_sequence[rows], method = "radix")
   rows <- rows[ord]
   trip_number <- trip_number[ord]
@@ -162,40 +167,45 @@ fix_overnight_stop_times <- function(
 
   rows_secs <- function(time_col) {
     secs_col <- paste0(time_col, "_secs")
-    if (secs_col %chin% names(stop_times)) {
-      return(stop_times[[secs_col]][rows])
+    if (secs_col %chin% names(x = stop_times)) {
+      return(value = stop_times[[secs_col]][rows])
     }
-    return(string_to_seconds(stop_times[[time_col]][rows]))
+    return(value = string_to_seconds(string = stop_times[[time_col]][rows]))
   }
 
-  n_rows <- length(rows)
+  n_rows <- length(x = rows)
   secs <- withCallingHandlers(
-    as.numeric(rbind(rows_secs("arrival_time"), rows_secs("departure_time"))),
+    expr = as.numeric(
+      x = rbind(
+        rows_secs(time_col = "arrival_time"),
+        rows_secs(time_col = "departure_time")
+      )
+    ),
     gtfstools_malformed_time = function(cnd) {
-      if (!warn) invokeRestart("muffleWarning")
+      if (!warn) invokeRestart(r = "muffleWarning")
     }
   )
-  row <- rep(rows, each = 2L)
-  is_arrival <- rep(c(TRUE, FALSE), times = n_rows)
+  row <- rep(x = rows, each = 2L)
+  is_arrival <- rep(x = c(TRUE, FALSE), times = n_rows)
 
   # trips are told apart by the numbers they were sorted by, which is cheaper
   # than comparing their ids on the interleaved times
 
-  trip_run <- rep(trip_number, each = 2L)
+  trip_run <- rep(x = trip_number, each = 2L)
 
-  is_known <- !is.na(secs)
+  is_known <- !is.na(x = secs)
   secs <- secs[is_known]
   row <- row[is_known]
   is_arrival <- is_arrival[is_known]
   trip_run <- trip_run[is_known]
 
-  n <- length(secs)
+  n <- length(x = secs)
   if (n == 0) {
-    return(if (detect_only) FALSE else gtfs)
+    return(value = if (detect_only) FALSE else gtfs)
   }
 
   is_first <- c(TRUE, trip_run[-1L] != trip_run[-n])
-  trip_idx <- cumsum(is_first)
+  trip_idx <- cumsum(x = is_first)
 
   # a step back of more than 12 hours between consecutive times of a trip
   # crosses midnight, so the times after it are one day later than written.
@@ -203,9 +213,9 @@ fix_overnight_stop_times <- function(
   # that mix "24:xx" and "00:xx" times are fixed too. round() rounds a step of
   # exactly 12 hours to 0
 
-  step <- c(0, diff(secs))
+  step <- c(0, diff(x = secs))
   step[is_first] <- 0
-  days <- cumsum(-round(step / 86400))
+  days <- cumsum(x = -round(x = step / 86400))
 
   # the days are counted from the start of each trip, and kept from going
   # below 0 by subtracting their running minimum within the trip, so times are
@@ -214,19 +224,19 @@ fix_overnight_stop_times <- function(
   # previous ones, so a single cummin() restarts at the start of each trip
 
   days <- days - days[is_first][trip_idx]
-  trip_shift <- trip_idx * (2 * max(abs(days)) + 1)
-  days <- days - (cummin(days - trip_shift) + trip_shift)
+  trip_shift <- trip_idx * (2 * max(abs(x = days)) + 1)
+  days <- days - (cummin(x = days - trip_shift) + trip_shift)
   fixed <- secs + days * 86400
 
   # steps that still go back are left as they are, with a warning
 
-  is_backwards <- !is_first & c(0, diff(fixed)) < 0
+  is_backwards <- !is_first & c(0, diff(x = fixed)) < 0
 
   if (warn && any(is_backwards)) {
-    backwards_trips <- unique(stop_times$trip_id[row[is_backwards]])
-    abbreviated <- abbreviate_ids(backwards_trips)
+    backwards_trips <- unique(x = stop_times$trip_id[row[is_backwards]])
+    abbreviated <- abbreviate_ids(ids = backwards_trips)
     cli::cli_warn(
-      c(
+      message = c(
         paste0(
           "{length(backwards_trips)} trip{?s} {?has/have} times earlier ",
           "than the previous time of the trip, which {?was/were} not fixed: ",
@@ -243,10 +253,10 @@ fix_overnight_stop_times <- function(
 
   is_changed <- days > 0
   if (detect_only) {
-    return(any(is_changed))
+    return(value = any(is_changed))
   }
   if (!any(is_changed)) {
-    return(gtfs)
+    return(value = gtfs)
   }
 
   # seconds_to_string() can't write times later than 9999:59:59
@@ -254,10 +264,10 @@ fix_overnight_stop_times <- function(
   is_invalid <- is_changed & fixed > max_time_secs
 
   if (any(is_invalid)) {
-    invalid_trips <- unique(stop_times$trip_id[row[is_invalid]])
-    abbreviated <- abbreviate_ids(invalid_trips)
+    invalid_trips <- unique(x = stop_times$trip_id[row[is_invalid]])
+    abbreviated <- abbreviate_ids(ids = invalid_trips)
     cli::cli_abort(
-      paste0(
+      message = paste0(
         "Fixing the times after midnight results in times later than ",
         "{.val 9999:59:59} in the following ",
         "{cli::qty(length(invalid_trips))}trip{?s}: ",
@@ -268,35 +278,35 @@ fix_overnight_stop_times <- function(
   }
 
   if (!by_reference) {
-    stop_times <- data.table::copy(stop_times)
+    stop_times <- data.table::copy(x = stop_times)
   }
 
   is_arr_changed <- is_changed & is_arrival
   data.table::set(
-    stop_times,
+    x = stop_times,
     i = row[is_arr_changed],
     j = "arrival_time",
-    value = seconds_to_string(as.integer(fixed[is_arr_changed]))
+    value = seconds_to_string(seconds = as.integer(x = fixed[is_arr_changed]))
   )
 
   is_dep_changed <- is_changed & !is_arrival
   data.table::set(
-    stop_times,
+    x = stop_times,
     i = row[is_dep_changed],
     j = "departure_time",
-    value = seconds_to_string(as.integer(fixed[is_dep_changed]))
+    value = seconds_to_string(seconds = as.integer(x = fixed[is_dep_changed]))
   )
 
   # refresh pre-existing *_secs columns, which other functions use as-is
 
   refresh_secs_columns(
-    stop_times,
-    c("arrival_time", "departure_time"),
-    unique(row[is_changed])
+    dt = stop_times,
+    time_cols = c("arrival_time", "departure_time"),
+    rows = unique(x = row[is_changed])
   )
 
   gtfs$stop_times <- stop_times
-  return(gtfs)
+  return(value = gtfs)
 }
 
 
@@ -310,24 +320,24 @@ fix_overnight_stop_times <- function(
 #' @keywords internal
 fix_overnight_frequencies <- function(gtfs) {
   frequencies <- gtfs$frequencies
-  if (is.null(frequencies)) {
-    return(gtfs)
+  if (is.null(x = frequencies)) {
+    return(value = gtfs)
   }
 
-  start <- time_secs(frequencies, "start_time")
-  end <- time_secs(frequencies, "end_time")
-  wrapped <- which(end < start)
+  start <- time_secs(dt = frequencies, time_col = "start_time")
+  end <- time_secs(dt = frequencies, time_col = "end_time")
+  wrapped <- which(x = end < start)
 
-  if (length(wrapped) == 0) {
-    return(gtfs)
+  if (length(x = wrapped) == 0) {
+    return(value = gtfs)
   }
 
   fixed <- end[wrapped] +
-    86400 * (floor((start[wrapped] - end[wrapped]) / 86400) + 1)
+    86400 * (floor(x = (start[wrapped] - end[wrapped]) / 86400) + 1)
 
   if (any(fixed > max_time_secs)) {
     cli::cli_abort(
-      paste0(
+      message = paste0(
         "Fixing the times after midnight results in times later than ",
         "{.val 9999:59:59} in {.field frequencies}."
       ),
@@ -335,17 +345,17 @@ fix_overnight_frequencies <- function(gtfs) {
     )
   }
 
-  frequencies <- data.table::copy(frequencies)
+  frequencies <- data.table::copy(x = frequencies)
   data.table::set(
-    frequencies,
+    x = frequencies,
     i = wrapped,
     j = "end_time",
-    value = seconds_to_string(as.integer(fixed))
+    value = seconds_to_string(seconds = as.integer(x = fixed))
   )
-  refresh_secs_columns(frequencies, "end_time", wrapped)
+  refresh_secs_columns(dt = frequencies, time_cols = "end_time", rows = wrapped)
 
   gtfs$frequencies <- frequencies
-  return(gtfs)
+  return(value = gtfs)
 }
 
 
@@ -367,39 +377,41 @@ fix_overnight_frequencies <- function(gtfs) {
 #' @keywords internal
 has_overnight_trips <- function(gtfs) {
   is_stop_times_valid <- gtfsio::check_field_class(
-    gtfs,
-    "stop_times",
-    c("trip_id", "stop_sequence", "arrival_time", "departure_time"),
-    c("character", "integer", "character", "character")
+    x = gtfs,
+    file = "stop_times",
+    fields = c("trip_id", "stop_sequence", "arrival_time", "departure_time"),
+    classes = c("character", "integer", "character", "character")
   )
   # the check is silent: malformed times are reported by the functions that
   # use the times
 
-  if (isTRUE(is_stop_times_valid)) {
+  if (isTRUE(x = is_stop_times_valid)) {
     has_wrapped_times <- fix_overnight_stop_times(
-      gtfs,
+      gtfs = gtfs,
       warn = FALSE,
       detect_only = TRUE
     )
-    if (has_wrapped_times) return(TRUE)
+    if (has_wrapped_times) return(value = TRUE)
   }
 
   is_frequencies_valid <- gtfsio::check_field_class(
-    gtfs,
-    "frequencies",
-    c("start_time", "end_time"),
-    c("character", "character")
+    x = gtfs,
+    file = "frequencies",
+    fields = c("start_time", "end_time"),
+    classes = c("character", "character")
   )
-  if (isTRUE(is_frequencies_valid)) {
+  if (isTRUE(x = is_frequencies_valid)) {
     is_wrapped <- withCallingHandlers(
-      time_secs(gtfs$frequencies, "end_time") <
-        time_secs(gtfs$frequencies, "start_time"),
-      gtfstools_malformed_time = function(cnd) invokeRestart("muffleWarning")
+      expr = time_secs(dt = gtfs$frequencies, time_col = "end_time") <
+        time_secs(dt = gtfs$frequencies, time_col = "start_time"),
+      gtfstools_malformed_time = function(cnd) {
+        invokeRestart(r = "muffleWarning")
+      }
     )
-    return(any(is_wrapped, na.rm = TRUE))
+    return(value = any(is_wrapped, na.rm = TRUE))
   }
 
-  return(FALSE)
+  return(value = FALSE)
 }
 
 
@@ -430,15 +442,15 @@ fix_overnight_in_call <- function(
   # own assertions report them
 
   is_stop_times_valid <- gtfsio::check_field_class(
-    gtfs,
-    "stop_times",
-    c("trip_id", "stop_sequence", "arrival_time", "departure_time"),
-    c("character", "integer", "character", "character")
+    x = gtfs,
+    file = "stop_times",
+    fields = c("trip_id", "stop_sequence", "arrival_time", "departure_time"),
+    classes = c("character", "integer", "character", "character")
   )
-  if (isTRUE(is_stop_times_valid)) {
+  if (isTRUE(x = is_stop_times_valid)) {
     gtfs <- fix_overnight_stop_times(
-      gtfs,
-      trip_id,
+      gtfs = gtfs,
+      trip_id = trip_id,
       warn = FALSE,
       by_reference = by_reference
     )
@@ -446,15 +458,15 @@ fix_overnight_in_call <- function(
 
   if (frequencies) {
     is_frequencies_valid <- gtfsio::check_field_class(
-      gtfs,
-      "frequencies",
-      c("start_time", "end_time"),
-      c("character", "character")
+      x = gtfs,
+      file = "frequencies",
+      fields = c("start_time", "end_time"),
+      classes = c("character", "character")
     )
-    if (isTRUE(is_frequencies_valid)) {
-      gtfs <- fix_overnight_frequencies(gtfs)
+    if (isTRUE(x = is_frequencies_valid)) {
+      gtfs <- fix_overnight_frequencies(gtfs = gtfs)
     }
   }
 
-  return(gtfs)
+  return(value = gtfs)
 }

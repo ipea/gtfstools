@@ -232,7 +232,7 @@ build_graph <- function(gtfs,
   # 'frequencies' come from its start and end times, which are fixed too
   # (fields of the wrong class are reported later, when they are used)
 
-  gtfs <- fix_overnight_in_call(gtfs, frequencies = TRUE)
+  gtfs <- fix_overnight_in_call(gtfs = gtfs, frequencies = TRUE)
 
   network <- build_service_network(
     gtfs,

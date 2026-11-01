@@ -230,7 +230,7 @@ test_that("fills shape_dist_traveled, only in feeds with shapes", {
   expect_false("shape_dist_traveled" %chin% names(result$stop_times))
 })
 
-test_that("fixes the times of trips that run past midnight", {
+test_that(desc = "fixes the times of trips that run past midnight", code = {
   # some trips of this feed have times after midnight written as "00:xx:xx".
   # they are fixed first, so their times are then capped and interpolated
 
@@ -247,25 +247,28 @@ test_that("fixes the times of trips that run past midnight", {
       invokeRestart("muffleWarning")
     }
   )
-  expect_false("gtfstools_backwards_times" %in% warning_classes)
+  expect_false(object = "gtfstools_backwards_times" %in% warning_classes)
 
   # the trip keeps its start time and ends after midnight. its intermediate
   # times are filled, and depend on the capped speeds, so only their order is
   # checked
 
   trip_times <- result$stop_times[trip_id == trip][order(stop_sequence)]
-  expect_identical(trip_times$arrival_time[1], "23:10:00")
-  expect_true(all(trip_times$arrival_time != ""))
-  expect_true(all(trip_times$departure_time != ""))
+  expect_identical(object = trip_times$arrival_time[1], expected = "23:10:00")
+  expect_true(object = all(trip_times$arrival_time != ""))
+  expect_true(object = all(trip_times$departure_time != ""))
 
   secs <- as.vector(
-    rbind(
-      string_to_seconds(trip_times$arrival_time),
-      string_to_seconds(trip_times$departure_time)
+    x = rbind(
+      string_to_seconds(string = trip_times$arrival_time),
+      string_to_seconds(string = trip_times$departure_time)
     )
   )
-  expect_false(is.unsorted(secs))
-  expect_gte(secs[length(secs)], string_to_seconds("24:02:00"))
+  expect_false(object = is.unsorted(x = secs))
+  expect_gte(
+    object = secs[length(x = secs)],
+    expected = string_to_seconds(string = "24:02:00")
+  )
 })
 
 test_that("unit arguments work correctly", {

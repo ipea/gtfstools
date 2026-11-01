@@ -254,7 +254,7 @@ change_dwell_times <- function(
   # keeps them fixed
 
   gtfs$stop_times <- stop_times
-  gtfs <- fix_overnight_in_call(gtfs, by_reference = TRUE)
+  gtfs <- fix_overnight_in_call(gtfs = gtfs, by_reference = TRUE)
 
   selected_rows <- select_dwell_time_calls(stop_times, trip_id, stop_id)
 

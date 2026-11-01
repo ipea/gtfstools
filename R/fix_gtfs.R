@@ -153,7 +153,7 @@ fix_gtfs <- function(
   # fix times after midnight before the steps that use the times, which skip
   # the spans that go back
 
-  gtfs_fixed <- fix_overnight_times(gtfs_fixed)
+  gtfs_fixed <- fix_overnight_times(gtfs = gtfs_fixed)
 
   # cap max speed. this is done before interpolating, so the interpolated
   # times follow the capped times

@@ -160,9 +160,13 @@ get_stop_frequency <- function(gtfs,
   # the departures are compared with the time of day as they should be. only
   # the relevant trips are fixed
 
-  gtfs <- fix_overnight_in_call(gtfs, relevant_trips, frequencies = TRUE)
+  gtfs <- fix_overnight_in_call(
+    gtfs = gtfs,
+    trip_id = relevant_trips,
+    frequencies = TRUE
+  )
 
-  if (is.null(relevant_trips)) {
+  if (is.null(x = relevant_trips)) {
     stop_times <- gtfs$stop_times[
       ,
       .(

@@ -269,7 +269,7 @@ set_trip_speed <- function(
   # keeps them fixed
 
   gtfs$stop_times <- stop_times
-  gtfs <- fix_overnight_in_call(gtfs, by_reference = TRUE)
+  gtfs <- fix_overnight_in_call(gtfs = gtfs, by_reference = TRUE)
 
   # select the rows of the given trips, ordered as in get_trip_length(), so
   # that the segment starting at the n-th stop of a trip is its n-th segment.

@@ -136,13 +136,18 @@ test_that("handles times past midnight", {
 
   # times after midnight written as early morning times are fixed first
 
-  feed <- synthetic_feed(c(0, 0.01, 0.02), c("23:59:00", "", "00:01:00"))
-  original_stop_times <- data.table::copy(feed$stop_times)
-  expect_no_warning(result <- tester(feed, method = "euclidean"))
-  expect_identical(feed$stop_times, original_stop_times)
+  feed <- synthetic_feed(
+    stop_lon = c(0, 0.01, 0.02),
+    arrival_time = c("23:59:00", "", "00:01:00")
+  )
+  original_stop_times <- data.table::copy(x = feed$stop_times)
+  expect_no_warning(
+    object = result <- tester(gtfs = feed, method = "euclidean")
+  )
+  expect_identical(object = feed$stop_times, expected = original_stop_times)
   expect_identical(
-    result$stop_times$arrival_time,
-    c("23:59:00", "24:00:00", "24:01:00")
+    object = result$stop_times$arrival_time,
+    expected = c("23:59:00", "24:00:00", "24:01:00")
   )
 })
 
@@ -261,7 +266,10 @@ test_that("falls back to euclidean distances without shapes", {
 })
 
 test_that("leaves spans whose arrival is earlier than the departure blank", {
-  feed <- synthetic_feed(c(0, 0.01, 0.02), c("08:59:00", "", "08:57:00"))
+  feed <- synthetic_feed(
+    stop_lon = c(0, 0.01, 0.02),
+    arrival_time = c("08:59:00", "", "08:57:00")
+  )
   expect_warning(
     result <- tester(feed, method = "euclidean"),
     regexp = "earlier than the previous departure",
@@ -280,8 +288,8 @@ test_that("leaves spans whose arrival is earlier than the departure blank", {
   )
   expect_match(conditionMessage(warning), "Affected trip")
   expect_match(
-    conditionMessage(warning),
-    "earlier than the previous departure"
+    object = conditionMessage(c = warning),
+    regexp = "earlier than the previous departure"
   )
 })
 
@@ -616,11 +624,11 @@ test_that("fills poa's blank times, which never decrease", {
   # trips that cross midnight are written with times such as "00:02:00",
   # which are fixed first, so every blank time is filled
   expect_no_warning(
-    result <- tester(poa_gtfs),
+    object = result <- tester(gtfs = poa_gtfs),
     class = "gtfstools_times_not_interpolated"
   )
   st <- data.table::copy(result$stop_times)
-  expect_false(any(st$arrival_time == "" | st$departure_time == ""))
+  expect_false(object = any(st$arrival_time == "" | st$departure_time == ""))
 
   st[, `:=`(
     arr = string_to_seconds(arrival_time),
@@ -635,7 +643,7 @@ test_that("fills poa's blank times, which never decrease", {
   is_timepoint <- poa_gtfs$stop_times$arrival_time != ""
   expect_identical(
     result$stop_times$arrival_time[is_timepoint],
-    fix_overnight_times(poa_gtfs)$stop_times$arrival_time[is_timepoint]
+    fix_overnight_times(gtfs = poa_gtfs)$stop_times$arrival_time[is_timepoint]
   )
 })
 
@@ -645,8 +653,8 @@ test_that("works with stop_times grouped by dplyr (#130)", {
   grouped_gtfs <- read_gtfs(poa_path)
   grouped_gtfs$stop_times <- dplyr::group_by(grouped_gtfs$stop_times, trip_id)
 
-  result <- tester(grouped_gtfs)
+  result <- tester(gtfs = grouped_gtfs)
 
-  expect_identical(result, tester())
+  expect_identical(object = result, expected = tester())
   expect_s3_class(grouped_gtfs$stop_times, "grouped_df")
 })

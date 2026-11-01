@@ -131,7 +131,7 @@ interpolate_stop_times <- function(
   # times after midnight written as early morning times are fixed first, so
   # they don't go back. the returned feed keeps the fixed times
 
-  gtfs <- fix_overnight_in_call(gtfs)
+  gtfs <- fix_overnight_in_call(gtfs = gtfs)
 
   stop_times <- gtfs$stop_times
 

@@ -151,7 +151,7 @@ set_route_frequency <- function(gtfs,
   # the departures and the clipped 'frequencies' entries below use the same
   # times. the returned feed keeps them fixed
 
-  gtfs <- fix_overnight_in_call(gtfs, frequencies = TRUE)
+  gtfs <- fix_overnight_in_call(gtfs = gtfs, frequencies = TRUE)
 
   # select the trips of the relevant routes and raise warning if a given
   # route_id doesn't exist in 'trips'. the departures are grouped by route,
