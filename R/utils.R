@@ -230,11 +230,17 @@ tables_not_data_table <- function(gtfs) {
 #' @param existing_id A character vector of the ids that exist in the table.
 #' @param table The name of the table, used in the warning message.
 #' @param id_name The name of the id field, used in the warning message.
+#' @param call The call the warning is attributed to. Defaults to the call of
+#'   the function that called this helper.
 #'
 #' @return The missing ids, invisibly.
 #'
 #' @keywords internal
-warn_missing_ids <- function(id, existing_id, table, id_name) {
+warn_missing_ids <- function(id,
+                             existing_id,
+                             table,
+                             id_name,
+                             call = sys.call(-1)) {
   invalid_id <- id[! id %chin% existing_id]
 
   if (length(invalid_id) > 0) {
@@ -242,7 +248,7 @@ warn_missing_ids <- function(id, existing_id, table, id_name) {
       "'", table, "' doesn't contain the following ", id_name, "(s): ",
       paste0("'", invalid_id, "'", collapse = ", ")
     )
-    warning(simpleWarning(msg, call = sys.call(-1)))
+    warning(simpleWarning(msg, call = call))
   }
 
   return(invisible(invalid_id))

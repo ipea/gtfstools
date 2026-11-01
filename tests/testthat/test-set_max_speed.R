@@ -167,6 +167,14 @@ test_that("raises an error if times would be later than 9999:59:59", {
   )
 })
 
+test_that("attributes warnings and errors to set_max_speed()", {
+  w <- tryCatch(tester(trip_id = "ola"), warning = function(w) w)
+  expect_identical(conditionCall(w)[[1]], quote(set_max_speed))
+
+  e <- tryCatch(tester(max_speed = 1e-6), error = function(e) e)
+  expect_identical(conditionCall(e)[[1]], quote(set_max_speed))
+})
+
 test_that("results in a dt_gtfs object", {
   result <- tester()
   expect_s3_class(result, "dt_gtfs")

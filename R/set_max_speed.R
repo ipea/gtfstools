@@ -64,7 +64,7 @@
 #' `"24:00:00"` for departures after midnight. Trips without a time there are
 #' left unchanged.
 #'
-#' @seealso [set_trip_speed()], [get_trip_speed()]
+#' @seealso [set_min_speed()], [set_trip_speed()], [get_trip_speed()]
 #'
 #' @examples
 #' \dontshow{
@@ -137,11 +137,52 @@ set_max_speed <- function(
   )
 
   window <- dwell_time_window(from, to)
+
+  # calculations use km/h
+
+  max_kmh <- max_speed * speed_unit_factors[[unit]]
+
+  return(
+    limit_trip_speed(
+      gtfs,
+      max_kmh,
+      "max",
+      route_id,
+      trip_id,
+      first_stop,
+      last_stop,
+      window,
+      route_type
+    )
+  )
+}
+
+
+
+# changes the speed of the selected trips, either capping it ('mode = "max"',
+# used by set_max_speed()) or raising it ('mode = "min"', used by
+# set_min_speed()) to 'limit_kmh'. the arguments are validated by the callers,
+# so that their errors are attributed to them, and 'window' is the output of
+# dwell_time_window()
+
+limit_trip_speed <- function(
+  gtfs,
+  limit_kmh,
+  mode,
+  route_id,
+  trip_id,
+  first_stop,
+  last_stop,
+  window,
+  route_type
+) {
+  is_max <- identical(mode, "max")
+
   from_secs <- window[1]
   to_secs <- window[2]
 
   has_stop_args <- !is.null(first_stop) || !is.null(last_stop)
-  has_window <- !is.null(from) || !is.null(to)
+  has_window <- any(is.finite(window))
 
   gtfsio::assert_field_class(
     gtfs,
@@ -154,10 +195,6 @@ set_max_speed <- function(
     gtfsio::assert_field_class(gtfs, "stop_times", "stop_id", "character")
   }
 
-  # calculations use km/h
-
-  max_kmh <- max_speed * speed_unit_factors[[unit]]
-
   # select the trips. ids is NULL only when both arguments are NULL, so that
   # trip_ids that don't exist don't result in all trips being changed
 
@@ -167,12 +204,16 @@ set_max_speed <- function(
   if (!is.null(trip_id) || !is.null(route_id)) {
     ids <- character(0)
 
+    # the call must be evaluated directly in this function's body, so that
+    # the warning is attributed to its caller
+
     if (!is.null(trip_id)) {
       invalid_trip_id <- warn_missing_ids(
         trip_id,
         existing_trips,
         "stop_times",
-        "trip_id"
+        "trip_id",
+        call = sys.call(-1)
       )
       ids <- setdiff(trip_id, invalid_trip_id)
     }
@@ -344,10 +385,22 @@ set_max_speed <- function(
     span_len := i.span_len
   ]
 
+  # capped spans last at least their length divided by the limit, rounded up,
+  # and raised ones at most that, rounded down, so that their speed respects
+  # the limit. raising spans of length 0 would remove the time spent between
+  # stops at the same place, so they are left unchanged. the extra time of
+  # raised spans is negative
+
   is_first <- data.table::rowid(timed$trip_id) == 1L
   span_dur <- timed$t_arr - data.table::shift(timed$t_dep)
-  min_dur <- ceiling(timed$span_len / max_kmh * 3600)
-  extra <- pmax(min_dur - span_dur, 0)
+  if (is_max) {
+    min_dur <- ceiling(timed$span_len / limit_kmh * 3600)
+    extra <- pmax(min_dur - span_dur, 0)
+  } else {
+    max_dur <- floor(timed$span_len / limit_kmh * 3600)
+    extra <- -pmax(span_dur - max_dur, 0)
+    extra[!is.na(timed$span_len) & timed$span_len <= 0] <- 0
+  }
   extra[is_first | is.na(extra)] <- 0
 
   # spans that end before they start have invalid times, which are not
@@ -375,12 +428,13 @@ set_max_speed <- function(
   if (any(is_backwards)) {
     backwards_trips <- unique(timed$trip_id[is_backwards])
     abbreviated <- abbreviate_ids(backwards_trips)
+    changed <- if (is_max) "capped" else "raised"
     cli::cli_warn(
       c(
         paste0(
           "{length(backwards_trips)} trip{?s} {?has/have} stops whose ",
           "arrival is earlier than the previous departure, so {?its/their} ",
-          "speed{?s} {?was/were} not capped between them: ",
+          "speed{?s} {?was/were} not ", changed, " between them: ",
           "{.val {abbreviated$shown}}{abbreviated$more}."
         ),
         "i" = paste0(
@@ -392,36 +446,65 @@ set_max_speed <- function(
     )
   }
 
-  # the delay of each stop is the extra time accumulated up to it in its trip.
-  # shifting a span doesn't change the duration of the following ones, so the
-  # delays don't depend on each other
+  # the delay of each stop is the extra time accumulated up to it in its trip
+  # (negative when raising speeds). shifting a span doesn't change the
+  # duration of the following ones, so the delays don't depend on each other
 
   cum_extra <- cumsum(extra)
   trip_start <- cumsum(is_first)
   timed[, delay := cum_extra - (cum_extra - extra)[is_first][trip_start]]
 
-  timed <- timed[delay > 0]
+  timed <- timed[delay != 0]
 
   if (nrow(timed) == 0) {
     return(gtfs)
   }
 
-  # seconds_to_string() can't write times later than 9999:59:59
+  # seconds_to_string() can't write times later than 9999:59:59 or earlier
+  # than 00:00:00. the latter usually happens after a span that ends before
+  # it starts. the calls to cli_abort() must be evaluated directly in this
+  # function's body, so that the errors are attributed to its caller
 
-  is_invalid <- pmax(timed$arr, timed$dep, na.rm = TRUE) + timed$delay >
-    max_time_secs
+  if (is_max) {
+    is_invalid <- pmax(timed$arr, timed$dep, na.rm = TRUE) + timed$delay >
+      max_time_secs
 
-  if (any(is_invalid)) {
-    invalid_trips <- unique(timed$trip_id[is_invalid])
-    abbreviated <- abbreviate_ids(invalid_trips)
-    cli::cli_abort(
-      paste0(
-        "Capping the speed results in times later than {.val 9999:59:59} ",
-        "in the following {cli::qty(length(invalid_trips))}trip{?s}: ",
-        "{.val {abbreviated$shown}}{abbreviated$more}."
-      ),
-      class = "gtfstools_time_out_of_range"
-    )
+    if (any(is_invalid)) {
+      invalid_trips <- unique(timed$trip_id[is_invalid])
+      abbreviated <- abbreviate_ids(invalid_trips)
+      cli::cli_abort(
+        paste0(
+          "Capping the speed results in times later than {.val 9999:59:59} ",
+          "in the following {cli::qty(length(invalid_trips))}trip{?s}: ",
+          "{.val {abbreviated$shown}}{abbreviated$more}."
+        ),
+        class = "gtfstools_time_out_of_range",
+        call = parent.frame()
+      )
+    }
+  } else {
+    is_invalid <- pmin(timed$arr, timed$dep, na.rm = TRUE) + timed$delay < 0
+
+    if (any(is_invalid)) {
+      invalid_trips <- unique(timed$trip_id[is_invalid])
+      abbreviated <- abbreviate_ids(invalid_trips)
+      cli::cli_abort(
+        c(
+          paste0(
+            "Raising the speed results in times earlier than ",
+            "{.val 00:00:00} in the following ",
+            "{cli::qty(length(invalid_trips))}trip{?s}: ",
+            "{.val {abbreviated$shown}}{abbreviated$more}."
+          ),
+          "i" = paste0(
+            "This usually happens when times after midnight are written as ",
+            "{.val 00:30:00} instead of {.val 24:30:00}."
+          )
+        ),
+        class = "gtfstools_time_out_of_range",
+        call = parent.frame()
+      )
+    }
   }
 
   # shift the non-blank times of the delayed stops
