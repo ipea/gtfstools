@@ -145,11 +145,9 @@ fix_gtfs <- function(
   checkmate::assert_logical(overwrite_stop_times, len = 1, any.missing = FALSE)
 
   # remove duplicates first, so the other steps don't see repeated rows
-
   gtfs_fixed <- remove_duplicates(gtfs)
 
   # remove unused ids
-
   gtfs_fixed <- remove_unused_ids(gtfs_fixed)
 
   # fix times after midnight before the steps that use the times, which skip

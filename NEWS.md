@@ -1,21 +1,23 @@
 # gtfstools (development version)
 
-## Breaking changes
+## Bug fixes
 
-- In `set_dwell_time()`, the arguments after `unit` must now be passed by name, since the new `strategy` argument comes right after it.
+- gtfstools functions now accept `dt_gtfs` objects whose tables were turned into tibbles, grouped data frames or plain data frames by other packages (e.g. after `dplyr::group_by()`). With `by_reference = TRUE`, an object with any such table now raises an informative error, since the edits can't be made by reference on a converted copy: convert it first with `as_dt_gtfs()` (#130, reported by @baarthur, who also opened PR #132).
+- Several functions that involved estimating trip speed and duration would
+drop trips that cross midnight if GTFS input had times in 00:MM:SS, which
+disrespects the GTFS standard to report times as 24:MM:SS in such cases. 
+This bug has been fixed.  Now all functions that calculate or change durations
+and speeds now fix these times using a new function `fix_overnight_times()`
+and return correct estimates for overnight trips.
+
 
 ## New features
 
 - New function `fix_overnight_times()` rewrites the times of trips that run past midnight but are written as early morning times (e.g. `"00:30:00"` instead of `"24:30:00"`), as required by the GTFS specification. `fix_gtfs()` now runs it before capping speeds and filling blank stop times, so these trips are no longer left with blank times.
-- The functions that calculate or change durations and speeds (`get_trip_duration()`, `get_trip_segment_duration()`, `get_trip_speed()`, `get_route_speed()`, `get_dwell_time()`, `set_trip_speed()`, `set_route_speed()`, `set_max_speed()`, `set_min_speed()`, `set_dwell_time()` and `set_min_dwell_time()`), `interpolate_stop_times()` and `build_graph()` now fix these times the same way before using them, so they give correct results for trips that run past midnight. The functions that return a GTFS object return it with the times fixed. Their `from` and `to` arguments are compared with the fixed times, so a visit written as `"00:30:00"` after midnight is now matched by a time of day such as `"24:00:00"`-`"25:00:00"`, not `"00:00:00"`-`"01:00:00"`, and `build_graph()` places these trips at their real times.
-- The functions that use a time of day (`filter_by_time_of_day()`, `get_route_frequency()`, `set_route_frequency()`, `get_stop_frequency()`, `get_vkt()`, `get_vmt()` and `get_trip_length()` with `by = "segment"`) and `get_summary()` also fix these times first, as well as `frequencies` entries whose `end_time` is earlier than their `start_time` (e.g. `"23:00:00"`-`"01:00:00"`). `get_route_frequency()` and the functions based on it used to count a trip that runs past midnight at its time written as an early morning time, instead of at its real departure. `filter_by_time_of_day()` and `set_route_frequency()` return the feed with these times fixed.
+- `interpolate_stop_times()` gains `overwrite` and `keep_dwell_times`. With `overwrite = TRUE`, the times of every stop between the first and the last stop of each trip are replaced by interpolated ones, instead of only the blank ones. By default (`keep_dwell_times = TRUE`), these stops keep their original dwell times.
 - `fix_gtfs()` gains `overwrite_stop_times`. With `overwrite_stop_times = TRUE`, the times of every stop between the first and the last stop of each trip are replaced by interpolated ones, keeping their dwell times, instead of only filling blank times (see `interpolate_stop_times()`).
 - `set_dwell_time()` gains `strategy`. The default, `"shift_trip_end"`, shifts the later times of the trips, as before. `"keep_total_duration"` splits the change around each intermediate stop, keeping the trip durations.
-- `interpolate_stop_times()` gains `overwrite` and `keep_dwell_times`. With `overwrite = TRUE`, the times of every stop between the first and the last stop of each trip are replaced by interpolated ones, instead of only the blank ones. By default (`keep_dwell_times = TRUE`), these stops keep their original dwell times.
 
-## Bug fixes
-
-- gtfstools functions now accept `dt_gtfs` objects whose tables were turned into tibbles, grouped data frames or plain data frames by other packages (e.g. after `dplyr::group_by()`), converting them back to `data.table` without modifying the input. `as_dt_gtfs()` does the same conversion. With `by_reference = TRUE`, an object with any such table now raises an informative error, since the edits can't be made by reference on a converted copy: convert it first with `as_dt_gtfs()` (#130, reported by @baarthur, who also opened PR #132).
 
 # gtfstools 2.0.0
 
