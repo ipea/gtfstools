@@ -37,6 +37,12 @@
 #' (unlike in [filter_by_time_of_day()], which also keeps entries at `to`).
 #' Departures after midnight are listed with times past "24:00:00", so use a
 #' time of day such as "24:00:00"-"26:00:00" to count them.
+#' Times after midnight written as early morning times (e.g. `"00:30:00"`
+#' instead of `"24:30:00"`), and `end_time`s earlier than `start_time`s in
+#' `frequencies`, are first fixed with [fix_overnight_times()], so these
+#' trips are counted at their real times. Without an integer `stop_sequence`
+#' column, the times of `stop_times` can't be ordered and are used as
+#' written.
 #'
 #' The mean headway is the length of the time of day divided by the number of
 #' departures, so it overstates the actual headway when service starts or ends
@@ -154,6 +160,11 @@ get_trip_departures <- function(gtfs, trip_id) {
   )
 
   relevant_trips <- trip_id
+
+  # times after midnight written as early morning times are fixed first, so
+  # each trip departs at its real time. only the relevant trips are fixed
+
+  gtfs <- fix_overnight_in_call(gtfs, relevant_trips, frequencies = TRUE)
 
   # the departures of trips listed in 'frequencies' come from the
   # 'frequencies' table, while their 'stop_times' entries are just templates

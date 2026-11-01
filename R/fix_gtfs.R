@@ -1,10 +1,10 @@
 #' Fix common problems in GTFS feeds
 #'
 #' Cleans a GTFS feed in one call, by removing duplicated entries and unused
-#' ids, optionally capping the speed of trips, filling blank stop times,
-#' optionally setting a minimum dwell time at intermediate stops and
-#' recalculating the distances travelled along shapes (replacing any existing
-#' ones).
+#' ids, fixing times after midnight written as early morning times, optionally
+#' capping the speed of trips, filling blank stop times, optionally setting a
+#' minimum dwell time at intermediate stops and recalculating the distances
+#' travelled along shapes (replacing any existing ones).
 #'
 #' @template gtfs
 #' @param max_speed A number. The maximum speed of trips, in the unit given by
@@ -35,12 +35,16 @@
 #'    entries of every table that no remaining trip uses (see its
 #'    documentation for the exceptions). Note that this removes data from the
 #'    feed;
-#' 3. [set_max_speed()], only if `max_speed` is given, slows down the parts of
+#' 3. [fix_overnight_times()] rewrites the times after midnight written as
+#'    early morning times (e.g. `"00:30:00"` instead of `"24:30:00"`), so the
+#'    next steps work on these trips too. Only times that go back by more
+#'    than 12 hours are taken as times after midnight, and the times that
+#'    still go back are left unchanged, with a warning;
+#' 4. [set_max_speed()], only if `max_speed` is given, slows down the parts of
 #'    trips that are faster than `max_speed`. Only spans between stops with
-#'    known times are capped, and spans that end before they start (e.g.
-#'    times after midnight written as `"00:30:00"`) are left unchanged, with
-#'    a warning;
-#' 4. [interpolate_stop_times()] fills blank stop times from the times of the
+#'    known times are capped, and spans that still end before they start are
+#'    left unchanged, with a warning;
+#' 5. [interpolate_stop_times()] fills blank stop times from the times of the
 #'    stops around them. Speeds are capped before interpolating, so the filled
 #'    times follow the capped times. Interpolated times are rounded to the
 #'    second. Stops whose times can't be interpolated are left blank, with a
@@ -49,7 +53,7 @@
 #'    times, keeping the stops' dwell times. The trips' durations still
 #'    follow the capped times, and their travel time is spread evenly over
 #'    the distance;
-#' 5. [set_min_dwell_time()], only if `min_dwell_time` is given, delays the
+#' 6. [set_min_dwell_time()], only if `min_dwell_time` is given, delays the
 #'    departure from each intermediate stop whose dwell time is shorter than
 #'    `min_dwell_time`, so that vehicles stay there for at least that long.
 #'    The minimum is rounded to the second. The later times of each changed
@@ -58,10 +62,8 @@
 #'    filling blank times, so the filled stops also get the minimum. Only the
 #'    stops between the first and the last stop with times of each trip get
 #'    the minimum, so trips keep their start times. Stops with negative dwell
-#'    times (departures earlier than arrivals) also get it, see
-#'    [set_min_dwell_time()] for times after midnight written as
-#'    `"00:30:00"`;
-#' 6. [interpolate_shape_dist_traveled()], only if the feed has a `shapes`
+#'    times (departures earlier than arrivals) also get it;
+#' 7. [interpolate_shape_dist_traveled()], only if the feed has a `shapes`
 #'    table and `trips` has a `shape_id` column, replaces the
 #'    `shape_dist_traveled` columns of `stop_times` and `shapes` with the
 #'    distances, in meters, from the start of each shape. Existing values,
@@ -74,7 +76,8 @@
 #' above, so some warnings (e.g. about trips not linked to a shape) may be
 #' raised more than once.
 #'
-#' @seealso [remove_duplicates()], [remove_unused_ids()], [set_max_speed()],
+#' @seealso [remove_duplicates()], [remove_unused_ids()],
+#'   [fix_overnight_times()], [set_max_speed()],
 #'   [interpolate_stop_times()], [set_min_dwell_time()],
 #'   [interpolate_shape_dist_traveled()]
 #'
@@ -147,7 +150,9 @@ fix_gtfs <- function(
   # remove unused ids
   gtfs_fixed <- remove_unused_ids(gtfs_fixed)
 
-  # fix overnight times
+  # fix times after midnight before the steps that use the times, which skip
+  # the spans that go back
+
   gtfs_fixed <- fix_overnight_times(gtfs_fixed)
 
   # cap max speed. this is done before interpolating, so the interpolated

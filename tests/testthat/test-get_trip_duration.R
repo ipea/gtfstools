@@ -110,9 +110,13 @@ test_that("calculates duration correctly", {
 
   modified_st_gtfs <- gtfs
   modified_st_gtfs$stop_times <- data.table::copy(gtfs$stop_times)
-  modified_st_gtfs$stop_times[
+  last_stop <- modified_st_gtfs$stop_times[
     trip_id == "CPTM L07-0",
-    arrival_time := "24:00:00"
+    max(stop_sequence)
+  ]
+  modified_st_gtfs$stop_times[
+    trip_id == "CPTM L07-0" & stop_sequence == last_stop,
+    `:=`(arrival_time = "24:00:00", departure_time = "24:00:00")
   ]
 
   durations <- tester(modified_st_gtfs, "CPTM L07-0")
@@ -304,4 +308,50 @@ test_that("empty results have the same duration type as non-empty ones", {
       }
     }
   }
+})
+
+test_that("fixes times after midnight written as early morning times", {
+  # a trip whose times after midnight are written as early morning times,
+  # including the departure from its second stop
+
+  overnight_gtfs <- gtfsio::new_gtfs(
+    list(
+      stop_times = data.table::data.table(
+        trip_id = "t1",
+        stop_id = c("s1", "s2", "s3"),
+        stop_sequence = 1:3,
+        arrival_time = c("23:50:00", "23:58:00", "00:05:00"),
+        departure_time = c("23:50:00", "00:01:00", "00:05:00")
+      )
+    ),
+    "dt_gtfs"
+  )
+
+  original_gtfs <- gtfsio::new_gtfs(
+    lapply(overnight_gtfs, data.table::copy),
+    "dt_gtfs"
+  )
+
+  expect_no_warning(
+    durations <- tester(overnight_gtfs),
+    class = "gtfstools_backwards_times"
+  )
+  expect_equal(durations$duration, 15)
+  expect_equal(overnight_gtfs, original_gtfs, ignore_attr = TRUE)
+
+  poa_gtfs <- read_gtfs(
+    system.file("extdata/poa_gtfs.zip", package = "gtfstools")
+  )
+  expect_equal(get_trip_duration(poa_gtfs, "T2-1@1#2310")$duration, 52)
+
+  # without stop_sequence the times can't be ordered, so they are used as
+  # written
+
+  no_sequence <- copy_gtfs_without_field(
+    overnight_gtfs,
+    "stop_times",
+    "stop_sequence"
+  )
+  durations <- get_trip_duration(no_sequence)
+  expect_equal(durations$duration, 1437)
 })

@@ -28,6 +28,11 @@
 #' [convert_time_to_seconds()]) are used as-is, not recalculated from the time
 #' strings.
 #'
+#' Times after midnight written as early morning times (e.g. `"00:30:00"`
+#' instead of `"24:30:00"`) are fixed with [fix_overnight_times()] before the
+#' durations are calculated, if `stop_sequence` is an integer column (without
+#' it, the times can't be ordered and are used as written).
+#'
 #' `from` and `to` are compared with the departure time of the first stop of
 #' each trip, in `stop_sequence` order (which must then be an integer column).
 #' The time is read as the durations are: from `departure_time_secs`, if
@@ -83,6 +88,12 @@ get_trip_duration <- function(gtfs,
   if (is_windowed) {
     gtfsio::assert_field_class(gtfs, "stop_times", "stop_sequence", "integer")
   }
+
+  # times after midnight written as early morning times are fixed first, so
+  # they don't go back. without an integer stop_sequence the times can't be
+  # ordered, so they are used as written
+
+  gtfs <- fix_overnight_in_call(gtfs, trip_id)
 
   # select trip_ids to get duration of and raise warning if a given trip_id
   # doesn't exist in 'stop_times'

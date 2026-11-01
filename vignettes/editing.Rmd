@@ -39,7 +39,7 @@ GTFS feeds describe the transit services of a city or region as they are. Quite 
 - `merge_gtfs()`: combines several feeds into a single one;
 - `remove_duplicates()`: removes duplicated entries from the feed's tables;
 - `remove_unused_ids()`: removes the ids that the feed doesn't use, with their entries in every table;
-- `fix_gtfs()`: cleans a feed in one call, removing duplicated entries and unused ids, optionally capping the speed of trips, filling blank stop times, optionally setting a minimum dwell time at intermediate stops and recalculating the distances travelled along shapes (replacing any existing ones).
+- `fix_gtfs()`: cleans a feed in one call, removing duplicated entries and unused ids, fixing times after midnight written as early morning times, optionally capping the speed of trips, filling blank stop times, optionally setting a minimum dwell time at intermediate stops and recalculating the distances travelled along shapes (replacing any existing ones).
 
 This vignette will introduce you to the first four functions and to `fix_gtfs()`, and will cover their usage in detail. By default, they return an edited copy of the feed and leave the given GTFS object unchanged.
 
@@ -179,7 +179,7 @@ interpolated_gtfs$stop_times |>
 
 Interpolated stops get equal arrival and departure times (i.e. no dwell time), rounded to the nearest second, and `timepoint = 0` when the `stop_times` table includes a `timepoint` column. In feeds without shapes, use `method = "euclidean"` to measure distances as straight lines between stops instead.
 
-If `trip_id` is not given, the function interpolates the data to give explicit stop times at every stop of every trip in the feed. Some stops may be left blank, with a warning: for example, a few trips of Porto Alegre's feed list their times after midnight as `"00:xx:xx"`, instead of `"24:xx:xx"`, so they seem to arrive before they depart and can't be interpolated.
+If `trip_id` is not given, the function interpolates the data to give explicit stop times at every stop of every trip in the feed. Some stops may be left blank, with a warning: for example, stops of trips not linked to a shape, or between times that go back. A few trips of Porto Alegre's feed list their times after midnight as `"00:xx:xx"`, instead of `"24:xx:xx"`, so they seem to arrive before they depart: these times are fixed first, with `fix_overnight_times()`, so these trips are interpolated too.
 
 # Fixing common problems
 
@@ -199,10 +199,11 @@ With `fix_gtfs()`, the feed goes through the following steps, in this order:
 
 1. `remove_duplicates()` removes duplicated entries from every table;
 2. `remove_unused_ids()` removes the trips without stop times and the entries of every table that no remaining trip uses (e.g. stops that are not used in any trip);
-3. `set_max_speed()`, only if `max_speed` is given, slows down the parts of trips that are faster than `max_speed`;
-4. `interpolate_stop_times()` fills blank stop times. Since this runs after the speed cap, the filled times follow the capped ones;
-5. `set_min_dwell_time()` forces every vehicle to remain stopped at each intermediate stop for at least `min_dwell_time` for passengers to board and alight;
-6. `interpolate_shape_dist_traveled()`, in feeds with shapes, adds the distances, in meters, travelled from the start of each shape to each stop and shape point.
+3. `fix_overnight_times()` rewrites times after midnight written as early morning times (e.g. `"00:30:00"` instead of `"24:30:00"`), as required by the GTFS specification;
+4. `set_max_speed()`, only if `max_speed` is given, slows down the parts of trips that are faster than `max_speed`;
+5. `interpolate_stop_times()` fills blank stop times. Since this runs after the speed cap, the filled times follow the capped ones;
+6. `set_min_dwell_time()` forces every vehicle to remain stopped at each intermediate stop for at least `min_dwell_time` for passengers to board and alight;
+7. `interpolate_shape_dist_traveled()`, in feeds with shapes, adds the distances, in meters, travelled from the start of each shape to each stop and shape point.
 
 **Note:**
 

@@ -54,6 +54,10 @@ Existing \verb{_secs} columns in \code{stop_times} (e.g. created with
 \code{\link[=convert_time_to_seconds]{convert_time_to_seconds()}}) are used as-is, not recalculated from the time
 strings.
 
+Times after midnight written as early morning times (e.g. \code{"00:30:00"}
+instead of \code{"24:30:00"}) are fixed with \code{\link[=fix_overnight_times]{fix_overnight_times()}} before the
+durations are calculated.
+
 \code{from} and \code{to} are compared with the departure time of the first stop of
 each segment, read as the durations are (from \code{departure_time_secs}, if
 present), so use times past \code{"24:00:00"} for departures after midnight.

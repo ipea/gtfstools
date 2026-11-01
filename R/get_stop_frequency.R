@@ -56,6 +56,10 @@
 #' times are equal to `to`. Departures after midnight are listed with times
 #' greater than "24:00:00" and belong to the previous service day, so a time
 #' of day such as "24:00:00"-"26:00:00" should be used to account for them.
+#' Times after midnight written as early morning times (e.g. `"00:30:00"`
+#' instead of `"24:30:00"`), and `end_time`s earlier than `start_time`s in
+#' `frequencies`, are first fixed with [fix_overnight_times()], so these
+#' departures are counted at their real times.
 #'
 #' The mean headway is the length of the time of day divided by the number of
 #' departures. It is an average over the whole time of day, so it is larger
@@ -148,9 +152,19 @@ get_stop_frequency <- function(gtfs,
       gtfs$stop_times$stop_id %chin% relevant_stops
     ]
     relevant_trips <- unique(relevant_trips)
+  } else {
+    relevant_trips <- NULL
+  }
 
+  # times after midnight written as early morning times are fixed first, so
+  # the departures are compared with the time of day as they should be. only
+  # the relevant trips are fixed
+
+  gtfs <- fix_overnight_in_call(gtfs, relevant_trips, frequencies = TRUE)
+
+  if (is.null(relevant_trips)) {
     stop_times <- gtfs$stop_times[
-      trip_id %chin% relevant_trips,
+      ,
       .(
         trip_id,
         stop_id,
@@ -160,7 +174,7 @@ get_stop_frequency <- function(gtfs,
     ]
   } else {
     stop_times <- gtfs$stop_times[
-      ,
+      trip_id %chin% relevant_trips,
       .(
         trip_id,
         stop_id,

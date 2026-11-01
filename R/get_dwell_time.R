@@ -40,8 +40,12 @@
 #' [interpolate_stop_times()]. Negative dwell times (departure earlier than
 #' arrival) are returned as they are.
 #'
+#' Times after midnight written as early morning times (e.g. `"00:30:00"`
+#' instead of `"24:30:00"`) are fixed with [fix_overnight_times()] before the
+#' dwell times are calculated.
+#'
 #' `from` and `to` are compared with the `arrival_time` of each visit as
-#' written in `stop_times` (template times, for trips listed in
+#' written in `stop_times`, once fixed (template times, for trips listed in
 #' `frequencies`), so use times past `"24:00:00"` for arrivals after midnight.
 #' Visits with a blank arrival time are never included when `from` or `to` is
 #' given.
@@ -100,6 +104,11 @@ get_dwell_time <- function(gtfs,
     c("trip_id", "stop_id", "stop_sequence", "arrival_time", "departure_time"),
     c("character", "character", "integer", "character", "character")
   )
+
+  # times after midnight written as early morning times are fixed first, so
+  # they don't go back
+
+  gtfs <- fix_overnight_in_call(gtfs, trip_id)
 
   rows <- select_dwell_time_calls(gtfs$stop_times, trip_id, stop_id)
 

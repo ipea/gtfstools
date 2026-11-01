@@ -38,9 +38,11 @@
 #' divided by `min_speed`, rounded down to the whole second (so a very
 #' short span may end up with a duration of 0). All the later times of the
 #' trip are shifted earlier by the accumulated saved time, so dwell times are
-#' kept. Spans whose arrival is earlier than the previous departure (usually
-#' times after midnight written as `"00:30:00"` instead of `"24:30:00"`) are
-#' left unchanged, with a warning. An error is raised if a shift would result
+#' kept. Times after midnight written as early morning times (e.g.
+#' `"00:30:00"` instead of `"24:30:00"`) are first fixed with
+#' [fix_overnight_times()] in every trip, so the returned GTFS has them fixed.
+#' Spans whose arrival is still earlier than the previous departure (by 12
+#' hours or less) are left unchanged, with a warning. An error is raised if a shift would result
 #' in a time earlier than `"00:00:00"`. Only `stop_times` is modified; its
 #' existing `_secs` columns are updated to match.
 #'

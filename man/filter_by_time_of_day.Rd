@@ -48,6 +48,12 @@ of the other tables related to the trips that remain.
 
 The time of day includes both \code{from} and \code{to}.
 
+Times after midnight written as early morning times (e.g. \code{"00:30:00"}
+instead of \code{"24:30:00"}), and \code{end_time}s earlier than \code{start_time}s in
+\code{frequencies}, are first fixed with \code{\link[=fix_overnight_times]{fix_overnight_times()}}, so these
+times are compared with the time of day as they should be, and the
+returned GTFS has them fixed.
+
 Trips listed in \code{frequencies} are filtered through their \code{frequencies}
 entries; their \code{stop_times} entries are templates and are kept whatever
 their times. With \code{keep = TRUE}, the entries that overlap the time of day

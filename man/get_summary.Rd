@@ -122,6 +122,11 @@ issues in the GTFS feed. To do that, use \code{\link[=validate_gtfs]{validate_gt
 The report requires the \code{{ggplot2}}, \code{{knitr}} and \code{{rmarkdown}} packages
 and \href{https://pandoc.org/}{Pandoc}.
 
+Times after midnight written as early morning times (e.g. \code{"00:30:00"}
+instead of \code{"24:30:00"}), and \code{end_time}s earlier than \code{start_time}s in
+\code{frequencies}, are first fixed with \code{\link[=fix_overnight_times]{fix_overnight_times()}}, if
+\code{stop_sequence} is an integer column.
+
 The time-of-day filter keeps whole trips (as \code{\link[=filter_by_time_of_day]{filter_by_time_of_day()}} with
 \code{full_trips = TRUE}), so trip speeds and lengths refer to whole trips.
 

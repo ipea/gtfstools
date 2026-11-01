@@ -42,6 +42,11 @@ Existing \verb{_secs} columns in \code{stop_times} (e.g. created with
 \code{\link[=convert_time_to_seconds]{convert_time_to_seconds()}}) are used as-is, not recalculated from the time
 strings.
 
+Times after midnight written as early morning times (e.g. \code{"00:30:00"}
+instead of \code{"24:30:00"}) are fixed with \code{\link[=fix_overnight_times]{fix_overnight_times()}} before the
+durations are calculated, if \code{stop_sequence} is an integer column (without
+it, the times can't be ordered and are used as written).
+
 \code{from} and \code{to} are compared with the departure time of the first stop of
 each trip, in \code{stop_sequence} order (which must then be an integer column).
 The time is read as the durations are: from \code{departure_time_secs}, if

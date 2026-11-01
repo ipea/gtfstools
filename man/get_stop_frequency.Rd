@@ -70,6 +70,10 @@ that this differs from \code{\link[=filter_by_time_of_day]{filter_by_time_of_day
 times are equal to \code{to}. Departures after midnight are listed with times
 greater than "24:00:00" and belong to the previous service day, so a time
 of day such as "24:00:00"-"26:00:00" should be used to account for them.
+Times after midnight written as early morning times (e.g. \code{"00:30:00"}
+instead of \code{"24:30:00"}), and \code{end_time}s earlier than \code{start_time}s in
+\code{frequencies}, are first fixed with \code{\link[=fix_overnight_times]{fix_overnight_times()}}, so these
+departures are counted at their real times.
 
 The mean headway is the length of the time of day divided by the number of
 departures. It is an average over the whole time of day, so it is larger

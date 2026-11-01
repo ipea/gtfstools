@@ -44,9 +44,11 @@
 #' Each span faster than `max_speed`, or with a zero duration, has its duration
 #' raised to its length divided by `max_speed`, rounded up to the next second.
 #' All the later times of the trip are shifted by the accumulated extra time,
-#' so dwell times are kept. Spans whose arrival is earlier than the previous
-#' departure (usually times after midnight written as `"00:30:00"` instead of
-#' `"24:30:00"`) are left unchanged, with a warning. An error is raised if a
+#' so dwell times are kept. Times after midnight written as early morning
+#' times (e.g. `"00:30:00"` instead of `"24:30:00"`) are first fixed with
+#' [fix_overnight_times()] in every trip, so the returned GTFS has them fixed.
+#' Spans whose arrival is still earlier than the previous departure (by 12
+#' hours or less) are left unchanged, with a warning. An error is raised if a
 #' shift would result in a time later than `"9999:59:59"`. Only `stop_times`
 #' is modified; its existing `_secs` columns are updated to match.
 #'
@@ -59,8 +61,8 @@
 #' warning if they were given in `trip_id` or `route_id`.
 #'
 #' `from` and `to` are compared with the departure at the segment's first stop
-#' (or its arrival, if the departure is blank) as written in `stop_times`
-#' (template times, for trips listed in `frequencies`), so use times past
+#' (or its arrival, if the departure is blank) as written in `stop_times`, once
+#' fixed (template times, for trips listed in `frequencies`), so use times past
 #' `"24:00:00"` for departures after midnight. Trips without a time there are
 #' left unchanged.
 #'
@@ -194,6 +196,11 @@ limit_trip_speed <- function(
   if (has_stop_args) {
     gtfsio::assert_field_class(gtfs, "stop_times", "stop_id", "character")
   }
+
+  # times after midnight written as early morning times are fixed first, so
+  # they don't go back. the returned feed keeps the fixed times
+
+  gtfs <- fix_overnight_in_call(gtfs)
 
   # select the trips. ids is NULL only when both arguments are NULL, so that
   # trip_ids that don't exist don't result in all trips being changed
@@ -438,8 +445,8 @@ limit_trip_speed <- function(
           "{.val {abbreviated$shown}}{abbreviated$more}."
         ),
         "i" = paste0(
-          "This usually happens when times after midnight are written as ",
-          "{.val 00:30:00} instead of {.val 24:30:00}."
+          "Times that go back by 12 hours or less are not taken as times ",
+          "after midnight (see {.fn fix_overnight_times})."
         )
       ),
       class = "gtfstools_backwards_times"

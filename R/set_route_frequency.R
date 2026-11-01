@@ -33,6 +33,10 @@
 #' headway (exactly, when the length of the time of day is a multiple of
 #' `headway`). Departures after midnight are listed with times past
 #' "24:00:00", so use a time of day such as "24:00:00"-"26:00:00" for them.
+#' Times after midnight written as early morning times (e.g. `"00:30:00"`
+#' instead of `"24:30:00"`), and `end_time`s earlier than `start_time`s in
+#' `frequencies`, are first fixed with [fix_overnight_times()], so the
+#' returned GTFS has them fixed.
 #'
 #' The function changes existing service, it does not create it: groups with
 #' no departure within the time of day are not modified, and scheduled trips
@@ -142,6 +146,12 @@ set_route_frequency <- function(gtfs,
     c("trip_id", "route_id", "service_id"),
     rep("character", 3)
   )
+
+  # times after midnight written as early morning times are fixed first, so
+  # the departures and the clipped 'frequencies' entries below use the same
+  # times. the returned feed keeps them fixed
+
+  gtfs <- fix_overnight_in_call(gtfs, frequencies = TRUE)
 
   # select the trips of the relevant routes and raise warning if a given
   # route_id doesn't exist in 'trips'. the departures are grouped by route,

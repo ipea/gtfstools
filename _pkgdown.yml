@@ -41,6 +41,7 @@ reference:
     - remove_duplicates
     - remove_unused_ids
     - fix_gtfs
+    - fix_overnight_times
     - set_dwell_time
     - set_min_dwell_time
     - set_max_speed

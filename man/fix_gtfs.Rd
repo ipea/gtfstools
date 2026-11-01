@@ -43,10 +43,10 @@ The fixed GTFS object.
 }
 \description{
 Cleans a GTFS feed in one call, by removing duplicated entries and unused
-ids, optionally capping the speed of trips, filling blank stop times,
-optionally setting a minimum dwell time at intermediate stops and
-recalculating the distances travelled along shapes (replacing any existing
-ones).
+ids, fixing times after midnight written as early morning times, optionally
+capping the speed of trips, filling blank stop times, optionally setting a
+minimum dwell time at intermediate stops and recalculating the distances
+travelled along shapes (replacing any existing ones).
 }
 \section{Details}{
 
@@ -57,11 +57,15 @@ The feed goes through the following steps, in this order:
 entries of every table that no remaining trip uses (see its
 documentation for the exceptions). Note that this removes data from the
 feed;
+\item \code{\link[=fix_overnight_times]{fix_overnight_times()}} rewrites the times after midnight written as
+early morning times (e.g. \code{"00:30:00"} instead of \code{"24:30:00"}), so the
+next steps work on these trips too. Only times that go back by more
+than 12 hours are taken as times after midnight, and the times that
+still go back are left unchanged, with a warning;
 \item \code{\link[=set_max_speed]{set_max_speed()}}, only if \code{max_speed} is given, slows down the parts of
 trips that are faster than \code{max_speed}. Only spans between stops with
-known times are capped, and spans that end before they start (e.g.
-times after midnight written as \code{"00:30:00"}) are left unchanged, with
-a warning;
+known times are capped, and spans that still end before they start are
+left unchanged, with a warning;
 \item \code{\link[=interpolate_stop_times]{interpolate_stop_times()}} fills blank stop times from the times of the
 stops around them. Speeds are capped before interpolating, so the filled
 times follow the capped times. Interpolated times are rounded to the
@@ -80,9 +84,7 @@ in \code{frequencies}, every departure gets longer). This is done after
 filling blank times, so the filled stops also get the minimum. Only the
 stops between the first and the last stop with times of each trip get
 the minimum, so trips keep their start times. Stops with negative dwell
-times (departures earlier than arrivals) also get it, see
-\code{\link[=set_min_dwell_time]{set_min_dwell_time()}} for times after midnight written as
-\code{"00:30:00"};
+times (departures earlier than arrivals) also get it;
 \item \code{\link[=interpolate_shape_dist_traveled]{interpolate_shape_dist_traveled()}}, only if the feed has a \code{shapes}
 table and \code{trips} has a \code{shape_id} column, replaces the
 \code{shape_dist_traveled} columns of \code{stop_times} and \code{shapes} with the
@@ -127,7 +129,8 @@ fixed_gtfs$stop_times |>
 \dontshow{\}) # examplesIf}
 }
 \seealso{
-\code{\link[=remove_duplicates]{remove_duplicates()}}, \code{\link[=remove_unused_ids]{remove_unused_ids()}}, \code{\link[=set_max_speed]{set_max_speed()}},
+\code{\link[=remove_duplicates]{remove_duplicates()}}, \code{\link[=remove_unused_ids]{remove_unused_ids()}},
+\code{\link[=fix_overnight_times]{fix_overnight_times()}}, \code{\link[=set_max_speed]{set_max_speed()}},
 \code{\link[=interpolate_stop_times]{interpolate_stop_times()}}, \code{\link[=set_min_dwell_time]{set_min_dwell_time()}},
 \code{\link[=interpolate_shape_dist_traveled]{interpolate_shape_dist_traveled()}}
 }

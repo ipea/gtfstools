@@ -96,14 +96,19 @@ For trips listed in \code{frequencies}, the times in \code{stop_times} are a tem
 stop only changes how long before each departure the vehicle arrives there,
 while changes at later stops lengthen or shorten every departure.
 
-\code{from} and \code{to} are compared with the \code{arrival_time} of each visit as
-written in \code{stop_times} before any change (template times, for trips listed
-in \code{frequencies}), so use times past \code{"24:00:00"} for arrivals after
-midnight. A shift caused by an earlier visit may thus move a changed visit
-out of the time of day, or another visit into it. Visits with a blank
+Times after midnight written as early morning times (e.g. \code{"00:30:00"}
+instead of \code{"24:30:00"}) are first fixed with \code{\link[=fix_overnight_times]{fix_overnight_times()}} in
+every trip, so the returned GTFS has them fixed (with \code{by_reference = TRUE},
+even if an error is then raised).
+
+\code{from} and \code{to} are compared with the \code{arrival_time} of each visit as written
+in \code{stop_times} before any change other than this fix (template times, for
+trips listed in \code{frequencies}), so use times past \code{"24:00:00"} for arrivals
+after midnight. A shift caused by an earlier visit may thus move a changed
+visit out of the time of day, or another visit into it. Visits with a blank
 arrival time are never selected when \code{from} or \code{to} is given. When the time
 of day contains no visit of the specified trips to the specified stops, the
-GTFS is returned unchanged.
+GTFS is returned with no change other than this fix.
 
 \code{stop_id}s are matched against the \code{stop_id}s in \code{stop_times}, which are
 never stations: to set the dwell times at a station, pass its children that
