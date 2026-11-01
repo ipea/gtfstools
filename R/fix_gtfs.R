@@ -142,12 +142,13 @@ fix_gtfs <- function(
   checkmate::assert_logical(overwrite_stop_times, len = 1, any.missing = FALSE)
 
   # remove duplicates first, so the other steps don't see repeated rows
-
   gtfs_fixed <- remove_duplicates(gtfs)
 
   # remove unused ids
-
   gtfs_fixed <- remove_unused_ids(gtfs_fixed)
+
+  # fix overnight times
+  gtfs_fixed <- fix_overnight_times(gtfs_fixed)
 
   # cap max speed. this is done before interpolating, so the interpolated
   # times follow the capped times
