@@ -11,6 +11,7 @@ tester <- function(gtfs = get("gtfs", envir = parent.frame()),
                    unit = "s",
                    from = NULL,
                    to = NULL,
+                   strategy = "push_trip_end",
                    by_reference = FALSE) {
   set_dwell_time(
     gtfs,
@@ -20,8 +21,30 @@ tester <- function(gtfs = get("gtfs", envir = parent.frame()),
     unit = unit,
     from = from,
     to = to,
+    strategy = strategy,
     by_reference = by_reference
   )
+}
+
+# builds a feed whose 'stop_times' has the given trips. each trip is a list
+# with stop_ids and arrival and departure times
+
+speed_gtfs <- function(...) {
+  trips <- list(...)
+  new_gtfs <- read_gtfs(spo_path)
+  new_gtfs$stop_times <- data.table::rbindlist(
+    lapply(names(trips), function(trip) {
+      x <- trips[[trip]]
+      data.table::data.table(
+        trip_id = trip,
+        stop_id = x$stop_id,
+        stop_sequence = seq_along(x$stop_id),
+        arrival_time = x$arr,
+        departure_time = x$dep
+      )
+    })
+  )
+  return(new_gtfs)
 }
 
 # small hand-built feed with a single trip, "t", whose rows are not ordered by
@@ -83,6 +106,9 @@ test_that("raises errors due to incorrect input types/value", {
   expect_error(tester(by_reference = "TRUE"))
   expect_error(tester(by_reference = NA))
   expect_error(tester(by_reference = c(TRUE, TRUE)))
+  expect_error(tester(strategy = "x"))
+  expect_error(tester(strategy = c("push_trip_end", "keep_total_duration")))
+  expect_error(tester(strategy = NA))
 
   # dwell_time is the second argument, so it can be given by position
 
@@ -594,4 +620,241 @@ test_that("route_type restricts the changed visits", {
   expect_identical(result$stop_times, gtfs$stop_times)
 
   expect_error(set_dwell_time(gtfs, dwell_time = 30, route_type = "2"))
+})
+
+test_that("keep_total_duration splits the change and keeps the trip duration", {
+
+  # t has no dwell times. u starts with a blank visit, which is skipped and
+  # doesn't carry t's times into u
+
+  four_gtfs <- speed_gtfs(
+    t = list(
+      stop_id = c("A", "B", "C", "D"),
+      arr = c("08:00:00", "08:10:00", "08:20:00", "08:40:00"),
+      dep = c("08:00:00", "08:10:00", "08:20:00", "08:40:00")
+    ),
+    u = list(
+      stop_id = c("W", "X", "Y", "Z"),
+      arr = c("", "07:00:00", "07:10:00", "07:20:00"),
+      dep = c("", "07:00:00", "07:10:00", "07:20:00")
+    )
+  )
+
+  new_gtfs <- tester(
+    four_gtfs,
+    dwell_time = 60,
+    strategy = "keep_total_duration"
+  )
+  expect_identical(
+    trip_times(new_gtfs, "t"),
+    data.table::data.table(
+      stop_id = c("A", "B", "C", "D"),
+      arrival_time = c("08:00:00", "08:09:30", "08:19:30", "08:40:00"),
+      departure_time = c("08:00:00", "08:10:30", "08:20:30", "08:40:00")
+    )
+  )
+  expect_identical(
+    trip_times(new_gtfs, "u"),
+    data.table::data.table(
+      stop_id = c("W", "X", "Y", "Z"),
+      arrival_time = c("", "07:00:00", "07:09:30", "07:20:00"),
+      departure_time = c("", "07:00:00", "07:10:30", "07:20:00")
+    )
+  )
+
+  # the default shifts the later times instead, at every stop
+
+  new_gtfs <- tester(four_gtfs, trip_id = "t", dwell_time = 60)
+  expect_identical(
+    trip_times(new_gtfs, "t")$arrival_time,
+    c("08:00:00", "08:11:00", "08:22:00", "08:43:00")
+  )
+
+  # the first and last stops are never changed, silently
+
+  expect_silent(
+    new_gtfs <- tester(
+      four_gtfs,
+      stop_id = c("A", "D"),
+      strategy = "keep_total_duration"
+    )
+  )
+  expect_identical(new_gtfs$stop_times, four_gtfs$stop_times)
+
+  # in a loop, the first visit to A is skipped, but the later one is changed
+
+  new_gtfs <- tester(
+    hand_gtfs,
+    stop_id = "A",
+    dwell_time = 120,
+    strategy = "keep_total_duration"
+  )
+  expect_identical(
+    trip_times(new_gtfs, "t"),
+    data.table::data.table(
+      stop_id = c("A", "B", "C", "A", "D"),
+      arrival_time = c("23:59:00", "24:05:00", "", "24:09:00", "24:20:00"),
+      departure_time = c("24:00:00", "24:05:30", "", "24:11:00", "24:21:00")
+    )
+  )
+})
+
+test_that("keep_total_duration decreases dwell times and splits odd seconds", {
+  v_gtfs <- speed_gtfs(
+    v = list(
+      stop_id = c("A", "B", "C", "D"),
+      arr = c("08:00:00", "08:10:00", "08:20:00", "08:30:00"),
+      dep = c("08:00:00", "08:12:00", "08:20:00", "08:30:00")
+    )
+  )
+
+  # B's 120 seconds dwell time is removed around its middle
+
+  new_gtfs <- tester(
+    v_gtfs,
+    stop_id = "B",
+    dwell_time = 0,
+    strategy = "keep_total_duration"
+  )
+  expect_identical(
+    trip_times(new_gtfs, "v")[stop_id == "B", -1],
+    data.table::data.table(
+      arrival_time = "08:11:00",
+      departure_time = "08:11:00"
+    )
+  )
+
+  # an odd second goes to the departure, whether the change is positive (C,
+  # +61) or negative (B, -61)
+
+  new_gtfs <- tester(
+    v_gtfs,
+    stop_id = "C",
+    dwell_time = 61,
+    strategy = "keep_total_duration"
+  )
+  expect_identical(
+    trip_times(new_gtfs, "v")[stop_id == "C", -1],
+    data.table::data.table(
+      arrival_time = "08:19:30",
+      departure_time = "08:20:31"
+    )
+  )
+
+  new_gtfs <- tester(
+    v_gtfs,
+    stop_id = "B",
+    dwell_time = 59,
+    strategy = "keep_total_duration"
+  )
+  expect_identical(
+    trip_times(new_gtfs, "v")[stop_id == "B", -1],
+    data.table::data.table(
+      arrival_time = "08:10:30",
+      departure_time = "08:11:29"
+    )
+  )
+})
+
+test_that("keep_total_duration raises an error if running times go negative", {
+
+  # B is blank, so C's arrival is compared with A's departure
+
+  w_gtfs <- speed_gtfs(
+    w = list(
+      stop_id = c("A", "B", "C", "D"),
+      arr = c("08:00:00", "", "08:02:00", "08:10:00"),
+      dep = c("08:00:00", "", "08:02:00", "08:10:00")
+    )
+  )
+  original_stop_times <- data.table::copy(w_gtfs$stop_times)
+
+  new_gtfs <- tester(
+    w_gtfs,
+    stop_id = "C",
+    dwell_time = 240,
+    strategy = "keep_total_duration"
+  )
+  expect_identical(
+    trip_times(new_gtfs, "w")[stop_id == "C"]$arrival_time,
+    "08:00:00"
+  )
+
+  err <- expect_error(
+    tester(
+      w_gtfs,
+      stop_id = "C",
+      dwell_time = 242,
+      strategy = "keep_total_duration",
+      by_reference = TRUE
+    ),
+    class = "gtfstools_negative_running_time"
+  )
+  expect_identical(err$call[[1]], quote(set_dwell_time))
+  expect_identical(w_gtfs$stop_times, original_stop_times)
+
+  # running times that are already negative don't raise this error, but times
+  # out of range still raise their own
+
+  n_gtfs <- speed_gtfs(
+    n = list(
+      stop_id = c("A", "B", "C", "D"),
+      arr = c("00:00:00", "00:00:10", "00:10:00", "00:20:00"),
+      dep = c("00:05:00", "00:00:10", "00:10:00", "00:20:00")
+    )
+  )
+
+  new_gtfs <- tester(
+    n_gtfs,
+    stop_id = "B",
+    dwell_time = 20,
+    strategy = "keep_total_duration"
+  )
+  expect_identical(
+    trip_times(new_gtfs, "n")[stop_id == "B", -1],
+    data.table::data.table(
+      arrival_time = "00:00:00",
+      departure_time = "00:00:20"
+    )
+  )
+
+  expect_error(
+    tester(
+      n_gtfs,
+      stop_id = "B",
+      dwell_time = 60,
+      strategy = "keep_total_duration"
+    ),
+    class = "gtfstools_time_out_of_range"
+  )
+})
+
+test_that("keep_total_duration works on a real feed with _secs columns", {
+  original_gtfs <- read_gtfs(spo_path)
+  spo_gtfs <- read_gtfs(spo_path)
+  trip <- "CPTM L07-0"
+
+  new_gtfs <- tester(spo_gtfs, trip_id = trip, strategy = "keep_total_duration")
+  expect_s3_class(new_gtfs, "dt_gtfs")
+  expect_equal(original_gtfs, spo_gtfs, ignore_attr = TRUE)
+
+  # the first departure (and so the departures in 'frequencies') and the last
+  # arrival are kept, and every intermediate dwell time is set
+
+  old_times <- trip_times(spo_gtfs, trip)
+  new_times <- trip_times(new_gtfs, trip)
+  n <- nrow(new_times)
+  expect_identical(new_times[c(1, n)], old_times[c(1, n)])
+  expect_true(
+    all(get_dwell_time(new_gtfs, trip)$dwell_time[-c(1, n)] == 30)
+  )
+
+  secs_gtfs <- convert_time_to_seconds(spo_gtfs)
+  st <- tester(
+    secs_gtfs,
+    trip_id = trip,
+    strategy = "keep_total_duration"
+  )$stop_times
+  expect_equal(st$arrival_time_secs, string_to_seconds(st$arrival_time))
+  expect_equal(st$departure_time_secs, string_to_seconds(st$departure_time))
 })

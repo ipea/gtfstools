@@ -8,6 +8,7 @@ set_dwell_time(
   gtfs,
   dwell_time,
   unit = "s",
+  strategy = "push_trip_end",
   trip_id = NULL,
   stop_id = NULL,
   from = NULL,
@@ -27,6 +28,22 @@ times).}
 \item{unit}{A string representing the time unit in which \code{dwell_time} is
 given. One of \code{"s"} (seconds, the default), \code{"min"} (minutes), \code{"h"}
 (hours) or \code{"d"} (days).}
+
+\item{strategy}{A string, how the trips absorb the changes in dwell time.
+One of:
+\itemize{
+\item \code{"push_trip_end"} (the default): keeps the running times between
+stops and shifts all the later times of the trip, so the arrival at the
+last stop moves later (or earlier, if dwell times are shortened). It
+preserves the implicit average speed between stops but changes the
+trip duration.
+\item \code{"keep_total_duration"}: centres each intermediate stop's dwell on its
+original time, taking half of the change from the running time before
+the stop and half from the one after it. The first and last stops are
+not changed, so the trip keeps its duration, its arrival at the last
+stop and the implicit average speed between its first and last stops.
+An error is raised if a running time would become negative.
+}}
 
 \item{trip_id}{A character vector including the \code{trip_id}s to have their
 dwell times set. If \code{NULL} (the default), the dwell times of every
@@ -61,11 +78,17 @@ invisibly (note that in this case the original GTFS object is altered).
 }
 \description{
 Sets the dwell time of each specified \code{trip_id} at each specified \code{stop_id},
-i.e. the time the vehicle stays at the stop, by changing the
-\code{departure_time} at these stops in \code{stop_times} and shifting the later times
-of the trips accordingly.
+i.e. the time the vehicle stays at the stop for passengers to board and
+alight, by changing the times at these stops in \code{stop_times}. By default,
+the later times of the trips are shifted accordingly. Alternatively, the
+trip durations are kept and the running times between stops absorb the
+change.
 }
 \section{Details}{
+
+The following paragraphs describe the default,
+\code{strategy = "push_trip_end"}. See the last paragraph for
+\code{strategy = "keep_total_duration"}.
 
 The dwell time of a visit is its \code{departure_time} minus its \code{arrival_time}
 in \code{stop_times}, as returned by \code{\link[=get_dwell_time]{get_dwell_time()}}. It is set at the visits
@@ -106,6 +129,21 @@ never stations: to set the dwell times at a station, pass its children that
 appear in \code{stop_times} (see \code{\link[=get_children_stops]{get_children_stops()}}). Existing \verb{_secs}
 columns in \code{stop_times} (e.g. created with \code{\link[=convert_time_to_seconds]{convert_time_to_seconds()}}) are
 updated to match.
+
+With \code{strategy = "keep_total_duration"}, visits are selected in the same
+way, but the change in dwell time is split around each visit: when the
+dwell time is lengthened, its arrival is moved earlier by half of the change
+(rounded toward zero, so an odd second goes to the departure) and its
+departure later by the rest, and the other way around when it's shortened.
+No other time of the trip changes, so the running times to and from the
+visit absorb the change (the vehicle runs faster when dwell times are
+lengthened) and the trip keeps its duration. The first and last visits with
+both an arrival and a departure time of each trip are never changed, as in
+\code{\link[=set_min_dwell_time]{set_min_dwell_time()}}. An error is raised if a running time would become
+negative, i.e. if the dwell times set take more time than the trip spends
+running between the stops (running times that are already negative are not
+checked). Since the first stop is never changed, the departures of trips
+listed in \code{frequencies} are not changed either.
 }
 
 \examples{
@@ -149,6 +187,18 @@ new_gtfs <- set_dwell_time(
   to = "06:00:00"
 )
 get_dwell_time(new_gtfs, trip_id = "CPTM L07-0")
+
+# keep the trip duration: the running times between the stops absorb the
+# dwell times, and the arrival at the last stop doesn't change
+new_gtfs <- set_dwell_time(
+  gtfs,
+  trip_id = "CPTM L07-0",
+  dwell_time = 30,
+  strategy = "keep_total_duration"
+)
+new_gtfs$stop_times |>
+  filter(trip_id == "CPTM L07-0") |>
+  tail()
 
 # original gtfs remains unchanged
 get_dwell_time(gtfs, stop_id = "18960")

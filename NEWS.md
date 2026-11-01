@@ -1,7 +1,12 @@
 # gtfstools (development version)
 
+## Breaking changes
+
+- In `set_dwell_time()`, the arguments after `unit` must now be passed by name, since the new `strategy` argument comes right after it.
+
 ## New features
 
+- `set_dwell_time()` gains `strategy`. The default, `"push_trip_end"`, shifts the later times of the trips, as before. `"keep_total_duration"` splits the change around each intermediate stop, keeping the trip durations.
 - `interpolate_stop_times()` gains `overwrite` and `keep_dwell_times`. With `overwrite = TRUE`, the times of every stop between the first and the last stop of each trip are replaced by interpolated ones, instead of only the blank ones. By default (`keep_dwell_times = TRUE`), these stops keep their original dwell times.
 
 ## Bug fixes
