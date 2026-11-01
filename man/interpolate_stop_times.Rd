@@ -50,9 +50,10 @@ The order of the rows and the other columns are kept. The given GTFS
 object is not modified.
 }
 \description{
-Fills blank \code{arrival_time}s and \code{departure_time}s in \code{stop_times}, assuming
-that vehicles travel at a constant speed between consecutive stops with
-known times (timepoints).
+Fills blank \code{arrival_time}s and \code{departure_time}s in \code{stop_times}, or
+overwrites those of the intermediate stops of each trip, assuming that
+vehicles travel at a constant speed between consecutive stops with known
+times (timepoints).
 }
 \section{Details}{
 

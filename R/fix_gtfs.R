@@ -18,6 +18,12 @@
 #' @param dwell_time_unit A string representing the time unit in which
 #'   `min_dwell_time` is given. One of `"s"` (seconds, the default), `"min"`
 #'   (minutes), `"h"` (hours) or `"d"` (days).
+#' @param overwrite_stop_times A logical. If `FALSE` (the default), only blank
+#'   stop times are filled. If `TRUE`, the times of every stop between the
+#'   first and the last stop of each trip are replaced by times interpolated
+#'   over the distance travelled, keeping their dwell times (see the
+#'   `overwrite` and `keep_dwell_times` arguments of
+#'   [interpolate_stop_times()]).
 #'
 #' @return The fixed GTFS object.
 #'
@@ -38,7 +44,11 @@
 #'    stops around them. Speeds are capped before interpolating, so the filled
 #'    times follow the capped times. Interpolated times are rounded to the
 #'    second. Stops whose times can't be interpolated are left blank, with a
-#'    warning;
+#'    warning. With `overwrite_stop_times = TRUE`, the times of every
+#'    intermediate stop are replaced instead, from each trip's first and last
+#'    times, keeping the stops' dwell times. The trips' durations still
+#'    follow the capped times, and their travel time is spread evenly over
+#'    the distance;
 #' 5. [set_min_dwell_time()], only if `min_dwell_time` is given, delays the
 #'    departure from each intermediate stop whose dwell time is shorter than
 #'    `min_dwell_time`, so that vehicles stay there for at least that long.
@@ -100,7 +110,8 @@ fix_gtfs <- function(
   max_speed = NULL,
   speed_unit = "km/h",
   min_dwell_time = NULL,
-  dwell_time_unit = "s"
+  dwell_time_unit = "s",
+  overwrite_stop_times = FALSE
 ) {
   gtfs <- assert_and_assign_gtfs_object(gtfs)
   checkmate::assert_number(
@@ -128,6 +139,7 @@ fix_gtfs <- function(
     upper = max_time_secs / dwell_unit_factors[[dwell_time_unit]],
     null.ok = TRUE
   )
+  checkmate::assert_logical(overwrite_stop_times, len = 1, any.missing = FALSE)
 
   # remove duplicates first, so the other steps don't see repeated rows
 
@@ -148,9 +160,12 @@ fix_gtfs <- function(
     )
   }
 
-  # interpolate stop_times
+  # fill blank stop times, or overwrite the times of intermediate stops
 
-  gtfs_fixed <- interpolate_stop_times(gtfs_fixed)
+  gtfs_fixed <- interpolate_stop_times(
+    gtfs = gtfs_fixed,
+    overwrite = overwrite_stop_times
+  )
 
   # set a minimum dwell time at intermediate stops. this is done after
   # interpolating, so the filled stops also get it. 'stop_times' is not the

@@ -11,7 +11,7 @@ tester <- function(gtfs = get("gtfs", envir = parent.frame()),
                    unit = "s",
                    from = NULL,
                    to = NULL,
-                   strategy = "push_trip_end",
+                   strategy = "shift_trip_end",
                    by_reference = FALSE) {
   set_dwell_time(
     gtfs,
@@ -107,7 +107,7 @@ test_that("raises errors due to incorrect input types/value", {
   expect_error(tester(by_reference = NA))
   expect_error(tester(by_reference = c(TRUE, TRUE)))
   expect_error(tester(strategy = "x"))
-  expect_error(tester(strategy = c("push_trip_end", "keep_total_duration")))
+  expect_error(tester(strategy = c("shift_trip_end", "keep_total_duration")))
   expect_error(tester(strategy = NA))
 
   # dwell_time is the second argument, so it can be given by position

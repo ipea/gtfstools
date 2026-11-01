@@ -59,6 +59,14 @@ test_that("raises error due to incorrect input types", {
     tester(min_dwell_time = 30, dwell_time_unit = "sec"),
     regexp = "dwell_time_unit"
   )
+  expect_error(
+    tester(overwrite_stop_times = "TRUE"),
+    regexp = "overwrite_stop_times"
+  )
+  expect_error(
+    tester(overwrite_stop_times = NA),
+    regexp = "overwrite_stop_times"
+  )
 })
 
 test_that("raises errors if gtfs doesn't have required tables", {
@@ -83,6 +91,9 @@ test_that("results in a dt_gtfs object and doesn't change given gtfs", {
 
   result <- tester(gtfs)
   expect_s3_class(result, "dt_gtfs")
+  expect_equal(original_gtfs, gtfs, ignore_attr = TRUE)
+
+  result <- tester(gtfs, overwrite_stop_times = TRUE)
   expect_equal(original_gtfs, gtfs, ignore_attr = TRUE)
 
   # spo has neither duplicated stop times nor blank times, so its dwell times
@@ -142,6 +153,33 @@ test_that("doesn't cap speeds if max_speed is NULL", {
 
   expect_identical(times$arrival_time[c(1, 6)], c("08:00:00", "08:01:00"))
   expect_false(anyNA(secs(times$arrival_time)))
+})
+
+test_that("overwrite_stop_times replaces the times of intermediate stops", {
+  # s3 arrives at 08:00:50 and stays 5 seconds
+  gtfs <- hand_feed()
+  gtfs$stop_times[
+    4,
+    `:=`(arrival_time = "08:00:50", departure_time = "08:00:55")
+  ]
+
+  result <- tester(gtfs, max_speed = NULL)
+  expect_identical(
+    result$stop_times$arrival_time,
+    c("08:00:00", "08:00:25", "08:00:50", "08:00:57", "08:00:58", "08:01:00")
+  )
+
+  # the 55 seconds that the trip isn't stopped are spread evenly over its 5
+  # segments of equal length
+  result <- tester(gtfs, max_speed = NULL, overwrite_stop_times = TRUE)
+  expect_identical(
+    result$stop_times$arrival_time,
+    c("08:00:00", "08:00:11", "08:00:22", "08:00:38", "08:00:49", "08:01:00")
+  )
+  expect_identical(
+    result$stop_times$departure_time,
+    c("08:00:00", "08:00:11", "08:00:27", "08:00:38", "08:00:49", "08:01:00")
+  )
 })
 
 test_that("sets the minimum dwell time at stops with interpolated times", {

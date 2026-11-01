@@ -8,7 +8,7 @@ set_dwell_time(
   gtfs,
   dwell_time,
   unit = "s",
-  strategy = "push_trip_end",
+  strategy = "shift_trip_end",
   trip_id = NULL,
   stop_id = NULL,
   from = NULL,
@@ -32,7 +32,7 @@ given. One of \code{"s"} (seconds, the default), \code{"min"} (minutes), \code{"
 \item{strategy}{A string, how the trips absorb the changes in dwell time.
 One of:
 \itemize{
-\item \code{"push_trip_end"} (the default): keeps the running times between
+\item \code{"shift_trip_end"} (the default): keeps the running times between
 stops and shifts all the later times of the trip, so the arrival at the
 last stop moves later (or earlier, if dwell times are shortened). It
 preserves the implicit average speed between stops but changes the
@@ -86,29 +86,10 @@ change.
 }
 \section{Details}{
 
-The following paragraphs describe the default,
-\code{strategy = "push_trip_end"}. See the last paragraph for
-\code{strategy = "keep_total_duration"}.
 
-The dwell time of a visit is its \code{departure_time} minus its \code{arrival_time}
-in \code{stop_times}, as returned by \code{\link[=get_dwell_time]{get_dwell_time()}}. It is set at the visits
-of every specified trip to every specified stop (not of pairs formed by
-their elements): the arrival time is kept and the departure time is set to
-the arrival time plus \code{dwell_time}. All the later times of the trip, in
-\code{stop_sequence} order, are shifted by the change, and changes at several
-visits of the same trip add up. At a trip's last stop, only the departure
-time changes. A stop visited more than once by the same trip has its dwell
-time set at each visit.
-
-Blank times are never filled. Selected visits with a blank arrival or
-departure time are not changed and don't shift the later times, with a
-warning when \code{stop_id} is given; fill them beforehand with
-\code{\link[=interpolate_stop_times]{interpolate_stop_times()}}. An error is raised if a shift would result in a
-negative time (times not in chronological order) or in a time later than
-\code{"9999:59:59"}. \code{stop_sequence} is assumed to be unique within each trip
-and not \code{NA}. When both \code{trip_id} and \code{stop_id} are given but none of the
-trips visits any of the stops, a warning is raised and the GTFS is returned
-unchanged.
+Since the first stop is never changed, the departures of trips listed in
+\code{frequencies} are not changed either. Blank arrival or departure times
+are never filled.
 
 For trips listed in \code{frequencies}, the times in \code{stop_times} are a template
 (see \code{\link[=frequencies_to_stop_times]{frequencies_to_stop_times()}}), so setting the dwell time at the first
@@ -129,21 +110,6 @@ never stations: to set the dwell times at a station, pass its children that
 appear in \code{stop_times} (see \code{\link[=get_children_stops]{get_children_stops()}}). Existing \verb{_secs}
 columns in \code{stop_times} (e.g. created with \code{\link[=convert_time_to_seconds]{convert_time_to_seconds()}}) are
 updated to match.
-
-With \code{strategy = "keep_total_duration"}, visits are selected in the same
-way, but the change in dwell time is split around each visit: when the
-dwell time is lengthened, its arrival is moved earlier by half of the change
-(rounded toward zero, so an odd second goes to the departure) and its
-departure later by the rest, and the other way around when it's shortened.
-No other time of the trip changes, so the running times to and from the
-visit absorb the change (the vehicle runs faster when dwell times are
-lengthened) and the trip keeps its duration. The first and last visits with
-both an arrival and a departure time of each trip are never changed, as in
-\code{\link[=set_min_dwell_time]{set_min_dwell_time()}}. An error is raised if a running time would become
-negative, i.e. if the dwell times set take more time than the trip spends
-running between the stops (running times that are already negative are not
-checked). Since the first stop is never changed, the departures of trips
-listed in \code{frequencies} are not changed either.
 }
 
 \examples{
