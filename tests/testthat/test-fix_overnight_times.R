@@ -483,7 +483,12 @@ test_that("warns about times that go back in feeds without times to fix", {
   expect_identical(result$stop_times, small_back$stop_times)
 
   malformed <- synthetic_feed(
-    list(malformed = list(arr = c("08:00:00", "ab:cd", "08:10:00")))
+    list(
+      malformed = list(
+        arr = c("08:00:00", "ab:cd", "08:10:00"),
+        dep = c("08:00:00", "08:05:00", "08:10:00")
+      )
+    )
   )
   expect_warning(tester(malformed), class = "gtfstools_malformed_time")
 })

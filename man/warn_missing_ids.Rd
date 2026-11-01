@@ -4,7 +4,7 @@
 \alias{warn_missing_ids}
 \title{Warn about ids missing from a table}
 \usage{
-warn_missing_ids(id, existing_id, table, id_name)
+warn_missing_ids(id, existing_id, table, id_name, call = sys.call(-1))
 }
 \arguments{
 \item{id}{A character vector of ids given by the user.}
@@ -14,6 +14,9 @@ warn_missing_ids(id, existing_id, table, id_name)
 \item{table}{The name of the table, used in the warning message.}
 
 \item{id_name}{The name of the id field, used in the warning message.}
+
+\item{call}{The call the warning is attributed to. Defaults to the call of
+the function that called this helper.}
 }
 \value{
 The missing ids, invisibly.

@@ -1,9 +1,11 @@
 #' Set dwell time
 #'
 #' Sets the dwell time of each specified `trip_id` at each specified `stop_id`,
-#' i.e. the time the vehicle stays at the stop, by changing the
-#' `departure_time` at these stops in `stop_times` and shifting the later times
-#' of the trips accordingly.
+#' i.e. the time the vehicle stays at the stop for passengers to board and
+#' alight, by changing the times at these stops in `stop_times`. By default,
+#' the later times of the trips are shifted accordingly. Alternatively, the
+#' trip durations are kept and the running times between stops absorb the
+#' change.
 #'
 #' @template gtfs
 #' @param dwell_time A non-negative number, the dwell time to be set, in
@@ -13,6 +15,20 @@
 #' @param unit A string representing the time unit in which `dwell_time` is
 #'   given. One of `"s"` (seconds, the default), `"min"` (minutes), `"h"`
 #'   (hours) or `"d"` (days).
+#' @param strategy A string, how the trips absorb the changes in dwell time.
+#'   One of:
+#'   - `"shift_trip_end"` (the default): keeps the running times between
+#'     stops and shifts all the later times of the trip, so the arrival at the
+#'     last stop moves later (or earlier, if dwell times are shortened). It
+#'     preserves the implicit average speed between stops but changes the
+#'     trip duration.
+#'   - `"keep_total_duration"`: centres each intermediate stop's dwell on its
+#'     original time, taking half of the change from the running time before
+#'     the stop and half from the one after it. The first and last stops are
+#'     not changed, so the trip keeps its duration, its arrival at the last
+#'     stop and the implicit average speed between its first and last stops.
+#'     An error is raised if a running time would become negative.
+#'
 #' @param trip_id A character vector including the `trip_id`s to have their
 #'   dwell times set. If `NULL` (the default), the dwell times of every
 #'   `trip_id` in the GTFS (or of every trip of the given `route_type`s) are
@@ -35,25 +51,10 @@
 #'   invisibly (note that in this case the original GTFS object is altered).
 #'
 #' @section Details:
-#' The dwell time of a visit is its `departure_time` minus its `arrival_time`
-#' in `stop_times`, as returned by [get_dwell_time()]. It is set at the visits
-#' of every specified trip to every specified stop (not of pairs formed by
-#' their elements): the arrival time is kept and the departure time is set to
-#' the arrival time plus `dwell_time`. All the later times of the trip, in
-#' `stop_sequence` order, are shifted by the change, and changes at several
-#' visits of the same trip add up. At a trip's last stop, only the departure
-#' time changes. A stop visited more than once by the same trip has its dwell
-#' time set at each visit.
 #'
-#' Blank times are never filled. Selected visits with a blank arrival or
-#' departure time are not changed and don't shift the later times, with a
-#' warning when `stop_id` is given; fill them beforehand with
-#' [interpolate_stop_times()]. An error is raised if a shift would result in a
-#' negative time (times not in chronological order) or in a time later than
-#' `"9999:59:59"`. `stop_sequence` is assumed to be unique within each trip
-#' and not `NA`. When both `trip_id` and `stop_id` are given but none of the
-#' trips visits any of the stops, a warning is raised and the GTFS is returned
-#' unchanged.
+#' Since the first stop is never changed, the departures of trips listed in
+#' `frequencies` are not changed either. Blank arrival or departure times
+#' are never filled.
 #'
 #' For trips listed in `frequencies`, the times in `stop_times` are a template
 #' (see [frequencies_to_stop_times()]), so setting the dwell time at the first
@@ -123,6 +124,18 @@
 #' )
 #' get_dwell_time(new_gtfs, trip_id = "CPTM L07-0")
 #'
+#' # keep the trip duration: the running times between the stops absorb the
+#' # dwell times, and the arrival at the last stop doesn't change
+#' new_gtfs <- set_dwell_time(
+#'   gtfs,
+#'   trip_id = "CPTM L07-0",
+#'   dwell_time = 30,
+#'   strategy = "keep_total_duration"
+#' )
+#' new_gtfs$stop_times |>
+#'   filter(trip_id == "CPTM L07-0") |>
+#'   tail()
+#'
 #' # original gtfs remains unchanged
 #' get_dwell_time(gtfs, stop_id = "18960")
 #'
@@ -144,6 +157,7 @@ set_dwell_time <- function(
   gtfs,
   dwell_time,
   unit = "s",
+  strategy = "shift_trip_end",
   trip_id = NULL,
   stop_id = NULL,
   from = NULL,
@@ -156,6 +170,11 @@ set_dwell_time <- function(
   checkmate::assert_character(stop_id, null.ok = TRUE, any.missing = FALSE)
   checkmate::assert_string(unit)
   checkmate::assert_names(unit, subset.of = names(dwell_unit_factors))
+  checkmate::assert_string(strategy)
+  checkmate::assert_names(
+    strategy,
+    subset.of = c("shift_trip_end", "keep_total_duration")
+  )
   checkmate::assert_number(
     dwell_time,
     lower = 0,
@@ -189,7 +208,8 @@ set_dwell_time <- function(
     stop_id,
     window,
     route_type,
-    by_reference
+    by_reference,
+    strategy = strategy
   )
 
   if (by_reference) {
@@ -200,11 +220,12 @@ set_dwell_time <- function(
 }
 
 
-
 # sets the dwell time of the selected visits to 'dwell_secs' and shifts the
 # later times of their trips, as described in set_dwell_time(). with
 # 'raise_only', only shorter dwell times are raised, as described in
-# set_min_dwell_time(). the arguments are validated by these functions
+# set_min_dwell_time(). with strategy = "keep_total_duration", the change is
+# split around each intermediate visit instead. the arguments are validated by
+# these functions
 
 change_dwell_times <- function(
   gtfs,
@@ -214,7 +235,8 @@ change_dwell_times <- function(
   window,
   route_type,
   by_reference,
-  raise_only = FALSE
+  raise_only = FALSE,
+  strategy = "shift_trip_end"
 ) {
   if (!is.null(route_type)) {
     type_routes <- route_type_ids(gtfs, route_type)
@@ -315,11 +337,12 @@ change_dwell_times <- function(
       )
     }
 
-    # a minimum skips the first and last visits with both times, and raises
-    # negative dwell times like any other shorter one. it comes after the
-    # blank warning, which needs the selection before it's narrowed
+    # a minimum and "keep_total_duration" skip the first and last visits with
+    # both times. a minimum also raises negative dwell times like any other
+    # shorter one. it comes after the blank warning, which needs the selection
+    # before it's narrowed
 
-    if (raise_only) {
+    if (raise_only || strategy == "keep_total_duration") {
       timed <- st[
         !is.na(arr) & !is.na(dep) & !is.na(trip_id) & !is.na(stop_sequence),
         c("row", "trip_id", "stop_sequence")
@@ -330,12 +353,15 @@ change_dwell_times <- function(
       st[,
         selected := selected &
           row %in% timed$row[is_middle] &
-          dep - arr < dwell_secs
+          (!raise_only | dep - arr < dwell_secs)
       ]
     }
 
-    # each selected call shifts its own departure and all the later times of
-    # its trip by the change in its dwell time
+    # with "shift_trip_end", each selected call shifts its own departure and
+    # all the later times of its trip by the change in its dwell time. with
+    # "keep_total_duration", the change is split around the call (an odd
+    # second goes to the departure), and the running times to and from it
+    # absorb it
 
     # the shifts are accumulated as doubles, so that a sum beyond the integer
     # range raises the error below instead of silently becoming NA
@@ -343,11 +369,68 @@ change_dwell_times <- function(
     st[, delta := 0]
     st[selected & !is_blank, delta := as.numeric(arr) + dwell_secs - dep]
     data.table::setorderv(st, c("trip_id", "stop_sequence"))
-    st[, dep_shift := cumsum(delta), by = trip_id]
-    st[, arr_shift := dep_shift - delta]
+
+    if (strategy == "shift_trip_end") {
+      st[, dep_shift := cumsum(delta), by = trip_id]
+      st[, arr_shift := dep_shift - delta]
+    } else {
+      st[, arr_shift := -trunc(delta / 2)]
+      st[, dep_shift := delta + arr_shift]
+    }
+
+    st[, `:=`(new_arr = arr + arr_shift, new_dep = dep + dep_shift)]
+
+    # with "keep_total_duration", a running time can't absorb more than it
+    # has. each one is measured from the previous timed call, skipping blank
+    # ones. running times that were already negative are left to the range
+    # check below
+
+    # 'st' is ordered by trip, so the previous timed call is found without
+    # grouping, which would be slow with many trips. calls with no previous
+    # timed call in their trip get NA. new times are blank where old ones are
+
+    if (strategy == "keep_total_duration") {
+      end <- data.table::fcoalesce(st$dep, st$arr)
+      new_end <- data.table::fcoalesce(st$new_dep, st$new_arr)
+      row_index <- seq_len(nrow(st))
+      last_timed <- data.table::nafill(
+        data.table::fifelse(is.na(end), NA_integer_, row_index),
+        "locf"
+      )
+      prev <- data.table::shift(last_timed)
+      is_trip_start <- !duplicated(st$trip_id)
+      trip_start <- row_index[is_trip_start][cumsum(is_trip_start)]
+      prev[prev < trip_start] <- NA
+
+      is_negative <- which(
+        data.table::fcoalesce(st$arr, st$dep) - end[prev] >= 0 &
+          data.table::fcoalesce(st$new_arr, st$new_dep) - new_end[prev] < 0
+      )
+
+      if (length(is_negative) > 0) {
+        negative_trips <- unique(st$trip_id[is_negative])
+        abbreviated <- abbreviate_ids(negative_trips)
+        cli::cli_abort(
+          c(
+            paste0(
+              "Setting the dwell time with ",
+              "{.code strategy = \"keep_total_duration\"} results in ",
+              "negative running times between stops in the following ",
+              "{cli::qty(length(negative_trips))}trip{?s}: ",
+              "{.val {abbreviated$shown}}{abbreviated$more}."
+            ),
+            "i" = paste0(
+              "Use a shorter {.arg dwell_time}, select fewer stops or trips, ",
+              "or use {.code strategy = \"shift_trip_end\"}."
+            )
+          ),
+          class = "gtfstools_negative_running_time",
+          call = parent.frame()
+        )
+      }
+    }
 
     st <- st[dep_shift != 0 | arr_shift != 0]
-    st[, `:=`(new_arr = arr + arr_shift, new_dep = dep + dep_shift)]
 
     # check before writing, so that by_reference doesn't leave a half-edited
     # table behind

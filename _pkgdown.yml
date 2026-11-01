@@ -45,6 +45,7 @@ reference:
     - set_dwell_time
     - set_min_dwell_time
     - set_max_speed
+    - set_min_speed
     - set_route_frequency
     - set_trip_speed
     - set_route_speed

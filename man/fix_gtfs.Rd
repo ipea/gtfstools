@@ -9,7 +9,8 @@ fix_gtfs(
   max_speed = NULL,
   speed_unit = "km/h",
   min_dwell_time = NULL,
-  dwell_time_unit = "s"
+  dwell_time_unit = "s",
+  overwrite_stop_times = FALSE
 )
 }
 \arguments{
@@ -29,6 +30,13 @@ open to serve passengers, in the unit given by \code{dwell_time_unit}. If
 \item{dwell_time_unit}{A string representing the time unit in which
 \code{min_dwell_time} is given. One of \code{"s"} (seconds, the default), \code{"min"}
 (minutes), \code{"h"} (hours) or \code{"d"} (days).}
+
+\item{overwrite_stop_times}{A logical. If \code{FALSE} (the default), only blank
+stop times are filled. If \code{TRUE}, the times of every stop between the
+first and the last stop of each trip are replaced by times interpolated
+over the distance travelled, keeping their dwell times (see the
+\code{overwrite} and \code{keep_dwell_times} arguments of
+\code{\link[=interpolate_stop_times]{interpolate_stop_times()}}).}
 }
 \value{
 The fixed GTFS object.
@@ -62,7 +70,11 @@ left unchanged, with a warning;
 stops around them. Speeds are capped before interpolating, so the filled
 times follow the capped times. Interpolated times are rounded to the
 second. Stops whose times can't be interpolated are left blank, with a
-warning;
+warning. With \code{overwrite_stop_times = TRUE}, the times of every
+intermediate stop are replaced instead, from each trip's first and last
+times, keeping the stops' dwell times. The trips' durations still
+follow the capped times, and their travel time is spread evenly over
+the distance;
 \item \code{\link[=set_min_dwell_time]{set_min_dwell_time()}}, only if \code{min_dwell_time} is given, delays the
 departure from each intermediate stop whose dwell time is shorter than
 \code{min_dwell_time}, so that vehicles stay there for at least that long.

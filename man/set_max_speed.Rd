@@ -136,5 +136,5 @@ gtfs_capped <- set_max_speed(gtfs, max_speed = 8)
 
 }
 \seealso{
-\code{\link[=set_trip_speed]{set_trip_speed()}}, \code{\link[=get_trip_speed]{get_trip_speed()}}
+\code{\link[=set_min_speed]{set_min_speed()}}, \code{\link[=set_trip_speed]{set_trip_speed()}}, \code{\link[=get_trip_speed]{get_trip_speed()}}
 }
