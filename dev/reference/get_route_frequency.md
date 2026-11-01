@@ -64,7 +64,14 @@ A departure is counted when it happens at or after `from` and before
 [`filter_by_time_of_day()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_time_of_day.md),
 which also keeps entries at `to`). Departures after midnight are listed
 with times past "24:00:00", so use a time of day such as
-"24:00:00"-"26:00:00" to count them.
+"24:00:00"-"26:00:00" to count them. Times after midnight written as
+early morning times (e.g. `"00:30:00"` instead of `"24:30:00"`), and
+`end_time`s earlier than `start_time`s in `frequencies`, are first fixed
+with
+[`fix_overnight_times()`](https://ipea.github.io/gtfstools/dev/reference/fix_overnight_times.md),
+so these trips are counted at their real times. Without an integer
+`stop_sequence` column, the times of `stop_times` can't be ordered and
+are used as written.
 
 The mean headway is the length of the time of day divided by the number
 of departures, so it overstates the actual headway when service starts

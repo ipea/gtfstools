@@ -56,7 +56,10 @@ tables. Departures are counted as in
 [`get_route_frequency()`](https://ipea.github.io/gtfstools/dev/reference/get_route_frequency.md):
 trips listed in the `frequencies` table depart once per headway, the
 other trips depart once, and departures after midnight belong to the
-previous service day. Unlike in
+previous service day (times after midnight written as early morning
+times are fixed first, as in
+[`get_route_frequency()`](https://ipea.github.io/gtfstools/dev/reference/get_route_frequency.md)).
+Unlike in
 [`get_route_frequency()`](https://ipea.github.io/gtfstools/dev/reference/get_route_frequency.md),
 the time of day includes `to`, as in
 [`get_trip_length()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_length.md).

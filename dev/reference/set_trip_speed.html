@@ -164,8 +164,12 @@ times at <code>last_stop</code> are both blank (unless it's the trip's last stop
 left unchanged, with a warning if they were given in <code>trip_id</code>. Without
 <code>first_stop</code>, <code>last_stop</code>, <code>from</code> and <code>to</code>, a blank departure at the trip's
 first stop leaves all the times of the trip blank, without a warning.</p>
+<p>Times after midnight written as early morning times (e.g. <code>"00:30:00"</code>
+instead of <code>"24:30:00"</code>) are first fixed with <code><a href="fix_overnight_times.html">fix_overnight_times()</a></code> in
+every trip, so the returned GTFS has them fixed (with <code>by_reference = TRUE</code>,
+even if an error is then raised).</p>
 <p><code>from</code> and <code>to</code> are compared with the <code>departure_time</code> at <code>first_stop</code> as
-written in <code>stop_times</code> (template times, for trips listed in
+written in <code>stop_times</code>, once fixed (template times, for trips listed in
 <code>frequencies</code>), so use times past <code>"24:00:00"</code> for departures after
 midnight; trips whose departure there is blank are then left unchanged.
 Existing <code>_secs</code> columns in <code>stop_times</code> are updated to match.</p>

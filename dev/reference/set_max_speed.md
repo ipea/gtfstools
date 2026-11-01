@@ -102,12 +102,15 @@ are left unchanged.
 Each span faster than `max_speed`, or with a zero duration, has its
 duration raised to its length divided by `max_speed`, rounded up to the
 next second. All the later times of the trip are shifted by the
-accumulated extra time, so dwell times are kept. Spans whose arrival is
-earlier than the previous departure (usually times after midnight
-written as `"00:30:00"` instead of `"24:30:00"`) are left unchanged,
-with a warning. An error is raised if a shift would result in a time
-later than `"9999:59:59"`. Only `stop_times` is modified; its existing
-`_secs` columns are updated to match.
+accumulated extra time, so dwell times are kept. Times after midnight
+written as early morning times (e.g. `"00:30:00"` instead of
+`"24:30:00"`) are first fixed with
+[`fix_overnight_times()`](https://ipea.github.io/gtfstools/dev/reference/fix_overnight_times.md)
+in every trip, so the returned GTFS has them fixed. Spans whose arrival
+is still earlier than the previous departure (by 12 hours or less) are
+left unchanged, with a warning. An error is raised if a shift would
+result in a time later than `"9999:59:59"`. Only `stop_times` is
+modified; its existing `_secs` columns are updated to match.
 
 With `first_stop` and `last_stop`, matched as in
 [`set_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.md),
@@ -121,12 +124,13 @@ there, are left unchanged, with a warning if they were given in
 
 `from` and `to` are compared with the departure at the segment's first
 stop (or its arrival, if the departure is blank) as written in
-`stop_times` (template times, for trips listed in `frequencies`), so use
-times past `"24:00:00"` for departures after midnight. Trips without a
-time there are left unchanged.
+`stop_times`, once fixed (template times, for trips listed in
+`frequencies`), so use times past `"24:00:00"` for departures after
+midnight. Trips without a time there are left unchanged.
 
 ## See also
 
+[`set_min_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_min_speed.md),
 [`set_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.md),
 [`get_trip_speed()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_speed.md)
 

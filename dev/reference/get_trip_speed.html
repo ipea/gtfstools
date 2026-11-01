@@ -157,7 +157,11 @@ of <code><a href="get_trip_duration.html">get_trip_duration()</a></code>.</p>
 <code><a href="convert_time_to_seconds.html">convert_time_to_seconds()</a></code>) are used as-is, not recalculated from the time
 strings.</p>
 <p><code>from</code> and <code>to</code> select the trips (or segments) as in <code><a href="get_trip_length.html">get_trip_length()</a></code>,
-from the <code>departure_time</code> strings, even if <code>_secs</code> columns exist.</p>
+from the <code>departure_time</code> strings, even if <code>_secs</code> columns exist. Times
+after midnight written as early morning times (e.g. <code>"00:30:00"</code> instead of
+<code>"24:30:00"</code>) are first fixed with <code><a href="fix_overnight_times.html">fix_overnight_times()</a></code>, if
+<code>stop_sequence</code> is an integer column, so lengths, durations and the time of
+day all use the fixed times.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

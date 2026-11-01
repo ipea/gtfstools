@@ -60,6 +60,10 @@
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/find_stop_pairs_within.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/first_departure_per_trip.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/fix_gtfs.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/fix_overnight_frequencies.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/fix_overnight_in_call.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/fix_overnight_stop_times.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/fix_overnight_times.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/frequencies_to_stop_times.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/get_active_services.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/get_calendar_overlap.html</loc></url>
@@ -97,6 +101,7 @@
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/get_vkt.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/get_vmt.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/gtfstools.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/has_overnight_trips.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/has_shapes.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/index.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/infer_trip_directions.html</loc></url>
@@ -130,6 +135,7 @@
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/set_dwell_time.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/set_max_speed.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/set_min_dwell_time.html</loc></url>
+<url><loc>https://ipea.github.io/gtfstools/dev/reference/set_min_speed.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/set_route_frequency.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/set_route_speed.html</loc></url>
 <url><loc>https://ipea.github.io/gtfstools/dev/reference/set_trip_speed.html</loc></url>

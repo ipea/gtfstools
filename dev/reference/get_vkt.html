@@ -114,7 +114,9 @@ times its number of departures times the number of counted days on which
 its service runs, according to the <code>calendar</code> and <code>calendar_dates</code> tables.
 Departures are counted as in <code><a href="get_route_frequency.html">get_route_frequency()</a></code>: trips listed in the
 <code>frequencies</code> table depart once per headway, the other trips depart once,
-and departures after midnight belong to the previous service day. Unlike in
+and departures after midnight belong to the previous service day (times
+after midnight written as early morning times are fixed first, as in
+<code><a href="get_route_frequency.html">get_route_frequency()</a></code>). Unlike in
 <code><a href="get_route_frequency.html">get_route_frequency()</a></code>, the time of day includes <code>to</code>, as in
 <code><a href="get_trip_length.html">get_trip_length()</a></code>. An error is raised if the <code>frequencies</code> table has
 invalid entries for trips that run on the counted days.</p>

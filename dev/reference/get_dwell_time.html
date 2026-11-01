@@ -131,8 +131,11 @@ visit of the template, not per departure.</p>
 <p>Blank times (<code>NA</code> dwell times) can be filled beforehand with
 <code><a href="interpolate_stop_times.html">interpolate_stop_times()</a></code>. Negative dwell times (departure earlier than
 arrival) are returned as they are.</p>
+<p>Times after midnight written as early morning times (e.g. <code>"00:30:00"</code>
+instead of <code>"24:30:00"</code>) are fixed with <code><a href="fix_overnight_times.html">fix_overnight_times()</a></code> before the
+dwell times are calculated.</p>
 <p><code>from</code> and <code>to</code> are compared with the <code>arrival_time</code> of each visit as
-written in <code>stop_times</code> (template times, for trips listed in
+written in <code>stop_times</code>, once fixed (template times, for trips listed in
 <code>frequencies</code>), so use times past <code>"24:00:00"</code> for arrivals after midnight.
 Visits with a blank arrival time are never included when <code>from</code> or <code>to</code> is
 given.</p>

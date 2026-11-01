@@ -125,7 +125,11 @@ present in <code>trips</code>) and counted within the time of day (at or after <
 and before <code>to</code>) as in <code><a href="get_route_frequency.html">get_route_frequency()</a></code>, which thus reports the new
 headway (exactly, when the length of the time of day is a multiple of
 <code>headway</code>). Departures after midnight are listed with times past
-"24:00:00", so use a time of day such as "24:00:00"-"26:00:00" for them.</p>
+"24:00:00", so use a time of day such as "24:00:00"-"26:00:00" for them.
+Times after midnight written as early morning times (e.g. <code>"00:30:00"</code>
+instead of <code>"24:30:00"</code>), and <code>end_time</code>s earlier than <code>start_time</code>s in
+<code>frequencies</code>, are first fixed with <code><a href="fix_overnight_times.html">fix_overnight_times()</a></code>, so the
+returned GTFS has them fixed.</p>
 <p>The function changes existing service, it does not create it: groups with
 no departure within the time of day are not modified, and scheduled trips
 that depart before <code>from</code> are not changed, even if they run within the time

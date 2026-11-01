@@ -111,7 +111,12 @@ are used as-is, not recalculated from the time strings.
 
 `from` and `to` select the trips (or segments) as in
 [`get_trip_length()`](https://ipea.github.io/gtfstools/dev/reference/get_trip_length.md),
-from the `departure_time` strings, even if `_secs` columns exist.
+from the `departure_time` strings, even if `_secs` columns exist. Times
+after midnight written as early morning times (e.g. `"00:30:00"` instead
+of `"24:30:00"`) are first fixed with
+[`fix_overnight_times()`](https://ipea.github.io/gtfstools/dev/reference/fix_overnight_times.md),
+if `stop_sequence` is an integer column, so lengths, durations and the
+time of day all use the fixed times.
 
 ## See also
 

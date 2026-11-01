@@ -118,6 +118,11 @@ process.</p>
 
 
 <p>The time of day includes both <code>from</code> and <code>to</code>.</p>
+<p>Times after midnight written as early morning times (e.g. <code>"00:30:00"</code>
+instead of <code>"24:30:00"</code>), and <code>end_time</code>s earlier than <code>start_time</code>s in
+<code>frequencies</code>, are first fixed with <code><a href="fix_overnight_times.html">fix_overnight_times()</a></code>, so these
+times are compared with the time of day as they should be, and the
+returned GTFS has them fixed.</p>
 <p>Trips listed in <code>frequencies</code> are filtered through their <code>frequencies</code>
 entries; their <code>stop_times</code> entries are templates and are kept whatever
 their times. With <code>keep = TRUE</code>, the entries that overlap the time of day

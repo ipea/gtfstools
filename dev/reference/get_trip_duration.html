@@ -105,6 +105,10 @@ table. Trips without any arrival time or without any departure time get a
 <p>Existing <code>_secs</code> columns in <code>stop_times</code> (e.g. created with
 <code><a href="convert_time_to_seconds.html">convert_time_to_seconds()</a></code>) are used as-is, not recalculated from the time
 strings.</p>
+<p>Times after midnight written as early morning times (e.g. <code>"00:30:00"</code>
+instead of <code>"24:30:00"</code>) are fixed with <code><a href="fix_overnight_times.html">fix_overnight_times()</a></code> before the
+durations are calculated, if <code>stop_sequence</code> is an integer column (without
+it, the times can't be ordered and are used as written).</p>
 <p><code>from</code> and <code>to</code> are compared with the departure time of the first stop of
 each trip, in <code>stop_sequence</code> order (which must then be an integer column).
 The time is read as the durations are: from <code>departure_time_secs</code>, if

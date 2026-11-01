@@ -71,7 +71,12 @@ Departures are grouped by `route_id`, `service_id` and `direction_id`
 which thus reports the new headway (exactly, when the length of the time
 of day is a multiple of `headway`). Departures after midnight are listed
 with times past "24:00:00", so use a time of day such as
-"24:00:00"-"26:00:00" for them.
+"24:00:00"-"26:00:00" for them. Times after midnight written as early
+morning times (e.g. `"00:30:00"` instead of `"24:30:00"`), and
+`end_time`s earlier than `start_time`s in `frequencies`, are first fixed
+with
+[`fix_overnight_times()`](https://ipea.github.io/gtfstools/dev/reference/fix_overnight_times.md),
+so the returned GTFS has them fixed.
 
 The function changes existing service, it does not create it: groups
 with no departure within the time of day are not modified, and scheduled

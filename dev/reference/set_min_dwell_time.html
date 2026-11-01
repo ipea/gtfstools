@@ -153,8 +153,8 @@ among all the visits of the trip, not only the selected ones, and the times
 of the last visit may still be shifted by an earlier visit.</p>
 <p>Negative dwell times (departure earlier than arrival) are raised like any
 other shorter dwell time, so a <code>min_dwell_time</code> of 0 raises only these.
-When they come from times after midnight written as <code>"00:30:00"</code> instead of
-<code>"24:30:00"</code>, the later times of the trip are shifted by about a day.</p>
+Times after midnight written as early morning times are fixed first, as in
+<code><a href="set_dwell_time.html">set_dwell_time()</a></code>, so they don't result in negative dwell times.</p>
 <p>Otherwise it works as <code><a href="set_dwell_time.html">set_dwell_time()</a></code>.</p>
     </div>
     <div class="section level2">

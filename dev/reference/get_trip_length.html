@@ -170,6 +170,9 @@ two distinct points have <code>NA</code> lengths, with a warning. Use
 <p><code>from</code> and <code>to</code> are compared with the <code>departure_time</code> of the first stop of
 each trip (in <code>stop_sequence</code> order) or segment, as written in
 <code>stop_times</code>, so use times past <code>"24:00:00"</code> for departures after midnight.
+With <code>by = "segment"</code>, times after midnight written as early morning times
+(e.g. <code>"00:30:00"</code> instead of <code>"24:30:00"</code>) are first fixed with
+<code><a href="fix_overnight_times.html">fix_overnight_times()</a></code>; a trip's first departure is never changed by it.
 For trips listed in <code>frequencies</code>, these are template times, not the times
 of each departure. Trips and segments whose departure is blank are never
 included when <code>from</code> or <code>to</code> is given.</p>

@@ -158,9 +158,11 @@ in trips not linked to a shape) are left unchanged.</p>
 <p>Each span faster than <code>max_speed</code>, or with a zero duration, has its duration
 raised to its length divided by <code>max_speed</code>, rounded up to the next second.
 All the later times of the trip are shifted by the accumulated extra time,
-so dwell times are kept. Spans whose arrival is earlier than the previous
-departure (usually times after midnight written as <code>"00:30:00"</code> instead of
-<code>"24:30:00"</code>) are left unchanged, with a warning. An error is raised if a
+so dwell times are kept. Times after midnight written as early morning
+times (e.g. <code>"00:30:00"</code> instead of <code>"24:30:00"</code>) are first fixed with
+<code><a href="fix_overnight_times.html">fix_overnight_times()</a></code> in every trip, so the returned GTFS has them fixed.
+Spans whose arrival is still earlier than the previous departure (by 12
+hours or less) are left unchanged, with a warning. An error is raised if a
 shift would result in a time later than <code>"9999:59:59"</code>. Only <code>stop_times</code>
 is modified; its existing <code>_secs</code> columns are updated to match.</p>
 <p>With <code>first_stop</code> and <code>last_stop</code>, matched as in <code><a href="set_trip_speed.html">set_trip_speed()</a></code>, only
@@ -171,14 +173,14 @@ the trip's first stop needs none). Trips that don't visit <code>first_stop</code
 then <code>last_stop</code>, or have blank times there, are left unchanged, with a
 warning if they were given in <code>trip_id</code> or <code>route_id</code>.</p>
 <p><code>from</code> and <code>to</code> are compared with the departure at the segment's first stop
-(or its arrival, if the departure is blank) as written in <code>stop_times</code>
-(template times, for trips listed in <code>frequencies</code>), so use times past
+(or its arrival, if the departure is blank) as written in <code>stop_times</code>, once
+fixed (template times, for trips listed in <code>frequencies</code>), so use times past
 <code>"24:00:00"</code> for departures after midnight. Trips without a time there are
 left unchanged.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="set_trip_speed.html">set_trip_speed()</a></code>, <code><a href="get_trip_speed.html">get_trip_speed()</a></code></p></div>
+    <div class="dont-index"><p><code><a href="set_min_speed.html">set_min_speed()</a></code>, <code><a href="set_trip_speed.html">set_trip_speed()</a></code>, <code><a href="get_trip_speed.html">get_trip_speed()</a></code></p></div>
     </div>
 
     <div class="section level2">

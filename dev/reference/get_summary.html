@@ -201,6 +201,10 @@ travelled).</p>
 
 <p>The report requires the <code>{ggplot2}</code>, <code>{knitr}</code> and <code>{rmarkdown}</code> packages
 and <a href="https://pandoc.org/" class="external-link">Pandoc</a>.</p>
+<p>Times after midnight written as early morning times (e.g. <code>"00:30:00"</code>
+instead of <code>"24:30:00"</code>), and <code>end_time</code>s earlier than <code>start_time</code>s in
+<code>frequencies</code>, are first fixed with <code><a href="fix_overnight_times.html">fix_overnight_times()</a></code>, if
+<code>stop_sequence</code> is an integer column.</p>
 <p>The time-of-day filter keeps whole trips (as <code><a href="filter_by_time_of_day.html">filter_by_time_of_day()</a></code> with
 <code>full_trips = TRUE</code>), so trip speeds and lengths refer to whole trips.</p>
 <p>Trip lengths, durations and speeds are calculated with <code><a href="get_trip_length.html">get_trip_length()</a></code>,

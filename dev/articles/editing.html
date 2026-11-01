@@ -129,9 +129,10 @@ the feed’s tables;</li>
 doesn’t use, with their entries in every table;</li>
 <li>
 <code><a href="../reference/fix_gtfs.html">fix_gtfs()</a></code>: cleans a feed in one call, removing
-duplicated entries and unused ids, optionally capping the speed of
-trips, filling blank stop times, optionally setting a minimum dwell time
-at intermediate stops and recalculating the distances travelled along
+duplicated entries and unused ids, fixing times after midnight written
+as early morning times, optionally capping the speed of trips, filling
+blank stop times, optionally setting a minimum dwell time at
+intermediate stops and recalculating the distances travelled along
 shapes (replacing any existing ones).</li>
 </ul>
 <p>This vignette will introduce you to the first four functions and to
@@ -415,10 +416,13 @@ includes a <code>timepoint</code> column. In feeds without shapes, use
 between stops instead.</p>
 <p>If <code>trip_id</code> is not given, the function interpolates the
 data to give explicit stop times at every stop of every trip in the
-feed. Some stops may be left blank, with a warning: for example, a few
+feed. Some stops may be left blank, with a warning: for example, stops
+of trips not linked to a shape, or between times that go back. A few
 trips of Porto Alegre’s feed list their times after midnight as
 <code>"00:xx:xx"</code>, instead of <code>"24:xx:xx"</code>, so they
-seem to arrive before they depart and can’t be interpolated.</p>
+seem to arrive before they depart: these times are fixed first, with
+<code><a href="../reference/fix_overnight_times.html">fix_overnight_times()</a></code>, so these trips are interpolated
+too.</p>
 </div>
 <div class="section level2">
 <h2 id="fixing-common-problems">Fixing common problems<a class="anchor" aria-label="anchor" href="#fixing-common-problems"></a>
@@ -436,18 +440,7 @@ intermediate stop for passengers to board and alight:</p>
 <span>  <span class="va">gtfs</span>, </span>
 <span>  max_speed <span class="op">=</span> <span class="fl">25</span>, </span>
 <span>  min_dwell_time <span class="op">=</span> <span class="fl">20</span></span>
-<span>  <span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: 10 trips have stops whose arrival is earlier than the previous departure, so</span></span>
-<span><span class="co">#&gt; their speeds were not capped between them: <span style="color: #0000BB;">"176-1@1#2310"</span>, <span style="color: #0000BB;">"A141-1@3#2340"</span>,</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">"A141-1@5#2340"</span>, <span style="color: #0000BB;">"T2-1@1#2310"</span>, <span style="color: #0000BB;">"T2-1@1#2332"</span> and 5 more.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> This usually happens when times after midnight are written as <span style="color: #0000BB;">"00:30:00"</span></span></span>
-<span><span class="co">#&gt;   instead of <span style="color: #0000BB;">"24:30:00"</span>.</span></span>
-<span><span class="co">#&gt; Warning: 558 stop times could not be interpolated and were left blank.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> 10 trips have an arrival earlier than the previous departure, e.g. times</span></span>
-<span><span class="co">#&gt;   after midnight written as <span style="color: #0000BB;">"00:30:00"</span> instead of <span style="color: #0000BB;">"24:30:00"</span>: <span style="color: #0000BB;">"176-1@1#2310"</span>,</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">"A141-1@3#2340"</span>, <span style="color: #0000BB;">"A141-1@5#2340"</span>, <span style="color: #0000BB;">"T2-1@1#2310"</span>, <span style="color: #0000BB;">"T2-1@1#2332"</span>,</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">"T2-1@1#2357"</span>, <span style="color: #0000BB;">"T2-1@2#2332"</span>, <span style="color: #0000BB;">"T2-1@2#2357"</span>, <span style="color: #0000BB;">"T2-1@5#2334"</span>, and</span></span>
-<span><span class="co">#&gt;   <span style="color: #0000BB;">"T2-1@5#2357"</span>.</span></span></code></pre></div>
+<span>  <span class="op">)</span></span></code></pre></div>
 <p>With <code><a href="../reference/fix_gtfs.html">fix_gtfs()</a></code>, the feed goes through the following
 steps, in this order:</p>
 <ol style="list-style-type: decimal">
@@ -458,6 +451,10 @@ every table;</li>
 <code><a href="../reference/remove_unused_ids.html">remove_unused_ids()</a></code> removes the trips without stop
 times and the entries of every table that no remaining trip uses
 (e.g. stops that are not used in any trip);</li>
+<li>
+<code><a href="../reference/fix_overnight_times.html">fix_overnight_times()</a></code> rewrites times after midnight
+written as early morning times (e.g. <code>"00:30:00"</code> instead of
+<code>"24:30:00"</code>), as required by the GTFS specification;</li>
 <li>
 <code><a href="../reference/set_max_speed.html">set_max_speed()</a></code>, only if <code>max_speed</code> is
 given, slows down the parts of trips that are faster than

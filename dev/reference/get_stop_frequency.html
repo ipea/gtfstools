@@ -137,7 +137,11 @@ that consecutive time windows (e.g. "06:00:00"-"07:00:00" and
 that this differs from <code><a href="filter_by_time_of_day.html">filter_by_time_of_day()</a></code>, which keeps entries whose
 times are equal to <code>to</code>. Departures after midnight are listed with times
 greater than "24:00:00" and belong to the previous service day, so a time
-of day such as "24:00:00"-"26:00:00" should be used to account for them.</p>
+of day such as "24:00:00"-"26:00:00" should be used to account for them.
+Times after midnight written as early morning times (e.g. <code>"00:30:00"</code>
+instead of <code>"24:30:00"</code>), and <code>end_time</code>s earlier than <code>start_time</code>s in
+<code>frequencies</code>, are first fixed with <code><a href="fix_overnight_times.html">fix_overnight_times()</a></code>, so these
+departures are counted at their real times.</p>
 <p>The mean headway is the length of the time of day divided by the number of
 departures. It is an average over the whole time of day, so it is larger
 than the actual headway when service starts or ends within it. Trips with an

@@ -68,6 +68,11 @@ Existing `_secs` columns in `stop_times` (e.g. created with
 [`convert_time_to_seconds()`](https://ipea.github.io/gtfstools/dev/reference/convert_time_to_seconds.md))
 are used as-is, not recalculated from the time strings.
 
+Times after midnight written as early morning times (e.g. `"00:30:00"`
+instead of `"24:30:00"`) are fixed with
+[`fix_overnight_times()`](https://ipea.github.io/gtfstools/dev/reference/fix_overnight_times.md)
+before the durations are calculated.
+
 `from` and `to` are compared with the departure time of the first stop
 of each segment, read as the durations are (from `departure_time_secs`,
 if present), so use times past `"24:00:00"` for departures after

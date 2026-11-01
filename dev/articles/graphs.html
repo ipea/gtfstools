@@ -151,10 +151,6 @@ that all trips have a minimum dwell time of 30 seconds to allow
 passengers to board and alight.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">gtfs</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fix_gtfs.html">fix_gtfs</a></span><span class="op">(</span><span class="va">gtfs</span>, max_speed <span class="op">=</span> <span class="fl">25</span>, min_dwell_time <span class="op">=</span> <span class="fl">30</span><span class="op">)</span></span></code></pre></div>
-<p>obs. in this case, <code><a href="../reference/fix_gtfs.html">fix_gtfs()</a></code> throws two warnings that
-refer to a few late night trips whose times go back to “00:00:00” after
-midnight. These trips depart outside the time of day used below, so they
-don’t affect the network.</p>
 </div>
 <div class="section level2">
 <h2 id="building-a-gmns-network">Building a GMNS network<a class="anchor" aria-label="anchor" href="#building-a-gmns-network"></a>

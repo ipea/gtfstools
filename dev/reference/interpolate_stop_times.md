@@ -1,8 +1,9 @@
 # Interpolate missing stop times
 
-Fills blank `arrival_time`s and `departure_time`s in `stop_times`,
-assuming that vehicles travel at a constant speed between consecutive
-stops with known times (timepoints).
+Fills blank `arrival_time`s and `departure_time`s in `stop_times`, or
+overwrites those of the intermediate stops of each trip, assuming that
+vehicles travel at a constant speed between consecutive stops with known
+times (timepoints).
 
 ## Usage
 
@@ -90,8 +91,11 @@ Some stops are left blank, with a warning:
   trips not linked to a shape or stops without coordinates;
 
 - stops between timepoints in which the arrival is earlier than the
-  previous departure, usually times after midnight written as
-  `"00:30:00"` instead of `"24:30:00"`.
+  previous departure. Times after midnight written as early morning
+  times (e.g. `"00:30:00"` instead of `"24:30:00"`) are first fixed with
+  [`fix_overnight_times()`](https://ipea.github.io/gtfstools/dev/reference/fix_overnight_times.md)
+  in every trip, so the returned GTFS has them fixed, and only times
+  that go back by 12 hours or less remain.
 
 Times are blank when they are `NA`, empty or whitespace-only strings, or
 `"NA"`. Malformed time strings are left unchanged (unless overwritten
@@ -134,7 +138,7 @@ gtfs$stop_times |>
 #> 6: T2-1@1#520                                5544             6
 
 # distances measured along the trips' shapes. some trips of this feed have
-# times past midnight written as "00:xx:xx", so they are left blank
+# times past midnight written as "00:xx:xx", which are fixed first
 interpolated_gtfs <- suppressWarnings(interpolate_stop_times(gtfs))
 interpolated_gtfs$stop_times |>
   filter(trip_id == trip) |>

@@ -7,7 +7,7 @@ this helper.
 ## Usage
 
 ``` r
-warn_missing_ids(id, existing_id, table, id_name)
+warn_missing_ids(id, existing_id, table, id_name, call = sys.call(-1))
 ```
 
 ## Arguments
@@ -27,6 +27,11 @@ warn_missing_ids(id, existing_id, table, id_name)
 - id_name:
 
   The name of the id field, used in the warning message.
+
+- call:
+
+  The call the warning is attributed to. Defaults to the call of the
+  function that called this helper.
 
 ## Value
 

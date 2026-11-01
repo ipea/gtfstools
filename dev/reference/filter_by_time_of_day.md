@@ -63,6 +63,13 @@ process.
 
 The time of day includes both `from` and `to`.
 
+Times after midnight written as early morning times (e.g. `"00:30:00"`
+instead of `"24:30:00"`), and `end_time`s earlier than `start_time`s in
+`frequencies`, are first fixed with
+[`fix_overnight_times()`](https://ipea.github.io/gtfstools/dev/reference/fix_overnight_times.md),
+so these times are compared with the time of day as they should be, and
+the returned GTFS has them fixed.
+
 Trips listed in `frequencies` are filtered through their `frequencies`
 entries; their `stop_times` entries are templates and are kept whatever
 their times. With `keep = TRUE`, the entries that overlap the time of
