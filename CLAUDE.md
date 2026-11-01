@@ -26,6 +26,11 @@ License MIT. Docs: <https://ipeagit.github.io/gtfstools/>.
   `MEMORY.md`.
 - **Code style.** Always use the convention `package::function()`. Exceptions
   are functions from ggplot2 and special data.table operators such as `:=`.
+- **Explicit argument names.** Never use positional arguments. Every
+  function call in R names its arguments explicitly, e.g.
+  `get_trip_length(gtfs = gtfs, trip_id = ids, unit = "km")`, never
+  `get_trip_length(gtfs, ids, unit = "km")`. (Values passed through `...`,
+  as in `c()` or `paste0()`, have no argument name to give.)
 
 Conventions are in [`.claude/rules/r-package-conventions.md`](.claude/rules/r-package-conventions.md);
 gates are in [`.claude/rules/quality-gates.md`](.claude/rules/quality-gates.md).

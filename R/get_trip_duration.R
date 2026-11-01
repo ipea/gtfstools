@@ -93,7 +93,7 @@ get_trip_duration <- function(gtfs,
   # they don't go back. without an integer stop_sequence the times can't be
   # ordered, so they are used as written
 
-  gtfs <- fix_overnight_in_call(gtfs, trip_id)
+  gtfs <- fix_overnight_in_call(gtfs = gtfs, trip_id = trip_id)
 
   # select trip_ids to get duration of and raise warning if a given trip_id
   # doesn't exist in 'stop_times'

@@ -34,5 +34,5 @@ overnight_feed <- function() {
     )
   )
 
-  return(gtfsio::new_gtfs(feed, "dt_gtfs"))
+  return(value = gtfsio::new_gtfs(x = feed, subclass = "dt_gtfs"))
 }

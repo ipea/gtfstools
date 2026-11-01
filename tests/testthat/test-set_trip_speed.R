@@ -666,7 +666,7 @@ test_that("segment and time of day args work by reference and on other feeds", {
   # the other trips keep their times, except that times after midnight
   # written as early morning times are fixed
 
-  fixed_poa <- fix_overnight_times(poa_gtfs)
+  fixed_poa <- fix_overnight_times(gtfs = poa_gtfs)
   expect_identical(
     new_poa$stop_times[!trip_id %chin% in_window],
     fixed_poa$stop_times[!trip_id %chin% in_window]
@@ -765,28 +765,53 @@ test_that("raises errors due to incorrect route_type and selection", {
   )
 })
 
-test_that("fixes times after midnight written as early morning times", {
-  poa_gtfs <- read_gtfs(
-    system.file("extdata/poa_gtfs.zip", package = "gtfstools")
-  )
-  trip <- "T2-1@1#2310"
+test_that(
+  desc = "fixes times after midnight written as early morning times",
+  code = {
+    poa_gtfs <- read_gtfs(
+      path = system.file("extdata/poa_gtfs.zip", package = "gtfstools")
+    )
+    trip <- "T2-1@1#2310"
 
-  # the returned feed has every trip's times after midnight fixed
+    # the returned feed has every trip's times after midnight fixed
 
-  expect_no_warning(
-    result <- set_trip_speed(poa_gtfs, trip, 20),
-    class = "gtfstools_backwards_times"
-  )
-  expect_equal(get_trip_speed(result, trip)$speed, 20, tolerance = 1e-3)
-  others <- result$stop_times[trip_id != trip]
-  fixed_poa <- fix_overnight_times(poa_gtfs)
-  expect_identical(others, fixed_poa$stop_times[trip_id != trip])
+    expect_no_warning(
+      object = result <- set_trip_speed(
+        gtfs = poa_gtfs,
+        trip_id = trip,
+        speed = 20
+      ),
+      class = "gtfstools_backwards_times"
+    )
+    expect_equal(
+      object = get_trip_speed(gtfs = result, trip_id = trip)$speed,
+      expected = 20,
+      tolerance = 1e-3
+    )
+    others <- result$stop_times[trip_id != trip]
+    fixed_poa <- fix_overnight_times(gtfs = poa_gtfs)
+    expect_identical(
+      object = others,
+      expected = fixed_poa$stop_times[trip_id != trip]
+    )
 
-  # by reference, the given feed gets the fixed times and the new speed
+    # by reference, the given feed gets the fixed times and the new speed
 
-  given_gtfs <- read_gtfs(
-    system.file("extdata/poa_gtfs.zip", package = "gtfstools")
-  )
-  expect_invisible(set_trip_speed(given_gtfs, trip, 20, by_reference = TRUE))
-  expect_equal(given_gtfs$stop_times, result$stop_times, ignore_attr = TRUE)
-})
+    given_gtfs <- read_gtfs(
+      path = system.file("extdata/poa_gtfs.zip", package = "gtfstools")
+    )
+    expect_invisible(
+      call = set_trip_speed(
+        gtfs = given_gtfs,
+        trip_id = trip,
+        speed = 20,
+        by_reference = TRUE
+      )
+    )
+    expect_equal(
+      object = given_gtfs$stop_times,
+      expected = result$stop_times,
+      ignore_attr = TRUE
+    )
+  }
+)

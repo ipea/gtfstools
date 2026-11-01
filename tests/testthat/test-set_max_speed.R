@@ -232,7 +232,7 @@ test_that("keeps dwell times and blank times in feeds with blank times", {
   # first, so they are capped too
 
   expect_no_warning(
-    result <- tester(poa_gtfs, max_speed = 20),
+    object = result <- tester(gtfs = poa_gtfs, max_speed = 20),
     class = "gtfstools_backwards_times"
   )
 
@@ -356,31 +356,44 @@ test_that("leaves spans that end before they start unchanged, with a warning", {
   )
 })
 
-test_that("fixes times after midnight written as early morning times", {
-  # the same trip, with times after midnight written as "00:xx:xx". they are
-  # fixed first, so the second span doesn't go back and is capped too
+test_that(
+  desc = "fixes times after midnight written as early morning times",
+  code = {
+    # the same trip, with times after midnight written as "00:xx:xx". they are
+    # fixed first, so the second span doesn't go back and is capped too
 
-  times <- c("23:58:00", "23:59:00", "00:01:00", "00:30:00", "00:31:00")
-  feed <- synthetic_feed(list(list(arr = times, dep = times)), route_id = "r1")
+    times <- c("23:58:00", "23:59:00", "00:01:00", "00:30:00", "00:31:00")
+    feed <- synthetic_feed(
+      times = list(list(arr = times, dep = times)),
+      route_id = "r1"
+    )
 
-  expect_no_warning(result <- tester(feed))
+    expect_no_warning(object = result <- tester(gtfs = feed))
 
-  fixed <- c("23:58:00", "23:59:00", "24:01:00", "24:30:00", "24:31:00")
-  fixed_feed <- synthetic_feed(
-    list(list(arr = fixed, dep = fixed)),
-    route_id = "r1"
-  )
-  expect_identical(result, tester(fixed_feed))
-  expect_false(identical(result, fix_overnight_times(feed)))
+    fixed <- c("23:58:00", "23:59:00", "24:01:00", "24:30:00", "24:31:00")
+    fixed_feed <- synthetic_feed(
+      times = list(list(arr = fixed, dep = fixed)),
+      route_id = "r1"
+    )
+    expect_identical(object = result, expected = tester(gtfs = fixed_feed))
+    expect_false(
+      object = identical(x = result, y = fix_overnight_times(gtfs = feed))
+    )
 
-  # a time of day with times after midnight written as "00:xx:xx" no longer
-  # matches the fixed stops
+    # a time of day with times after midnight written as "00:xx:xx" no longer
+    # matches the fixed stops
 
-  expect_identical(
-    tester(feed, first_stop = "s3", from = "00:00:00", to = "01:00:00"),
-    fix_overnight_times(feed)
-  )
-})
+    expect_identical(
+      object = tester(
+        gtfs = feed,
+        first_stop = "s3",
+        from = "00:00:00",
+        to = "01:00:00"
+      ),
+      expected = fix_overnight_times(gtfs = feed)
+    )
+  }
+)
 
 test_that("warns only about the selected trips with backwards spans", {
   backwards <- list(

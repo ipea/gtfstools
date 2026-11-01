@@ -148,7 +148,7 @@ get_trip_speed <- function(
   # again. without an integer stop_sequence the times can't be ordered, so
   # they are used as written
 
-  gtfs <- fix_overnight_in_call(gtfs, trip_id)
+  gtfs <- fix_overnight_in_call(gtfs = gtfs, trip_id = trip_id)
 
   # get_trip_length() keeps only the trips or segments within the time of
   # day, so the durations joined to them below are filtered too

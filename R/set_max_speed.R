@@ -200,7 +200,7 @@ limit_trip_speed <- function(
   # times after midnight written as early morning times are fixed first, so
   # they don't go back. the returned feed keeps the fixed times
 
-  gtfs <- fix_overnight_in_call(gtfs)
+  gtfs <- fix_overnight_in_call(gtfs = gtfs)
 
   # select the trips. ids is NULL only when both arguments are NULL, so that
   # trip_ids that don't exist don't result in all trips being changed

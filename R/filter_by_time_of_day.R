@@ -142,7 +142,7 @@ filter_by_time_of_day <- function(gtfs,
   # they are compared with the time of day as they should be. the returned
   # feed keeps them fixed
 
-  gtfs <- fix_overnight_in_call(gtfs, frequencies = TRUE)
+  gtfs <- fix_overnight_in_call(gtfs = gtfs, frequencies = TRUE)
 
   # if the gtfs contains a frequencies table, it's important to keep the
   # stop_times of the trips listed in there intact.

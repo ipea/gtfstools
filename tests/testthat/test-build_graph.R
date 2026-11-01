@@ -378,8 +378,16 @@ test_that("handles times after midnight and decreasing times", {
     ),
     stop_times = rbind(
       new_stop_times("P1", c("A", "B"), c("24:30:00", "24:35:00")),
-      new_stop_times("W1", c("A", "B"), c("23:58:00", "00:02:00")),
-      new_stop_times("D1", c("A", "B"), c("08:02:00", "07:58:00"))
+      new_stop_times(
+        trip_id = "W1",
+        stop_id = c("A", "B"),
+        arrival_time = c("23:58:00", "00:02:00")
+      ),
+      new_stop_times(
+        trip_id = "D1",
+        stop_id = c("A", "B"),
+        arrival_time = c("08:02:00", "07:58:00")
+      )
     )
   )
 
@@ -391,23 +399,23 @@ test_that("handles times after midnight and decreasing times", {
   # W1 is written going back to 00:02 after midnight, which is fixed to
   # 24:02 first, so it departs at 23:58 and runs at night
 
-  night_graph <- tester(gtfs, from = "23:00:00", to = "24:00:00")
+  night_graph <- tester(gtfs = gtfs, from = "23:00:00", to = "24:00:00")
   in_vehicle <- night_graph$link[link_type == "in_vehicle"]
-  expect_identical(in_vehicle$route_id, "R2")
-  expect_equal(in_vehicle$travel_time, 4)
+  expect_identical(object = in_vehicle$route_id, expected = "R2")
+  expect_equal(object = in_vehicle$travel_time, expected = 4)
 
-  early_graph <- tester(gtfs, from = "00:00:00", to = "01:00:00")
-  expect_false("R2" %chin% early_graph$link$route_id)
+  early_graph <- tester(gtfs = gtfs, from = "00:00:00", to = "01:00:00")
+  expect_false(object = "R2" %chin% early_graph$link$route_id)
 
   # D1 goes back by less than 12 hours, so it departs at its earliest time
   # and its segment has no travel time
 
   expect_warning(
-    day_graph <- tester(gtfs, from = "07:00:00", to = "09:00:00"),
+    day_graph <- tester(gtfs = gtfs, from = "07:00:00", to = "09:00:00"),
     class = "gtfstools_links_without_travel_time"
   )
   in_vehicle <- day_graph$link[link_type == "in_vehicle"]
-  expect_identical(in_vehicle$route_id, "R3")
+  expect_identical(object = in_vehicle$route_id, expected = "R3")
   expect_identical(in_vehicle$travel_time, NA_real_)
   expect_identical(in_vehicle$free_speed, NA_real_)
 
@@ -420,9 +428,9 @@ test_that("handles times after midnight and decreasing times", {
     end_time = "01:00:00",
     headway_secs = 600L
   )
-  night_graph <- tester(gtfs, from = "23:00:00", to = "24:00:00")
+  night_graph <- tester(gtfs = gtfs, from = "23:00:00", to = "24:00:00")
   in_vehicle <- night_graph$link[link_type == "in_vehicle" & route_id == "R1"]
-  expect_identical(in_vehicle$departures, 6L)
+  expect_identical(object = in_vehicle$departures, expected = 6L)
 })
 
 test_that("uses the first entry of duplicated trip_ids", {

@@ -169,7 +169,7 @@ get_trip_length <- function(gtfs,
   # changed by the fix, so by = "trip" doesn't need it
 
   if (is_windowed && by == "segment") {
-    gtfs <- fix_overnight_in_call(gtfs, trip_id)
+    gtfs <- fix_overnight_in_call(gtfs = gtfs, trip_id = trip_id)
   }
 
   if (is_windowed) {

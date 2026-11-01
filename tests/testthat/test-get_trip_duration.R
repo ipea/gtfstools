@@ -159,10 +159,10 @@ test_that("doesn't change given gtfs", {
 
   n_calls <- 0
   testthat::local_mocked_bindings(
-    string_to_seconds = function(x) {
+    string_to_seconds = function(string) {
       n_calls <<- n_calls + 1
       if (n_calls > 1) stop("interrupted")
-      return(rep(0L, length(x)))
+      return(value = rep(x = 0L, length(x = string)))
     }
   )
   expect_error(tester(gtfs = new_gtfs), "interrupted")
@@ -310,48 +310,61 @@ test_that("empty results have the same duration type as non-empty ones", {
   }
 })
 
-test_that("fixes times after midnight written as early morning times", {
-  # a trip whose times after midnight are written as early morning times,
-  # including the departure from its second stop
+test_that(
+  desc = "fixes times after midnight written as early morning times",
+  code = {
+    # a trip whose times after midnight are written as early morning times,
+    # including the departure from its second stop
 
-  overnight_gtfs <- gtfsio::new_gtfs(
-    list(
-      stop_times = data.table::data.table(
-        trip_id = "t1",
-        stop_id = c("s1", "s2", "s3"),
-        stop_sequence = 1:3,
-        arrival_time = c("23:50:00", "23:58:00", "00:05:00"),
-        departure_time = c("23:50:00", "00:01:00", "00:05:00")
-      )
-    ),
-    "dt_gtfs"
-  )
+    overnight_gtfs <- gtfsio::new_gtfs(
+      x = list(
+        stop_times = data.table::data.table(
+          trip_id = "t1",
+          stop_id = c("s1", "s2", "s3"),
+          stop_sequence = 1:3,
+          arrival_time = c("23:50:00", "23:58:00", "00:05:00"),
+          departure_time = c("23:50:00", "00:01:00", "00:05:00")
+        )
+      ),
+      subclass = "dt_gtfs"
+    )
 
-  original_gtfs <- gtfsio::new_gtfs(
-    lapply(overnight_gtfs, data.table::copy),
-    "dt_gtfs"
-  )
+    original_gtfs <- gtfsio::new_gtfs(
+      x = lapply(X = overnight_gtfs, FUN = data.table::copy),
+      subclass = "dt_gtfs"
+    )
 
-  expect_no_warning(
-    durations <- tester(overnight_gtfs),
-    class = "gtfstools_backwards_times"
-  )
-  expect_equal(durations$duration, 15)
-  expect_equal(overnight_gtfs, original_gtfs, ignore_attr = TRUE)
+    expect_no_warning(
+      object = durations <- tester(gtfs = overnight_gtfs),
+      class = "gtfstools_backwards_times"
+    )
+    expect_equal(object = durations$duration, expected = 15)
+    expect_equal(
+      object = overnight_gtfs,
+      expected = original_gtfs,
+      ignore_attr = TRUE
+    )
 
-  poa_gtfs <- read_gtfs(
-    system.file("extdata/poa_gtfs.zip", package = "gtfstools")
-  )
-  expect_equal(get_trip_duration(poa_gtfs, "T2-1@1#2310")$duration, 52)
+    poa_gtfs <- read_gtfs(
+      path = system.file("extdata/poa_gtfs.zip", package = "gtfstools")
+    )
+    expect_equal(
+      object = get_trip_duration(
+        gtfs = poa_gtfs,
+        trip_id = "T2-1@1#2310"
+      )$duration,
+      expected = 52
+    )
 
-  # without stop_sequence the times can't be ordered, so they are used as
-  # written
+    # without stop_sequence the times can't be ordered, so they are used as
+    # written
 
-  no_sequence <- copy_gtfs_without_field(
-    overnight_gtfs,
-    "stop_times",
-    "stop_sequence"
-  )
-  durations <- get_trip_duration(no_sequence)
-  expect_equal(durations$duration, 1437)
-})
+    no_sequence <- copy_gtfs_without_field(
+      gtfs = overnight_gtfs,
+      file = "stop_times",
+      field = "stop_sequence"
+    )
+    durations <- get_trip_duration(gtfs = no_sequence)
+    expect_equal(object = durations$duration, expected = 1437)
+  }
+)

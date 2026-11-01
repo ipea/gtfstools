@@ -42,9 +42,9 @@
 #' `"00:30:00"` instead of `"24:30:00"`) are first fixed with
 #' [fix_overnight_times()] in every trip, so the returned GTFS has them fixed.
 #' Spans whose arrival is still earlier than the previous departure (by 12
-#' hours or less) are left unchanged, with a warning. An error is raised if a shift would result
-#' in a time earlier than `"00:00:00"`. Only `stop_times` is modified; its
-#' existing `_secs` columns are updated to match.
+#' hours or less) are left unchanged, with a warning. An error is raised if a
+#' shift would result in a time earlier than `"00:00:00"`. Only `stop_times`
+#' is modified; its existing `_secs` columns are updated to match.
 #'
 #' With `first_stop` and `last_stop`, matched as in [set_trip_speed()], only
 #' the spans between them are raised: times before `first_stop` don't change,

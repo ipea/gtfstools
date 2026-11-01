@@ -106,7 +106,7 @@ get_trip_segment_duration <- function(gtfs,
   # times after midnight written as early morning times are fixed first, so
   # they don't go back
 
-  gtfs <- fix_overnight_in_call(gtfs, trip_id)
+  gtfs <- fix_overnight_in_call(gtfs = gtfs, trip_id = trip_id)
 
   # select the trips to get the segments' durations of and raise a warning if
   # a given trip_id doesn't exist in 'stop_times'

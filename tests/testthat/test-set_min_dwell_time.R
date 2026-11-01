@@ -122,18 +122,25 @@ test_that("raises only shorter dwell times at intermediate stops", {
   # A's times are fixed, so only these change
 
   zero_min <- tester(min_dwell_time = 0)
-  expect_equal(zero_min, fix_overnight_times(dwell_gtfs), ignore_attr = TRUE)
+  expect_equal(
+    object = zero_min,
+    expected = fix_overnight_times(gtfs = dwell_gtfs),
+    ignore_attr = TRUE
+  )
 
   # B departs from Y a minute before arriving there
 
   negative_gtfs <- dwell_feed()
   negative_gtfs$stop_times[7, departure_time := "09:04:00"]
-  zero_min <- tester(negative_gtfs, min_dwell_time = 0)$stop_times
-  expect_identical(zero_min$departure_time[7:8], c("09:05:00", "09:11:00"))
-  expect_identical(zero_min$arrival_time[8], "09:11:00")
+  zero_min <- tester(gtfs = negative_gtfs, min_dwell_time = 0)$stop_times
   expect_identical(
-    zero_min$departure_time[-(4:8)],
-    dwell_gtfs$stop_times$departure_time[-(4:8)]
+    object = zero_min$departure_time[7:8],
+    expected = c("09:05:00", "09:11:00")
+  )
+  expect_identical(object = zero_min$arrival_time[8], expected = "09:11:00")
+  expect_identical(
+    object = zero_min$departure_time[-(4:8)],
+    expected = dwell_gtfs$stop_times$departure_time[-(4:8)]
   )
 })
 
@@ -150,8 +157,8 @@ test_that("never shortens dwell times, whatever the trips and stops given", {
 
   expect_silent(first_stops <- tester(stop_id = "s0"))
   expect_equal(
-    first_stops,
-    fix_overnight_times(dwell_gtfs),
+    object = first_stops,
+    expected = fix_overnight_times(gtfs = dwell_gtfs),
     ignore_attr = TRUE
   )
 

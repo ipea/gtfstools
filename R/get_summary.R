@@ -314,7 +314,7 @@ get_summary <- function(
   # times after midnight written as early morning times are fixed once, here,
   # so the functions used below find them already fixed
 
-  gtfs <- fix_overnight_in_call(gtfs, frequencies = TRUE)
+  gtfs <- fix_overnight_in_call(gtfs = gtfs, frequencies = TRUE)
 
   feed <- gtfs
   if (!is.null(agency_id)) {
