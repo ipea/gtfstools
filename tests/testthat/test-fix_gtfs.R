@@ -59,6 +59,14 @@ test_that("raises error due to incorrect input types", {
     tester(min_dwell_time = 30, dwell_time_unit = "sec"),
     regexp = "dwell_time_unit"
   )
+  expect_error(
+    tester(overwrite_stop_times = "TRUE"),
+    regexp = "overwrite_stop_times"
+  )
+  expect_error(
+    tester(overwrite_stop_times = NA),
+    regexp = "overwrite_stop_times"
+  )
 })
 
 test_that("raises errors if gtfs doesn't have required tables", {
@@ -83,6 +91,9 @@ test_that("results in a dt_gtfs object and doesn't change given gtfs", {
 
   result <- tester(gtfs)
   expect_s3_class(result, "dt_gtfs")
+  expect_equal(original_gtfs, gtfs, ignore_attr = TRUE)
+
+  result <- tester(gtfs, overwrite_stop_times = TRUE)
   expect_equal(original_gtfs, gtfs, ignore_attr = TRUE)
 
   # spo has neither duplicated stop times nor blank times, so its dwell times
@@ -144,6 +155,33 @@ test_that("doesn't cap speeds if max_speed is NULL", {
   expect_false(anyNA(secs(times$arrival_time)))
 })
 
+test_that("overwrite_stop_times replaces the times of intermediate stops", {
+  # s3 arrives at 08:00:50 and stays 5 seconds
+  gtfs <- hand_feed()
+  gtfs$stop_times[
+    4,
+    `:=`(arrival_time = "08:00:50", departure_time = "08:00:55")
+  ]
+
+  result <- tester(gtfs, max_speed = NULL)
+  expect_identical(
+    result$stop_times$arrival_time,
+    c("08:00:00", "08:00:25", "08:00:50", "08:00:57", "08:00:58", "08:01:00")
+  )
+
+  # the 55 seconds that the trip isn't stopped are spread evenly over its 5
+  # segments of equal length
+  result <- tester(gtfs, max_speed = NULL, overwrite_stop_times = TRUE)
+  expect_identical(
+    result$stop_times$arrival_time,
+    c("08:00:00", "08:00:11", "08:00:22", "08:00:38", "08:00:49", "08:01:00")
+  )
+  expect_identical(
+    result$stop_times$departure_time,
+    c("08:00:00", "08:00:11", "08:00:27", "08:00:38", "08:00:49", "08:01:00")
+  )
+})
+
 test_that("sets the minimum dwell time at stops with interpolated times", {
   without_min <- tester()
   result <- tester(min_dwell_time = 10)
@@ -192,10 +230,9 @@ test_that("fills shape_dist_traveled, only in feeds with shapes", {
   expect_false("shape_dist_traveled" %chin% names(result$stop_times))
 })
 
-test_that("doesn't make up times for trips that end before they start", {
-  # some trips of this feed have times after midnight written as "00:xx:xx",
-  # so their times are not interpolated nor capped. only their first and last
-  # stops have times, so no minimum dwell time is set either
+test_that("fixes the times of trips that run past midnight", {
+  # some trips of this feed have times after midnight written as "00:xx:xx".
+  # they are fixed first, so their times are then capped and interpolated
 
   poa_gtfs <- read_gtfs(
     system.file("extdata/poa_gtfs.zip", package = "gtfstools")
@@ -210,20 +247,25 @@ test_that("doesn't make up times for trips that end before they start", {
       invokeRestart("muffleWarning")
     }
   )
-  expect_true("gtfstools_backwards_times" %in% warning_classes)
+  expect_false("gtfstools_backwards_times" %in% warning_classes)
 
-  # shape_dist_traveled is added to every trip, so only the original columns
-  # are compared
+  # the trip keeps its start time and ends after midnight. its intermediate
+  # times are filled, and depend on the capped speeds, so only their order is
+  # checked
 
-  original_cols <- names(poa_gtfs$stop_times)
-  expect_identical(
-    result$stop_times[trip_id == trip, .SD, .SDcols = original_cols],
-    poa_gtfs$stop_times[trip_id == trip]
+  trip_times <- result$stop_times[trip_id == trip][order(stop_sequence)]
+  expect_identical(trip_times$arrival_time[1], "23:10:00")
+  expect_true(all(trip_times$arrival_time != ""))
+  expect_true(all(trip_times$departure_time != ""))
+
+  secs <- as.vector(
+    rbind(
+      string_to_seconds(trip_times$arrival_time),
+      string_to_seconds(trip_times$departure_time)
+    )
   )
-  expect_identical(
-    setdiff(names(result$stop_times), original_cols),
-    "shape_dist_traveled"
-  )
+  expect_false(is.unsorted(secs))
+  expect_gte(secs[length(secs)], string_to_seconds("24:02:00"))
 })
 
 test_that("unit arguments work correctly", {

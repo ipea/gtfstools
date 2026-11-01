@@ -32,6 +32,10 @@
 #' [convert_time_to_seconds()]) are used as-is, not recalculated from the time
 #' strings.
 #'
+#' Times after midnight written as early morning times (e.g. `"00:30:00"`
+#' instead of `"24:30:00"`) are fixed with [fix_overnight_times()] before the
+#' durations are calculated.
+#'
 #' `from` and `to` are compared with the departure time of the first stop of
 #' each segment, read as the durations are (from `departure_time_secs`, if
 #' present), so use times past `"24:00:00"` for departures after midnight.
@@ -98,6 +102,11 @@ get_trip_segment_duration <- function(gtfs,
     c("trip_id", "arrival_time", "departure_time", "stop_sequence"),
     c("character", "character", "character", "integer")
   )
+
+  # times after midnight written as early morning times are fixed first, so
+  # they don't go back
+
+  gtfs <- fix_overnight_in_call(gtfs, trip_id)
 
   # select the trips to get the segments' durations of and raise a warning if
   # a given trip_id doesn't exist in 'stop_times'

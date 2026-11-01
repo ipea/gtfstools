@@ -78,9 +78,11 @@ in trips not linked to a shape) are left unchanged.
 Each span faster than \code{max_speed}, or with a zero duration, has its duration
 raised to its length divided by \code{max_speed}, rounded up to the next second.
 All the later times of the trip are shifted by the accumulated extra time,
-so dwell times are kept. Spans whose arrival is earlier than the previous
-departure (usually times after midnight written as \code{"00:30:00"} instead of
-\code{"24:30:00"}) are left unchanged, with a warning. An error is raised if a
+so dwell times are kept. Times after midnight written as early morning
+times (e.g. \code{"00:30:00"} instead of \code{"24:30:00"}) are first fixed with
+\code{\link[=fix_overnight_times]{fix_overnight_times()}} in every trip, so the returned GTFS has them fixed.
+Spans whose arrival is still earlier than the previous departure (by 12
+hours or less) are left unchanged, with a warning. An error is raised if a
 shift would result in a time later than \code{"9999:59:59"}. Only \code{stop_times}
 is modified; its existing \verb{_secs} columns are updated to match.
 
@@ -93,8 +95,8 @@ then \code{last_stop}, or have blank times there, are left unchanged, with a
 warning if they were given in \code{trip_id} or \code{route_id}.
 
 \code{from} and \code{to} are compared with the departure at the segment's first stop
-(or its arrival, if the departure is blank) as written in \code{stop_times}
-(template times, for trips listed in \code{frequencies}), so use times past
+(or its arrival, if the departure is blank) as written in \code{stop_times}, once
+fixed (template times, for trips listed in \code{frequencies}), so use times past
 \code{"24:00:00"} for departures after midnight. Trips without a time there are
 left unchanged.
 }
@@ -134,5 +136,5 @@ gtfs_capped <- set_max_speed(gtfs, max_speed = 8)
 
 }
 \seealso{
-\code{\link[=set_trip_speed]{set_trip_speed()}}, \code{\link[=get_trip_speed]{get_trip_speed()}}
+\code{\link[=set_min_speed]{set_min_speed()}}, \code{\link[=set_trip_speed]{set_trip_speed()}}, \code{\link[=get_trip_speed]{get_trip_speed()}}
 }

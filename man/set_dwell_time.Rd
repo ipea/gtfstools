@@ -8,6 +8,7 @@ set_dwell_time(
   gtfs,
   dwell_time,
   unit = "s",
+  strategy = "shift_trip_end",
   trip_id = NULL,
   stop_id = NULL,
   from = NULL,
@@ -27,6 +28,22 @@ times).}
 \item{unit}{A string representing the time unit in which \code{dwell_time} is
 given. One of \code{"s"} (seconds, the default), \code{"min"} (minutes), \code{"h"}
 (hours) or \code{"d"} (days).}
+
+\item{strategy}{A string, how the trips absorb the changes in dwell time.
+One of:
+\itemize{
+\item \code{"shift_trip_end"} (the default): keeps the running times between
+stops and shifts all the later times of the trip, so the arrival at the
+last stop moves later (or earlier, if dwell times are shortened). It
+preserves the implicit average speed between stops but changes the
+trip duration.
+\item \code{"keep_total_duration"}: centres each intermediate stop's dwell on its
+original time, taking half of the change from the running time before
+the stop and half from the one after it. The first and last stops are
+not changed, so the trip keeps its duration, its arrival at the last
+stop and the implicit average speed between its first and last stops.
+An error is raised if a running time would become negative.
+}}
 
 \item{trip_id}{A character vector including the \code{trip_id}s to have their
 dwell times set. If \code{NULL} (the default), the dwell times of every
@@ -61,45 +78,37 @@ invisibly (note that in this case the original GTFS object is altered).
 }
 \description{
 Sets the dwell time of each specified \code{trip_id} at each specified \code{stop_id},
-i.e. the time the vehicle stays at the stop, by changing the
-\code{departure_time} at these stops in \code{stop_times} and shifting the later times
-of the trips accordingly.
+i.e. the time the vehicle stays at the stop for passengers to board and
+alight, by changing the times at these stops in \code{stop_times}. By default,
+the later times of the trips are shifted accordingly. Alternatively, the
+trip durations are kept and the running times between stops absorb the
+change.
 }
 \section{Details}{
 
-The dwell time of a visit is its \code{departure_time} minus its \code{arrival_time}
-in \code{stop_times}, as returned by \code{\link[=get_dwell_time]{get_dwell_time()}}. It is set at the visits
-of every specified trip to every specified stop (not of pairs formed by
-their elements): the arrival time is kept and the departure time is set to
-the arrival time plus \code{dwell_time}. All the later times of the trip, in
-\code{stop_sequence} order, are shifted by the change, and changes at several
-visits of the same trip add up. At a trip's last stop, only the departure
-time changes. A stop visited more than once by the same trip has its dwell
-time set at each visit.
 
-Blank times are never filled. Selected visits with a blank arrival or
-departure time are not changed and don't shift the later times, with a
-warning when \code{stop_id} is given; fill them beforehand with
-\code{\link[=interpolate_stop_times]{interpolate_stop_times()}}. An error is raised if a shift would result in a
-negative time (times not in chronological order) or in a time later than
-\code{"9999:59:59"}. \code{stop_sequence} is assumed to be unique within each trip
-and not \code{NA}. When both \code{trip_id} and \code{stop_id} are given but none of the
-trips visits any of the stops, a warning is raised and the GTFS is returned
-unchanged.
+Since the first stop is never changed, the departures of trips listed in
+\code{frequencies} are not changed either. Blank arrival or departure times
+are never filled.
 
 For trips listed in \code{frequencies}, the times in \code{stop_times} are a template
 (see \code{\link[=frequencies_to_stop_times]{frequencies_to_stop_times()}}), so setting the dwell time at the first
 stop only changes how long before each departure the vehicle arrives there,
 while changes at later stops lengthen or shorten every departure.
 
-\code{from} and \code{to} are compared with the \code{arrival_time} of each visit as
-written in \code{stop_times} before any change (template times, for trips listed
-in \code{frequencies}), so use times past \code{"24:00:00"} for arrivals after
-midnight. A shift caused by an earlier visit may thus move a changed visit
-out of the time of day, or another visit into it. Visits with a blank
+Times after midnight written as early morning times (e.g. \code{"00:30:00"}
+instead of \code{"24:30:00"}) are first fixed with \code{\link[=fix_overnight_times]{fix_overnight_times()}} in
+every trip, so the returned GTFS has them fixed (with \code{by_reference = TRUE},
+even if an error is then raised).
+
+\code{from} and \code{to} are compared with the \code{arrival_time} of each visit as written
+in \code{stop_times} before any change other than this fix (template times, for
+trips listed in \code{frequencies}), so use times past \code{"24:00:00"} for arrivals
+after midnight. A shift caused by an earlier visit may thus move a changed
+visit out of the time of day, or another visit into it. Visits with a blank
 arrival time are never selected when \code{from} or \code{to} is given. When the time
 of day contains no visit of the specified trips to the specified stops, the
-GTFS is returned unchanged.
+GTFS is returned with no change other than this fix.
 
 \code{stop_id}s are matched against the \code{stop_id}s in \code{stop_times}, which are
 never stations: to set the dwell times at a station, pass its children that
@@ -149,6 +158,18 @@ new_gtfs <- set_dwell_time(
   to = "06:00:00"
 )
 get_dwell_time(new_gtfs, trip_id = "CPTM L07-0")
+
+# keep the trip duration: the running times between the stops absorb the
+# dwell times, and the arrival at the last stop doesn't change
+new_gtfs <- set_dwell_time(
+  gtfs,
+  trip_id = "CPTM L07-0",
+  dwell_time = 30,
+  strategy = "keep_total_duration"
+)
+new_gtfs$stop_times |>
+  filter(trip_id == "CPTM L07-0") |>
+  tail()
 
 # original gtfs remains unchanged
 get_dwell_time(gtfs, stop_id = "18960")

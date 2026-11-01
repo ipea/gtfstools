@@ -133,6 +133,17 @@ test_that("handles times past midnight", {
   feed <- synthetic_feed(c(0, 0.01, 0.02), c("25:59:00", "", "26:01:00"))
   result <- tester(feed, method = "euclidean")
   expect_identical(result$stop_times$arrival_time[2], "26:00:00")
+
+  # times after midnight written as early morning times are fixed first
+
+  feed <- synthetic_feed(c(0, 0.01, 0.02), c("23:59:00", "", "00:01:00"))
+  original_stop_times <- data.table::copy(feed$stop_times)
+  expect_no_warning(result <- tester(feed, method = "euclidean"))
+  expect_identical(feed$stop_times, original_stop_times)
+  expect_identical(
+    result$stop_times$arrival_time,
+    c("23:59:00", "24:00:00", "24:01:00")
+  )
 })
 
 test_that("spreads times evenly if the distance between timepoints is 0", {
@@ -250,10 +261,10 @@ test_that("falls back to euclidean distances without shapes", {
 })
 
 test_that("leaves spans whose arrival is earlier than the departure blank", {
-  feed <- synthetic_feed(c(0, 0.01, 0.02), c("23:59:00", "", "00:01:00"))
+  feed <- synthetic_feed(c(0, 0.01, 0.02), c("08:59:00", "", "08:57:00"))
   expect_warning(
     result <- tester(feed, method = "euclidean"),
-    regexp = "after midnight",
+    regexp = "earlier than the previous departure",
     class = "gtfstools_times_not_interpolated"
   )
   expect_identical(result$stop_times, feed$stop_times)
@@ -261,14 +272,17 @@ test_that("leaves spans whose arrival is earlier than the departure blank", {
   # a trip with a backwards span and other blanks is listed for both reasons
   feed <- synthetic_feed(
     c(0, 0.01, 0.02, 0.03),
-    c("23:59:00", "", "00:01:00", "")
+    c("08:59:00", "", "08:57:00", "")
   )
   warning <- expect_warning(
     tester(feed, method = "euclidean"),
     class = "gtfstools_times_not_interpolated"
   )
   expect_match(conditionMessage(warning), "Affected trip")
-  expect_match(conditionMessage(warning), "after midnight")
+  expect_match(
+    conditionMessage(warning),
+    "earlier than the previous departure"
+  )
 })
 
 test_that("doesn't mix up stops of different trips", {
@@ -521,12 +535,12 @@ test_that("drops dwell times that exceed the time between timepoints", {
 })
 
 test_that("overwrite = TRUE keeps the times of trips it can't interpolate", {
-  # t1's last stop is written as "00:05:00" instead of "24:05:00". t2 can't
-  # be interpolated either, but its intermediate stop was already blank
+  # t1's last stop is earlier than its first one. t2 can't be interpolated
+  # either, but its intermediate stop was already blank
   feed <- synthetic_feed(
     c(0, 0.01, 0.02),
-    arrival_time = c("23:50:00", "", "00:05:00"),
-    departure_time = c("23:50:00", "23:55:00", "00:05:00")
+    arrival_time = c("08:50:00", "", "08:45:00"),
+    departure_time = c("08:50:00", "08:55:00", "08:45:00")
   )
   t2 <- data.table::copy(feed$stop_times)
   t2[, `:=`(trip_id = "t2", arrival_time = c("08:00:00", "", ""))]
@@ -599,18 +613,15 @@ test_that("returns feeds without blank times unchanged", {
 })
 
 test_that("fills poa's blank times, which never decrease", {
-  expect_warning(
+  # trips that cross midnight are written with times such as "00:02:00",
+  # which are fixed first, so every blank time is filled
+  expect_no_warning(
     result <- tester(poa_gtfs),
     class = "gtfstools_times_not_interpolated"
   )
   st <- data.table::copy(result$stop_times)
+  expect_false(any(st$arrival_time == "" | st$departure_time == ""))
 
-  # trips that cross midnight are written with times such as "00:02:00"
-  st[, is_blank := arrival_time == "" | departure_time == ""]
-  blank_trips <- unique(st[is_blank == TRUE]$trip_id)
-  expect_length(blank_trips, 10)
-
-  st <- st[!trip_id %chin% blank_trips]
   st[, `:=`(
     arr = string_to_seconds(arrival_time),
     dep = string_to_seconds(departure_time)
@@ -620,11 +631,11 @@ test_that("fills poa's blank times, which never decrease", {
   expect_true(all(st$dep >= st$arr))
   expect_true(all(st$next_arr >= st$dep, na.rm = TRUE))
 
-  # the original timepoints are kept
+  # the original timepoints are kept, with their times after midnight fixed
   is_timepoint <- poa_gtfs$stop_times$arrival_time != ""
   expect_identical(
     result$stop_times$arrival_time[is_timepoint],
-    poa_gtfs$stop_times$arrival_time[is_timepoint]
+    fix_overnight_times(poa_gtfs)$stop_times$arrival_time[is_timepoint]
   )
 })
 
@@ -634,10 +645,8 @@ test_that("works with stop_times grouped by dplyr (#130)", {
   grouped_gtfs <- read_gtfs(poa_path)
   grouped_gtfs$stop_times <- dplyr::group_by(grouped_gtfs$stop_times, trip_id)
 
-  # poa_gtfs has trips whose times can't be interpolated, which warn
+  result <- tester(grouped_gtfs)
 
-  result <- suppressWarnings(tester(grouped_gtfs))
-
-  expect_identical(result, suppressWarnings(tester()))
+  expect_identical(result, tester())
   expect_s3_class(grouped_gtfs$stop_times, "grouped_df")
 })

@@ -55,6 +55,10 @@ and before \code{to}) as in \code{\link[=get_route_frequency]{get_route_frequenc
 headway (exactly, when the length of the time of day is a multiple of
 \code{headway}). Departures after midnight are listed with times past
 "24:00:00", so use a time of day such as "24:00:00"-"26:00:00" for them.
+Times after midnight written as early morning times (e.g. \code{"00:30:00"}
+instead of \code{"24:30:00"}), and \code{end_time}s earlier than \code{start_time}s in
+\code{frequencies}, are first fixed with \code{\link[=fix_overnight_times]{fix_overnight_times()}}, so the
+returned GTFS has them fixed.
 
 The function changes existing service, it does not create it: groups with
 no departure within the time of day are not modified, and scheduled trips

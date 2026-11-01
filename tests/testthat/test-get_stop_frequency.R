@@ -442,3 +442,33 @@ test_that("doesn't change given gtfs", {
   frequency <- tester(gtfs, stop_id = "18848")
   expect_equal(original_gtfs, gtfs, ignore_attr = TRUE)
 })
+
+test_that("fixes times after midnight written as early morning times", {
+  # after midnight, F departs from A at 24:00 and 24:30, and W from B at 24:05
+  # and C at 24:20 (D is W's last stop, and B is F's)
+
+  gtfs <- overnight_feed()
+  original_stop_times <- data.table::copy(gtfs$stop_times)
+
+  result <- get_stop_frequency(gtfs, from = "24:00:00", to = "25:00:00")
+  expect_identical(result$stop_id, c("A", "B", "C"))
+  expect_identical(result$departures, c(2L, 1L, 1L))
+
+  result <- get_stop_frequency(
+    gtfs,
+    stop_id = "B",
+    from = "24:00:00",
+    to = "25:00:00"
+  )
+  expect_identical(result$departures, 1L)
+
+  result <- get_stop_frequency(gtfs, from = "00:00:00", to = "01:00:00")
+  expect_identical(nrow(result), 0L)
+  expect_identical(gtfs$stop_times, original_stop_times)
+
+  # without arrival_time, the times can't be fixed and are used as written
+
+  no_arrival <- copy_gtfs_without_field(gtfs, "stop_times", "arrival_time")
+  result <- get_stop_frequency(no_arrival, from = "00:00:00", to = "01:00:00")
+  expect_identical(result$stop_id, c("B", "C"))
+})

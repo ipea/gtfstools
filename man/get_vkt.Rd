@@ -45,7 +45,9 @@ times its number of departures times the number of counted days on which
 its service runs, according to the \code{calendar} and \code{calendar_dates} tables.
 Departures are counted as in \code{\link[=get_route_frequency]{get_route_frequency()}}: trips listed in the
 \code{frequencies} table depart once per headway, the other trips depart once,
-and departures after midnight belong to the previous service day. Unlike in
+and departures after midnight belong to the previous service day (times
+after midnight written as early morning times are fixed first, as in
+\code{\link[=get_route_frequency]{get_route_frequency()}}). Unlike in
 \code{\link[=get_route_frequency]{get_route_frequency()}}, the time of day includes \code{to}, as in
 \code{\link[=get_trip_length]{get_trip_length()}}. An error is raised if the \code{frequencies} table has
 invalid entries for trips that run on the counted days.

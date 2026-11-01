@@ -9,7 +9,8 @@ fix_gtfs(
   max_speed = NULL,
   speed_unit = "km/h",
   min_dwell_time = NULL,
-  dwell_time_unit = "s"
+  dwell_time_unit = "s",
+  overwrite_stop_times = FALSE
 )
 }
 \arguments{
@@ -29,16 +30,23 @@ open to serve passengers, in the unit given by \code{dwell_time_unit}. If
 \item{dwell_time_unit}{A string representing the time unit in which
 \code{min_dwell_time} is given. One of \code{"s"} (seconds, the default), \code{"min"}
 (minutes), \code{"h"} (hours) or \code{"d"} (days).}
+
+\item{overwrite_stop_times}{A logical. If \code{FALSE} (the default), only blank
+stop times are filled. If \code{TRUE}, the times of every stop between the
+first and the last stop of each trip are replaced by times interpolated
+over the distance travelled, keeping their dwell times (see the
+\code{overwrite} and \code{keep_dwell_times} arguments of
+\code{\link[=interpolate_stop_times]{interpolate_stop_times()}}).}
 }
 \value{
 The fixed GTFS object.
 }
 \description{
 Cleans a GTFS feed in one call, by removing duplicated entries and unused
-ids, optionally capping the speed of trips, filling blank stop times,
-optionally setting a minimum dwell time at intermediate stops and
-recalculating the distances travelled along shapes (replacing any existing
-ones).
+ids, fixing times after midnight written as early morning times, optionally
+capping the speed of trips, filling blank stop times, optionally setting a
+minimum dwell time at intermediate stops and recalculating the distances
+travelled along shapes (replacing any existing ones).
 }
 \section{Details}{
 
@@ -49,16 +57,24 @@ The feed goes through the following steps, in this order:
 entries of every table that no remaining trip uses (see its
 documentation for the exceptions). Note that this removes data from the
 feed;
+\item \code{\link[=fix_overnight_times]{fix_overnight_times()}} rewrites the times after midnight written as
+early morning times (e.g. \code{"00:30:00"} instead of \code{"24:30:00"}), so the
+next steps work on these trips too. Only times that go back by more
+than 12 hours are taken as times after midnight, and the times that
+still go back are left unchanged, with a warning;
 \item \code{\link[=set_max_speed]{set_max_speed()}}, only if \code{max_speed} is given, slows down the parts of
 trips that are faster than \code{max_speed}. Only spans between stops with
-known times are capped, and spans that end before they start (e.g.
-times after midnight written as \code{"00:30:00"}) are left unchanged, with
-a warning;
+known times are capped, and spans that still end before they start are
+left unchanged, with a warning;
 \item \code{\link[=interpolate_stop_times]{interpolate_stop_times()}} fills blank stop times from the times of the
 stops around them. Speeds are capped before interpolating, so the filled
 times follow the capped times. Interpolated times are rounded to the
 second. Stops whose times can't be interpolated are left blank, with a
-warning;
+warning. With \code{overwrite_stop_times = TRUE}, the times of every
+intermediate stop are replaced instead, from each trip's first and last
+times, keeping the stops' dwell times. The trips' durations still
+follow the capped times, and their travel time is spread evenly over
+the distance;
 \item \code{\link[=set_min_dwell_time]{set_min_dwell_time()}}, only if \code{min_dwell_time} is given, delays the
 departure from each intermediate stop whose dwell time is shorter than
 \code{min_dwell_time}, so that vehicles stay there for at least that long.
@@ -68,9 +84,7 @@ in \code{frequencies}, every departure gets longer). This is done after
 filling blank times, so the filled stops also get the minimum. Only the
 stops between the first and the last stop with times of each trip get
 the minimum, so trips keep their start times. Stops with negative dwell
-times (departures earlier than arrivals) also get it, see
-\code{\link[=set_min_dwell_time]{set_min_dwell_time()}} for times after midnight written as
-\code{"00:30:00"};
+times (departures earlier than arrivals) also get it;
 \item \code{\link[=interpolate_shape_dist_traveled]{interpolate_shape_dist_traveled()}}, only if the feed has a \code{shapes}
 table and \code{trips} has a \code{shape_id} column, replaces the
 \code{shape_dist_traveled} columns of \code{stop_times} and \code{shapes} with the
@@ -115,7 +129,8 @@ fixed_gtfs$stop_times |>
 \dontshow{\}) # examplesIf}
 }
 \seealso{
-\code{\link[=remove_duplicates]{remove_duplicates()}}, \code{\link[=remove_unused_ids]{remove_unused_ids()}}, \code{\link[=set_max_speed]{set_max_speed()}},
+\code{\link[=remove_duplicates]{remove_duplicates()}}, \code{\link[=remove_unused_ids]{remove_unused_ids()}},
+\code{\link[=fix_overnight_times]{fix_overnight_times()}}, \code{\link[=set_max_speed]{set_max_speed()}},
 \code{\link[=interpolate_stop_times]{interpolate_stop_times()}}, \code{\link[=set_min_dwell_time]{set_min_dwell_time()}},
 \code{\link[=interpolate_shape_dist_traveled]{interpolate_shape_dist_traveled()}}
 }

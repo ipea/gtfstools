@@ -32,7 +32,9 @@
 #' its service runs, according to the `calendar` and `calendar_dates` tables.
 #' Departures are counted as in [get_route_frequency()]: trips listed in the
 #' `frequencies` table depart once per headway, the other trips depart once,
-#' and departures after midnight belong to the previous service day. Unlike in
+#' and departures after midnight belong to the previous service day (times
+#' after midnight written as early morning times are fixed first, as in
+#' [get_route_frequency()]). Unlike in
 #' [get_route_frequency()], the time of day includes `to`, as in
 #' [get_trip_length()]. An error is raised if the `frequencies` table has
 #' invalid entries for trips that run on the counted days.

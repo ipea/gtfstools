@@ -90,7 +90,10 @@ are not included. The trips of every \code{service_id} are pooled, so the feed
 should usually be filtered to a single day first, with \code{\link[=filter_by_date]{filter_by_date()}}
 or \code{\link[=filter_by_weekday]{filter_by_weekday()}}. Departures after midnight have times past
 "24:00:00", so use a time of day such as "24:00:00"-"26:00:00" for them.
-Trips whose times wrongly go back to "00:00:00" after midnight are placed
+Times after midnight written as early morning times (e.g. \code{"00:30:00"}
+instead of \code{"24:30:00"}) are first fixed with \code{\link[=fix_overnight_times]{fix_overnight_times()}}, as
+are \code{end_time}s earlier than \code{start_time}s in \code{frequencies}, so these trips
+are placed at their real times. Trips whose times still go back are placed
 by their earliest time.
 
 Within a trip, consecutive \code{stop_times} entries at the same stop are one

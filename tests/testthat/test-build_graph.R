@@ -372,13 +372,14 @@ test_that("handles times after midnight and decreasing times", {
   gtfs <- new_feed(
     stops = new_stops(c("A", "B"), c(0, 1000)),
     trips = data.table::data.table(
-      trip_id = c("P1", "W1"),
-      route_id = c("R1", "R2"),
+      trip_id = c("P1", "W1", "D1"),
+      route_id = c("R1", "R2", "R3"),
       direction_id = 0L
     ),
     stop_times = rbind(
       new_stop_times("P1", c("A", "B"), c("24:30:00", "24:35:00")),
-      new_stop_times("W1", c("A", "B"), c("23:58:00", "00:02:00"))
+      new_stop_times("W1", c("A", "B"), c("23:58:00", "00:02:00")),
+      new_stop_times("D1", c("A", "B"), c("08:02:00", "07:58:00"))
     )
   )
 
@@ -387,17 +388,41 @@ test_that("handles times after midnight and decreasing times", {
   expect_identical(in_vehicle$route_id, "R1")
   expect_equal(in_vehicle$travel_time, 5)
 
-  # W1 wrongly goes back to 00:02 after midnight, so it departs at its
-  # earliest time and its segment has no travel time
+  # W1 is written going back to 00:02 after midnight, which is fixed to
+  # 24:02 first, so it departs at 23:58 and runs at night
+
+  night_graph <- tester(gtfs, from = "23:00:00", to = "24:00:00")
+  in_vehicle <- night_graph$link[link_type == "in_vehicle"]
+  expect_identical(in_vehicle$route_id, "R2")
+  expect_equal(in_vehicle$travel_time, 4)
+
+  early_graph <- tester(gtfs, from = "00:00:00", to = "01:00:00")
+  expect_false("R2" %chin% early_graph$link$route_id)
+
+  # D1 goes back by less than 12 hours, so it departs at its earliest time
+  # and its segment has no travel time
 
   expect_warning(
-    early_graph <- tester(gtfs, from = "00:00:00", to = "01:00:00"),
+    day_graph <- tester(gtfs, from = "07:00:00", to = "09:00:00"),
     class = "gtfstools_links_without_travel_time"
   )
-  in_vehicle <- early_graph$link[link_type == "in_vehicle"]
-  expect_identical(in_vehicle$route_id, "R2")
+  in_vehicle <- day_graph$link[link_type == "in_vehicle"]
+  expect_identical(in_vehicle$route_id, "R3")
   expect_identical(in_vehicle$travel_time, NA_real_)
   expect_identical(in_vehicle$free_speed, NA_real_)
+
+  # in 'frequencies', an end time earlier than the start time is fixed too,
+  # so P1 departs every 10 minutes from 23:00:00 until 25:00:00
+
+  gtfs$frequencies <- data.table::data.table(
+    trip_id = "P1",
+    start_time = "23:00:00",
+    end_time = "01:00:00",
+    headway_secs = 600L
+  )
+  night_graph <- tester(gtfs, from = "23:00:00", to = "24:00:00")
+  in_vehicle <- night_graph$link[link_type == "in_vehicle" & route_id == "R1"]
+  expect_identical(in_vehicle$departures, 6L)
 })
 
 test_that("uses the first entry of duplicated trip_ids", {

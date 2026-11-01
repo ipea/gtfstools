@@ -41,7 +41,8 @@ dates and to a time of day.
 
 The VMT is the vehicle-kilometres travelled calculated by \code{\link[=get_vkt]{get_vkt()}},
 converted to international miles (1 mile = 1.609344 km). See \code{\link[=get_vkt]{get_vkt()}}
-for how trips, departures, days and trip lengths are counted.
+for how trips, departures, days and trip lengths are counted, and how
+times after midnight written as early morning times are fixed.
 }
 
 \examples{

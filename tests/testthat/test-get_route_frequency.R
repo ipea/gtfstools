@@ -316,3 +316,39 @@ test_that("doesn't change given gtfs", {
   frequency <- tester(gtfs)
   expect_equal(original_gtfs, gtfs, ignore_attr = TRUE)
 })
+
+test_that("fixes times after midnight written as early morning times", {
+  # W departs at 23:50, and F every 30 minutes from 23:00 to "01:00:00"
+
+  gtfs <- overnight_feed()
+  original_stop_times <- data.table::copy(gtfs$stop_times)
+
+  result <- get_route_frequency(gtfs, from = "23:00:00", to = "24:00:00")
+  expect_identical(result$departures, c(1L, 2L))
+  result <- get_route_frequency(gtfs, from = "24:00:00", to = "25:00:00")
+  expect_identical(result$route_id, "R2")
+  expect_identical(result$departures, 2L)
+  result <- get_route_frequency(gtfs, from = "00:00:00", to = "01:00:00")
+  expect_identical(nrow(result), 0L)
+  expect_identical(gtfs$stop_times, original_stop_times)
+
+  # poa's trip departs at 23:10, not at its last time written as "00:02:00"
+
+  poa_gtfs <- read_gtfs(
+    system.file("extdata/poa_gtfs.zip", package = "gtfstools")
+  )
+  late <- get_route_frequency(
+    poa_gtfs,
+    "T2",
+    from = "23:00:00",
+    to = "23:59:59"
+  )
+  early <- get_route_frequency(
+    poa_gtfs,
+    "T2",
+    from = "00:00:00",
+    to = "01:00:00"
+  )
+  expect_gt(sum(late$departures), 0L)
+  expect_identical(sum(early$departures), 0L)
+})

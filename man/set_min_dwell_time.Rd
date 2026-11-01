@@ -76,8 +76,8 @@ of the last visit may still be shifted by an earlier visit.
 
 Negative dwell times (departure earlier than arrival) are raised like any
 other shorter dwell time, so a \code{min_dwell_time} of 0 raises only these.
-When they come from times after midnight written as \code{"00:30:00"} instead of
-\code{"24:30:00"}, the later times of the trip are shifted by about a day.
+Times after midnight written as early morning times are fixed first, as in
+\code{\link[=set_dwell_time]{set_dwell_time()}}, so they don't result in negative dwell times.
 
 Otherwise it works as \code{\link[=set_dwell_time]{set_dwell_time()}}.
 }

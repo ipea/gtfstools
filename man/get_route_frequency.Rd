@@ -50,6 +50,12 @@ A departure is counted when it happens at or after \code{from} and before \code{
 (unlike in \code{\link[=filter_by_time_of_day]{filter_by_time_of_day()}}, which also keeps entries at \code{to}).
 Departures after midnight are listed with times past "24:00:00", so use a
 time of day such as "24:00:00"-"26:00:00" to count them.
+Times after midnight written as early morning times (e.g. \code{"00:30:00"}
+instead of \code{"24:30:00"}), and \code{end_time}s earlier than \code{start_time}s in
+\code{frequencies}, are first fixed with \code{\link[=fix_overnight_times]{fix_overnight_times()}}, so these
+trips are counted at their real times. Without an integer \code{stop_sequence}
+column, the times of \code{stop_times} can't be ordered and are used as
+written.
 
 The mean headway is the length of the time of day divided by the number of
 departures, so it overstates the actual headway when service starts or ends

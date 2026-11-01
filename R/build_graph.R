@@ -67,7 +67,10 @@
 #' should usually be filtered to a single day first, with [filter_by_date()]
 #' or [filter_by_weekday()]. Departures after midnight have times past
 #' "24:00:00", so use a time of day such as "24:00:00"-"26:00:00" for them.
-#' Trips whose times wrongly go back to "00:00:00" after midnight are placed
+#' Times after midnight written as early morning times (e.g. `"00:30:00"`
+#' instead of `"24:30:00"`) are first fixed with [fix_overnight_times()], as
+#' are `end_time`s earlier than `start_time`s in `frequencies`, so these trips
+#' are placed at their real times. Trips whose times still go back are placed
 #' by their earliest time.
 #'
 #' Within a trip, consecutive `stop_times` entries at the same stop are one
@@ -223,6 +226,13 @@ build_graph <- function(gtfs,
   if (gtfsio::check_field_exists(gtfs, "stops", "stop_name")) {
     gtfsio::assert_field_class(gtfs, "stops", "stop_name", "character")
   }
+
+  # times after midnight written as early morning times are fixed first, so
+  # trips are placed at their real times. the departures of trips listed in
+  # 'frequencies' come from its start and end times, which are fixed too
+  # (fields of the wrong class are reported later, when they are used)
+
+  gtfs <- fix_overnight_in_call(gtfs, frequencies = TRUE)
 
   network <- build_service_network(
     gtfs,
@@ -510,7 +520,7 @@ build_service_network <- function(gtfs,
 
   # in-vehicle links connect the service nodes of consecutive visits of each
   # trip, whose rows are contiguous. times that are missing or that decrease
-  # (e.g. times after midnight written as 00:xx) are not used
+  # (by 12 hours or less, since the others were fixed) are not used
 
   has_next <- c(trip_run[-1L] == trip_run[-length(trip_run)], FALSE)
   current <- which(has_next)

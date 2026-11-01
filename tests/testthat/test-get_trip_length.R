@@ -759,3 +759,32 @@ test_that("from and to select single-stop trips by their only stop", {
   result <- get_trip_length(one_stop_gtfs, from = "12:00:00")
   expect_false("CPTM L07-0" %chin% result$trip_id)
 })
+
+test_that("selects segments after midnight from the fixed times", {
+  # W's segments from B (24:05) and C (24:20) depart after midnight
+
+  gtfs <- overnight_feed()
+  lengths <- get_trip_length(
+    gtfs,
+    by = "segment",
+    method = "euclidean",
+    from = "24:00:00",
+    to = "25:00:00"
+  )
+  durations <- get_trip_segment_duration(
+    gtfs,
+    from = "24:00:00",
+    to = "25:00:00"
+  )
+  expect_identical(lengths$segment, c(2L, 3L))
+  expect_identical(lengths$segment, durations$segment)
+
+  lengths <- get_trip_length(
+    gtfs,
+    by = "segment",
+    method = "euclidean",
+    from = "00:00:00",
+    to = "01:00:00"
+  )
+  expect_false("W" %chin% lengths$trip_id)
+})
