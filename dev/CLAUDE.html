@@ -67,6 +67,8 @@
 <strong>Learn from corrections.</strong> Log <code>[LEARN:category] wrong → right</code> in <code>MEMORY.md</code>.</li>
 <li>
 <strong>Code style.</strong> Always use the convention <code>package::function()</code>. Exceptions are functions from ggplot2 and special data.table operators such as <code>:=</code>.</li>
+<li>
+<strong>Explicit argument names.</strong> Never use positional arguments. Every function call in R names its arguments explicitly, e.g. <code>get_trip_length(gtfs = gtfs, trip_id = ids, unit = "km")</code>, never <code>get_trip_length(gtfs, ids, unit = "km")</code>. (Values passed through <code>...</code>, as in <code><a href="https://rdrr.io/r/base/c.html" class="external-link">c()</a></code> or <code><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0()</a></code>, have no argument name to give.)</li>
 </ul><p>Conventions are in <a href=".claude/rules/r-package-conventions.html"><code>.claude/rules/r-package-conventions.md</code></a>; gates are in <a href=".claude/rules/quality-gates.html"><code>.claude/rules/quality-gates.md</code></a>.</p>
 <hr></div>
 <div class="section level2">

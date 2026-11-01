@@ -164,9 +164,9 @@ kept. Times after midnight written as early morning times (e.g.
 <code>"00:30:00"</code> instead of <code>"24:30:00"</code>) are first fixed with
 <code><a href="fix_overnight_times.html">fix_overnight_times()</a></code> in every trip, so the returned GTFS has them fixed.
 Spans whose arrival is still earlier than the previous departure (by 12
-hours or less) are left unchanged, with a warning. An error is raised if a shift would result
-in a time earlier than <code>"00:00:00"</code>. Only <code>stop_times</code> is modified; its
-existing <code>_secs</code> columns are updated to match.</p>
+hours or less) are left unchanged, with a warning. An error is raised if a
+shift would result in a time earlier than <code>"00:00:00"</code>. Only <code>stop_times</code>
+is modified; its existing <code>_secs</code> columns are updated to match.</p>
 <p>With <code>first_stop</code> and <code>last_stop</code>, matched as in <code><a href="set_trip_speed.html">set_trip_speed()</a></code>, only
 the spans between them are raised: times before <code>first_stop</code> don't change,
 and the times at and after <code>last_stop</code> are shifted. The given stops must

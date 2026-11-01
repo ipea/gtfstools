@@ -29,6 +29,13 @@ Herszenhut. License MIT. Docs: <https://ipeagit.github.io/gtfstools/>.
 - **Code style.** Always use the convention `package::function()`.
   Exceptions are functions from ggplot2 and special data.table operators
   such as `:=`.
+- **Explicit argument names.** Never use positional arguments. Every
+  function call in R names its arguments explicitly, e.g.
+  `get_trip_length(gtfs = gtfs, trip_id = ids, unit = "km")`, never
+  `get_trip_length(gtfs, ids, unit = "km")`. (Values passed through
+  `...`, as in [`c()`](https://rdrr.io/r/base/c.html) or
+  [`paste0()`](https://rdrr.io/r/base/paste.html), have no argument name
+  to give.)
 
 Conventions are in
 [`.claude/rules/r-package-conventions.md`](https://ipea.github.io/gtfstools/dev/.claude/rules/r-package-conventions.md);
