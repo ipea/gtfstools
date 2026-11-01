@@ -50,8 +50,10 @@
 #' - stops between timepoints whose distance can't be calculated, e.g. trips
 #'   not linked to a shape or stops without coordinates;
 #' - stops between timepoints in which the arrival is earlier than the
-#'   previous departure, usually times after midnight written as
-#'   `"00:30:00"` instead of `"24:30:00"`.
+#'   previous departure. Times after midnight written as early morning times
+#'   (e.g. `"00:30:00"` instead of `"24:30:00"`) are first fixed with
+#'   [fix_overnight_times()] in every trip, so the returned GTFS has them
+#'   fixed, and only times that go back by 12 hours or less remain.
 #'
 #' Times are blank when they are `NA`, empty or whitespace-only strings, or
 #' `"NA"`. Malformed time strings are left unchanged (unless overwritten with
@@ -81,7 +83,7 @@
 #'   head()
 #'
 #' # distances measured along the trips' shapes. some trips of this feed have
-#' # times past midnight written as "00:xx:xx", so they are left blank
+#' # times past midnight written as "00:xx:xx", which are fixed first
 #' interpolated_gtfs <- suppressWarnings(interpolate_stop_times(gtfs))
 #' interpolated_gtfs$stop_times |>
 #'   filter(trip_id == trip) |>
@@ -124,6 +126,11 @@ interpolate_stop_times <- function(
     c("trip_id", "stop_sequence", "arrival_time", "departure_time"),
     c("character", "integer", "character", "character")
   )
+
+  # times after midnight written as early morning times are fixed first, so
+  # they don't go back. the returned feed keeps the fixed times
+
+  gtfs <- fix_overnight_in_call(gtfs)
 
   stop_times <- gtfs$stop_times
 
@@ -241,8 +248,9 @@ interpolate_stop_times <- function(
   p <- p[is_inside]
   q <- q[is_inside]
 
-  # spans in which the arrival is earlier than the previous departure (e.g.
-  # times after midnight written as "00:xx:xx") are left blank
+  # spans in which the arrival is earlier than the previous departure (times
+  # that go back by 12 hours or less, since the others were fixed) are left
+  # blank
 
   is_backwards <- t_arr[q] < t_dep[p]
   back_trips <- unique(tid[i[is_backwards & !is_overwritten[i]]])
@@ -442,8 +450,9 @@ warn_times_not_interpolated <- function(n_left, left_trips, back_trips) {
       message,
       "i" = paste0(
         "{length(back_trips)} trip{?s} {?has/have} an arrival earlier than ",
-        "the previous departure, e.g. times after midnight written as ",
-        "{.val 00:30:00} instead of {.val 24:30:00}: {.val {back_trips}}."
+        "the previous departure (times that go back by 12 hours or less are ",
+        "not taken as times after midnight, see {.fn fix_overnight_times}): ",
+        "{.val {back_trips}}."
       )
     )
   }

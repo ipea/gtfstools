@@ -98,6 +98,9 @@ Lengths are great-circle (haversine) distances on the sphere used by
 \code{from} and \code{to} are compared with the \code{departure_time} of the first stop of
 each trip (in \code{stop_sequence} order) or segment, as written in
 \code{stop_times}, so use times past \code{"24:00:00"} for departures after midnight.
+With \code{by = "segment"}, times after midnight written as early morning times
+(e.g. \code{"00:30:00"} instead of \code{"24:30:00"}) are first fixed with
+\code{\link[=fix_overnight_times]{fix_overnight_times()}}; a trip's first departure is never changed by it.
 For trips listed in \code{frequencies}, these are template times, not the times
 of each departure. Trips and segments whose departure is blank are never
 included when \code{from} or \code{to} is given.

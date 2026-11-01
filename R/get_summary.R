@@ -89,6 +89,11 @@
 #' The report requires the `{ggplot2}`, `{knitr}` and `{rmarkdown}` packages
 #' and [Pandoc](https://pandoc.org/).
 #'
+#' Times after midnight written as early morning times (e.g. `"00:30:00"`
+#' instead of `"24:30:00"`), and `end_time`s earlier than `start_time`s in
+#' `frequencies`, are first fixed with [fix_overnight_times()], if
+#' `stop_sequence` is an integer column.
+#'
 #' The time-of-day filter keeps whole trips (as [filter_by_time_of_day()] with
 #' `full_trips = TRUE`), so trip speeds and lengths refer to whole trips.
 #'
@@ -305,6 +310,11 @@ get_summary <- function(
   }
 
   cli::cli_progress_update(id = progress_bar, status = "Applying filters")
+
+  # times after midnight written as early morning times are fixed once, here,
+  # so the functions used below find them already fixed
+
+  gtfs <- fix_overnight_in_call(gtfs, frequencies = TRUE)
 
   feed <- gtfs
   if (!is.null(agency_id)) {

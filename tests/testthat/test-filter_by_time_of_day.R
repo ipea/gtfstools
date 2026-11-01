@@ -531,3 +531,21 @@ test_that("handles trips with some non specified departure/arrival times", {
   data.table::setindex(gtfs$stop_times, NULL)
   expect_identical(filtered_stop_times, gtfs$stop_times)
 })
+
+test_that("fixes times after midnight written as early morning times", {
+  gtfs <- overnight_feed()
+  original_stop_times <- data.table::copy(gtfs$stop_times)
+
+  result <- filter_by_time_of_day(gtfs, "23:00:00", "25:00:00")
+  expect_identical(
+    result$stop_times[trip_id == "W"]$arrival_time,
+    c("23:50:00", "24:05:00", "24:20:00", "24:35:00")
+  )
+  expect_identical(result$frequencies$end_time, "25:00:00")
+
+  # W's stops after midnight are not within these times of day
+
+  result <- filter_by_time_of_day(gtfs, "00:00:00", "01:00:00")
+  expect_false("W" %chin% result$stop_times$trip_id)
+  expect_identical(gtfs$stop_times, original_stop_times)
+})

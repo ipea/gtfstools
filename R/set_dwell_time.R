@@ -60,14 +60,19 @@
 #' stop only changes how long before each departure the vehicle arrives there,
 #' while changes at later stops lengthen or shorten every departure.
 #'
-#' `from` and `to` are compared with the `arrival_time` of each visit as
-#' written in `stop_times` before any change (template times, for trips listed
-#' in `frequencies`), so use times past `"24:00:00"` for arrivals after
-#' midnight. A shift caused by an earlier visit may thus move a changed visit
-#' out of the time of day, or another visit into it. Visits with a blank
+#' Times after midnight written as early morning times (e.g. `"00:30:00"`
+#' instead of `"24:30:00"`) are first fixed with [fix_overnight_times()] in
+#' every trip, so the returned GTFS has them fixed (with `by_reference = TRUE`,
+#' even if an error is then raised).
+#'
+#' `from` and `to` are compared with the `arrival_time` of each visit as written
+#' in `stop_times` before any change other than this fix (template times, for
+#' trips listed in `frequencies`), so use times past `"24:00:00"` for arrivals
+#' after midnight. A shift caused by an earlier visit may thus move a changed
+#' visit out of the time of day, or another visit into it. Visits with a blank
 #' arrival time are never selected when `from` or `to` is given. When the time
 #' of day contains no visit of the specified trips to the specified stops, the
-#' GTFS is returned unchanged.
+#' GTFS is returned with no change other than this fix.
 #'
 #' `stop_id`s are matched against the `stop_id`s in `stop_times`, which are
 #' never stations: to set the dwell times at a station, pass its children that
@@ -221,6 +226,13 @@ change_dwell_times <- function(
   } else {
     stop_times <- data.table::copy(gtfs$stop_times)
   }
+
+  # times after midnight written as early morning times are fixed first, in
+  # the table that is edited, so they don't go back and the returned feed
+  # keeps them fixed
+
+  gtfs$stop_times <- stop_times
+  gtfs <- fix_overnight_in_call(gtfs, by_reference = TRUE)
 
   selected_rows <- select_dwell_time_calls(stop_times, trip_id, stop_id)
 

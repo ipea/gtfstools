@@ -90,8 +90,13 @@ left unchanged, with a warning if they were given in \code{trip_id}. Without
 \code{first_stop}, \code{last_stop}, \code{from} and \code{to}, a blank departure at the trip's
 first stop leaves all the times of the trip blank, without a warning.
 
+Times after midnight written as early morning times (e.g. \code{"00:30:00"}
+instead of \code{"24:30:00"}) are first fixed with \code{\link[=fix_overnight_times]{fix_overnight_times()}} in
+every trip, so the returned GTFS has them fixed (with \code{by_reference = TRUE},
+even if an error is then raised).
+
 \code{from} and \code{to} are compared with the \code{departure_time} at \code{first_stop} as
-written in \code{stop_times} (template times, for trips listed in
+written in \code{stop_times}, once fixed (template times, for trips listed in
 \code{frequencies}), so use times past \code{"24:00:00"} for departures after
 midnight; trips whose departure there is blank are then left unchanged.
 Existing \verb{_secs} columns in \code{stop_times} are updated to match.

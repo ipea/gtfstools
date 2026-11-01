@@ -402,3 +402,28 @@ test_that("route_type restricts the changed routes", {
     class = "gtfstools_missing_selection_error"
   )
 })
+
+test_that("fixes times after midnight written as early morning times", {
+  # F departs every 30 minutes from 23:00 to "01:00:00". setting it to every
+  # 10 minutes from 23:30 to 24:30 replaces those departures, without
+  # doubling them
+
+  gtfs <- overnight_feed()
+  result <- set_route_frequency(
+    gtfs,
+    "R2",
+    headway = 10,
+    from = "23:30:00",
+    to = "24:30:00"
+  )
+  expect_identical(result$frequencies$end_time[3], "25:00:00")
+
+  frequency <- get_route_frequency(
+    result,
+    "R2",
+    from = "23:30:00",
+    to = "24:30:00"
+  )
+  expect_identical(frequency$departures, 6L)
+  expect_equal(frequency$mean_headway, 10)
+})

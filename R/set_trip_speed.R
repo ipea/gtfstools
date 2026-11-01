@@ -60,8 +60,13 @@
 #' `first_stop`, `last_stop`, `from` and `to`, a blank departure at the trip's
 #' first stop leaves all the times of the trip blank, without a warning.
 #'
+#' Times after midnight written as early morning times (e.g. `"00:30:00"`
+#' instead of `"24:30:00"`) are first fixed with [fix_overnight_times()] in
+#' every trip, so the returned GTFS has them fixed (with `by_reference = TRUE`,
+#' even if an error is then raised).
+#'
 #' `from` and `to` are compared with the `departure_time` at `first_stop` as
-#' written in `stop_times` (template times, for trips listed in
+#' written in `stop_times`, once fixed (template times, for trips listed in
 #' `frequencies`), so use times past `"24:00:00"` for departures after
 #' midnight; trips whose departure there is blank are then left unchanged.
 #' Existing `_secs` columns in `stop_times` are updated to match.
@@ -258,6 +263,13 @@ set_trip_speed <- function(
   } else {
     stop_times <- data.table::copy(gtfs$stop_times)
   }
+
+  # times after midnight written as early morning times are fixed first, in
+  # the table that is edited, so they don't go back and the returned feed
+  # keeps them fixed
+
+  gtfs$stop_times <- stop_times
+  gtfs <- fix_overnight_in_call(gtfs, by_reference = TRUE)
 
   # select the rows of the given trips, ordered as in get_trip_length(), so
   # that the segment starting at the n-th stop of a trip is its n-th segment.

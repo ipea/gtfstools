@@ -260,3 +260,33 @@ test_that("returns a typed empty table when stop_times is empty", {
 
   expect_type(tester(empty_gtfs)$duration, "double")
 })
+
+test_that("fixes times after midnight written as early morning times", {
+  # a trip whose times after midnight are written as early morning times,
+  # including the departure from its second stop
+
+  overnight_gtfs <- gtfsio::new_gtfs(
+    list(
+      stop_times = data.table::data.table(
+        trip_id = "t1",
+        stop_id = c("s1", "s2", "s3"),
+        stop_sequence = 1:3,
+        arrival_time = c("23:50:00", "23:58:00", "00:05:00"),
+        departure_time = c("23:50:00", "00:01:00", "00:05:00")
+      )
+    ),
+    "dt_gtfs"
+  )
+
+  original_gtfs <- gtfsio::new_gtfs(
+    lapply(overnight_gtfs, data.table::copy),
+    "dt_gtfs"
+  )
+
+  expect_no_warning(
+    durations <- tester(overnight_gtfs),
+    class = "gtfstools_backwards_times"
+  )
+  expect_equal(durations$duration, c(8, 4))
+  expect_equal(overnight_gtfs, original_gtfs, ignore_attr = TRUE)
+})

@@ -64,6 +64,9 @@
 #' `from` and `to` are compared with the `departure_time` of the first stop of
 #' each trip (in `stop_sequence` order) or segment, as written in
 #' `stop_times`, so use times past `"24:00:00"` for departures after midnight.
+#' With `by = "segment"`, times after midnight written as early morning times
+#' (e.g. `"00:30:00"` instead of `"24:30:00"`) are first fixed with
+#' [fix_overnight_times()]; a trip's first departure is never changed by it.
 #' For trips listed in `frequencies`, these are template times, not the times
 #' of each departure. Trips and segments whose departure is blank are never
 #' included when `from` or `to` is given.
@@ -159,6 +162,15 @@ get_trip_length <- function(gtfs,
   )
 
   if (method == "shapes") assert_shapes_fields(gtfs)
+
+  # with by = "segment", the segments within the time of day are selected by
+  # the departure at their first stop, so times after midnight written as
+  # early morning times are fixed first. a trip's first departure is never
+  # changed by the fix, so by = "trip" doesn't need it
+
+  if (is_windowed && by == "segment") {
+    gtfs <- fix_overnight_in_call(gtfs, trip_id)
+  }
 
   if (is_windowed) {
     st <- prepare_trip_stops(gtfs, trip_id, with_departure = TRUE)

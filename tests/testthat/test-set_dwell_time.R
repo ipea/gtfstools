@@ -307,7 +307,10 @@ test_that("leaves visits with blank times unchanged with a warning", {
     new_gtfs <- tester(poa_gtfs, trip_id = trip, stop_id = untimed_stop),
     class = "gtfstools_blank_dwell_time"
   )
-  expect_identical(new_gtfs$stop_times, poa_gtfs$stop_times)
+  expect_identical(
+    new_gtfs$stop_times,
+    fix_overnight_times(poa_gtfs)$stop_times
+  )
 
   # the warning counts the calls and the trips separately
 
@@ -594,4 +597,54 @@ test_that("route_type restricts the changed visits", {
   expect_identical(result$stop_times, gtfs$stop_times)
 
   expect_error(set_dwell_time(gtfs, dwell_time = 30, route_type = "2"))
+})
+
+test_that("fixes times after midnight written as early morning times", {
+  # a trip whose times after midnight are written as early morning times,
+  # including the departure from its second stop
+
+  overnight_gtfs <- gtfsio::new_gtfs(
+    list(
+      stop_times = data.table::data.table(
+        trip_id = "t1",
+        stop_id = c("s1", "s2", "s3"),
+        stop_sequence = 1:3,
+        arrival_time = c("23:50:00", "23:58:00", "00:05:00"),
+        departure_time = c("23:50:00", "00:01:00", "00:05:00")
+      )
+    ),
+    "dt_gtfs"
+  )
+
+  # the dwell time at s2 is 3 minutes, from 23:58:00 to "00:01:00"
+
+  result <- set_dwell_time(overnight_gtfs, 120, stop_id = "s2")
+  expect_identical(
+    result$stop_times$departure_time,
+    c("23:50:00", "24:00:00", "24:04:00")
+  )
+  expect_identical(
+    result$stop_times$arrival_time,
+    c("23:50:00", "23:58:00", "24:04:00")
+  )
+
+  # the time of day of a visit after midnight is compared as fixed
+
+  expect_identical(
+    set_dwell_time(
+      overnight_gtfs,
+      120,
+      stop_id = "s2",
+      from = "00:00:00",
+      to = "01:00:00"
+    )$stop_times,
+    fix_overnight_times(overnight_gtfs)$stop_times
+  )
+
+  # by reference, the given feed gets the fixed times and the new dwell time
+
+  expect_invisible(
+    set_dwell_time(overnight_gtfs, 120, stop_id = "s2", by_reference = TRUE)
+  )
+  expect_identical(overnight_gtfs$stop_times, result$stop_times)
 })

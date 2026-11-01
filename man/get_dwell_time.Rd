@@ -62,8 +62,12 @@ Blank times (\code{NA} dwell times) can be filled beforehand with
 \code{\link[=interpolate_stop_times]{interpolate_stop_times()}}. Negative dwell times (departure earlier than
 arrival) are returned as they are.
 
+Times after midnight written as early morning times (e.g. \code{"00:30:00"}
+instead of \code{"24:30:00"}) are fixed with \code{\link[=fix_overnight_times]{fix_overnight_times()}} before the
+dwell times are calculated.
+
 \code{from} and \code{to} are compared with the \code{arrival_time} of each visit as
-written in \code{stop_times} (template times, for trips listed in
+written in \code{stop_times}, once fixed (template times, for trips listed in
 \code{frequencies}), so use times past \code{"24:00:00"} for arrivals after midnight.
 Visits with a blank arrival time are never included when \code{from} or \code{to} is
 given.

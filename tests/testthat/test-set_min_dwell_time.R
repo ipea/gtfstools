@@ -3,7 +3,8 @@ spo_gtfs <- read_gtfs(spo_path)
 
 # creates a feed with three trips whose intermediate stops have dwell times
 # below and above 30 seconds. trip A runs past midnight, with its later times
-# written as "00:01:00" and "00:10:00", and trip C visits stop Y twice
+# written as "00:01:00" and "00:10:00" (fixed to "24:01:00" and "24:10:00" by
+# the function), and trip C visits stop Y twice
 
 dwell_feed <- function() {
   feed <- list(
@@ -92,13 +93,13 @@ test_that("raises only shorter dwell times at intermediate stops", {
 
   # dwell times below 30 seconds are raised and the later times shifted.
   # longer dwell times are kept, and so are the first and last stops of each
-  # trip. Z's negative dwell time is raised too, so its departure and the
-  # later times are shifted by about a day and written past 24:00:00
+  # trip. A's times after midnight are fixed first, so Z's dwell time is 120
+  # seconds and is kept
 
   expect_identical(
     times$arrival_time,
     c(
-      "08:00:00", "08:05:00", "08:10:30", "23:59:30", "24:09:00",
+      "08:00:00", "08:05:00", "08:10:30", "23:59:30", "24:10:30",
       "09:00:00", "09:05:00", "09:10:30",
       "10:00:00", "10:05:00", "10:10:30", "10:20:30"
     )
@@ -106,7 +107,7 @@ test_that("raises only shorter dwell times at intermediate stops", {
   expect_identical(
     times$departure_time,
     c(
-      "08:00:00", "08:05:30", "08:12:30", "24:00:00", "24:09:00",
+      "08:00:00", "08:05:30", "08:12:30", "24:01:30", "24:10:30",
       "09:00:00", "09:05:30", "09:10:30",
       "10:00:00", "10:05:30", "10:12:30", "10:20:30"
     )
@@ -117,13 +118,22 @@ test_that("raises only shorter dwell times at intermediate stops", {
   expect_silent(set_again <- tester(result))
   expect_equal(set_again, result)
 
-  # a minimum of 0 raises only Z's negative dwell time
+  # a minimum of 0 raises only negative dwell times. this feed has none once
+  # A's times are fixed, so only these change
 
-  zero_min <- tester(min_dwell_time = 0)$stop_times
-  expect_identical(zero_min$departure_time[4:5], c("23:59:00", "24:08:00"))
+  zero_min <- tester(min_dwell_time = 0)
+  expect_equal(zero_min, fix_overnight_times(dwell_gtfs), ignore_attr = TRUE)
+
+  # B departs from Y a minute before arriving there
+
+  negative_gtfs <- dwell_feed()
+  negative_gtfs$stop_times[7, departure_time := "09:04:00"]
+  zero_min <- tester(negative_gtfs, min_dwell_time = 0)$stop_times
+  expect_identical(zero_min$departure_time[7:8], c("09:05:00", "09:11:00"))
+  expect_identical(zero_min$arrival_time[8], "09:11:00")
   expect_identical(
-    zero_min$departure_time[-(4:5)],
-    dwell_gtfs$stop_times$departure_time[-(4:5)]
+    zero_min$departure_time[-(4:8)],
+    dwell_gtfs$stop_times$departure_time[-(4:8)]
   )
 })
 
@@ -139,7 +149,11 @@ test_that("never shortens dwell times, whatever the trips and stops given", {
   # the first stops of the trips are never changed
 
   expect_silent(first_stops <- tester(stop_id = "s0"))
-  expect_equal(first_stops, dwell_gtfs, ignore_attr = TRUE)
+  expect_equal(
+    first_stops,
+    fix_overnight_times(dwell_gtfs),
+    ignore_attr = TRUE
+  )
 
   # B's last stop has no departure time, so Y is B's last stop with both times
   # and keeps its dwell time
