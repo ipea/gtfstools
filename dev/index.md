@@ -4,12 +4,11 @@
 status](https://www.r-pkg.org/badges/version/gtfstools)](https://CRAN.R-project.org/package=gtfstools)
 [![gtfstools status
 badge](https://dhersz.r-universe.dev/badges/gtfstools)](https://dhersz.r-universe.dev)
-[![B
-status](https://github.com/ipea/gtfstools/workflows/check/badge.svg)](https://github.com/ipea/gtfstools/actions?query=workflow%3Acheck)
+[![R-CMD-check](https://github.com/ipea/gtfstools/workflows/check/badge.svg)](https://github.com/ipea/gtfstools/actions?query=workflow%3Acheck)
 [![Codecov test
 coverage](https://codecov.io/gh/ipeaGIT/gtfstools/branch/main/graph/badge.svg)](https://app.codecov.io/gh/ipeaGIT/gtfstools?branch=main)
 [![Lifecycle:
-experimental](https://lifecycle.r-lib.org/articles/figures/lifecycle-stable.svg)](https://lifecycle.r-lib.org/articles/stages.html)
+stable](https://lifecycle.r-lib.org/articles/figures/lifecycle-stable.svg)](https://lifecycle.r-lib.org/articles/stages.html)
 [![CRAN/METACRAN Total
 downloads](http://cranlogs.r-pkg.org/badges/grand-total/gtfstools?color=yellow)](https://CRAN.R-project.org/package=gtfstools)
 

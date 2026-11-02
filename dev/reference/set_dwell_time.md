@@ -107,9 +107,11 @@ invisibly (note that in this case the original GTFS object is altered).
 
 ## Details
 
-Since the first stop is never changed, the departures of trips listed in
-`frequencies` are not changed either. Blank arrival or departure times
-are never filled.
+The departures of trips listed in `frequencies` are never changed,
+because
+[`frequencies_to_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/frequencies_to_stop_times.md)
+anchors each of them on the first departure of the trip's template.
+Blank arrival or departure times are never filled.
 
 For trips listed in `frequencies`, the times in `stop_times` are a
 template (see

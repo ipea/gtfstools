@@ -127,9 +127,10 @@ Defaults to <code>FALSE</code>.</p></dd>
 
 
 <dt id="arg-n-threads">n_threads<a class="anchor" aria-label="anchor" href="#arg-n-threads"></a></dt>
-<dd><p>An integer between 1 and the number of cores in the running
-machine. Control how many threads are used during the validation. Defaults
-to 1.</p></dd>
+<dd><p>An integer. Control how many threads are used during the
+validation. Defaults to 1. Values larger than the number of cores in the
+running machine, or than the number of free R connections, are capped to
+the smaller of these numbers.</p></dd>
 
 </dl></div>
     <div class="section level2">

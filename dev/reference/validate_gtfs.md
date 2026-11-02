@@ -64,9 +64,10 @@ validate_gtfs(
 
 - n_threads:
 
-  An integer between 1 and the number of cores in the running machine.
-  Control how many threads are used during the validation. Defaults to
-  1.
+  An integer. Control how many threads are used during the validation.
+  Defaults to 1. Values larger than the number of cores in the running
+  machine, or than the number of free R connections, are capped to the
+  smaller of these numbers.
 
 ## Value
 

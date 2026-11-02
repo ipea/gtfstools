@@ -29,8 +29,16 @@ functions currently available are:
 - [`set_max_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_max_speed.md):
   caps the speed of trips, slowing down only the parts that are faster
   than a maximum speed;
+- [`set_min_speed()`](https://ipea.github.io/gtfstools/dev/reference/set_min_speed.md):
+  raises the speed of trips, speeding up only the parts that are slower
+  than a minimum speed;
 - [`set_dwell_time()`](https://ipea.github.io/gtfstools/dev/reference/set_dwell_time.md):
   sets how long vehicles stay at stops;
+- [`set_min_dwell_time()`](https://ipea.github.io/gtfstools/dev/reference/set_min_dwell_time.md):
+  makes vehicles stay at least a minimum time at stops;
+- [`combine_nearby_stops()`](https://ipea.github.io/gtfstools/dev/reference/combine_nearby_stops.md):
+  merges the stops within a given distance of each other into a single
+  stop;
 - [`frequencies_to_stop_times()`](https://ipea.github.io/gtfstools/dev/reference/frequencies_to_stop_times.md):
   converts frequency-based trips into scheduled ones;
 - [`merge_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/merge_gtfs.md):

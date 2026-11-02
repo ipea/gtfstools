@@ -170,9 +170,9 @@ invisibly (note that in this case the original GTFS object is altered).</p>
 
 
 
-<p>Since the first stop is never changed, the departures of trips listed in
-<code>frequencies</code> are not changed either. Blank arrival or departure times
-are never filled.</p>
+<p>The departures of trips listed in <code>frequencies</code> are never changed, because
+<code><a href="frequencies_to_stop_times.html">frequencies_to_stop_times()</a></code> anchors each of them on the first departure
+of the trip's template. Blank arrival or departure times are never filled.</p>
 <p>For trips listed in <code>frequencies</code>, the times in <code>stop_times</code> are a template
 (see <code><a href="frequencies_to_stop_times.html">frequencies_to_stop_times()</a></code>), so setting the dwell time at the first
 stop only changes how long before each departure the vehicle arrives there,

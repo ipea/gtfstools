@@ -23,6 +23,16 @@
   using a new function
   [`fix_overnight_times()`](https://ipea.github.io/gtfstools/dev/reference/fix_overnight_times.md)
   and return correct estimates for overnight trips.
+- [`filter_by_weekday()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_weekday.md)
+  now warns when the GTFS object has no `calendar` table, instead of
+  silently returning it unchanged. Its documentation now states that
+  services defined only in `calendar_dates` are never related to a
+  weekday (use
+  [`filter_by_date()`](https://ipea.github.io/gtfstools/dev/reference/filter_by_date.md)
+  to consider them).
+- [`validate_gtfs()`](https://ipea.github.io/gtfstools/dev/reference/validate_gtfs.md)
+  now raises an error when `n_threads` is not a whole number, as
+  documented, instead of passing it to the validator.
 
 ### New features
 
