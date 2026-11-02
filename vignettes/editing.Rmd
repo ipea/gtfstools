@@ -34,7 +34,10 @@ GTFS feeds describe the transit services of a city or region as they are. Quite 
 - `interpolate_shape_dist_traveled()`: calculates the distances, in meters, travelled along the shapes up to each stop and shape point, replacing any existing ones;
 - `set_route_speed()`: sets the average speed of the trips of routes, or of a segment of them;
 - `set_max_speed()`: caps the speed of trips, slowing down only the parts that are faster than a maximum speed;
+- `set_min_speed()`: raises the speed of trips, speeding up only the parts that are slower than a minimum speed;
 - `set_dwell_time()`: sets how long vehicles stay at stops;
+- `set_min_dwell_time()`: makes vehicles stay at least a minimum time at stops;
+- `combine_nearby_stops()`: merges the stops within a given distance of each other into a single stop;
 - `frequencies_to_stop_times()`: converts frequency-based trips into scheduled ones;
 - `merge_gtfs()`: combines several feeds into a single one;
 - `remove_duplicates()`: removes duplicated entries from the feed's tables;

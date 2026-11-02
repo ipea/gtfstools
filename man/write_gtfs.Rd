@@ -29,7 +29,7 @@ object are written.}
 (defaults to \code{FALSE}, which doesn't drop extra files and fields).}
 
 \item{as_dir}{Whether to write the feed as a directory, instead of a \code{.zip}
-file (defaults to \code{FALSE}, which means that the field is written as a zip
+file (defaults to \code{FALSE}, which means that the feed is written as a zip
 file).}
 
 \item{overwrite}{Whether to overwrite existing \code{.zip} file (defaults to
@@ -44,8 +44,8 @@ larger files. Defaults to 6, which is usually several times faster than 9
 and creates files of very similar size. Ignored when \code{as_dir = TRUE}.}
 }
 \value{
-Invisibly returns the same GTFS object passed to the \code{gtfs}
-parameter.
+Invisibly returns the GTFS object passed to the \code{gtfs} parameter, as
+a \code{dt_gtfs} object.
 }
 \description{
 Writes GTFS objects as GTFS \code{.zip} files.

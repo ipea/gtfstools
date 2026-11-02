@@ -31,6 +31,13 @@
 #' that run on mondays and tuesdays or drop them, depending on the value you
 #' pass to `keep`.
 #'
+#' @details # `calendar_dates`
+#' Only the weekday columns of the `calendar` table are used: services defined
+#' only in `calendar_dates` are never related to a weekday, so they are dropped
+#' when `keep = TRUE` and kept when `keep = FALSE`. A GTFS object without a
+#' `calendar` table is returned unchanged, with a warning. To filter by the dates
+#' in `calendar_dates` too, use [filter_by_date()].
+#'
 #' @family filtering functions
 #'
 #' @examplesIf requireNamespace("dplyr", quietly = TRUE)
@@ -110,6 +117,14 @@ filter_by_weekday <- function(gtfs, weekday, combine = "or", keep = TRUE) {
     relevant_services <- unique(filtered_calendar$service_id)
 
     gtfs <- filter_by_service_id(gtfs, relevant_services, keep)
+  } else {
+    cli::cli_warn(
+      c(
+        "The GTFS object has no {.file calendar} table.",
+        "i" = "It was returned unchanged."
+      ),
+      class = "gtfstools_no_calendar_warning"
+    )
   }
 
   return(gtfs)

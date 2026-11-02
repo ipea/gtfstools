@@ -52,9 +52,9 @@
 #'
 #' @section Details:
 #'
-#' Since the first stop is never changed, the departures of trips listed in
-#' `frequencies` are not changed either. Blank arrival or departure times
-#' are never filled.
+#' The departures of trips listed in `frequencies` are never changed, because
+#' [frequencies_to_stop_times()] anchors each of them on the first departure
+#' of the trip's template. Blank arrival or departure times are never filled.
 #'
 #' For trips listed in `frequencies`, the times in `stop_times` are a template
 #' (see [frequencies_to_stop_times()]), so setting the dwell time at the first

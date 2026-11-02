@@ -15,9 +15,9 @@ knitr::opts_chunk$set(
 
 [![CRAN status](https://www.r-pkg.org/badges/version/gtfstools)](https://CRAN.R-project.org/package=gtfstools)
 [![gtfstools status badge](https://dhersz.r-universe.dev/badges/gtfstools)](https://dhersz.r-universe.dev)
-[![B status](https://github.com/ipea/gtfstools/workflows/check/badge.svg)](https://github.com/ipea/gtfstools/actions?query=workflow%3Acheck)
+[![R-CMD-check](https://github.com/ipea/gtfstools/workflows/check/badge.svg)](https://github.com/ipea/gtfstools/actions?query=workflow%3Acheck)
 [![Codecov test coverage](https://codecov.io/gh/ipeaGIT/gtfstools/branch/main/graph/badge.svg)](https://app.codecov.io/gh/ipeaGIT/gtfstools?branch=main)
-[![Lifecycle: experimental](https://lifecycle.r-lib.org/articles/figures/lifecycle-stable.svg)](https://lifecycle.r-lib.org/articles/stages.html)
+[![Lifecycle: stable](https://lifecycle.r-lib.org/articles/figures/lifecycle-stable.svg)](https://lifecycle.r-lib.org/articles/stages.html)
 [![CRAN/METACRAN Total downloads](http://cranlogs.r-pkg.org/badges/grand-total/gtfstools?color=yellow)](https://CRAN.R-project.org/package=gtfstools)
 
 **gtfstools** offers a set of convenient tools for editing and analysing
@@ -84,9 +84,14 @@ Please read **gtfstools** vignettes for more on the package usage:
 
 ## Related packages
 
-- [`{tidytransit}`](https://github.com/r-transit/tidytransit)
-- [`{gtfs2gps}`](https://github.com/ipea/gtfs2gps)
-- [`{gtfsrouter}`](https://github.com/UrbanAnalyst/gtfsrouter)
+- [`{gtfs2gps}`](https://github.com/ipea/gtfs2gps): Converting public transport data from GTFS format to GPS-like records
+- [`{gtfs2emis}`](https://github.com/ipea/gtfs2emis): Estimating public transport emissions from GTFS data
+- [`{GTFShift}`](https://u-shift.github.io/GTFShift/): Explore and Analyse GTFS with a Focus on Urban Mobility
+- [`{tidytransit}`](https://github.com/r-transit/tidytransit): Read, Validate, Analyze, and Map GTFS Feeds
+- [`{croquis}`](https://github.com/julian-city/croquis/): Interactive way to create and edit GTFS feeds in R
+- [`{gtfsrealtime}`](https://projects.indicatrix.org/gtfsrealtime-r/): Read GTFS-Realtime Files into Data Frames
+- [`{gtfsrouter}`](https://github.com/UrbanAnalyst/gtfsrouter): Routing with GTFS data
+- [`{r5r}`](https://ipea.github.io/r5r/): Rapid Realistic Routing with R5 in R
 
 ## Acknowledgement <a href="https://www.ipea.gov.br"><img align="right" src="man/figures/ipea_logo.png" alt="IPEA" width="300" /></a>
 
