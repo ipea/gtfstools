@@ -39,9 +39,10 @@ Defaults to \code{FALSE}.}
 \item{quiet}{A logical. Whether to hide informative messages. Defaults to
 \code{TRUE}.}
 
-\item{n_threads}{An integer between 1 and the number of cores in the running
-machine. Control how many threads are used during the validation. Defaults
-to 1.}
+\item{n_threads}{An integer. Control how many threads are used during the
+validation. Defaults to 1. Values larger than the number of cores in the
+running machine, or than the number of free R connections, are capped to
+the smaller of these numbers.}
 }
 \value{
 Invisibly returns the normalized path to the directory where the

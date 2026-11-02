@@ -9,6 +9,8 @@ disrespects the GTFS standard to report times as 24:MM:SS in such cases.
 This bug has been fixed.  Now all functions that calculate or change durations
 and speeds now fix these times using a new function `fix_overnight_times()`
 and return correct estimates for overnight trips.
+- `filter_by_weekday()` now warns when the GTFS object has no `calendar` table, instead of silently returning it unchanged. Its documentation now states that services defined only in `calendar_dates` are never related to a weekday (use `filter_by_date()` to consider them).
+- `validate_gtfs()` now raises an error when `n_threads` is not a whole number, as documented, instead of passing it to the validator.
 
 
 ## New features

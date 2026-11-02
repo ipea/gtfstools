@@ -43,6 +43,14 @@ that run on mondays and tuesdays or drop them, depending on the value you
 pass to \code{keep}.
 }
 
+\section{\code{calendar_dates}}{
+Only the weekday columns of the \code{calendar} table are used: services defined
+only in \code{calendar_dates} are never related to a weekday, so they are dropped
+when \code{keep = TRUE} and kept when \code{keep = FALSE}. A GTFS object without a
+\code{calendar} table is returned unchanged, with a warning. To filter by the dates
+in \code{calendar_dates} too, use \code{\link[=filter_by_date]{filter_by_date()}}.
+}
+
 \examples{
 \dontshow{if (requireNamespace("dplyr", quietly = TRUE)) withAutoprint(\{ # examplesIf}
 \dontshow{

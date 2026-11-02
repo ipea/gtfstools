@@ -11,7 +11,7 @@
 #' @param standard_only Whether to write only standard files and fields
 #'   (defaults to `FALSE`, which doesn't drop extra files and fields).
 #' @param as_dir Whether to write the feed as a directory, instead of a `.zip`
-#'   file (defaults to `FALSE`, which means that the field is written as a zip
+#'   file (defaults to `FALSE`, which means that the feed is written as a zip
 #'   file).
 #' @param overwrite Whether to overwrite existing `.zip` file (defaults to
 #'   `TRUE`).
@@ -22,8 +22,8 @@
 #'   larger files. Defaults to 6, which is usually several times faster than 9
 #'   and creates files of very similar size. Ignored when `as_dir = TRUE`.
 #'
-#' @return Invisibly returns the same GTFS object passed to the `gtfs`
-#' parameter.
+#' @return Invisibly returns the GTFS object passed to the `gtfs` parameter, as
+#' a `dt_gtfs` object.
 #'
 #' @family io functions
 #'
