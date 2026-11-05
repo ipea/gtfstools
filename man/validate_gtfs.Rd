@@ -40,9 +40,10 @@ Defaults to \code{FALSE}.}
 \code{TRUE}.}
 
 \item{n_threads}{An integer. Control how many threads are used during the
-validation. Defaults to 1. Values larger than the number of cores in the
-running machine, or than the number of free R connections, are capped to
-the smaller of these numbers.}
+validation. Defaults to 1. Values larger than the number of CPUs available
+to the R session (as reported by \code{\link[parallelly:availableCores]{parallelly::availableCores()}}), or than
+the number of free R connections, are capped to the smaller of these
+numbers.}
 }
 \value{
 Invisibly returns the normalized path to the directory where the
