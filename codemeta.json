@@ -8,7 +8,7 @@
   "codeRepository": "https://github.com/ipea/gtfstools",
   "issueTracker": "https://github.com/ipea/gtfstools/issues",
   "license": "https://spdx.org/licenses/MIT",
-  "version": "2.0.0.9000",
+  "version": "2.0.1.9000",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
