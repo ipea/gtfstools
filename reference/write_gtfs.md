@@ -42,7 +42,7 @@ write_gtfs(
 - as_dir:
 
   Whether to write the feed as a directory, instead of a `.zip` file
-  (defaults to `FALSE`, which means that the field is written as a zip
+  (defaults to `FALSE`, which means that the feed is written as a zip
   file).
 
 - overwrite:
@@ -62,7 +62,8 @@ write_gtfs(
 
 ## Value
 
-Invisibly returns the same GTFS object passed to the `gtfs` parameter.
+Invisibly returns the GTFS object passed to the `gtfs` parameter, as a
+`dt_gtfs` object.
 
 ## See also
 
@@ -82,7 +83,7 @@ list.files(tmp_dir) #'
 tmp_file <- tempfile(pattern = "gtfs", tmpdir = tmp_dir, fileext = ".zip")
 write_gtfs(gtfs, tmp_file)
 list.files(tmp_dir)
-#> [1] "gtfs1f373af93a0d.zip"
+#> [1] "gtfs1f82add9f17.zip"
 
 gtfs_all_files <- read_gtfs(tmp_file)
 names(gtfs_all_files)

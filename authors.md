@@ -36,12 +36,12 @@ Source:
 
 Herszenhut D, Pereira R, Andrade P, Bazzo J (2026). *gtfstools: General
 Transit Feed Specification (GTFS) Editing and Analysing Tools*. R
-package version 2.0.0, <https://ipea.github.io/gtfstools/>.
+package version 2.0.1, <https://ipea.github.io/gtfstools/>.
 
     @Manual{,
       title = {gtfstools: General Transit Feed Specification (GTFS) Editing and Analysing Tools},
       author = {Daniel Herszenhut and Rafael H. M. Pereira and Pedro R. Andrade and Joao Bazzo},
       year = {2026},
-      note = {R package version 2.0.0},
+      note = {R package version 2.0.1},
       url = {https://ipea.github.io/gtfstools/},
     }

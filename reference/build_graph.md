@@ -111,8 +111,13 @@ first, with
 or
 [`filter_by_weekday()`](https://ipea.github.io/gtfstools/reference/filter_by_weekday.md).
 Departures after midnight have times past "24:00:00", so use a time of
-day such as "24:00:00"-"26:00:00" for them. Trips whose times wrongly go
-back to "00:00:00" after midnight are placed by their earliest time.
+day such as "24:00:00"-"26:00:00" for them. Times after midnight written
+as early morning times (e.g. `"00:30:00"` instead of `"24:30:00"`) are
+first fixed with
+[`fix_overnight_times()`](https://ipea.github.io/gtfstools/reference/fix_overnight_times.md),
+as are `end_time`s earlier than `start_time`s in `frequencies`, so these
+trips are placed at their real times. Trips whose times still go back
+are placed by their earliest time.
 
 Within a trip, consecutive `stop_times` entries at the same stop are one
 visit, arriving at their first known time and departing at their last. A

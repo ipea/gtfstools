@@ -101,9 +101,10 @@ an earlier visit.
 
 Negative dwell times (departure earlier than arrival) are raised like
 any other shorter dwell time, so a `min_dwell_time` of 0 raises only
-these. When they come from times after midnight written as `"00:30:00"`
-instead of `"24:30:00"`, the later times of the trip are shifted by
-about a day.
+these. Times after midnight written as early morning times are fixed
+first, as in
+[`set_dwell_time()`](https://ipea.github.io/gtfstools/reference/set_dwell_time.md),
+so they don't result in negative dwell times.
 
 Otherwise it works as
 [`set_dwell_time()`](https://ipea.github.io/gtfstools/reference/set_dwell_time.md).

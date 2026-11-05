@@ -76,8 +76,13 @@ Blank times (`NA` dwell times) can be filled beforehand with
 Negative dwell times (departure earlier than arrival) are returned as
 they are.
 
+Times after midnight written as early morning times (e.g. `"00:30:00"`
+instead of `"24:30:00"`) are fixed with
+[`fix_overnight_times()`](https://ipea.github.io/gtfstools/reference/fix_overnight_times.md)
+before the dwell times are calculated.
+
 `from` and `to` are compared with the `arrival_time` of each visit as
-written in `stop_times` (template times, for trips listed in
+written in `stop_times`, once fixed (template times, for trips listed in
 `frequencies`), so use times past `"24:00:00"` for arrivals after
 midnight. Visits with a blank arrival time are never included when
 `from` or `to` is given.

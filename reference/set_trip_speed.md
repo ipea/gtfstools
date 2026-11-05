@@ -117,9 +117,15 @@ stop), are left unchanged, with a warning if they were given in
 departure at the trip's first stop leaves all the times of the trip
 blank, without a warning.
 
+Times after midnight written as early morning times (e.g. `"00:30:00"`
+instead of `"24:30:00"`) are first fixed with
+[`fix_overnight_times()`](https://ipea.github.io/gtfstools/reference/fix_overnight_times.md)
+in every trip, so the returned GTFS has them fixed (with
+`by_reference = TRUE`, even if an error is then raised).
+
 `from` and `to` are compared with the `departure_time` at `first_stop`
-as written in `stop_times` (template times, for trips listed in
-`frequencies`), so use times past `"24:00:00"` for departures after
+as written in `stop_times`, once fixed (template times, for trips listed
+in `frequencies`), so use times past `"24:00:00"` for departures after
 midnight; trips whose departure there is blank are then left unchanged.
 Existing `_secs` columns in `stop_times` are updated to match.
 

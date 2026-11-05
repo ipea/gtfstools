@@ -78,12 +78,6 @@ time of 30 seconds to allow passengers to board and alight.
 gtfs <- fix_gtfs(gtfs, max_speed = 25, min_dwell_time = 30)
 ```
 
-obs. in this case,
-[`fix_gtfs()`](https://ipea.github.io/gtfstools/reference/fix_gtfs.md)
-throws two warnings that refer to a few late night trips whose times go
-back to “00:00:00” after midnight. These trips depart outside the time
-of day used below, so they don’t affect the network.
-
 ## Building a GMNS network
 
 By default,

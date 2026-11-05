@@ -1,24 +1,67 @@
 # Changelog
 
-## gtfstools (development version)
+## gtfstools v2.0.1
 
 ### Bug fixes
 
 - gtfstools functions now accept `dt_gtfs` objects whose tables were
   turned into tibbles, grouped data frames or plain data frames by other
   packages (e.g. after
-  [`dplyr::group_by()`](https://dplyr.tidyverse.org/reference/group_by.html)),
-  converting them back to `data.table` without modifying the input.
-  [`as_dt_gtfs()`](https://ipea.github.io/gtfstools/reference/as_dt_gtfs.md)
-  does the same conversion. With `by_reference = TRUE`, an object with
-  any such table now raises an informative error, since the edits can’t
-  be made by reference on a converted copy: convert it first with
+  [`dplyr::group_by()`](https://dplyr.tidyverse.org/reference/group_by.html)).
+  With `by_reference = TRUE`, an object with any such table now raises
+  an informative error, since the edits can’t be made by reference on a
+  converted copy: convert it first with
   [`as_dt_gtfs()`](https://ipea.github.io/gtfstools/reference/as_dt_gtfs.md)
   ([\#130](https://github.com/ipea/gtfstools/issues/130), reported by
   [@baarthur](https://github.com/baarthur), who also opened PR
   [\#132](https://github.com/ipea/gtfstools/issues/132)).
+- Several functions that involved estimating trip speed and duration
+  would drop trips that cross midnight if GTFS input had times in
+  00:MM:SS, which disrespects the GTFS standard to report times as
+  24:MM:SS in such cases. This bug has been fixed. Now all functions
+  that calculate or change durations and speeds now fix these times
+  using a new function
+  [`fix_overnight_times()`](https://ipea.github.io/gtfstools/reference/fix_overnight_times.md)
+  and return correct estimates for overnight trips.
+- [`filter_by_weekday()`](https://ipea.github.io/gtfstools/reference/filter_by_weekday.md)
+  now warns when the GTFS object has no `calendar` table, instead of
+  silently returning it unchanged. Its documentation now states that
+  services defined only in `calendar_dates` are never related to a
+  weekday (use
+  [`filter_by_date()`](https://ipea.github.io/gtfstools/reference/filter_by_date.md)
+  to consider them).
+- [`validate_gtfs()`](https://ipea.github.io/gtfstools/reference/validate_gtfs.md)
+  now raises an error when `n_threads` is not a whole number, as
+  documented, instead of passing it to the validator.
 
-## gtfstools v2.0.0
+### New features
+
+- New function
+  [`fix_overnight_times()`](https://ipea.github.io/gtfstools/reference/fix_overnight_times.md)
+  rewrites the times of trips that run past midnight but are written as
+  early morning times (e.g. `"00:30:00"` instead of `"24:30:00"`), as
+  required by the GTFS specification.
+  [`fix_gtfs()`](https://ipea.github.io/gtfstools/reference/fix_gtfs.md)
+  now runs it before capping speeds and filling blank stop times, so
+  these trips are no longer left with blank times.
+- [`interpolate_stop_times()`](https://ipea.github.io/gtfstools/reference/interpolate_stop_times.md)
+  gains `overwrite` and `keep_dwell_times`. With `overwrite = TRUE`, the
+  times of every stop between the first and the last stop of each trip
+  are replaced by interpolated ones, instead of only the blank ones. By
+  default (`keep_dwell_times = TRUE`), these stops keep their original
+  dwell times.
+- [`fix_gtfs()`](https://ipea.github.io/gtfstools/reference/fix_gtfs.md)
+  gains `overwrite_stop_times`. With `overwrite_stop_times = TRUE`, the
+  times of every stop between the first and the last stop of each trip
+  are replaced by interpolated ones, keeping their dwell times, instead
+  of only filling blank times (see
+  [`interpolate_stop_times()`](https://ipea.github.io/gtfstools/reference/interpolate_stop_times.md)).
+- [`set_dwell_time()`](https://ipea.github.io/gtfstools/reference/set_dwell_time.md)
+  gains `strategy`. The default, `"shift_trip_end"`, shifts the later
+  times of the trips, as before. `"keep_total_duration"` splits the
+  change around each intermediate stop, keeping the trip durations.
+
+## gtfstools 2.0.0
 
 CRAN release: 2026-10-28
 
@@ -179,14 +222,15 @@ CRAN release: 2026-10-28
     [`set_trip_speed()`](https://ipea.github.io/gtfstools/reference/set_trip_speed.md)
     does for trips.
   - [`set_dwell_time()`](https://ipea.github.io/gtfstools/reference/set_dwell_time.md),
-    [`set_min_dwell_time()`](https://ipea.github.io/gtfstools/reference/set_min_dwell_time.md)
-    and
+    [`set_min_dwell_time()`](https://ipea.github.io/gtfstools/reference/set_min_dwell_time.md),
     [`set_max_speed()`](https://ipea.github.io/gtfstools/reference/set_max_speed.md)
+    and
+    [`set_min_speed()`](https://ipea.github.io/gtfstools/reference/set_min_speed.md)
     set dwell times, raise dwell times at intermediate stops to a
-    minimum and cap trip speeds, shifting the later times of each trip
-    accordingly. The dwell times can be set within a time of day, and
-    speeds capped only between two stops or for trips departing within a
-    time of day, as in
+    minimum, and cap or raise trip speeds to a maximum or minimum,
+    shifting the later times of each trip accordingly. The dwell times
+    can be set within a time of day, and speeds changed only between two
+    stops or for trips departing within a time of day, as in
     [`set_trip_speed()`](https://ipea.github.io/gtfstools/reference/set_trip_speed.md).
     Like
     [`set_trip_speed()`](https://ipea.github.io/gtfstools/reference/set_trip_speed.md)

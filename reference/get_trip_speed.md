@@ -96,9 +96,12 @@ divided by the duration calculated by
 (with `by = "trip"`) or by
 [`get_trip_segment_duration()`](https://ipea.github.io/gtfstools/reference/get_trip_segment_duration.md)
 (with `by = "segment"`). Speeds are `NA` when the length is `NA` (e.g.
-trips not linked to a shape) or when the duration is missing (e.g. blank
-times at intermediate stops) or not positive. With `by = "trip"`, trips
-without any arrival or departure time raise the warning of
+trips not linked to a shape) or when the duration is missing or not
+positive. With `by = "segment"`, the duration is missing when the
+segment's departure or arrival time is blank. With `by = "trip"`, blank
+times at intermediate stops don't affect the duration, which is missing
+only for trips without any arrival or departure time; these trips raise
+the warning of
 [`get_trip_duration()`](https://ipea.github.io/gtfstools/reference/get_trip_duration.md).
 
 The `route_id` of each trip comes from the `trips` table, which is
@@ -111,7 +114,12 @@ are used as-is, not recalculated from the time strings.
 
 `from` and `to` select the trips (or segments) as in
 [`get_trip_length()`](https://ipea.github.io/gtfstools/reference/get_trip_length.md),
-from the `departure_time` strings, even if `_secs` columns exist.
+from the `departure_time` strings, even if `_secs` columns exist. Times
+after midnight written as early morning times (e.g. `"00:30:00"` instead
+of `"24:30:00"`) are first fixed with
+[`fix_overnight_times()`](https://ipea.github.io/gtfstools/reference/fix_overnight_times.md),
+if `stop_sequence` is an integer column, so lengths, durations and the
+time of day all use the fixed times.
 
 ## See also
 

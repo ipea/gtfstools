@@ -121,9 +121,14 @@ in `NA` lengths for their segments and trips.
 `from` and `to` are compared with the `departure_time` of the first stop
 of each trip (in `stop_sequence` order) or segment, as written in
 `stop_times`, so use times past `"24:00:00"` for departures after
-midnight. For trips listed in `frequencies`, these are template times,
-not the times of each departure. Trips and segments whose departure is
-blank are never included when `from` or `to` is given.
+midnight. With `by = "segment"`, times after midnight written as early
+morning times (e.g. `"00:30:00"` instead of `"24:30:00"`) are first
+fixed with
+[`fix_overnight_times()`](https://ipea.github.io/gtfstools/reference/fix_overnight_times.md);
+a trip's first departure is never changed by it. For trips listed in
+`frequencies`, these are template times, not the times of each
+departure. Trips and segments whose departure is blank are never
+included when `from` or `to` is given.
 
 ## See also
 

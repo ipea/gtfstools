@@ -88,7 +88,12 @@ that this differs from
 which keeps entries whose times are equal to `to`. Departures after
 midnight are listed with times greater than "24:00:00" and belong to the
 previous service day, so a time of day such as "24:00:00"-"26:00:00"
-should be used to account for them.
+should be used to account for them. Times after midnight written as
+early morning times (e.g. `"00:30:00"` instead of `"24:30:00"`), and
+`end_time`s earlier than `start_time`s in `frequencies`, are first fixed
+with
+[`fix_overnight_times()`](https://ipea.github.io/gtfstools/reference/fix_overnight_times.md),
+so these departures are counted at their real times.
 
 The mean headway is the length of the time of day divided by the number
 of departures. It is an average over the whole time of day, so it is

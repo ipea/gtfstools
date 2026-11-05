@@ -53,7 +53,8 @@ The VMT is the vehicle-kilometres travelled calculated by
 [`get_vkt()`](https://ipea.github.io/gtfstools/reference/get_vkt.md),
 converted to international miles (1 mile = 1.609344 km). See
 [`get_vkt()`](https://ipea.github.io/gtfstools/reference/get_vkt.md) for
-how trips, departures, days and trip lengths are counted.
+how trips, departures, days and trip lengths are counted, and how times
+after midnight written as early morning times are fixed.
 
 ## See also
 

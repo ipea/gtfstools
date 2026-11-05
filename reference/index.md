@@ -153,12 +153,16 @@
   : Remove unused ids
 - [`fix_gtfs()`](https://ipea.github.io/gtfstools/reference/fix_gtfs.md)
   : Fix common problems in GTFS feeds
+- [`fix_overnight_times()`](https://ipea.github.io/gtfstools/reference/fix_overnight_times.md)
+  : Fix times after midnight written as early morning times
 - [`set_dwell_time()`](https://ipea.github.io/gtfstools/reference/set_dwell_time.md)
   : Set dwell time
 - [`set_min_dwell_time()`](https://ipea.github.io/gtfstools/reference/set_min_dwell_time.md)
   : Set a minimum dwell time
 - [`set_max_speed()`](https://ipea.github.io/gtfstools/reference/set_max_speed.md)
   : Set trip maximum speed
+- [`set_min_speed()`](https://ipea.github.io/gtfstools/reference/set_min_speed.md)
+  : Set trip minimum speed
 - [`set_route_frequency()`](https://ipea.github.io/gtfstools/reference/set_route_frequency.md)
   : Set route frequency
 - [`set_trip_speed()`](https://ipea.github.io/gtfstools/reference/set_trip_speed.md)

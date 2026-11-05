@@ -1,9 +1,11 @@
 # Set dwell time
 
 Sets the dwell time of each specified `trip_id` at each specified
-`stop_id`, i.e. the time the vehicle stays at the stop, by changing the
-`departure_time` at these stops in `stop_times` and shifting the later
-times of the trips accordingly.
+`stop_id`, i.e. the time the vehicle stays at the stop for passengers to
+board and alight, by changing the times at these stops in `stop_times`.
+By default, the later times of the trips are shifted accordingly.
+Alternatively, the trip durations are kept and the running times between
+stops absorb the change.
 
 ## Usage
 
@@ -12,6 +14,7 @@ set_dwell_time(
   gtfs,
   dwell_time,
   unit = "s",
+  strategy = "shift_trip_end",
   trip_id = NULL,
   stop_id = NULL,
   from = NULL,
@@ -39,6 +42,24 @@ set_dwell_time(
   A string representing the time unit in which `dwell_time` is given.
   One of `"s"` (seconds, the default), `"min"` (minutes), `"h"` (hours)
   or `"d"` (days).
+
+- strategy:
+
+  A string, how the trips absorb the changes in dwell time. One of:
+
+  - `"shift_trip_end"` (the default): keeps the running times between
+    stops and shifts all the later times of the trip, so the arrival at
+    the last stop moves later (or earlier, if dwell times are
+    shortened). It preserves the implicit average speed between stops
+    but changes the trip duration.
+
+  - `"keep_total_duration"`: centres each intermediate stop's dwell on
+    its original time, taking half of the change from the running time
+    before the stop and half from the one after it. The first and last
+    stops are not changed, so the trip keeps its duration, its arrival
+    at the last stop and the implicit average speed between its first
+    and last stops. An error is raised if a running time would become
+    negative.
 
 - trip_id:
 
@@ -86,27 +107,11 @@ invisibly (note that in this case the original GTFS object is altered).
 
 ## Details
 
-The dwell time of a visit is its `departure_time` minus its
-`arrival_time` in `stop_times`, as returned by
-[`get_dwell_time()`](https://ipea.github.io/gtfstools/reference/get_dwell_time.md).
-It is set at the visits of every specified trip to every specified stop
-(not of pairs formed by their elements): the arrival time is kept and
-the departure time is set to the arrival time plus `dwell_time`. All the
-later times of the trip, in `stop_sequence` order, are shifted by the
-change, and changes at several visits of the same trip add up. At a
-trip's last stop, only the departure time changes. A stop visited more
-than once by the same trip has its dwell time set at each visit.
-
-Blank times are never filled. Selected visits with a blank arrival or
-departure time are not changed and don't shift the later times, with a
-warning when `stop_id` is given; fill them beforehand with
-[`interpolate_stop_times()`](https://ipea.github.io/gtfstools/reference/interpolate_stop_times.md).
-An error is raised if a shift would result in a negative time (times not
-in chronological order) or in a time later than `"9999:59:59"`.
-`stop_sequence` is assumed to be unique within each trip and not `NA`.
-When both `trip_id` and `stop_id` are given but none of the trips visits
-any of the stops, a warning is raised and the GTFS is returned
-unchanged.
+The departures of trips listed in `frequencies` are never changed,
+because
+[`frequencies_to_stop_times()`](https://ipea.github.io/gtfstools/reference/frequencies_to_stop_times.md)
+anchors each of them on the first departure of the trip's template.
+Blank arrival or departure times are never filled.
 
 For trips listed in `frequencies`, the times in `stop_times` are a
 template (see
@@ -115,14 +120,21 @@ so setting the dwell time at the first stop only changes how long before
 each departure the vehicle arrives there, while changes at later stops
 lengthen or shorten every departure.
 
+Times after midnight written as early morning times (e.g. `"00:30:00"`
+instead of `"24:30:00"`) are first fixed with
+[`fix_overnight_times()`](https://ipea.github.io/gtfstools/reference/fix_overnight_times.md)
+in every trip, so the returned GTFS has them fixed (with
+`by_reference = TRUE`, even if an error is then raised).
+
 `from` and `to` are compared with the `arrival_time` of each visit as
-written in `stop_times` before any change (template times, for trips
-listed in `frequencies`), so use times past `"24:00:00"` for arrivals
-after midnight. A shift caused by an earlier visit may thus move a
-changed visit out of the time of day, or another visit into it. Visits
-with a blank arrival time are never selected when `from` or `to` is
-given. When the time of day contains no visit of the specified trips to
-the specified stops, the GTFS is returned unchanged.
+written in `stop_times` before any change other than this fix (template
+times, for trips listed in `frequencies`), so use times past
+`"24:00:00"` for arrivals after midnight. A shift caused by an earlier
+visit may thus move a changed visit out of the time of day, or another
+visit into it. Visits with a blank arrival time are never selected when
+`from` or `to` is given. When the time of day contains no visit of the
+specified trips to the specified stops, the GTFS is returned with no
+change other than this fix.
 
 `stop_id`s are matched against the `stop_id`s in `stop_times`, which are
 never stations: to set the dwell times at a station, pass its children
@@ -211,6 +223,26 @@ get_dwell_time(new_gtfs, trip_id = "CPTM L07-0")
 #> 16: CPTM L07-0   18973            16         30
 #> 17: CPTM L07-0   18974            17          0
 #> 18: CPTM L07-0   18975            18          0
+
+# keep the trip duration: the running times between the stops absorb the
+# dwell times, and the arrival at the last stop doesn't change
+new_gtfs <- set_dwell_time(
+  gtfs,
+  trip_id = "CPTM L07-0",
+  dwell_time = 30,
+  strategy = "keep_total_duration"
+)
+new_gtfs$stop_times |>
+  filter(trip_id == "CPTM L07-0") |>
+  tail()
+#>       trip_id arrival_time departure_time stop_id stop_sequence
+#>        <char>       <char>         <char>  <char>         <int>
+#> 1: CPTM L07-0     05:35:45       05:36:15   18926            13
+#> 2: CPTM L07-0     05:43:45       05:44:15   18971            14
+#> 3: CPTM L07-0     05:51:45       05:52:15   18972            15
+#> 4: CPTM L07-0     05:59:45       06:00:15   18973            16
+#> 5: CPTM L07-0     06:07:45       06:08:15   18974            17
+#> 6: CPTM L07-0     06:16:00       06:16:00   18975            18
 
 # original gtfs remains unchanged
 get_dwell_time(gtfs, stop_id = "18960")

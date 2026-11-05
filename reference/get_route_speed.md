@@ -116,7 +116,7 @@ route_speed
 #>    route_id min_speed mean_speed median_speed max_speed     sd_speed
 #>      <char>     <num>      <num>        <num>     <num>        <num>
 #> 1:  2002-10  6.559614   6.559614     6.559614  6.559614           NA
-#> 2: CPTM L07 24.342591  24.342591    24.342591 24.342591 3.552714e-15
+#> 2: CPTM L07 24.342591  24.342591    24.342591 24.342591 6.531585e-14
 
 route_speed <- get_route_speed(gtfs, route_ids, unit = "m/s")
 route_speed

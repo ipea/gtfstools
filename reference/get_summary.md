@@ -148,6 +148,12 @@ The report is saved as `gtfs_summary.md` and `gtfs_summary.html`
 The report requires the `{ggplot2}`, `{knitr}` and `{rmarkdown}`
 packages and [Pandoc](https://pandoc.org/).
 
+Times after midnight written as early morning times (e.g. `"00:30:00"`
+instead of `"24:30:00"`), and `end_time`s earlier than `start_time`s in
+`frequencies`, are first fixed with
+[`fix_overnight_times()`](https://ipea.github.io/gtfstools/reference/fix_overnight_times.md),
+if `stop_sequence` is an integer column.
+
 The time-of-day filter keeps whole trips (as
 [`filter_by_time_of_day()`](https://ipea.github.io/gtfstools/reference/filter_by_time_of_day.md)
 with `full_trips = TRUE`), so trip speeds and lengths refer to whole
