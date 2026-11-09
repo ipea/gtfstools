@@ -2,11 +2,11 @@
 
 Routing and accessibility analyses often combine several GTFS feeds,
 such as those of the different transit agencies of a metropolitan
-region. Routing engines such as [r5r](https://github.com/ipeaGIT/r5r)
-and OpenTripPlanner work on a given departure date, which must have
-service in every feed: otherwise, one of the networks silently drops out
-of the analysis. Feeds are published at different times and cover
-different periods, so such a date is not always easy to find.
+region. Routing engines such as [r5r](https://github.com/ipea/r5r) and
+OpenTripPlanner work on a given departure date, which must have service
+in every feed: otherwise, one of the networks silently drops out of the
+analysis. Feeds are published at different times and cover different
+periods, so such a date is not always easy to find.
 
 [`get_calendar_overlap()`](https://ipea.github.io/gtfstools/dev/reference/get_calendar_overlap.md)
 compares the calendars of several feeds. Besides the feeds, it has only

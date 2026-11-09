@@ -65,9 +65,11 @@ validate_gtfs(
 - n_threads:
 
   An integer. Control how many threads are used during the validation.
-  Defaults to 1. Values larger than the number of cores in the running
-  machine, or than the number of free R connections, are capped to the
-  smaller of these numbers.
+  Defaults to 1. Values larger than the number of CPUs available to the
+  R session (as reported by
+  [`parallelly::availableCores()`](https://parallelly.futureverse.org/reference/availableCores.html)),
+  or than the number of free R connections, are capped to the smaller of
+  these numbers.
 
 ## Value
 

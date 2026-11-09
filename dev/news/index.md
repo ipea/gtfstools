@@ -2,6 +2,10 @@
 
 ## gtfstools (development version)
 
+## gtfstools v2.0.1
+
+CRAN release: 2026-11-05
+
 ### Bug fixes
 
 - gtfstools functions now accept `dt_gtfs` objects whose tables were
